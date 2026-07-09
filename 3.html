@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Artikel hinzufügen</title>
+
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+
+body{
+
+background:#fff3e6;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+
+
+.box{
+
+background:white;
+width:400px;
+padding:30px;
+border-radius:20px;
+box-shadow:0 5px 20px #aaa;
+
+}
+
+
+
+h1{
+
+text-align:center;
+color:#ff8c00;
+margin-bottom:20px;
+
+}
+
+
+
+input, textarea, select{
+
+width:100%;
+padding:12px;
+margin-top:12px;
+border-radius:10px;
+border:1px solid #ccc;
+font-size:16px;
+
+}
+
+
+
+textarea{
+
+height:100px;
+resize:none;
+
+}
+
+
+
+button{
+
+width:100%;
+margin-top:20px;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#ff8c00;
+color:white;
+font-size:17px;
+cursor:pointer;
+
+}
+
+
+
+.back{
+
+position:absolute;
+top:20px;
+left:20px;
+width:45px;
+height:45px;
+border-radius:50%;
+background:#ff8c00;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-size:22px;
+
+}
+
+
+
+#preview{
+
+display:none;
+width:120px;
+height:120px;
+object-fit:cover;
+margin-top:15px;
+border-radius:10px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="back" onclick="back()">
+⬅
+</div>
+
+
+
+
+<div class="box">
+
+
+<h1>
+Artikel hinzufügen
+</h1>
+
+
+
+<input 
+type="file" 
+accept="image/*"
+onchange="uploadImage(event)"
+>
+
+
+
+<img id="preview">
+
+
+
+<input 
+id="name"
+placeholder="Artikelname"
+>
+
+
+
+<textarea 
+id="description"
+placeholder="Beschreibung">
+</textarea>
+
+
+
+<input 
+id="mail"
+placeholder="E-Mail Verkäufer"
+>
+
+
+
+<select id="country">
+
+<option>Deutschland</option>
+<option>Österreich</option>
+<option>Schweiz</option>
+<option>Frankreich</option>
+<option>Italien</option>
+
+</select>
+
+
+
+<select id="condition">
+
+<option>Neu</option>
+<option>Gebraucht</option>
+
+</select>
+
+
+
+<input 
+id="price"
+type="number"
+placeholder="Preis €"
+>
+
+
+
+<button onclick="saveArticle()">
+Artikel speichern
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+let imageData="";
+
+
+
+// Bild laden
+
+function uploadImage(event){
+
+
+let file =
+event.target.files[0];
+
+
+let reader =
+new FileReader();
+
+
+
+reader.onload=function(){
+
+
+imageData=reader.result;
+
+
+let img =
+document.getElementById("preview");
+
+
+img.src=imageData;
+
+img.style.display="block";
+
+
+}
+
+
+
+reader.readAsDataURL(file);
+
+
+
+}
+
+
+
+
+// Speichern
+
+function saveArticle(){
+
+
+let name =
+document.getElementById("name").value;
+
+
+let description =
+document.getElementById("description").value;
+
+
+let mail =
+document.getElementById("mail").value;
+
+
+let country =
+document.getElementById("country").value;
+
+
+let condition =
+document.getElementById("condition").value;
+
+
+let price =
+document.getElementById("price").value;
+
+
+
+
+if(
+name==="" ||
+description==="" ||
+mail==="" ||
+price===""
+){
+
+alert("Bitte alle Felder ausfüllen!");
+
+return;
+
+}
+
+
+
+
+let articles =
+JSON.parse(
+localStorage.getItem("articles")
+) || [];
+
+
+
+
+
+articles.push({
+
+image:imageData,
+name:name,
+description:description,
+mail:mail,
+country:country,
+condition:condition,
+price:price
+
+});
+
+
+
+
+
+localStorage.setItem(
+"articles",
+JSON.stringify(articles)
+);
+
+
+
+alert("Artikel wurde hinzugefügt!");
+
+
+
+window.location.href="index.html";
+
+
+}
+
+
+
+
+function back(){
+
+window.location.href="index.html";
+
+}
+
+
+
+</script>
+
+
+
+</body>
+</html>
