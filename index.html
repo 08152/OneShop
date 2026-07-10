@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Offline JSON KI</title>
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh}
+.chat{width:min(900px,95vw);height:90vh;background:#1e293b;border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+header{padding:15px;background:#111827}
+#chat{flex:1;padding:20px;overflow:auto}
+.msg{padding:12px 16px;border-radius:14px;margin:10px 0;max-width:75%}
+.ai{background:#334155}
+.user{background:#2563eb;margin-left:auto}
+footer{display:flex;padding:15px;gap:10px;background:#111827}
+input{flex:1;padding:12px;border-radius:12px;border:none}
+button{padding:12px 18px;border:none;border-radius:12px;background:#2563eb;color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="chat">
+<header>🤖 Offline JSON KI</header>
+<div id="chat">
+<div class="msg ai">Willkommen! Passe diese Vorlage nach Wunsch an.</div>
+</div>
+<footer>
+<input id="input" placeholder="Nachricht...">
+<button onclick="send()">Senden</button>
+</footer>
+</div>
+<script>
+function send(){
+const i=document.getElementById('input');
+if(!i.value.trim())return;
+const c=document.getElementById('chat');
+c.innerHTML+=`<div class="msg user">${i.value}</div>`;
+c.innerHTML+=`<div class="msg ai">Dies ist eine Vorlage. Hier kannst du deine KI-Logik einbauen.</div>`;
+i.value="";
+c.scrollTop=c.scrollHeight;
+}
+</script>
+</body>
+</html>
