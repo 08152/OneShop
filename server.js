@@ -1,18 +1,36 @@
 const express = require("express");
-const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Statische Dateien bereitstellen
-app.use(express.static(path.join(__dirname)));
+app.use(express.json());
 
-// Startseite
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+let wissen = require("./wissen.json");
+
+
+app.post("/frage",(req,res)=>{
+
+let frage=req.body.frage.toLowerCase();
+
+let antwort="Keine Antwort gefunden";
+
+
+for(let eintrag of wissen){
+
+if(frage.includes(eintrag.frage)){
+antwort=eintrag.antwort;
+break;
+}
+
+}
+
+
+res.json({
+antwort:antwort
 });
 
-// Server starten
-app.listen(PORT, () => {
-    console.log(`OrangeShop läuft auf Port ${PORT}`);
+});
+
+
+app.listen(3000,()=>{
+console.log("KI Server läuft");
 });
