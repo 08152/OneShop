@@ -1,268 +1,211 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Offline HTML KI</title>
+
+<title>Code KI</title>
 
 <style>
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
+box-sizing:border-box;
 }
 
 body{
-    background:#202123;
-    color:#fff;
-    display:flex;
-    flex-direction:column;
-    height:100vh;
+margin:0;
+background:#202123;
+color:white;
+font-family:Arial, sans-serif;
 }
 
-header{
-    background:#343541;
-    padding:18px;
-    text-align:center;
-    font-size:24px;
-    font-weight:bold;
-    border-bottom:1px solid #555;
+.container{
+max-width:900px;
+margin:auto;
+padding:20px;
 }
 
-#chat{
-    flex:1;
-    overflow-y:auto;
-    padding:20px;
+h1{
+text-align:center;
 }
 
-.msg{
-    max-width:85%;
-    padding:14px;
-    margin:10px 0;
-    border-radius:12px;
-    line-height:1.6;
-    white-space:pre-wrap;
-    word-wrap:break-word;
-}
-
-.user{
-    background:#19c37d;
-    color:#000;
-    margin-left:auto;
-}
-
-.bot{
-    background:#444654;
-}
-
-footer{
-    display:flex;
-    gap:10px;
-    padding:15px;
-    background:#343541;
-}
-
-input{
-    flex:1;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    font-size:16px;
-    outline:none;
+textarea{
+width:100%;
+height:150px;
+background:#111;
+color:white;
+border:1px solid #555;
+border-radius:10px;
+padding:15px;
+font-size:17px;
+resize:none;
 }
 
 button{
-    background:#19c37d;
-    border:none;
-    padding:14px 22px;
-    border-radius:10px;
-    font-size:16px;
-    cursor:pointer;
-    font-weight:bold;
+margin-top:15px;
+width:100%;
+padding:15px;
+background:#00a67e;
+color:white;
+border:none;
+border-radius:10px;
+font-size:18px;
+cursor:pointer;
 }
 
 button:hover{
-    background:#16a56b;
+background:#008f6a;
 }
+
+pre{
+margin-top:20px;
+background:#000;
+color:#00ff99;
+padding:20px;
+border-radius:10px;
+min-height:200px;
+white-space:pre-wrap;
+font-family:monospace;
+}
+
+.status{
+text-align:center;
+margin-top:10px;
+color:#aaa;
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>🤖 Offline HTML KI</header>
 
-<div id="chat">
-    <div class="msg bot">
-Hallo! 👋
+<div class="container">
 
-Ich bin deine Offline-KI.
+<h1>🤖 Meine Code KI</h1>
 
-Mein Wissen lade ich aus der Datei <b>1.json</b>.
+<textarea 
+id="frage"
+placeholder="Beschreibe deinen Code-Wunsch...">
+</textarea>
 
-Ich kann Fragen zu HTML, CSS und JavaScript beantworten.
-    </div>
+
+<button onclick="startKI()">
+Code erstellen
+</button>
+
+
+<div class="status" id="status">
+Bereit
 </div>
 
-<footer>
-<input
-id="frage"
-placeholder="Frage zu HTML, CSS oder JavaScript..."
-onkeydown="if(event.key==='Enter') senden();">
 
-<button onclick="senden()">Senden</button>
-</footer>
+<pre id="antwort">
+Hier erscheint nur Code...
+</pre>
+
+
+</div>
+
+
 
 <script>
 
-let wissen=[];
 
-fetch("1.json")
-.then(r=>r.json())
-.then(data=>{
-    wissen=data;
-})
-.catch(()=>{
-    chat.innerHTML+=`
-    <div class="msg bot">
-    Fehler:
-    Die Datei <b>1.json</b> konnte nicht geladen werden.
-    </div>`;
-});
+async function startKI(){
 
-const chat=document.getElementById("chat");
 
-function neueNachricht(text,klasse){
+let frage =
+document.getElementById("frage").value;
 
-const div=document.createElement("div");
-div.className="msg "+klasse;
-div.innerHTML=text;
-chat.appendChild(div);
 
-chat.scrollTop=chat.scrollHeight;
+let antwort =
+document.getElementById("antwort");
 
+
+let status =
+document.getElementById("status");
+
+
+if(frage.trim()==""){
+antwort.textContent="Bitte eine Frage eingeben.";
+return;
 }
 
-function senden(){
 
-const input=document.getElementById("frage");
+status.textContent="KI arbeitet...";
 
-let frage=input.value.trim();
 
-if(frage==="") return;
+antwort.textContent="";
 
-neueNachricht(frage,"user");
 
-input.value="";
+try{
 
-antwort(frage);
 
+let res = await fetch(
+"https://oneshop-1.onrender.com/frage",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(
+{
+frage:frage
 }
-
-function antwort(frage){
-
-frage=frage.toLowerCase();
-
-let besteAntwort=null;
-let punkte=0;
-for (const eintrag of wissen) {
-
-    let score = 0;
-
-    if (eintrag.frage) {
-
-        const begriffe = eintrag.frage
-            .toLowerCase()
-            .split(/[\s,;]+/);
-
-        for (const wort of begriffe) {
-
-            if (frage.includes(wort) && wort.length > 1) {
-                score++;
-            }
-
-        }
-
-    }
-
-    if (score > punkte) {
-        punkte = score;
-        besteAntwort = eintrag;
-    }
-
-}
-
-if (besteAntwort) {
-
-    neueNachricht(besteAntwort.antwort, "bot");
-
-} else {
-
-    let gefunden = [];
-
-    for (const eintrag of wissen) {
-
-        if (!eintrag.frage) continue;
-
-        const begriffe = eintrag.frage
-            .toLowerCase()
-            .split(/[\s,;]+/);
-
-        for (const wort of begriffe) {
-
-            if (
-                wort.startsWith(frage.substring(0,3)) ||
-                frage.startsWith(wort.substring(0,3))
-            ) {
-
-                gefunden.push(eintrag.antwort);
-                break;
-
-            }
-
-        }
-
-    }
-
-    if (gefunden.length > 0) {
-
-        neueNachricht(
-            gefunden.slice(0,3).join("<hr>"),
-            "bot"
-        );
-
-    } else {
-
-        neueNachricht(
-            "Dazu habe ich in meiner Datei <b>1.json</b> leider kein Wissen gefunden.",
-            "bot"
-        );
-
-    }
-
-}
-}
-
-document.getElementById("frage").focus();
-
-document.getElementById("frage").addEventListener("input", function(){
-
-    if(this.value.length > 300){
-        this.value = this.value.substring(0,300);
-    }
+)
 
 });
 
-window.addEventListener("load",()=>{
 
-    neueNachricht(
-        "✅ Offline-KI bereit.<br>Ich beantworte Fragen anhand der Datei <b>1.json</b>.",
-        "bot"
-    );
+let daten = await res.json();
 
-});
+
+if(daten.antwort){
+
+antwort.textContent=daten.antwort;
+
+}
+
+else{
+
+antwort.textContent=
+"Keine Antwort vom KI-Server.";
+
+}
+
+
+status.textContent="Fertig";
+
+
+}
+
+catch(error){
+
+
+status.textContent="Fehler";
+
+
+antwort.textContent=
+"Server nicht erreichbar.\n\n"+
+error;
+
+
+}
+
+
+}
+
+
 
 </script>
+
 
 </body>
 </html>
