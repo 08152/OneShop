@@ -3,105 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Zoom-Alternative</title>
-    <!-- Jitsi Meet externe API laden -->
-    <script src="https://jit.si"></script>
+    <title>Echte Instrumente - KI Beat Generator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #1a1a1a;
-            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #11141a;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
+            margin: 0;
         }
-        #setup-container {
-            margin-top: 50px;
+        .container {
+            background: #1b202c;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-align: center;
-            background: #2a2a2a;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 350px;
+            border: 1px solid #2d3548;
         }
-        input, button {
-            padding: 10px 15px;
-            font-size: 16px;
-            margin: 10px;
-            border-radius: 4px;
-            border: none;
-        }
-        input {
-            width: 250px;
-        }
+        h2 { margin-top: 0; color: #00f5ff; font-size: 24px; }
         button {
-            background-color: #0e71eb;
+            background: #00adb5;
             color: white;
-            cursor: pointer;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
             font-weight: bold;
-        }
-        button:hover {
-            background-color: #0b5cb8;
-        }
-        #meet-container {
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px 0;
             width: 100%;
-            flex-grow: 1;
-            display: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 173, 181, 0.3);
+        }
+        button:hover:not(:disabled) { 
+            background: #00f5ff; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 245, 255, 0.4);
+        }
+        button:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .stop-btn { background: #ff4141; box-shadow: 0 4px 12px rgba(255, 65, 65, 0.3); }
+        .stop-btn:hover:not(:disabled) { 
+            background: #ff6b6b; 
+            box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
+        }
+        .info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a0aec0;
+            background: #11141a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #2d3548;
+            line-height: 1.5;
+        }
+        .loader {
+            color: #00adb5;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- Startbildschirm zur Raumeingabe -->
-    <div id="setup-container">
-        <h2>Videokonferenz starten</h2>
-        <p>Geben Sie einen Raumnamen ein, um ein Meeting zu starten oder beizutreten:</p>
-        <input type="text" id="room-name" placeholder="z. B. mein-super-meeting-123">
-        <br>
-        <button onclick="startMeeting()">Meeting beitreten</button>
-    </div>
+<div class="container">
+    <h2>Real Drum KI</h2>
+    <p style="color: #a0aec0; font-size: 14px; margin-bottom: 20px;">Generiert Rhythmen aus echten CC0-Studioaufnahmen.</p>
+    
+    <button id="startBtn" onclick="startBeat()" disabled><span class="loader">Lade echte Instrumente...</span></button>
+    <button id="stopBtn" class="stop-btn" onclick="stopBeat()" style="display:none;">Stop</button>
+    
+    <div class="info" id="status">Warte auf Audio-Samples...</div>
+</div>
 
-    <!-- Container für das Videobild -->
-    <div id="meet-container"></div>
+<script>
+// Web Audio Context initialisieren
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
 
-    <script>
-        function startMeeting() {
-            const roomInput = document.getElementById('room-name').value.trim();
-            if (!roomInput) {
-                alert('Bitte geben Sie einen Raumnamen ein!');
-                return;
-            }
+let isPlaying = false;
+let currentStep = 0;
+let nextNoteTime = 0.0;
+let timerId = null;
 
-            // Sicherstellen, dass der Raumname URL-konform ist
-            const cleanRoomName = encodeURIComponent(roomInput);
+// Parameter der KI
+let bpm = 95;
+let kickPattern = [];
+let snarePattern = [];
+let hatPattern = [];
 
-            // Interface anpassen
-            document.getElementById('setup-container').style.display = 'none';
-            const container = document.getElementById('meet-container');
-            container.style.display = 'block';
+// Audio-Buffer für die echten Instrumente
+const buffers = { kick: null, snare: null, hat: null };
 
-            // Jitsi Meet Optionen konfigurieren
-            const domain = "meet.jit.si";
-            const options = {
-                roomName: cleanRoomName,
-                width: "100%",
-                height: "100%",
-                parentNode: container,
-                lang: "de",
-                interfaceConfigOverwrite: {
-                    // Hier können Sie UI-Elemente anpassen falls gewünscht
-                },
-                configOverwrite: {
-                    startWithAudioMuted: false,
-                    startWithVideoMuted: false
-                }
-            };
+// CC0 Audio-Dateien von echten Instrumenten (gehostet auf Archive.org)
+const SAMPLE_URLS = {
+    kick: 'https://archive.org',
+    snare: 'https://archive.org',
+    hat: 'https://archive.org'
+};
 
-            // Meeting instanziieren
-            const api = new JitsiMeetExternalAPI(domain, options);
+// Samples beim Laden der Seite im Hintergrund herunterladen
+async function loadSamples() {
+    audioCtx = new AudioContext();
+    try {
+        for (const [key, url] of Object.entries(SAMPLE_URLS)) {
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            buffers[key] = await audioCtx.decodeAudioData(arrayBuffer);
         }
-    </script>
+        // Button freischalten, wenn alles geladen ist
+        document.getElementById("startBtn").disabled = false;
+        document.getElementById("startBtn").innerText = "Zufälligen Beat starten";
+        document.getElementById("status").innerText = "Echte Samples geladen! Bereit zum Würfeln.";
+    } catch (error) {
+        document.getElementById("status").innerHTML = "<span style='color:#ff4141;'>Fehler beim Laden der Audio-Dateien. Bitte Seite neu laden oder Internetverbindung prüfen.</span>";
+        console.error("Fehler beim Laden:", error);
+    }
+}
+
+// Startet das Laden direkt beim Seitenaufruf
+window.addEventListener('DOMContentLoaded', loadSamples);
+
+// Spielt ein geladenes Instrumenten-Sample zu einer exakten Zeit ab
+function playSample(buffer, time) {
+    if (!buffer) return;
+    let source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start(time);
+}
+
+// KI-Algorithmus gewichtet die Rhythmen logisch
+function generateRandomPatterns() {
+    bpm = Math.floor(Math.random() * (125 - 80 + 1)) + 80;
+    
+    // Mathematische Wahrscheinlichkeiten für echten Groove (16 Schritte)
+    kickPattern = Array.from({length: 16}, (_, i) => i % 4 === 0 ? (Math.random() < 0.85) : (Math.random() < 0.15));
+    snarePattern = Array.from({length: 16}, (_, i) => i % 8 === 4 ? (Math.random() < 0.90) : (Math.random() < 0.10));
+    hatPattern = Array.from({length: 16}, (_, i) => i % 2 === 0 ? (Math.random() < 0.80) : (Math.random() < 0.40));
+}
+
+// Der mathematische Takt-Scheduler für fehlerfreies Timing
+function scheduler() {
+    while (nextNoteTime < audioCtx.currentTime + 0.1) {
+        scheduleNote(currentStep, nextNoteTime);
+        advanceNote();
+    }
+    timerId = setTimeout(scheduler, 25.0);
+}
+
+function scheduleNote(step, time) {
+    if (kickPattern[step]) playSample(buffers.kick, time);
+    if (snarePattern[step]) playSample(buffers.snare, time);
+    if (hatPattern[step]) playSample(buffers.hat, time);
+}
+
+function advanceNote() {
+    let secondsPerBeat = 60.0 / bpm;
+    let secondsPerStep = secondsPerBeat / 4; // 16tel Note
+    nextNoteTime += secondsPerStep;
+    currentStep = (currentStep + 1) % 16;
+}
+
+// Kontroll-Funktionen
+function startBeat() {
+    // Falls der AudioContext im Ruhezustand war (Browser-Sicherheit)
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    if (isPlaying) {
+        generateRandomPatterns();
+        document.getElementById("status").innerHTML = `KI würfelt neu...<br><b>Tempo:</b> ${bpm} BPM`;
+        return;
+    }
+    
+    isPlaying = true;
+    currentStep = 0;
+    nextNoteTime = audioCtx.currentTime;
+    
+    generateRandomPatterns();
+    scheduler();
+
+    document.getElementById("startBtn").innerText = "Neuen Beat würfeln";
+    document.getElementById("stopBtn").style.display = "block";
+    document.getElementById("status").innerHTML = `<b>Status:</b> Spielt...<br><b>Tempo:</b> ${bpm} BPM`;
+}
+
+function stopBeat() {
+    isPlaying = false;
+    clearTimeout(timerId);
+    
+    document.getElementById("startBtn").innerText = "Zufälligen Beat starten";
+    document.getElementById("stopBtn").style.display = "none";
+    document.getElementById("status").innerText = "Gestoppt. Klicke auf Start für einen neuen Beat.";
+}
+</script>
+
 </body>
 </html>
