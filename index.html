@@ -3,41 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Benachrichtigung Test</title>
+
+<title>Secure Notification</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    width: 350px;
+    background: #1c1c1c;
+    border-radius: 25px;
+    padding: 40px;
+    text-align: center;
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+}
+
+.yellow-circle {
+    width: 170px;
+    height: 170px;
+    background: #ffd400;
+    border-radius: 50%;
+
+    margin: auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.red-circle {
+    width:120px;
+    height:120px;
+    background:#e53935;
+    border-radius:50%;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:25px;
+    font-weight:bold;
+}
+
+button {
+    margin-top:20px;
+
+    background:#ffd400;
+    color:black;
+
+    border:0;
+    border-radius:12px;
+
+    padding:15px 25px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+}
+</style>
+
 </head>
 
-<body style="font-family:Arial;text-align:center;padding-top:100px;background:#222;color:white;">
+<body>
 
-<h1>Notification Test</h1>
+<div class="card">
 
-<button onclick="benachrichtigung()">
-    Popups erlauben
+<div class="yellow-circle">
+    <div class="red-circle">
+        Sicher
+    </div>
+</div>
+
+<h1>Secure System</h1>
+
+<p id="status">
+Benachrichtigungen deaktiviert
+</p>
+
+<button onclick="startSystem()">
+Benachrichtigungen erlauben
 </button>
 
+</div>
+
+
 <script>
-function benachrichtigung() {
 
-    if (!("Notification" in window)) {
-        alert("Dieser Browser unterstützt keine Benachrichtigungen.");
-        return;
-    }
+function popup(){
 
-    Notification.requestPermission().then(permission => {
+    new Notification("Hi",{
+        body:"Automatische Sicherheitsmeldung",
+        icon:"https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
+    });
 
-        if (permission === "granted") {
+}
 
-            new Notification("Hi", {
-                body: "Das ist eine echte Browser-Benachrichtigung!",
-                icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
-            });
+
+function startSystem(){
+
+    Notification.requestPermission().then(permission=>{
+
+        if(permission==="granted"){
+
+            document.getElementById("status").innerHTML =
+            "Trojaner entdeckt";
+
+            // Erstes Popup nach 10 Minuten
+            setInterval(()=>{
+                popup();
+            },3);
 
         } else {
-            alert("Benachrichtigungen wurden abgelehnt.");
+
+            document.getElementById("status").innerHTML =
+            "❌ Keine Erlaubnis";
+
         }
 
     });
 
 }
+
 </script>
 
 </body>
