@@ -1,146 +1,107 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Secure Notification</title>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    min-height: 100vh;
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.card {
-    width: 350px;
-    background: #1c1c1c;
-    border-radius: 25px;
-    padding: 40px;
-    text-align: center;
-
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-}
-
-.yellow-circle {
-    width: 170px;
-    height: 170px;
-    background: #ffd400;
-    border-radius: 50%;
-
-    margin: auto;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.red-circle {
-    width:120px;
-    height:120px;
-    background:#e53935;
-    border-radius:50%;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    font-size:25px;
-    font-weight:bold;
-}
-
-button {
-    margin-top:20px;
-
-    background:#ffd400;
-    color:black;
-
-    border:0;
-    border-radius:12px;
-
-    padding:15px 25px;
-
-    font-size:18px;
-    font-weight:bold;
-
-    cursor:pointer;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine Zoom-Alternative</title>
+    <!-- Jitsi Meet externe API laden -->
+    <script src="https://jit.si"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        #setup-container {
+            margin-top: 50px;
+            text-align: center;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        input, button {
+            padding: 10px 15px;
+            font-size: 16px;
+            margin: 10px;
+            border-radius: 4px;
+            border: none;
+        }
+        input {
+            width: 250px;
+        }
+        button {
+            background-color: #0e71eb;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0b5cb8;
+        }
+        #meet-container {
+            width: 100%;
+            flex-grow: 1;
+            display: none;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="card">
-
-<div class="yellow-circle">
-    <div class="red-circle">
-        Sicher
+    <!-- Startbildschirm zur Raumeingabe -->
+    <div id="setup-container">
+        <h2>Videokonferenz starten</h2>
+        <p>Geben Sie einen Raumnamen ein, um ein Meeting zu starten oder beizutreten:</p>
+        <input type="text" id="room-name" placeholder="z. B. mein-super-meeting-123">
+        <br>
+        <button onclick="startMeeting()">Meeting beitreten</button>
     </div>
-</div>
 
-<h1>Secure System</h1>
+    <!-- Container für das Videobild -->
+    <div id="meet-container"></div>
 
-<p id="status">
-Benachrichtigungen deaktiviert
-</p>
+    <script>
+        function startMeeting() {
+            const roomInput = document.getElementById('room-name').value.trim();
+            if (!roomInput) {
+                alert('Bitte geben Sie einen Raumnamen ein!');
+                return;
+            }
 
-<button onclick="startSystem()">
-Benachrichtigungen erlauben
-</button>
+            // Sicherstellen, dass der Raumname URL-konform ist
+            const cleanRoomName = encodeURIComponent(roomInput);
 
-</div>
+            // Interface anpassen
+            document.getElementById('setup-container').style.display = 'none';
+            const container = document.getElementById('meet-container');
+            container.style.display = 'block';
 
+            // Jitsi Meet Optionen konfigurieren
+            const domain = "meet.jit.si";
+            const options = {
+                roomName: cleanRoomName,
+                width: "100%",
+                height: "100%",
+                parentNode: container,
+                lang: "de",
+                interfaceConfigOverwrite: {
+                    // Hier können Sie UI-Elemente anpassen falls gewünscht
+                },
+                configOverwrite: {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: false
+                }
+            };
 
-<script>
-
-function popup(){
-
-    new Notification("trojaner gefunden",{
-        body:"Automatische Sicherheitsmeldung",
-        icon:"https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
-    });
-
-}
-
-
-function startSystem(){
-
-    Notification.requestPermission().then(permission=>{
-
-        if(permission==="granted"){
-
-            document.getElementById("status").innerHTML =
-            "✅ Aktiv - Meldung alle 600 Sekunden";
-
-            // Erstes Popup nach 10 Minuten
-            setInterval(()=>{
-                popup();
-            },6000);
-
-        } else {
-
-            document.getElementById("status").innerHTML =
-            "❌ Keine Erlaubnis";
-
+            // Meeting instanziieren
+            const api = new JitsiMeetExternalAPI(domain, options);
         }
-
-    });
-
-}
-
-</script>
-
+    </script>
 </body>
 </html>
