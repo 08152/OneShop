@@ -1,170 +1,114 @@
+// GhostChat - kleiner WhatsApp-Klon
+// Server.js für Render
+
 const express = require("express");
-const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
+const path = require("path");
 
 const app = express();
+const server = http.createServer(app);
 
-
-// Erlaubt Anfragen von deiner HTML-Datei
-app.use(cors());
-
-
-// JSON erlauben
-app.use(express.json());
-
-
-// Startseite
-app.get("/", (req, res) => {
-    res.send("🤖 Code KI Server läuft!");
-});
-
-
-// Wissensdaten
-let wissen = [
-    {
-        frage: "button",
-        antwort: `<button>Klick mich</button>
-
-<style>
-button{
-padding:15px;
-background:blue;
-color:white;
-border:none;
-border-radius:10px;
-}
-</style>`
-    },
-
-    {
-        frage: "html seite",
-        antwort: `<!DOCTYPE html>
-<html>
-<body>
-
-<h1>Meine Seite</h1>
-
-</body>
-</html>`
-    },
-
-    {
-        frage: "spiel",
-        antwort: `<canvas id="game"></canvas>
-
-<script>
-let canvas=document.getElementById("game");
-let ctx=canvas.getContext("2d");
-
-ctx.fillStyle="green";
-ctx.fillRect(50,50,100,100);
-<\/script>`
-    },
-
-    {
-        frage: "rechnung",
-        antwort: `<script>
-let a=10;
-let b=5;
-
-console.log(a+b);
-<\/script>`
+const io = new Server(server, {
+    cors: {
+        origin: "*"
     }
-];
-
-
-// KI Anfrage
-app.post("/frage", (req,res)=>{
-
-
-let frage = req.body.frage;
-
-
-if(!frage){
-
-return res.json({
-antwort:"Keine Frage erhalten."
 });
-
-}
-
-
-frage = frage.toLowerCase();
-
-
-let beste = null;
-
-
-// Suche nach passender Antwort
-
-for(let eintrag of wissen){
-
-if(frage.includes(eintrag.frage)){
-
-beste = eintrag.antwort;
-break;
-
-}
-
-}
-
-
-// Wenn nichts gefunden
-
-if(!beste){
-
-beste = 
-`<!-- KI Vorschlag -->
-
-<!DOCTYPE html>
-<html>
-
-<head>
-
-<style>
-
-body{
-font-family:Arial;
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-<h1>Neues Projekt</h1>
-
-
-</body>
-
-</html>`;
-
-}
-
-
-// Antwort senden
-
-res.json({
-
-antwort:beste
-
-});
-
-
-});
-
-
-
-// Render Port
 
 const PORT = process.env.PORT || 3000;
 
 
-app.listen(PORT,()=>{
+// Dateien aus public laden
+app.use(express.static(path.join(__dirname, "public")));
 
-console.log(
-"KI Server läuft auf Port " + PORT
-);
+
+// Test-Seite
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
+// Aktive Nutzer speichern
+let users = {};
+
+
+// Wenn ein Nutzer verbindet
+io.on("connection", (socket) => {
+
+    console.log("Neuer Nutzer verbunden:", socket.id);
+
+
+    // Nutzer anmelden
+    socket.on("join", (username) => {
+
+        users[socket.id] = {
+            name: username
+        };
+
+        console.log(username + " ist online");
+
+        io.emit("users", getUsers());
+    });
+
+
+
+    // Nachricht senden
+    socket.on("message", (data) => {
+
+        const user = users[socket.id];
+
+        if (!user) return;
+
+
+        const message = {
+            username: user.name,
+            text: data.text,
+            time: new Date().toLocaleTimeString()
+        };
+
+
+        // Nachricht an alle senden
+        io.emit("message", message);
+
+    });
+
+
+
+    // Nutzer trennt Verbindung
+    socket.on("disconnect", () => {
+
+        if(users[socket.id]){
+
+            console.log(
+                users[socket.id].name + " ist offline"
+            );
+
+            delete users[socket.id];
+
+            io.emit("users", getUsers());
+
+        }
+
+    });
+
+});
+
+
+
+// Nutzerliste
+function getUsers(){
+
+    return Object.values(users);
+
+}
+
+
+
+// Server starten
+server.listen(PORT, () => {
+
+    console.log(
+        "GhostChat läuft auf Port " + PORT
+    );
 
 });
