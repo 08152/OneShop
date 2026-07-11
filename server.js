@@ -1,5 +1,5 @@
-// GhostChat - kleiner WhatsApp-Klon
-// Server.js für Render
+// GhostChat - kleiner WhatsApp Klon
+// Render kompatibel
 
 const express = require("express");
 const http = require("http");
@@ -18,89 +18,94 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 
 
-// Dateien aus public laden
-app.use(express.static(path.join(__dirname, "public")));
+// HTML Dateien aus dem Hauptordner laden
+app.use(express.static(__dirname));
 
 
-// Test-Seite
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 
-// Aktive Nutzer speichern
+// Nutzer speichern
 let users = {};
 
 
-// Wenn ein Nutzer verbindet
+// Verbindung
 io.on("connection", (socket) => {
 
-    console.log("Neuer Nutzer verbunden:", socket.id);
+    console.log("Nutzer verbunden:", socket.id);
 
 
-    // Nutzer anmelden
+    // Login
     socket.on("join", (username) => {
 
         users[socket.id] = {
             name: username
         };
 
+        io.emit("users", Object.values(users));
+
         console.log(username + " ist online");
 
-        io.emit("users", getUsers());
     });
 
 
 
-    // Nachricht senden
-    socket.on("message", (data) => {
+    // Nachricht
+    socket.on("message", (text) => {
 
-        const user = users[socket.id];
-
-        if (!user) return;
+        if (!users[socket.id]) return;
 
 
-        const message = {
-            username: user.name,
-            text: data.text,
-            time: new Date().toLocaleTimeString()
+        const msg = {
+
+            user: users[socket.id].name,
+
+            text: text,
+
+            time: new Date()
+                .toLocaleTimeString("de-DE",
+                {
+                    hour:"2-digit",
+                    minute:"2-digit"
+                })
+
         };
 
 
-        // Nachricht an alle senden
-        io.emit("message", message);
+        io.emit("message", msg);
 
     });
 
 
 
-    // Nutzer trennt Verbindung
+    // Verbindung beendet
     socket.on("disconnect", () => {
+
 
         if(users[socket.id]){
 
             console.log(
-                users[socket.id].name + " ist offline"
+                users[socket.id].name +
+                " offline"
             );
+
 
             delete users[socket.id];
 
-            io.emit("users", getUsers());
+
+            io.emit(
+                "users",
+                Object.values(users)
+            );
 
         }
 
     });
 
+
 });
-
-
-
-// Nutzerliste
-function getUsers(){
-
-    return Object.values(users);
-
-}
 
 
 
