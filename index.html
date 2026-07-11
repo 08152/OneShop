@@ -1,79 +1,120 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Code KI</title>
+<title>SecureShield Scanner</title>
 
 <style>
 
-*{
-box-sizing:border-box;
-}
-
 body{
-margin:0;
-background:#202123;
-color:white;
-font-family:Arial, sans-serif;
+    margin:0;
+    background:#f3f3f3;
+    font-family:Arial, sans-serif;
+    color:#222;
 }
 
 .container{
-max-width:900px;
-margin:auto;
-padding:20px;
+    max-width:700px;
+    margin:40px auto;
+    background:white;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 5px 25px #bbb;
+    text-align:center;
 }
+
 
 h1{
-text-align:center;
+    font-size:32px;
 }
 
-textarea{
-width:100%;
-height:150px;
-background:#111;
-color:white;
-border:1px solid #555;
-border-radius:10px;
-padding:15px;
-font-size:17px;
-resize:none;
+
+.circle{
+    width:180px;
+    height:180px;
+    background:#f5c400;
+    border-radius:50%;
+    margin:30px auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    font-weight:bold;
+    color:white;
+    box-shadow:0 0 20px #d9a900;
 }
+
+
+.upload{
+    border:3px dashed #f5c400;
+    padding:40px;
+    border-radius:15px;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+
+input{
+    display:none;
+}
+
 
 button{
-margin-top:15px;
-width:100%;
-padding:15px;
-background:#00a67e;
-color:white;
-border:none;
-border-radius:10px;
-font-size:18px;
-cursor:pointer;
+    margin-top:20px;
+    background:#f5c400;
+    border:none;
+    padding:15px 35px;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
 }
+
 
 button:hover{
-background:#008f6a;
+    background:#dba900;
 }
 
-pre{
-margin-top:20px;
-background:#000;
-color:#00ff99;
-padding:20px;
-border-radius:10px;
-min-height:200px;
-white-space:pre-wrap;
-font-family:monospace;
+
+.result{
+    margin-top:30px;
+    text-align:left;
+    background:#fafafa;
+    padding:20px;
+    border-radius:15px;
+    display:none;
 }
 
-.status{
-text-align:center;
-margin-top:10px;
-color:#aaa;
+
+.progress{
+    width:100%;
+    height:15px;
+    background:#ddd;
+    border-radius:20px;
+    overflow:hidden;
+    display:none;
 }
+
+
+.bar{
+    width:0%;
+    height:100%;
+    background:#f5c400;
+}
+
+
+.safe{
+    color:green;
+    font-weight:bold;
+}
+
+
+.danger{
+    color:red;
+    font-weight:bold;
+}
+
 
 </style>
 
@@ -85,27 +126,48 @@ color:#aaa;
 
 <div class="container">
 
-<h1>🤖 Meine Code KI</h1>
 
-<textarea 
-id="frage"
-placeholder="Beschreibe deinen Code-Wunsch...">
-</textarea>
+<h1>🛡️ SecureShield</h1>
 
-
-<button onclick="startKI()">
-Code erstellen
-</button>
-
-
-<div class="status" id="status">
-Bereit
+<div class="circle" id="status">
+Sicher
 </div>
 
 
-<pre id="antwort">
-Hier erscheint nur Code...
-</pre>
+<label class="upload">
+
+📁 Datei oder Ordner auswählen
+
+<input type="file" id="file">
+
+</label>
+
+
+<button onclick="scan()">Scan starten</button>
+
+
+<div class="progress" id="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+
+
+<div class="result" id="result">
+
+<h2>Scan Ergebnis</h2>
+
+<p><b>Dateiname:</b> <span id="name"></span></p>
+
+<p><b>Größe:</b> <span id="size"></span></p>
+
+<p><b>Muster:</b> <span id="pattern"></span></p>
+
+<p><b>Gefahr:</b> <span id="danger"></span></p>
+
+<p><b>Status:</b> <span id="level"></span></p>
+
+
+</div>
 
 
 </div>
@@ -115,93 +177,136 @@ Hier erscheint nur Code...
 <script>
 
 
-async function startKI(){
+let file;
 
 
-let frage =
-document.getElementById("frage").value;
+document.getElementById("file").onchange=function(e){
+
+file=e.target.files[0];
+
+}
 
 
-let antwort =
-document.getElementById("antwort");
+
+function scan(){
 
 
-let status =
-document.getElementById("status");
+if(!file){
 
+alert("Bitte zuerst eine Datei auswählen!");
 
-if(frage.trim()==""){
-antwort.textContent="Bitte eine Frage eingeben.";
 return;
+
 }
 
 
-status.textContent="KI arbeitet...";
+let progress=document.getElementById("progress");
+let bar=document.getElementById("bar");
+
+progress.style.display="block";
 
 
-antwort.textContent="";
+let value=0;
 
 
-try{
+let timer=setInterval(()=>{
 
 
-let res = await fetch(
-"https://oneshop-1.onrender.com/frage",
-{
+value+=5;
 
-method:"POST",
+bar.style.width=value+"%";
 
-headers:{
-"Content-Type":"application/json"
-},
 
-body:JSON.stringify(
-{
-frage:frage
+if(value>=100){
+
+
+clearInterval(timer);
+
+showResult();
+
+
 }
-)
-
-});
 
 
-let daten = await res.json();
+},100);
 
 
-if(daten.antwort){
 
-antwort.textContent=daten.antwort;
+}
+
+
+
+function showResult(){
+
+
+let result=document.getElementById("result");
+
+result.style.display="block";
+
+
+let danger=Math.floor(Math.random()*101);
+
+
+document.getElementById("name").innerHTML=file.name;
+
+
+document.getElementById("size").innerHTML=
+(file.size/1024).toFixed(2)+" KB";
+
+
+document.getElementById("pattern").innerHTML=
+"SS-"+Math.floor(Math.random()*999999);
+
+
+document.getElementById("danger").innerHTML=
+danger+"%";
+
+
+
+let status=document.getElementById("status");
+
+let level=document.getElementById("level");
+
+
+if(danger<30){
+
+
+status.style.background="#f5c400";
+status.innerHTML="Sicher";
+
+level.innerHTML="Keine Bedrohung erkannt";
+level.className="safe";
+
+
+}
+
+else if(danger<70){
+
+
+status.style.background="orange";
+status.innerHTML="Warnung";
+
+level.innerHTML="Verdächtige Datei";
+level.className="danger";
+
 
 }
 
 else{
 
-antwort.textContent=
-"Keine Antwort vom KI-Server.";
 
-}
+status.style.background="red";
+status.innerHTML="Gefahr";
 
-
-status.textContent="Fertig";
-
-
-}
-
-catch(error){
-
-
-status.textContent="Fehler";
-
-
-antwort.textContent=
-"Server nicht erreichbar.\n\n"+
-error;
+level.innerHTML="Bedrohung gefunden";
+level.className="danger";
 
 
 }
 
 
-}
 
+}
 
 
 </script>
