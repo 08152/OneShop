@@ -1,160 +1,348 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fake Hacker Simulator</title>
+
+<title>GhostChat</title>
+
 
 <style>
+
 body {
-    margin: 0;
-    background: #050505;
-    color: #00ff66;
-    font-family: monospace;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#111;
+    color:white;
+
 }
 
-.box {
-    width: 500px;
-    background: #111;
-    border: 2px solid #00ff66;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 0 20px #00ff66;
+
+.app {
+
+    display:flex;
+    height:100vh;
+
 }
 
-h1 {
-    text-align: center;
+
+
+/* Linke Seite */
+
+.sidebar {
+
+    width:260px;
+    background:#202020;
+    padding:20px;
+    box-sizing:border-box;
+
 }
+
+
+.logo {
+
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:20px;
+
+}
+
 
 input {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    background: black;
-    color: #00ff66;
-    border: 1px solid #00ff66;
-    font-size: 20px;
-    text-align: center;
+
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    box-sizing:border-box;
+
+    border:none;
+    border-radius:8px;
+
 }
+
 
 button {
-    width: 100%;
-    margin-top: 15px;
-    padding: 12px;
-    background: #00ff66;
-    color: black;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 8px;
+
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+
+    background:#25d366;
+    border:none;
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
 }
 
-button:hover {
-    background: white;
+
+#users {
+
+    margin-top:20px;
+
 }
 
-#terminal {
-    margin-top: 20px;
-    height: 220px;
-    overflow: hidden;
-    background: black;
-    padding: 10px;
-    border-radius: 10px;
+
+
+
+/* Chat */
+
+.chat {
+
+    flex:1;
+    display:flex;
+    flex-direction:column;
+
 }
 
-.line {
-    margin: 5px 0;
+
+.header {
+
+    background:#075e54;
+    padding:20px;
+    font-size:20px;
+
 }
+
+
+#messages {
+
+    flex:1;
+    padding:20px;
+    overflow:auto;
+
+}
+
+
+
+.message {
+
+    background:#075e54;
+    padding:10px;
+    margin:10px;
+
+    border-radius:10px;
+
+    max-width:300px;
+
+}
+
+
+
+.send {
+
+    display:flex;
+    padding:15px;
+    background:#202020;
+
+}
+
+
+.send input {
+
+    flex:1;
+    margin:0;
+
+}
+
+
+.send button {
+
+    width:60px;
+    margin-left:10px;
+
+}
+
+
 </style>
+
 </head>
+
+
 
 <body>
 
-<div class="box">
 
-<h1>⚠ FAKE HACK SIMULATOR</h1>
+<div class="app">
 
-<p>Ziel-Code eingeben (3 Zahlen):</p>
 
-<input id="target" maxlength="3" placeholder="z.B. 527">
+<div class="sidebar">
 
-<button onclick="startHack()">START</button>
 
-<div id="terminal">
-<div class="line">Bereit...</div>
+<div class="logo">
+💬 GhostChat
 </div>
 
+
+<input id="username" placeholder="Name">
+
+
+<button onclick="join()">
+Start
+</button>
+
+
+<h3>Online:</h3>
+
+
+<div id="users">
+Keine Nutzer
 </div>
+
+
+</div>
+
+
+
+
+<div class="chat">
+
+
+<div class="header">
+
+Allgemeiner Chat
+
+</div>
+
+
+<div id="messages"></div>
+
+
+
+<div class="send">
+
+<input 
+id="text"
+placeholder="Nachricht..."
+>
+
+
+<button onclick="send()">
+➤
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
 
 
 <script>
 
-let interval;
-let count = 0;
 
-function startHack(){
-
-    let target = document.getElementById("target").value;
-
-    if(target.length !== 3 || isNaN(target)){
-        alert("Bitte 3 Zahlen eingeben!");
-        return;
-    }
-
-    clearInterval(interval);
-
-    let terminal = document.getElementById("terminal");
-    terminal.innerHTML = "";
-
-    count = 0;
-
-    interval = setInterval(()=>{
-
-        count++;
-
-        let fake =
-        Math.floor(Math.random()*900+100);
-
-        let line=document.createElement("div");
-        line.className="line";
-
-        line.innerHTML =
-        "> Versuch #" + count +
-        " | Code: " + fake +
-        " | analysiere...";
-
-        terminal.appendChild(line);
-
-        if(terminal.children.length > 10){
-            terminal.removeChild(terminal.firstChild);
-        }
+const socket = io();
 
 
-        if(count >= 1287){
-
-            clearInterval(interval);
-
-            terminal.innerHTML +=
-            "<div class='line'>✔ Code gefunden: "
-            + target +
-            "</div>";
-
-            terminal.innerHTML +=
-            "<div class='line'>✔ Zugriff simuliert...</div>";
-
-        }
+let name = "";
 
 
-    },1);
+
+function join(){
+
+    name =
+    document.getElementById("username").value;
+
+
+    if(name.trim()=="") return;
+
+
+    socket.emit(
+        "join",
+        name
+    );
 
 }
 
+
+
+function send(){
+
+    let text =
+    document.getElementById("text").value;
+
+
+    if(text.trim()=="") return;
+
+
+    socket.emit(
+        "message",
+        text
+    );
+
+
+    document.getElementById("text").value="";
+
+}
+
+
+
+
+socket.on("message",(msg)=>{
+
+
+let box =
+document.getElementById("messages");
+
+
+box.innerHTML += `
+
+<div class="message">
+
+<b>${msg.user}</b><br>
+
+${msg.text}
+
+<br>
+
+<small>${msg.time}</small>
+
+</div>
+
+`;
+
+
+box.scrollTop =
+box.scrollHeight;
+
+
+});
+
+
+
+
+socket.on("users",(users)=>{
+
+
+document.getElementById("users").innerHTML =
+
+users.map(
+u=>"👤 "+u.name
+).join("<br>");
+
+
+
+});
+
+
 </script>
 
+
+
 </body>
+
 </html>
