@@ -1,464 +1,160 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>SecureShield Scanner</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake Hacker Simulator</title>
 
 <style>
-
-*{
-box-sizing:border-box;
+body {
+    margin: 0;
+    background: #050505;
+    color: #00ff66;
+    font-family: monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-
-body{
-
-margin:0;
-background:#050505;
-font-family:Arial;
-color:white;
-
+.box {
+    width: 500px;
+    background: #111;
+    border: 2px solid #00ff66;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px #00ff66;
 }
 
-
-.app{
-
-width:90%;
-max-width:750px;
-margin:40px auto;
-background:#111;
-padding:30px;
-border-radius:20px;
-border:2px solid #ffd000;
-
+h1 {
+    text-align: center;
 }
 
-
-h1{
-
-text-align:center;
-color:#ffd000;
-
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: black;
+    color: #00ff66;
+    border: 1px solid #00ff66;
+    font-size: 20px;
+    text-align: center;
 }
 
-
-
-.status{
-
-width:180px;
-height:180px;
-margin:30px auto;
-
-background:#ffd000;
-border-radius:50%;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-size:25px;
-font-weight:bold;
-
-color:black;
-
+button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #00ff66;
+    color: black;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
 }
 
-
-
-.upload{
-
-display:block;
-
-border:2px dashed #ffd000;
-
-padding:35px;
-
-text-align:center;
-
-border-radius:15px;
-
-cursor:pointer;
-
-margin-top:25px;
-
+button:hover {
+    background: white;
 }
 
-
-input{
-
-display:none;
-
+#terminal {
+    margin-top: 20px;
+    height: 220px;
+    overflow: hidden;
+    background: black;
+    padding: 10px;
+    border-radius: 10px;
 }
 
-
-
-button{
-
-width:100%;
-
-margin-top:20px;
-
-padding:15px;
-
-background:#ffd000;
-
-border:none;
-
-border-radius:10px;
-
-font-size:18px;
-
-font-weight:bold;
-
-cursor:pointer;
-
+.line {
+    margin: 5px 0;
 }
-
-
-
-button:hover{
-
-background:#e0b600;
-
-}
-
-
-
-.progress{
-
-margin-top:25px;
-
-height:15px;
-
-background:#333;
-
-border-radius:20px;
-
-overflow:hidden;
-
-display:none;
-
-}
-
-
-
-.bar{
-
-height:100%;
-
-width:0%;
-
-background:#ffd000;
-
-}
-
-
-
-.box{
-
-margin-top:25px;
-
-background:#1b1b1b;
-
-padding:20px;
-
-border-radius:15px;
-
-border-left:5px solid #ffd000;
-
-display:none;
-
-}
-
-
-
-.good{
-
-color:#00ff55;
-
-}
-
-
-.bad{
-
-color:red;
-
-}
-
-
-
 </style>
-
 </head>
-
-
 
 <body>
 
+<div class="box">
 
-<div class="app">
+<h1>⚠ FAKE HACK SIMULATOR</h1>
 
+<p>Ziel-Code eingeben (3 Zahlen):</p>
 
-<h1>🛡️ SecureShield</h1>
+<input id="target" maxlength="3" placeholder="z.B. 527">
 
+<button onclick="startHack()">START</button>
 
-<div class="status" id="status">
-
-SICHER
-
+<div id="terminal">
+<div class="line">Bereit...</div>
 </div>
 
-
-
-<label class="upload">
-
-📁 Datei auswählen
-
-<input type="file" id="file">
-
-</label>
-
-
-
-<button onclick="startScan()">
-
-Scan starten
-
-</button>
-
-
-
-<div class="progress" id="progress">
-
-<div class="bar" id="bar"></div>
-
 </div>
-
-
-
-<div class="box" id="result">
-
-<h2>Scan Ergebnis</h2>
-
-<p>Datei: <span id="filename"></span></p>
-
-<p>Größe: <span id="filesize"></span></p>
-
-<p>Muster: <span id="pattern"></span></p>
-
-<p>Gefahr: <span id="danger"></span></p>
-
-<p>Status: <span id="state"></span></p>
-
-
-</div>
-
-
-</div>
-
 
 
 <script>
 
+let interval;
+let count = 0;
 
-let selectedFile;
+function startHack(){
 
-let daten;
+    let target = document.getElementById("target").value;
 
+    if(target.length !== 3 || isNaN(target)){
+        alert("Bitte 3 Zahlen eingeben!");
+        return;
+    }
 
+    clearInterval(interval);
 
-document.getElementById("file").onchange=e=>{
+    let terminal = document.getElementById("terminal");
+    terminal.innerHTML = "";
 
-selectedFile=e.target.files[0];
+    count = 0;
 
-};
+    interval = setInterval(()=>{
 
+        count++;
 
+        let fake =
+        Math.floor(Math.random()*900+100);
 
-// JSON laden
+        let line=document.createElement("div");
+        line.className="line";
 
-fetch("wissen.json")
+        line.innerHTML =
+        "> Versuch #" + count +
+        " | Code: " + fake +
+        " | analysiere...";
 
-.then(r=>r.json())
+        terminal.appendChild(line);
 
-.then(j=>{
-
-daten=j;
-
-});
-
-
-
-
-
-function startScan(){
-
-
-if(!selectedFile){
-
-alert("Datei auswählen!");
-
-return;
-
-}
+        if(terminal.children.length > 10){
+            terminal.removeChild(terminal.firstChild);
+        }
 
 
-if(!daten){
+        if(count >= 1287){
 
-alert("Wissensdatenbank lädt noch!");
+            clearInterval(interval);
 
-return;
+            terminal.innerHTML +=
+            "<div class='line'>✔ Code gefunden: "
+            + target +
+            "</div>";
 
-}
+            terminal.innerHTML +=
+            "<div class='line'>✔ Zugriff simuliert...</div>";
 
-
-
-let progress=document.getElementById("progress");
-
-let bar=document.getElementById("bar");
-
-
-progress.style.display="block";
+        }
 
 
-let p=0;
-
-
-let timer=setInterval(()=>{
-
-
-p+=4;
-
-bar.style.width=p+"%";
-
-
-if(p>=100){
-
-clearInterval(timer);
-
-scanFile();
+    },1);
 
 }
-
-
-},80);
-
-
-}
-
-
-
-
-function scanFile(){
-
-
-
-let gefunden=null;
-
-
-
-for(let virus of daten.muster){
-
-
-if(selectedFile.name
-.toLowerCase()
-.includes(
-virus.name.toLowerCase()
-.split(".")[1]
-)){
-
-
-gefunden=virus;
-
-
-}
-
-
-}
-
-
-
-let chance=Math.floor(Math.random()*40);
-
-
-let gefahr=chance;
-
-
-if(gefunden){
-
-gefahr=gefunden.gefahr;
-
-}
-
-
-
-document.getElementById("filename").innerHTML=
-selectedFile.name;
-
-
-document.getElementById("filesize").innerHTML=
-(selectedFile.size/1024).toFixed(2)+" KB";
-
-
-
-document.getElementById("pattern").innerHTML=
-gefunden ? gefunden.kennung : "Keine";
-
-
-
-document.getElementById("danger").innerHTML=
-gefahr+"%";
-
-
-
-let status=document.getElementById("status");
-
-let state=document.getElementById("state");
-
-
-
-if(gefahr<40){
-
-
-status.innerHTML="SICHER";
-
-status.style.background="#ffd000";
-
-state.innerHTML="Keine Gefahr";
-
-state.className="good";
-
-
-}
-
-else{
-
-
-status.innerHTML="GEFAHR";
-
-status.style.background="red";
-
-state.innerHTML="Bedrohung erkannt";
-
-state.className="bad";
-
-
-}
-
-
-document.getElementById("result").style.display="block";
-
-
-}
-
 
 </script>
 
-
 </body>
-
 </html>
