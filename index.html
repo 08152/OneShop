@@ -3,56 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Popup Beispiel</title>
-
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    background: #222;
-    font-family: Arial, sans-serif;
-}
-
-/* Popup rechts unten */
-.popup {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-
-    background: white;
-    color: black;
-
-    padding: 20px 30px;
-    border-radius: 12px;
-
-    font-size: 22px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-
-    animation: erscheinen 0.5s ease;
-}
-
-/* Animation */
-@keyframes erscheinen {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
-
+<title>Benachrichtigung Test</title>
 </head>
 
-<body>
+<body style="font-family:Arial;text-align:center;padding-top:100px;background:#222;color:white;">
 
-<div class="popup">
-    Hi
-</div>
+<h1>Notification Test</h1>
+
+<button onclick="benachrichtigung()">
+    Popups erlauben
+</button>
+
+<script>
+function benachrichtigung() {
+
+    if (!("Notification" in window)) {
+        alert("Dieser Browser unterstützt keine Benachrichtigungen.");
+        return;
+    }
+
+    Notification.requestPermission().then(permission => {
+
+        if (permission === "granted") {
+
+            new Notification("Hi", {
+                body: "Das ist eine echte Browser-Benachrichtigung!",
+                icon: "https://cdn-icons-png.flaticon.com/512/1827/1827392.png"
+            });
+
+        } else {
+            alert("Benachrichtigungen wurden abgelehnt.");
+        }
+
+    });
+
+}
+</script>
 
 </body>
 </html>
