@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>GhostChat</title>
@@ -12,152 +11,258 @@
 
 <style>
 
-body {
-
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#111;
-    color:white;
-
+*{
+box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
 
 
-.app {
+body{
 
-    display:flex;
-    height:100vh;
-
-}
-
-
-
-/* Linke Seite */
-
-.sidebar {
-
-    width:260px;
-    background:#202020;
-    padding:20px;
-    box-sizing:border-box;
-
-}
-
-
-.logo {
-
-    font-size:25px;
-    font-weight:bold;
-    margin-bottom:20px;
-
-}
-
-
-input {
-
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    box-sizing:border-box;
-
-    border:none;
-    border-radius:8px;
-
-}
-
-
-button {
-
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-
-    background:#25d366;
-    border:none;
-    border-radius:8px;
-
-    cursor:pointer;
-
-    font-weight:bold;
-
-}
-
-
-#users {
-
-    margin-top:20px;
+margin:0;
+background:#080808;
+color:white;
+height:100vh;
 
 }
 
 
 
+/* LOGIN */
 
-/* Chat */
+#loginBox{
 
-.chat {
-
-    flex:1;
-    display:flex;
-    flex-direction:column;
-
-}
-
-
-.header {
-
-    background:#075e54;
-    padding:20px;
-    font-size:20px;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 
 }
 
 
-#messages {
+.card{
 
-    flex:1;
-    padding:20px;
-    overflow:auto;
+background:#151515;
+padding:30px;
+border-radius:25px;
+width:90%;
+max-width:400px;
 
 }
 
 
 
-.message {
+.logo{
 
-    background:#075e54;
-    padding:10px;
-    margin:10px;
-
-    border-radius:10px;
-
-    max-width:300px;
+font-size:35px;
+text-align:center;
+color:#ffd400;
+font-weight:bold;
+margin-bottom:20px;
 
 }
 
 
 
-.send {
+input{
 
-    display:flex;
-    padding:15px;
-    background:#202020;
+width:100%;
+padding:15px;
+margin:7px 0;
+
+border:none;
+border-radius:12px;
+
+background:#222;
+color:white;
+
+font-size:16px;
+
+}
+
+
+
+button{
+
+width:100%;
+padding:15px;
+
+margin-top:10px;
+
+border:none;
+border-radius:12px;
+
+background:#ffd400;
+
+font-weight:bold;
+
+font-size:16px;
 
 }
 
 
-.send input {
 
-    flex:1;
-    margin:0;
+
+
+/* CHAT */
+
+#chat{
+
+display:none;
+height:100vh;
+
+}
+
+
+
+.sidebar{
+
+width:260px;
+background:#111;
+padding:20px;
 
 }
 
 
-.send button {
 
-    width:60px;
-    margin-left:10px;
+.sidebar h1{
+
+color:#ffd400;
 
 }
+
+
+
+.chat{
+
+flex:1;
+display:flex;
+flex-direction:column;
+
+}
+
+
+
+.header{
+
+background:#ffd400;
+color:black;
+padding:20px;
+font-weight:bold;
+
+}
+
+
+
+.messages{
+
+flex:1;
+overflow:auto;
+padding:15px;
+
+}
+
+
+
+.msg{
+
+background:#222;
+padding:15px;
+border-radius:15px;
+
+margin-bottom:10px;
+
+max-width:500px;
+
+}
+
+
+
+.msg b{
+
+color:#ffd400;
+
+}
+
+
+
+.send{
+
+display:flex;
+padding:15px;
+background:#111;
+
+gap:10px;
+
+}
+
+
+
+.send button{
+
+width:70px;
+
+}
+
+
+
+
+
+/* POPUP UNTEN RECHTS */
+
+#notify{
+
+position:fixed;
+
+right:20px;
+
+bottom:20px;
+
+background:#ffd400;
+
+color:black;
+
+padding:18px;
+
+border-radius:15px;
+
+display:none;
+
+width:300px;
+
+font-weight:bold;
+
+box-shadow:0 0 20px black;
+
+z-index:999;
+
+}
+
+
+
+
+
+@media(max-width:700px){
+
+
+#chat{
+
+flex-direction:column;
+
+}
+
+
+.sidebar{
+
+width:100%;
+height:150px;
+
+}
+
+
+}
+
+
 
 
 </style>
@@ -169,34 +274,86 @@ button {
 <body>
 
 
-<div class="app">
+
+<div id="loginBox">
+
+
+<div class="card">
+
+
+<div class="logo">
+
+💬 GhostChat
+
+</div>
+
+
+
+<input id="email" placeholder="E-Mail">
+
+<input id="pin" placeholder="PIN">
+
+<input id="name" placeholder="Öffentlicher Name">
+
+
+
+<button onclick="register()">
+
+Account erstellen
+
+</button>
+
+
+<button onclick="login()">
+
+Anmelden
+
+</button>
+
+
+<p id="info"></p>
+
+
+</div>
+
+</div>
+
+
+
+
+
+
+<div id="chat">
+
 
 
 <div class="sidebar">
 
 
-<div class="logo">
-💬 GhostChat
-</div>
+<h1>
+GhostChat
+</h1>
 
 
-<input id="username" placeholder="Name">
+<h3>
+Online
+</h3>
 
 
-<button onclick="join()">
-Start
+<div id="users"></div>
+
+
+<button onclick="logout()">
+
+Ausloggen
+
 </button>
 
 
-<h3>Online:</h3>
-
-
-<div id="users">
-Keine Nutzer
 </div>
 
 
-</div>
+
 
 
 
@@ -206,36 +363,50 @@ Keine Nutzer
 
 <div class="header">
 
-Allgemeiner Chat
+💬 Chat
 
 </div>
 
 
-<div id="messages"></div>
+<div class="messages" id="messages">
+
+</div>
 
 
 
 <div class="send">
 
-<input 
-id="text"
-placeholder="Nachricht..."
->
+
+<input id="text" placeholder="Nachricht...">
 
 
 <button onclick="send()">
+
 ➤
+
 </button>
 
 
 </div>
 
 
+
+</div>
+
+
 </div>
 
 
 
+
+
+<!-- Popup -->
+
+<div id="notify">
+
 </div>
+
+
 
 
 
@@ -245,79 +416,233 @@ placeholder="Nachricht..."
 <script>
 
 
-const socket = io();
+const socket=io();
 
 
-let name = "";
+let username="";
 
 
 
-function join(){
 
-    name =
-    document.getElementById("username").value;
+// Benachrichtigung erlauben
 
-
-    if(name.trim()=="") return;
+function notifications(){
 
 
-    socket.emit(
-        "join",
-        name
-    );
+if(Notification.permission!=="granted"){
+
+
+Notification.requestPermission();
+
 
 }
+
+
+}
+
+
+notifications();
+
+
+
+
+
+function register(){
+
+
+fetch("/register",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+email:email.value,
+
+pin:pin.value,
+
+name:name.value
+
+})
+
+
+})
+.then(r=>r.json())
+.then(d=>{
+
+
+info.innerHTML =
+d.success?
+"Account erstellt":
+d.message;
+
+
+});
+
+
+}
+
+
+
+
+
+
+function login(){
+
+
+fetch("/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+email:email.value,
+
+pin:pin.value
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(d=>{
+
+
+if(d.success){
+
+
+username=d.name;
+
+
+loginBox.style.display="none";
+
+
+chat.style.display="flex";
+
+
+socket.emit(
+"join",
+username
+);
+
+
+}
+
+else{
+
+
+info.innerHTML="Login falsch";
+
+
+}
+
+
+});
+
+
+}
+
+
+
 
 
 
 function send(){
 
-    let text =
-    document.getElementById("text").value;
+
+if(text.value.trim()=="")
+return;
 
 
-    if(text.trim()=="") return;
+socket.emit(
+"message",
+text.value
+);
 
 
-    socket.emit(
-        "message",
-        text
-    );
+text.value="";
 
-
-    document.getElementById("text").value="";
 
 }
 
 
 
 
-socket.on("message",(msg)=>{
 
 
-let box =
-document.getElementById("messages");
+
+socket.on("message",(m)=>{
 
 
-box.innerHTML += `
+// Nachricht in Chat
 
-<div class="message">
+messages.innerHTML += `
 
-<b>${msg.user}</b><br>
+<div class="msg">
 
-${msg.text}
+<b>${m.user}</b><br>
+
+${m.text}
 
 <br>
 
-<small>${msg.time}</small>
+<small>${m.time}</small>
 
 </div>
 
 `;
 
 
-box.scrollTop =
-box.scrollHeight;
+
+
+
+messages.scrollTop=
+messages.scrollHeight;
+
+
+
+
+
+// Popup unten rechts
+
+showNotification(
+m.user,
+m.text
+);
+
+
+
+
+
+// ChromeOS Benachrichtigung
+
+if(Notification.permission==="granted"
+&& m.user!==username){
+
+
+new Notification(
+
+"Neue Nachricht von "+m.user,
+
+{
+
+body:m.text
+
+}
+
+);
+
+
+}
+
 
 
 });
@@ -325,22 +650,65 @@ box.scrollHeight;
 
 
 
-socket.on("users",(users)=>{
 
 
-document.getElementById("users").innerHTML =
+function showNotification(user,text){
 
-users.map(
-u=>"👤 "+u.name
+
+notify.innerHTML=
+
+"💬 "+user+
+"<br><br>"+
+text;
+
+
+notify.style.display="block";
+
+
+
+setTimeout(()=>{
+
+
+notify.style.display="none";
+
+
+},5000);
+
+
+
+}
+
+
+
+
+
+
+
+socket.on("users",(u)=>{
+
+
+users.innerHTML=
+u.map(
+x=>"🟡 "+x
 ).join("<br>");
 
 
-
 });
 
 
-</script>
 
+
+
+
+function logout(){
+
+location.reload();
+
+}
+
+
+
+</script>
 
 
 </body>
