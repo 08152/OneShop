@@ -1,716 +1,192 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GhostChat</title>
-
+<title>BeatAI Offline</title>
 
 <style>
-
-*{
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-
 body{
-
-margin:0;
-background:#080808;
-color:white;
-height:100vh;
-
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
 }
 
-
-
-/* LOGIN */
-
-#loginBox{
-
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-
+header{
+    padding:25px;
+    text-align:center;
+    font-size:35px;
+    font-weight:bold;
+    background:linear-gradient(90deg,#ffcc00,#ff6600);
+    color:#111;
 }
 
+.app{
+    max-width:800px;
+    margin:auto;
+    padding:25px;
+}
 
 .card{
-
-background:#151515;
-padding:30px;
-border-radius:25px;
-width:90%;
-max-width:400px;
-
+    background:#1d1d1d;
+    border-radius:20px;
+    padding:25px;
+    margin-top:20px;
 }
-
-
-
-.logo{
-
-font-size:35px;
-text-align:center;
-color:#ffd400;
-font-weight:bold;
-margin-bottom:20px;
-
-}
-
-
-
-input{
-
-width:100%;
-padding:15px;
-margin:7px 0;
-
-border:none;
-border-radius:12px;
-
-background:#222;
-color:white;
-
-font-size:16px;
-
-}
-
-
 
 button{
-
-width:100%;
-padding:15px;
-
-margin-top:10px;
-
-border:none;
-border-radius:12px;
-
-background:#ffd400;
-
-font-weight:bold;
-
-font-size:16px;
-
+    background:#ffcc00;
+    border:0;
+    padding:15px 25px;
+    border-radius:15px;
+    font-size:18px;
+    cursor:pointer;
 }
 
-
-
-
-
-/* CHAT */
-
-#chat{
-
-display:none;
-height:100vh;
-
+button:hover{
+    background:#ffaa00;
 }
 
-
-
-.sidebar{
-
-width:260px;
-background:#111;
-padding:20px;
-
+select,input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:10px;
 }
 
-
-
-.sidebar h1{
-
-color:#ffd400;
-
+.result{
+    background:#000;
+    padding:20px;
+    border-radius:15px;
+    margin-top:20px;
 }
-
-
-
-.chat{
-
-flex:1;
-display:flex;
-flex-direction:column;
-
-}
-
-
-
-.header{
-
-background:#ffd400;
-color:black;
-padding:20px;
-font-weight:bold;
-
-}
-
-
-
-.messages{
-
-flex:1;
-overflow:auto;
-padding:15px;
-
-}
-
-
-
-.msg{
-
-background:#222;
-padding:15px;
-border-radius:15px;
-
-margin-bottom:10px;
-
-max-width:500px;
-
-}
-
-
-
-.msg b{
-
-color:#ffd400;
-
-}
-
-
-
-.send{
-
-display:flex;
-padding:15px;
-background:#111;
-
-gap:10px;
-
-}
-
-
-
-.send button{
-
-width:70px;
-
-}
-
-
-
-
-
-/* POPUP UNTEN RECHTS */
-
-#notify{
-
-position:fixed;
-
-right:20px;
-
-bottom:20px;
-
-background:#ffd400;
-
-color:black;
-
-padding:18px;
-
-border-radius:15px;
-
-display:none;
-
-width:300px;
-
-font-weight:bold;
-
-box-shadow:0 0 20px black;
-
-z-index:999;
-
-}
-
-
-
-
-
-@media(max-width:700px){
-
-
-#chat{
-
-flex-direction:column;
-
-}
-
-
-.sidebar{
-
-width:100%;
-height:150px;
-
-}
-
-
-}
-
-
-
-
 </style>
-
 </head>
-
 
 
 <body>
 
+<header>
+🎵 BeatAI Offline
+</header>
 
 
-<div id="loginBox">
+<div class="app">
+
+<div class="card">
+
+<h2>🎤 Song erstellen</h2>
+
+<label>Stil</label>
+<select id="style">
+<option>Pop</option>
+<option>Rock</option>
+<option>Gaming</option>
+<option>Horror</option>
+<option>Epic</option>
+</select>
+
+
+<label>Instrumente aus daten</label>
+
+<select id="instrument">
+<option>Trommel</option>
+<option>Gitarre</option>
+</select>
+
+
+<button onclick="createSong()">
+✨ Musik generieren
+</button>
+
+</div>
 
 
 <div class="card">
 
+<h2>📂 Daten</h2>
 
-<div class="logo">
+<p>
+Ordner:
+<b>/daten</b>
+</p>
 
-💬 GhostChat
+<p>
+Geladene Instrumente:
+</p>
 
-</div>
-
-
-
-<input id="email" placeholder="E-Mail">
-
-<input id="pin" placeholder="PIN">
-
-<input id="name" placeholder="Öffentlicher Name">
-
-
-
-<button onclick="register()">
-
-Account erstellen
-
-</button>
-
-
-<button onclick="login()">
-
-Anmelden
-
-</button>
-
-
-<p id="info"></p>
-
-
-</div>
+<ul>
+<li>🥁 trommel</li>
+<li>🎸 gitarre</li>
+</ul>
 
 </div>
 
 
-
-
-
-
-<div id="chat">
-
-
-
-<div class="sidebar">
-
-
-<h1>
-GhostChat
-</h1>
-
-
-<h3>
-Online
-</h3>
-
-
-<div id="users"></div>
-
-
-<button onclick="logout()">
-
-Ausloggen
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="chat">
-
-
-<div class="header">
-
-💬 Chat
-
-</div>
-
-
-<div class="messages" id="messages">
-
-</div>
-
-
-
-<div class="send">
-
-
-<input id="text" placeholder="Nachricht...">
-
-
-<button onclick="send()">
-
-➤
-
-</button>
-
-
-</div>
-
-
-
+<div class="result" id="output">
+Noch kein Song erstellt...
 </div>
 
 
 </div>
-
-
-
-
-
-<!-- Popup -->
-
-<div id="notify">
-
-</div>
-
-
-
-
-
-<script src="/socket.io/socket.io.js"></script>
 
 
 <script>
 
+let daten={
+"Trommel":"trommel",
+"Gitarre":"gitarre"
+};
 
-const socket=io();
 
+function createSong(){
 
-let username="";
+let style=document.getElementById("style").value;
+let instrument=document.getElementById("instrument").value;
 
 
+let datei=daten[instrument];
 
 
-// Benachrichtigung erlauben
+document.getElementById("output").innerHTML=
+`
+<h2>🎶 Song erstellt</h2>
 
-function notifications(){
+<p>Genre: ${style}</p>
 
+<p>Instrument:
+<b>${instrument}</b>
+</p>
 
-if(Notification.permission!=="granted"){
-
-
-Notification.requestPermission();
-
-
-}
-
-
-}
-
-
-notifications();
-
-
-
-
-
-function register(){
-
-
-fetch("/register",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-email:email.value,
-
-pin:pin.value,
-
-name:name.value
-
-})
-
-
-})
-.then(r=>r.json())
-.then(d=>{
-
-
-info.innerHTML =
-d.success?
-"Account erstellt":
-d.message;
-
-
-});
-
-
-}
-
-
-
-
-
-
-function login(){
-
-
-fetch("/login",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-
-email:email.value,
-
-pin:pin.value
-
-})
-
-})
-
-.then(r=>r.json())
-
-.then(d=>{
-
-
-if(d.success){
-
-
-username=d.name;
-
-
-loginBox.style.display="none";
-
-
-chat.style.display="flex";
-
-
-socket.emit(
-"join",
-username
-);
-
-
-}
-
-else{
-
-
-info.innerHTML="Login falsch";
-
-
-}
-
-
-});
-
-
-}
-
-
-
-
-
-
-function send(){
-
-
-if(text.value.trim()=="")
-return;
-
-
-socket.emit(
-"message",
-text.value
-);
-
-
-text.value="";
-
-
-}
-
-
-
-
-
-
-
-socket.on("message",(m)=>{
-
-
-// Nachricht in Chat
-
-messages.innerHTML += `
-
-<div class="msg">
-
-<b>${m.user}</b><br>
-
-${m.text}
-
+<p>
+KI nutzt Daten:
 <br>
+📁 daten/${datei}
+</p>
 
-<small>${m.time}</small>
+<hr>
 
-</div>
+🎵 Intro:
+${instrument} startet...
 
+<br><br>
+
+🥁 Rhythmus wird erstellt...
+
+<br><br>
+
+🎤 Melodie wird generiert...
+
+<br><br>
+
+✅ Fertig!
 `;
 
-
-
-
-
-messages.scrollTop=
-messages.scrollHeight;
-
-
-
-
-
-// Popup unten rechts
-
-showNotification(
-m.user,
-m.text
-);
-
-
-
-
-
-// ChromeOS Benachrichtigung
-
-if(Notification.permission==="granted"
-&& m.user!==username){
-
-
-new Notification(
-
-"Neue Nachricht von "+m.user,
-
-{
-
-body:m.text
-
 }
-
-);
-
-
-}
-
-
-
-});
-
-
-
-
-
-
-function showNotification(user,text){
-
-
-notify.innerHTML=
-
-"💬 "+user+
-"<br><br>"+
-text;
-
-
-notify.style.display="block";
-
-
-
-setTimeout(()=>{
-
-
-notify.style.display="none";
-
-
-},5000);
-
-
-
-}
-
-
-
-
-
-
-
-socket.on("users",(u)=>{
-
-
-users.innerHTML=
-u.map(
-x=>"🟡 "+x
-).join("<br>");
-
-
-});
-
-
-
-
-
-
-function logout(){
-
-location.reload();
-
-}
-
-
 
 </script>
 
-
 </body>
-
 </html>
