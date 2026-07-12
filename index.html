@@ -1,137 +1,193 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>GhostShop</title>
 
 <style>
+
 *{
+    margin:0;
+    padding:0;
     box-sizing:border-box;
-    font-family:Arial, sans-serif;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
 body{
-    margin:0;
     background:#f3f3f3;
+    color:#222;
 }
 
-/* Kopf */
+
+/* Navigation */
+
 header{
-    background:#131921;
+
+    height:70px;
+    background:#111;
     color:white;
-    padding:20px;
     display:flex;
-    justify-content:space-between;
     align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:10;
+
 }
 
 .logo{
-    font-size:28px;
+
+    color:#ffd400;
+    font-size:32px;
     font-weight:bold;
-    color:#ffd814;
+
 }
 
-.cartIcon{
+
+.cart-btn{
+
     cursor:pointer;
     font-size:28px;
+
 }
 
 
 /* Produkte */
 
 .container{
+
     padding:30px;
+
 }
+
 
 .products{
+
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+    gap:25px;
+
 }
 
 
-.product{
+.card{
+
     background:white;
-    border-radius:15px;
+    border-radius:18px;
     padding:20px;
-    box-shadow:0 5px 15px #ccc;
-    text-align:center;
+    box-shadow:
+    0 8px 20px rgba(0,0,0,.15);
+
+    transition:.3s;
+
 }
 
 
-.product img{
-    width:150px;
-    height:150px;
+.card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+
+.card img{
+
+    width:100%;
+    height:180px;
     object-fit:contain;
+
+}
+
+
+.card h3{
+
+    margin:15px 0;
+
 }
 
 
 .price{
+
+    color:#e67e00;
     font-size:22px;
-    color:#b12704;
     font-weight:bold;
+
 }
 
 
 button{
-    border:0;
-    padding:12px 20px;
-    border-radius:8px;
+
+    border:none;
+    background:#ffd400;
+    padding:12px 18px;
+    border-radius:12px;
     cursor:pointer;
-    background:#ffd814;
     font-weight:bold;
+    margin-top:10px;
+
 }
 
 
 button:hover{
-    background:#ffca00;
+
+    filter:brightness(.9);
+
 }
 
 
-/* Warenkorb */
+/* Warenkorb Seitenmenü */
 
-.cartMenu{
+.cart{
 
     position:fixed;
-    right:-400px;
     top:0;
-
-    width:350px;
+    right:-400px;
+    width:380px;
     height:100%;
-
     background:white;
-
-    box-shadow:-5px 0 20px #999;
-
-    padding:20px;
-
-    transition:.3s;
-
+    z-index:20;
+    box-shadow:-5px 0 20px #0005;
+    padding:25px;
+    transition:.4s;
     overflow:auto;
+
 }
 
 
-.cartMenu.open{
+.cart.open{
+
     right:0;
+
 }
 
 
-.cartItem{
+.cart h2{
+
+    margin-bottom:20px;
+
+}
+
+
+.cart-item{
 
     border-bottom:1px solid #ddd;
-    padding:10px;
+    padding:12px 0;
 
 }
 
 
-.close{
-    float:right;
-    cursor:pointer;
-    font-size:25px;
-}
+.total{
 
+    font-size:22px;
+    font-weight:bold;
+    margin-top:20px;
+
+}
 
 
 /* Admin */
@@ -139,14 +195,12 @@ button:hover{
 .admin{
 
     display:none;
-
-    padding:30px;
-
+    position:fixed;
+    inset:0;
     background:white;
-
-    margin:20px;
-
-    border-radius:15px;
+    z-index:50;
+    padding:30px;
+    overflow:auto;
 
 }
 
@@ -154,19 +208,35 @@ button:hover{
 .order{
 
     background:#eee;
-    padding:15px;
-
-    margin:10px;
-
-    border-radius:10px;
+    padding:20px;
+    border-radius:15px;
+    margin:15px 0;
 
 }
 
 
+.close{
+
+    float:right;
+    background:#222;
+    color:white;
+
+}
+
+
+@media(max-width:500px){
+
+.cart{
+
+    width:100%;
+
+}
+
+}
+
 </style>
 
 </head>
-
 
 <body>
 
@@ -178,21 +248,21 @@ GhostShop
 </div>
 
 
-<div class="cartIcon" onclick="openCart()">
+<div class="cart-btn" onclick="openCart()">
 🛒
+<span id="cartCount">0</span>
 </div>
-
 
 </header>
 
 
-
 <div class="container">
 
-<h1>Artikel</h1>
+<h1>Unsere Produkte</h1>
+
+<br>
 
 <div class="products" id="products"></div>
-
 
 </div>
 
@@ -200,25 +270,27 @@ GhostShop
 
 <!-- Warenkorb -->
 
-<div class="cartMenu" id="cart">
+<div class="cart" id="cart">
 
+<button onclick="closeCart()" class="close">
+X
+</button>
 
-<span class="close" onclick="closeCart()">✖</span>
-
-
-<h2>Warenkorb</h2>
+<h2>
+Warenkorb
+</h2>
 
 
 <div id="cartItems"></div>
 
 
-<h3>
+<div class="total">
 Gesamt:
 <span id="total">0</span> €
-</h3>
+</div>
 
 
-<button onclick="order()">
+<button onclick="orderNow()">
 Jetzt bestellen
 </button>
 
@@ -227,13 +299,16 @@ Jetzt bestellen
 
 
 
-<!-- Bestellungen -->
+<!-- Admin Menü -->
 
 <div class="admin" id="admin">
 
+<button onclick="closeAdmin()" class="close">
+X
+</button>
 
 <h1>
-Bestellungen
+GhostShop Verwaltung
 </h1>
 
 
@@ -241,32 +316,24 @@ Bestellungen
 
 
 </div>
+
+
 <script>
 
 
-/*
-Neue Artikel hinzufügen:
-
-einfach neue Zeile kopieren:
-
-{
-name:"Artikel",
-price:1.00,
-img:"BILD"
-}
-
-*/
+// ==========================
+// Produkte
+// Neue Artikel einfach hier hinzufügen
+// ==========================
 
 
-let products=[
-
+const products = [
 
 {
 name:"Weihenstephan H-Milch 1L",
 price:1.40,
 img:"https://www.molkerei-weihenstephan.de/fileadmin/media/produkte/milch/haltbare_milch/hmilch_1l_35.png"
 }
-
 
 ];
 
@@ -275,34 +342,33 @@ img:"https://www.molkerei-weihenstephan.de/fileadmin/media/produkte/milch/haltba
 let cart=[];
 
 
-let orders=[];
-
-
 
 function loadProducts(){
 
-let area=document.getElementById("products");
+const box=
+document.getElementById("products");
 
-area.innerHTML="";
+
+box.innerHTML="";
 
 
 products.forEach((p,i)=>{
 
 
-area.innerHTML+=`
+box.innerHTML+=`
 
-<div class="product">
+<div class="card">
 
 <img src="${p.img}">
 
-<h2>${p.name}</h2>
+<h3>${p.name}</h3>
 
-<p class="price">
+<div class="price">
 ${p.price.toFixed(2)} €
-</p>
+</div>
 
 
-<button onclick="add(${i})">
+<button onclick="addCart(${i})">
 In den Warenkorb
 </button>
 
@@ -318,169 +384,244 @@ In den Warenkorb
 }
 
 
-function add(i){
+loadProducts();
+<script>
 
-cart.push(products[i]);
+// ==========================
+// Warenkorb hinzufügen
+// ==========================
 
-updateCart();
+function addCart(index){
+
+    cart.push(products[index]);
+
+    updateCart();
+
+    alert(
+        products[index].name +
+        " wurde hinzugefügt"
+    );
 
 }
 
+
+// ==========================
+// Warenkorb anzeigen
+// ==========================
 
 function updateCart(){
 
-let box=document.getElementById("cartItems");
+    const box =
+    document.getElementById("cartItems");
 
-box.innerHTML="";
-
-
-let sum=0;
+    box.innerHTML="";
 
 
-cart.forEach(p=>{
+    let total=0;
 
 
-sum+=p.price;
+    cart.forEach((item,index)=>{
 
 
-box.innerHTML+=`
-
-<div class="cartItem">
-
-${p.name}<br>
-
-${p.price.toFixed(2)} €
-
-</div>
-
-`;
+        total += item.price;
 
 
-});
+        box.innerHTML += `
+
+        <div class="cart-item">
+
+        <b>${item.name}</b><br>
+
+        ${item.price.toFixed(2)} €
+
+        <br>
+
+        <button onclick="removeCart(${index})">
+        Entfernen
+        </button>
 
 
-document.getElementById("total").innerHTML=sum.toFixed(2);
+        </div>
+
+        `;
+
+
+    });
+
+
+    document.getElementById("total")
+    .innerText =
+    total.toFixed(2);
+
+
+    document.getElementById("cartCount")
+    .innerText =
+    cart.length;
 
 
 }
 
 
+// ==========================
+// Artikel entfernen
+// ==========================
+
+function removeCart(index){
+
+    cart.splice(index,1);
+
+    updateCart();
+
+}
+
+
+
+// ==========================
+// Warenkorb öffnen
+// ==========================
 
 function openCart(){
 
-document.getElementById("cart").classList.add("open");
+    document
+    .getElementById("cart")
+    .classList.add("open");
 
 }
 
 
+// ==========================
+// Warenkorb schließen
+// ==========================
 
 function closeCart(){
 
-document.getElementById("cart").classList.remove("open");
+    document
+    .getElementById("cart")
+    .classList.remove("open");
 
 }
 
 
 
+// ==========================
+// Bestellung senden
+// ==========================
 
-function order(){
+async function orderNow(){
 
 
-if(cart.length==0){
+    if(cart.length===0){
 
-alert("Warenkorb leer");
+        alert(
+        "Der Warenkorb ist leer"
+        );
 
-return;
+        return;
+
+    }
+
+
+
+    let preis=0;
+
+
+    cart.forEach(item=>{
+
+        preis+=item.price;
+
+    });
+
+
+
+    const daten={
+
+        artikel:cart,
+
+        preis:
+        Number(preis.toFixed(2))
+
+    };
+
+
+
+    try{
+
+
+        await fetch(
+        "/api/orders",
+        {
+
+            method:"POST",
+
+            headers:{
+            "Content-Type":
+            "application/json"
+            },
+
+
+            body:
+            JSON.stringify(daten)
+
+        });
+
+
+
+        alert(
+        "Bestellung erfolgreich!"
+        );
+
+
+        cart=[];
+
+        updateCart();
+
+        closeCart();
+
+
+
+    }catch(e){
+
+
+        alert(
+        "Fehler beim Bestellen"
+        );
+
+
+    }
+
 
 }
 
 
-let text="";
 
+// ==========================
+// STRG Taste Admin PIN
+// ==========================
 
-cart.forEach(p=>{
-
-text+=p.name+"<br>";
-
-});
-
-
-orders.push({
-
-date:new Date().toLocaleString(),
-
-items:text,
-
-price:document.getElementById("total").innerHTML
-
-});
-
-
-
-alert("Bestellung erstellt");
-
-
-printReceipt();
-
-
-
-cart=[];
-
-updateCart();
-
-
-}
-
-
-
-function printReceipt(){
-
-
-let w=window.open();
-
-
-w.document.write(`
-
-<h1>Rechnung</h1>
-
-${document.getElementById("cartItems").innerHTML}
-
-<h2>
-Gesamt: ${document.getElementById("total").innerHTML} €
-</h2>
-
-`);
-
-
-w.print();
-
-
-}
-
-
-
-
-
-document.addEventListener("keydown",function(e){
+document.addEventListener(
+"keydown",
+function(e){
 
 
 if(e.ctrlKey){
 
 
-let pin=prompt("PIN eingeben");
+let pin =
+prompt(
+"GhostShop Admin PIN:"
+);
 
 
-if(pin=="0123"){
 
+if(pin==="0123"){
 
-document.getElementById("admin").style.display="block";
+openAdmin();
 
-showOrders();
+}
 
 
 }
 
-}
 
 
 });
@@ -488,43 +629,134 @@ showOrders();
 
 
 
-function showOrders(){
+// ==========================
+// Admin öffnen
+// ==========================
 
-let box=document.getElementById("orders");
+async function openAdmin(){
+
+
+document
+.getElementById("admin")
+.style.display="block";
+
+
+loadOrders();
+
+
+}
+
+
+
+// ==========================
+// Admin schließen
+// ==========================
+
+function closeAdmin(){
+
+
+document
+.getElementById("admin")
+.style.display="none";
+
+
+}
+
+
+
+// ==========================
+// Bestellungen laden
+// ==========================
+
+async function loadOrders(){
+
+
+const res =
+await fetch(
+"/api/orders"
+);
+
+
+const orders =
+await res.json();
+
+
+
+const box =
+document.getElementById("orders");
+
 
 box.innerHTML="";
 
 
-orders.forEach((o,i)=>{
+
+orders.forEach(order=>{
 
 
-box.innerHTML+=`
+box.innerHTML += `
+
 
 <div class="order">
 
 
-<b>${o.date}</b>
+<h3>
+Bestellung ${order.id}
+</h3>
+
 
 <p>
-${o.items}
+Datum:
+${order.datum}
 </p>
 
 
+<p>
+Artikel:
+<br>
+
+${order.artikel
+.map(a=>a.name)
+.join("<br>")}
+
+</p>
+
+
+<p>
 Preis:
-${o.price} €
+${order.preis.toFixed(2)}
+€
+</p>
 
 
-<br><br>
+<p>
+Status:
+${order.status}
+</p>
 
 
-<button onclick="printOrder(${i})">
-Ausdrucken
+
+<button onclick="printList(${order.id})">
+
+Einkaufszettel drucken
+
 </button>
 
 
-<button onclick="deleteOrder(${i})">
+
+<button onclick="printInvoice(${order.id})">
+
+Rechnung drucken
+
+</button>
+
+
+
+<button onclick="finishOrder(${order.id})">
+
 Erledigen
+
 </button>
+
 
 
 </div>
@@ -533,103 +765,129 @@ Erledigen
 `;
 
 
+
 });
 
 
-}
-function deleteOrder(i){
-
-orders.splice(i,1);
-
-showOrders();
 
 }
 
 
 
 
-function printOrder(i){
+// ==========================
+// Bestellung erledigen
+// ==========================
+
+async function finishOrder(id){
 
 
-let o=orders[i];
+await fetch(
+"/api/orders/"+id,
+{
+
+method:"DELETE"
+
+});
 
 
-let w=window.open();
+loadOrders();
 
 
-w.document.write(`
+}
 
-<h1>Einkaufszettel</h1>
 
-${o.items}
+
+
+// ==========================
+// Druck Funktionen
+// ==========================
+
+async function getOrder(id){
+
+
+const res =
+await fetch("/api/orders");
+
+
+const orders =
+await res.json();
+
+
+return orders.find(
+o=>o.id===id
+);
+
+
+}
+
+
+
+async function printList(id){
+
+
+const o =
+await getOrder(id);
+
+
+
+let win =
+window.open("");
+
+
+
+win.document.write(`
+
+
+<h1>
+GhostShop Einkaufszettel
+</h1>
+
+
+<h3>
+Artikel:
+</h3>
+
+
+${o.artikel.map(
+a=>a.name
+).join("<br>")}
+
+
+<br><br>
+
+
+Preis:
+${o.preis} €
+
+
 
 `);
 
-w.print();
+
+
+win.print();
 
 
 }
 
 
 
-// NEU: Rechnung drucken
 
-function printInvoice(i){
-
-
-let o=orders[i];
+async function printInvoice(id){
 
 
-let w=window.open();
+const o =
+await getOrder(id);
 
 
-w.document.write(`
 
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<title>GhostShop Rechnung</title>
+let win =
+window.open("");
 
 
-<style>
 
-body{
-
-font-family:Arial;
-
-padding:40px;
-
-}
-
-
-h1{
-
-font-size:35px;
-
-}
-
-
-.box{
-
-border:1px solid #aaa;
-
-padding:20px;
-
-border-radius:10px;
-
-}
-
-
-</style>
-
-
-</head>
-
-
-<body>
+win.document.write(`
 
 
 <h1>
@@ -637,61 +895,51 @@ GhostShop Rechnung
 </h1>
 
 
-<div class="box">
-
-
-<b>Datum:</b>
-
-${o.date}
+Datum:
+${o.datum}
 
 
 <br><br>
 
 
-<h2>
 Artikel:
-</h2>
-
-
-${o.items}
-
-
-<h2>
-Gesamt:
-${o.price} €
-</h2>
-
 
 <br>
 
 
-Vielen Dank für Ihren Einkauf!
+${o.artikel.map(
+a=>a.name
+).join("<br>")}
 
 
-</div>
+<br><br>
 
 
-</body>
+Gesamt:
+${o.preis} €
 
-</html>
+
+<br><br>
+
+
+Vielen Dank für Ihren Einkauf.
+
+
 
 `);
 
 
-w.print();
+
+win.print();
+
 
 
 }
 
 
 
-
-loadProducts();
-
-
 </script>
 
 
 </body>
-
 </html>
