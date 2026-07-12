@@ -1,171 +1,232 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
+// Render Port oder Standard 3000
 const PORT = process.env.PORT || 3000;
 
-
+// Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
+// Dateien
+const ordersFile = path.join(__dirname, "orders.json");
 
-
-let orders = [];
-
-
-/* gespeicherte Bestellungen laden */
-
-if(fs.existsSync("orders.json")){
-
-    orders = JSON.parse(
-        fs.readFileSync("orders.json")
+// orders.json automatisch erstellen
+if (!fs.existsSync(ordersFile)) {
+    fs.writeFileSync(
+        ordersFile,
+        JSON.stringify([], null, 2),
+        "utf8"
     );
-
 }
 
 
+// ==============================
+// Bestellungen laden
+// ==============================
 
-/* Bestellungen speichern */
+function getOrders() {
+    try {
+        const data = fs.readFileSync(
+            ordersFile,
+            "utf8"
+        );
 
-function save(){
+        return JSON.parse(data);
+
+    } catch (error) {
+
+        return [];
+    }
+}
+
+
+// ==============================
+// Bestellungen speichern
+// ==============================
+
+function saveOrders(orders) {
 
     fs.writeFileSync(
-        "orders.json",
-        JSON.stringify(orders,null,2)
+        ordersFile,
+        JSON.stringify(
+            orders,
+            null,
+            2
+        ),
+        "utf8"
     );
-
 }
 
 
+// ==============================
+// Webseite ausliefern
+// ==============================
 
-/*
-Neue Bestellung
-*/
+app.get("/", (req, res) => {
 
-app.post("/api/order",(req,res)=>{
+    res.sendFile(
+        path.join(
+            __dirname,
+            "index.html"
+        )
+    );
+
+});
 
 
-    let order={
+// ==============================
+// Alle Bestellungen abrufen
+// GET /api/orders
+// ==============================
 
-        id:Date.now(),
+app.get("/api/orders", (req, res)=>{
 
-        date:new Date().toLocaleString(),
+    res.json(
+        getOrders()
+    );
 
-        items:req.body.items,
+});
 
-        total:req.body.total,
 
-        status:"Offen"
+// ==============================
+// Neue Bestellung erstellen
+// POST /api/orders
+// ==============================
+
+app.post("/api/orders",(req,res)=>{
+
+    const orders = getOrders();
+
+    const newOrder = {
+
+        id: Date.now(),
+
+        datum:
+        new Date().toLocaleString("de-DE"),
+
+        artikel:
+        req.body.artikel || [],
+
+        preis:
+        req.body.preis || 0,
+
+        status:
+        "Offen"
 
     };
 
 
-    orders.push(order);
+    orders.push(newOrder);
 
-
-    save();
+    saveOrders(orders);
 
 
     res.json({
 
         success:true,
 
-        order:order
+        order:newOrder
 
     });
 
-
 });
 
 
-
-
-/*
-Alle Bestellungen
-*/
-
-app.get("/api/orders",(req,res)=>{
-
-
-res.json(orders);
-
-
-});
-
-
-
-
-
-/*
-Bestellung erledigen
-*/
+// ==============================
+// Bestellung löschen
+// DELETE /api/orders/:id
+// ==============================
 
 app.delete("/api/orders/:id",(req,res)=>{
 
-
-let id=req.params.id;
-
-
-orders=orders.filter(o=>o.id!=id);
+    let orders = getOrders();
 
 
-save();
+    orders =
+    orders.filter(
+        order =>
+        order.id != req.params.id
+    );
 
 
-res.json({
+    saveOrders(orders);
 
-success:true
+
+    res.json({
+
+        success:true
+
+    });
 
 });
 
 
-});
-
-
-
-
-
-/*
-Status ändern
-*/
+// ==============================
+// Bestellung bearbeiten
+// PUT /api/orders/:id
+// ==============================
 
 app.put("/api/orders/:id",(req,res)=>{
 
-
-let order=orders.find(
-o=>o.id==req.params.id
-);
+    let orders = getOrders();
 
 
-if(order){
-
-order.status=req.body.status;
-
-save();
-
-}
+    const index =
+    orders.findIndex(
+        order =>
+        order.id == req.params.id
+    );
 
 
-res.json({
+    if(index === -1){
 
-success:true
+        return res.status(404).json({
+
+            error:
+            "Bestellung nicht gefunden"
+
+        });
+
+    }
+
+
+    orders[index] = {
+
+        ...orders[index],
+
+        ...req.body
+
+    };
+
+
+    saveOrders(orders);
+
+
+    res.json({
+
+        success:true,
+
+        order:
+        orders[index]
+
+    });
 
 });
 
 
-});
-
-
-
-
+// ==============================
+// Server starten
+// ==============================
 
 app.listen(PORT,()=>{
 
-console.log(
-"GhostShop läuft auf Port "+PORT
-);
+    console.log(
+        `GhostShop läuft auf Port ${PORT}`
+    );
 
 });
