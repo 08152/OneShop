@@ -513,12 +513,17 @@ ${o.price} €
 
 
 <button onclick="printOrder(${i})">
-Ausdrucken
+🛒 Einkaufszettel
+</button>
+
+
+<button onclick="printInvoice(${i})">
+🧾 Rechnung
 </button>
 
 
 <button onclick="deleteOrder(${i})">
-Erledigen
+✅ Erledigen
 </button>
 
 
@@ -567,7 +572,116 @@ w.print();
 
 
 }
+function printInvoice(i){
 
+
+let o=orders[i];
+
+
+let w=window.open();
+
+
+w.document.write(`
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>Rechnung GhostShop</title>
+
+
+<style>
+
+body{
+
+font-family:Arial;
+
+padding:40px;
+
+}
+
+
+h1{
+
+font-size:35px;
+
+}
+
+
+.box{
+
+border:1px solid #aaa;
+
+padding:20px;
+
+border-radius:10px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<h1>
+GhostShop Rechnung
+</h1>
+
+
+<div class="box">
+
+
+<b>Bestelldatum:</b>
+
+${o.date}
+
+
+<br><br>
+
+
+<h2>
+Artikel:
+</h2>
+
+
+${o.items}
+
+
+
+<h2>
+Gesamt:
+${o.price} €
+</h2>
+
+
+<br>
+
+
+Vielen Dank für Ihren Einkauf!
+
+
+</div>
+
+
+</body>
+
+</html>
+
+
+`);
+
+
+w.print();
+
+
+}
 
 
 loadProducts();
