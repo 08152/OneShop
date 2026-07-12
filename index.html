@@ -1,210 +1,363 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echte Instrumente - KI Beat Generator</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #11141a;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: #1b202c;
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            text-align: center;
-            width: 350px;
-            border: 1px solid #2d3548;
-        }
-        h2 { margin-top: 0; color: #00f5ff; font-size: 24px; }
-        button {
-            background: #00adb5;
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px 0;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 173, 181, 0.3);
-        }
-        button:hover:not(:disabled) { 
-            background: #00f5ff; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0, 245, 255, 0.4);
-        }
-        button:disabled {
-            background: #4a5568;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        .stop-btn { background: #ff4141; box-shadow: 0 4px 12px rgba(255, 65, 65, 0.3); }
-        .stop-btn:hover:not(:disabled) { 
-            background: #ff6b6b; 
-            box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
-        }
-        .info {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #a0aec0;
-            background: #11141a;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #2d3548;
-            line-height: 1.5;
-        }
-        .loader {
-            color: #00adb5;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GhostOS Desktop</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+width:100vw;
+height:100vh;
+overflow:hidden;
+
+background-image:url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80");
+background-size:cover;
+background-position:center;
+
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+}
+
+/* Desktop */
+
+.desktop{
+position:absolute;
+inset:0;
+padding:30px;
+}
+
+/* Dock */
+
+.dock{
+height:62px;
+width:100%;
+
+background:rgba(255,255,255,.22);
+
+backdrop-filter:blur(25px);
+-webkit-backdrop-filter:blur(25px);
+
+border-top:1px solid rgba(255,255,255,.3);
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+padding:0 15px;
+
+z-index:1000;
+}
+
+/* Launcher */
+
+.launcher{
+width:42px;
+height:42px;
+
+border-radius:50%;
+
+background:white;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+cursor:pointer;
+
+box-shadow:0 5px 15px rgba(0,0,0,.25);
+}
+
+.launcher:before{
+content:"";
+width:20px;
+height:20px;
+border-radius:50%;
+border:4px solid #4285f4;
+}
+
+/* Apps */
+
+.apps{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.app{
+width:50px;
+height:50px;
+
+background:rgba(255,255,255,.5);
+
+border-radius:16px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+cursor:pointer;
+
+transition:.2s;
+
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+.app:hover{
+transform:translateY(-5px) scale(1.08);
+}
+
+.app img{
+width:30px;
+height:30px;
+}
+
+/* Status */
+
+.status{
+background:rgba(255,255,255,.35);
+
+padding:8px 15px;
+
+border-radius:20px;
+
+display:flex;
+align-items:center;
+gap:12px;
+
+backdrop-filter:blur(20px);
+
+color:white;
+font-weight:600;
+
+box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+.status svg{
+width:16px;
+height:16px;
+fill:white;
+}
+
+/* Menu */
+
+.menu{
+position:absolute;
+bottom:80px;
+left:15px;
+
+width:350px;
+height:450px;
+
+background:rgba(255,255,255,.2);
+
+backdrop-filter:blur(30px);
+
+border-radius:25px;
+
+padding:20px;
+
+display:none;
+
+color:white;
+
+box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+
+.menu.active{
+display:block;
+}
+
+.search{
+width:100%;
+padding:12px;
+
+border:none;
+outline:none;
+
+border-radius:14px;
+
+background:rgba(255,255,255,.2);
+color:white;
+}
+
+.search::placeholder{
+color:white;
+}
+
+.grid{
+margin-top:20px;
+
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+}
+
+.grid .app{
+width:65px;
+height:65px;
+margin:auto;
+}
+
+/* Notification */
+
+.notification{
+position:absolute;
+right:20px;
+bottom:90px;
+
+width:320px;
+
+background:rgba(255,255,255,.25);
+
+backdrop-filter:blur(20px);
+
+padding:15px;
+
+border-radius:18px;
+
+color:white;
+
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+
+display:none;
+}
+
+.notification.show{
+display:block;
+animation:slide .4s ease;
+}
+
+@keyframes slide{
+from{
+transform:translateX(100px);
+opacity:0;
+}
+to{
+transform:translateX(0);
+opacity:1;
+}
+}
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Real Drum KI</h2>
-    <p style="color: #a0aec0; font-size: 14px; margin-bottom: 20px;">Generiert Rhythmen aus echten CC0-Studioaufnahmen.</p>
-    
-    <button id="startBtn" onclick="startBeat()" disabled><span class="loader">Lade echte Instrumente...</span></button>
-    <button id="stopBtn" class="stop-btn" onclick="stopBeat()" style="display:none;">Stop</button>
-    
-    <div class="info" id="status">Warte auf Audio-Samples...</div>
+<div class="desktop"></div>
+
+<div class="menu" id="menu">
+
+<input class="search" placeholder="Apps suchen...">
+
+<div class="grid">
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=google.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=youtube.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=gmail.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=spotify.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=discord.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=github.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=drive.google.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=photos.google.com"></div>
+
+</div>
+
+</div>
+
+<div class="notification" id="notify">
+🔔 Willkommen bei GhostOS
+</div>
+
+<div class="dock">
+
+<div class="launcher" id="launcher"></div>
+
+<div class="apps">
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=google.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=youtube.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=gmail.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=spotify.com"></div>
+
+<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=github.com"></div>
+
+</div>
+
+<div class="status">
+
+<svg viewBox="0 0 24 24">
+<path d="M2 18h2c3 0 5-2 5-5s-2-5-5-5H2v2h2c2 0 3 1 3 3s-1 3-3 3H2z"/>
+</svg>
+
+<svg viewBox="0 0 24 24">
+<path d="M3 6h18v12H3z"/>
+</svg>
+
+<span id="clock">00:00</span>
+
+</div>
+
 </div>
 
 <script>
-// Web Audio Context initialisieren
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null;
 
-let isPlaying = false;
-let currentStep = 0;
-let nextNoteTime = 0.0;
-let timerId = null;
+function updateClock(){
 
-// Parameter der KI
-let bpm = 95;
-let kickPattern = [];
-let snarePattern = [];
-let hatPattern = [];
+const now=new Date();
 
-// Audio-Buffer für die echten Instrumente
-const buffers = { kick: null, snare: null, hat: null };
+const h=String(now.getHours()).padStart(2,"0");
+const m=String(now.getMinutes()).padStart(2,"0");
 
-// CC0 Audio-Dateien von echten Instrumenten (gehostet auf Archive.org)
-const SAMPLE_URLS = {
-    kick: 'https://archive.org',
-    snare: 'https://archive.org',
-    hat: 'https://archive.org'
+document.getElementById("clock").textContent=h+":"+m;
+
+}
+
+setInterval(updateClock,1000);
+updateClock();
+
+const launcher=document.getElementById("launcher");
+const menu=document.getElementById("menu");
+
+launcher.onclick=()=>{
+
+menu.classList.toggle("active");
+
 };
 
-// Samples beim Laden der Seite im Hintergrund herunterladen
-async function loadSamples() {
-    audioCtx = new AudioContext();
-    try {
-        for (const [key, url] of Object.entries(SAMPLE_URLS)) {
-            const response = await fetch(url);
-            const arrayBuffer = await response.arrayBuffer();
-            buffers[key] = await audioCtx.decodeAudioData(arrayBuffer);
-        }
-        // Button freischalten, wenn alles geladen ist
-        document.getElementById("startBtn").disabled = false;
-        document.getElementById("startBtn").innerText = "Zufälligen Beat starten";
-        document.getElementById("status").innerText = "Echte Samples geladen! Bereit zum Würfeln.";
-    } catch (error) {
-        document.getElementById("status").innerHTML = "<span style='color:#ff4141;'>Fehler beim Laden der Audio-Dateien. Bitte Seite neu laden oder Internetverbindung prüfen.</span>";
-        console.error("Fehler beim Laden:", error);
-    }
-}
+const notify=document.getElementById("notify");
 
-// Startet das Laden direkt beim Seitenaufruf
-window.addEventListener('DOMContentLoaded', loadSamples);
+setTimeout(()=>{
 
-// Spielt ein geladenes Instrumenten-Sample zu einer exakten Zeit ab
-function playSample(buffer, time) {
-    if (!buffer) return;
-    let source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.destination);
-    source.start(time);
-}
+notify.classList.add("show");
 
-// KI-Algorithmus gewichtet die Rhythmen logisch
-function generateRandomPatterns() {
-    bpm = Math.floor(Math.random() * (125 - 80 + 1)) + 80;
-    
-    // Mathematische Wahrscheinlichkeiten für echten Groove (16 Schritte)
-    kickPattern = Array.from({length: 16}, (_, i) => i % 4 === 0 ? (Math.random() < 0.85) : (Math.random() < 0.15));
-    snarePattern = Array.from({length: 16}, (_, i) => i % 8 === 4 ? (Math.random() < 0.90) : (Math.random() < 0.10));
-    hatPattern = Array.from({length: 16}, (_, i) => i % 2 === 0 ? (Math.random() < 0.80) : (Math.random() < 0.40));
-}
+},1000);
 
-// Der mathematische Takt-Scheduler für fehlerfreies Timing
-function scheduler() {
-    while (nextNoteTime < audioCtx.currentTime + 0.1) {
-        scheduleNote(currentStep, nextNoteTime);
-        advanceNote();
-    }
-    timerId = setTimeout(scheduler, 25.0);
-}
+setTimeout(()=>{
 
-function scheduleNote(step, time) {
-    if (kickPattern[step]) playSample(buffers.kick, time);
-    if (snarePattern[step]) playSample(buffers.snare, time);
-    if (hatPattern[step]) playSample(buffers.hat, time);
-}
+notify.classList.remove("show");
 
-function advanceNote() {
-    let secondsPerBeat = 60.0 / bpm;
-    let secondsPerStep = secondsPerBeat / 4; // 16tel Note
-    nextNoteTime += secondsPerStep;
-    currentStep = (currentStep + 1) % 16;
-}
+},6000);
 
-// Kontroll-Funktionen
-function startBeat() {
-    // Falls der AudioContext im Ruhezustand war (Browser-Sicherheit)
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-
-    if (isPlaying) {
-        generateRandomPatterns();
-        document.getElementById("status").innerHTML = `KI würfelt neu...<br><b>Tempo:</b> ${bpm} BPM`;
-        return;
-    }
-    
-    isPlaying = true;
-    currentStep = 0;
-    nextNoteTime = audioCtx.currentTime;
-    
-    generateRandomPatterns();
-    scheduler();
-
-    document.getElementById("startBtn").innerText = "Neuen Beat würfeln";
-    document.getElementById("stopBtn").style.display = "block";
-    document.getElementById("status").innerHTML = `<b>Status:</b> Spielt...<br><b>Tempo:</b> ${bpm} BPM`;
-}
-
-function stopBeat() {
-    isPlaying = false;
-    clearTimeout(timerId);
-    
-    document.getElementById("startBtn").innerText = "Zufälligen Beat starten";
-    document.getElementById("stopBtn").style.display = "none";
-    document.getElementById("status").innerText = "Gestoppt. Klicke auf Start für einen neuen Beat.";
-}
 </script>
 
 </body>
