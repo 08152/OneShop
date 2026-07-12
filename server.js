@@ -1,97 +1,118 @@
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
+const cors = require("cors");
 const fs = require("fs");
-const path = require("path");
-
 
 const app = express();
-const server = http.createServer(app);
-
-const io = new Server(server);
-
 
 const PORT = process.env.PORT || 3000;
 
 
+app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static("public"));
 
 
-let users = [];
 
-let online = {};
+let orders = [];
 
 
-// Nutzer laden
+/* gespeicherte Bestellungen laden */
 
-if(fs.existsSync("users.json")){
+if(fs.existsSync("orders.json")){
 
-    users = JSON.parse(
-        fs.readFileSync("users.json")
+    orders = JSON.parse(
+        fs.readFileSync("orders.json")
     );
 
 }
 
 
 
-// speichern
+/* Bestellungen speichern */
 
-function saveUsers(){
+function save(){
 
     fs.writeFileSync(
-        "users.json",
-        JSON.stringify(users,null,2)
+        "orders.json",
+        JSON.stringify(orders,null,2)
     );
 
 }
 
 
 
+/*
+Neue Bestellung
+*/
 
-app.get("/",(req,res)=>{
-
-    res.sendFile(
-        path.join(__dirname,"index.html")
-    );
-
-});
+app.post("/api/order",(req,res)=>{
 
 
+    let order={
+
+        id:Date.now(),
+
+        date:new Date().toLocaleString(),
+
+        items:req.body.items,
+
+        total:req.body.total,
+
+        status:"Offen"
+
+    };
 
 
-
-// Registrierung
-
-app.post("/register",(req,res)=>{
+    orders.push(order);
 
 
-const {email,pin,name}=req.body;
+    save();
 
 
+    res.json({
 
-if(users.find(u=>u.email===email)){
+        success:true,
 
-    return res.json({
-        success:false,
-        message:"Account existiert bereits"
+        order:order
+
     });
 
-}
-
-
-
-users.push({
-
-    email,
-    pin,
-    name
 
 });
 
 
-saveUsers();
 
+
+/*
+Alle Bestellungen
+*/
+
+app.get("/api/orders",(req,res)=>{
+
+
+res.json(orders);
+
+
+});
+
+
+
+
+
+/*
+Bestellung erledigen
+*/
+
+app.delete("/api/orders/:id",(req,res)=>{
+
+
+let id=req.params.id;
+
+
+orders=orders.filter(o=>o.id!=id);
+
+
+save();
 
 
 res.json({
@@ -107,40 +128,30 @@ success:true
 
 
 
+/*
+Status ändern
+*/
 
-// Login
-
-app.post("/login",(req,res)=>{
-
-
-const {email,pin}=req.body;
+app.put("/api/orders/:id",(req,res)=>{
 
 
-
-let user =
-users.find(
-u=>u.email===email && u.pin===pin
+let order=orders.find(
+o=>o.id==req.params.id
 );
 
 
+if(order){
 
-if(!user){
+order.status=req.body.status;
 
-return res.json({
-
-success:false
-
-});
+save();
 
 }
-
 
 
 res.json({
 
-success:true,
-
-name:user.name
+success:true
 
 });
 
@@ -151,93 +162,10 @@ name:user.name
 
 
 
-
-
-
-io.on("connection",(socket)=>{
-
-
-
-socket.on("join",(name)=>{
-
-
-online[socket.id]=name;
-
-
-io.emit(
-"users",
-Object.values(online)
-);
-
-
-});
-
-
-
-
-
-
-socket.on("message",(text)=>{
-
-
-if(!online[socket.id])
-return;
-
-
-
-io.emit(
-"message",
-{
-
-user:online[socket.id],
-
-text,
-
-time:
-new Date()
-.toLocaleTimeString()
-
-}
-
-);
-
-
-});
-
-
-
-
-
-
-
-socket.on("disconnect",()=>{
-
-
-delete online[socket.id];
-
-
-io.emit(
-"users",
-Object.values(online)
-);
-
-
-});
-
-
-
-});
-
-
-
-
-
-
-
-server.listen(PORT,()=>{
+app.listen(PORT,()=>{
 
 console.log(
-"GhostChat läuft auf Port "+PORT
+"GhostShop läuft auf Port "+PORT
 );
 
 });
