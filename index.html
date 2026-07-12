@@ -3,362 +3,578 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GhostOS Desktop</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>GhostShop</title>
 
 <style>
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,Arial,sans-serif;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
 body{
-width:100vw;
-height:100vh;
-overflow:hidden;
-
-background-image:url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80");
-background-size:cover;
-background-position:center;
-
-display:flex;
-flex-direction:column;
-justify-content:flex-end;
+    margin:0;
+    background:#f3f3f3;
 }
 
-/* Desktop */
-
-.desktop{
-position:absolute;
-inset:0;
-padding:30px;
+/* Kopf */
+header{
+    background:#131921;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-/* Dock */
-
-.dock{
-height:62px;
-width:100%;
-
-background:rgba(255,255,255,.22);
-
-backdrop-filter:blur(25px);
--webkit-backdrop-filter:blur(25px);
-
-border-top:1px solid rgba(255,255,255,.3);
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:0 15px;
-
-z-index:1000;
+.logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#ffd814;
 }
 
-/* Launcher */
-
-.launcher{
-width:42px;
-height:42px;
-
-border-radius:50%;
-
-background:white;
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-cursor:pointer;
-
-box-shadow:0 5px 15px rgba(0,0,0,.25);
+.cartIcon{
+    cursor:pointer;
+    font-size:28px;
 }
 
-.launcher:before{
-content:"";
-width:20px;
-height:20px;
-border-radius:50%;
-border:4px solid #4285f4;
+
+/* Produkte */
+
+.container{
+    padding:30px;
 }
 
-/* Apps */
-
-.apps{
-display:flex;
-gap:10px;
-align-items:center;
+.products{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
 }
 
-.app{
-width:50px;
-height:50px;
 
-background:rgba(255,255,255,.5);
-
-border-radius:16px;
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-cursor:pointer;
-
-transition:.2s;
-
-box-shadow:0 5px 15px rgba(0,0,0,.2);
+.product{
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 15px #ccc;
+    text-align:center;
 }
 
-.app:hover{
-transform:translateY(-5px) scale(1.08);
+
+.product img{
+    width:150px;
+    height:150px;
+    object-fit:contain;
 }
 
-.app img{
-width:30px;
-height:30px;
+
+.price{
+    font-size:22px;
+    color:#b12704;
+    font-weight:bold;
 }
 
-/* Status */
 
-.status{
-background:rgba(255,255,255,.35);
-
-padding:8px 15px;
-
-border-radius:20px;
-
-display:flex;
-align-items:center;
-gap:12px;
-
-backdrop-filter:blur(20px);
-
-color:white;
-font-weight:600;
-
-box-shadow:0 5px 15px rgba(0,0,0,.2);
+button{
+    border:0;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    background:#ffd814;
+    font-weight:bold;
 }
 
-.status svg{
-width:16px;
-height:16px;
-fill:white;
+
+button:hover{
+    background:#ffca00;
 }
 
-/* Menu */
 
-.menu{
-position:absolute;
-bottom:80px;
-left:15px;
+/* Warenkorb */
 
-width:350px;
-height:450px;
+.cartMenu{
 
-background:rgba(255,255,255,.2);
+    position:fixed;
+    right:-400px;
+    top:0;
 
-backdrop-filter:blur(30px);
+    width:350px;
+    height:100%;
 
-border-radius:25px;
+    background:white;
 
-padding:20px;
+    box-shadow:-5px 0 20px #999;
 
-display:none;
+    padding:20px;
 
-color:white;
+    transition:.3s;
 
-box-shadow:0 20px 40px rgba(0,0,0,.3);
+    overflow:auto;
 }
 
-.menu.active{
-display:block;
+
+.cartMenu.open{
+    right:0;
 }
 
-.search{
-width:100%;
-padding:12px;
 
-border:none;
-outline:none;
+.cartItem{
 
-border-radius:14px;
+    border-bottom:1px solid #ddd;
+    padding:10px;
 
-background:rgba(255,255,255,.2);
-color:white;
 }
 
-.search::placeholder{
-color:white;
+
+.close{
+    float:right;
+    cursor:pointer;
+    font-size:25px;
 }
 
-.grid{
-margin-top:20px;
 
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:15px;
+
+/* Admin */
+
+.admin{
+
+    display:none;
+
+    padding:30px;
+
+    background:white;
+
+    margin:20px;
+
+    border-radius:15px;
+
 }
 
-.grid .app{
-width:65px;
-height:65px;
-margin:auto;
+
+.order{
+
+    background:#eee;
+    padding:15px;
+    margin:10px;
+    border-radius:10px;
+
 }
 
-/* Notification */
 
-.notification{
-position:absolute;
-right:20px;
-bottom:90px;
-
-width:320px;
-
-background:rgba(255,255,255,.25);
-
-backdrop-filter:blur(20px);
-
-padding:15px;
-
-border-radius:18px;
-
-color:white;
-
-box-shadow:0 10px 25px rgba(0,0,0,.3);
-
-display:none;
-}
-
-.notification.show{
-display:block;
-animation:slide .4s ease;
-}
-
-@keyframes slide{
-from{
-transform:translateX(100px);
-opacity:0;
-}
-to{
-transform:translateX(0);
-opacity:1;
-}
-}
 </style>
+
 </head>
+
+
 <body>
 
-<div class="desktop"></div>
 
-<div class="menu" id="menu">
+<header>
 
-<input class="search" placeholder="Apps suchen...">
+<div class="logo">
+GhostShop
+</div>
 
-<div class="grid">
+<div class="cartIcon" onclick="openCart()">
+🛒
+</div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=google.com"></div>
+</header>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=youtube.com"></div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=gmail.com"></div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=spotify.com"></div>
+<div class="container">
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=discord.com"></div>
+<h1>Artikel</h1>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=github.com"></div>
+<div class="products" id="products"></div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=drive.google.com"></div>
-
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=photos.google.com"></div>
 
 </div>
 
-</div>
 
-<div class="notification" id="notify">
-🔔 Willkommen bei GhostOS
-</div>
 
-<div class="dock">
+<!-- Warenkorb -->
 
-<div class="launcher" id="launcher"></div>
+<div class="cartMenu" id="cart">
 
-<div class="apps">
+<span class="close" onclick="closeCart()">✖</span>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=google.com"></div>
+<h2>Warenkorb</h2>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=youtube.com"></div>
+<div id="cartItems"></div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=gmail.com"></div>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=spotify.com"></div>
+<h3>
+Gesamt:
+<span id="total">0</span> €
+</h3>
 
-<div class="app"><img src="https://www.google.com/s2/favicons?sz=64&domain=github.com"></div>
 
-</div>
+<button onclick="order()">
+Jetzt bestellen
+</button>
 
-<div class="status">
-
-<svg viewBox="0 0 24 24">
-<path d="M2 18h2c3 0 5-2 5-5s-2-5-5-5H2v2h2c2 0 3 1 3 3s-1 3-3 3H2z"/>
-</svg>
-
-<svg viewBox="0 0 24 24">
-<path d="M3 6h18v12H3z"/>
-</svg>
-
-<span id="clock">00:00</span>
 
 </div>
 
+
+
+<!-- Bestellungen -->
+
+<div class="admin" id="admin">
+
+<h1>
+Bestellungen
+</h1>
+
+
+<div id="orders"></div>
+
+
 </div>
+
+
 
 <script>
 
-function updateClock(){
 
-const now=new Date();
+/*
+Neue Artikel hinzufügen:
 
-const h=String(now.getHours()).padStart(2,"0");
-const m=String(now.getMinutes()).padStart(2,"0");
+einfach neue Zeile kopieren:
 
-document.getElementById("clock").textContent=h+":"+m;
+{
+name:"Artikel",
+price:1.00,
+img:"BILD"
+}
+
+*/
+
+
+let products=[
+
+
+{
+name:"Weihenstephan H-Milch 1L",
+price:1.40,
+img:"https://www.molkerei-weihenstephan.de/fileadmin/media/produkte/milch/haltbare_milch/hmilch_1l_35.png"
+}
+
+
+];
+
+
+
+let cart=[];
+
+
+let orders=[];
+
+
+
+function loadProducts(){
+
+let area=document.getElementById("products");
+
+area.innerHTML="";
+
+
+products.forEach((p,i)=>{
+
+
+area.innerHTML+=`
+
+<div class="product">
+
+<img src="${p.img}">
+
+<h2>${p.name}</h2>
+
+<p class="price">
+${p.price.toFixed(2)} €
+</p>
+
+
+<button onclick="add(${i})">
+In den Warenkorb
+</button>
+
+
+</div>
+
+`;
+
+
+});
+
 
 }
 
-setInterval(updateClock,1000);
-updateClock();
 
-const launcher=document.getElementById("launcher");
-const menu=document.getElementById("menu");
+function add(i){
 
-launcher.onclick=()=>{
+cart.push(products[i]);
 
-menu.classList.toggle("active");
+updateCart();
 
-};
+}
 
-const notify=document.getElementById("notify");
 
-setTimeout(()=>{
+function updateCart(){
 
-notify.classList.add("show");
+let box=document.getElementById("cartItems");
 
-},1000);
+box.innerHTML="";
 
-setTimeout(()=>{
 
-notify.classList.remove("show");
+let sum=0;
 
-},6000);
+
+cart.forEach(p=>{
+
+
+sum+=p.price;
+
+
+box.innerHTML+=`
+
+<div class="cartItem">
+
+${p.name}<br>
+
+${p.price.toFixed(2)} €
+
+</div>
+
+`;
+
+
+});
+
+
+document.getElementById("total").innerHTML=sum.toFixed(2);
+
+
+}
+
+
+
+function openCart(){
+
+document.getElementById("cart").classList.add("open");
+
+}
+
+
+
+function closeCart(){
+
+document.getElementById("cart").classList.remove("open");
+
+}
+
+
+
+
+function order(){
+
+
+if(cart.length==0){
+
+alert("Warenkorb leer");
+
+return;
+
+}
+
+
+let text="";
+
+
+cart.forEach(p=>{
+
+text+=p.name+"<br>";
+
+});
+
+
+orders.push({
+
+date:new Date().toLocaleString(),
+
+items:text,
+
+price:document.getElementById("total").innerHTML
+
+});
+
+
+
+alert("Bestellung erstellt");
+
+
+printReceipt();
+
+
+
+cart=[];
+
+updateCart();
+
+
+}
+
+
+
+function printReceipt(){
+
+
+let w=window.open();
+
+
+w.document.write(`
+
+<h1>Rechnung</h1>
+
+${document.getElementById("cartItems").innerHTML}
+
+<h2>
+Gesamt: ${document.getElementById("total").innerHTML} €
+</h2>
+
+`);
+
+
+w.print();
+
+
+}
+
+
+
+
+
+document.addEventListener("keydown",function(e){
+
+
+if(e.ctrlKey){
+
+
+let pin=prompt("PIN eingeben");
+
+
+if(pin=="0123"){
+
+
+document.getElementById("admin").style.display="block";
+
+showOrders();
+
+
+}
+
+}
+
+
+});
+
+
+
+
+function showOrders(){
+
+let box=document.getElementById("orders");
+
+box.innerHTML="";
+
+
+orders.forEach((o,i)=>{
+
+
+box.innerHTML+=`
+
+<div class="order">
+
+
+<b>${o.date}</b>
+
+<p>
+${o.items}
+</p>
+
+
+Preis:
+${o.price} €
+
+
+<br><br>
+
+
+<button onclick="printOrder(${i})">
+Ausdrucken
+</button>
+
+
+<button onclick="deleteOrder(${i})">
+Erledigen
+</button>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+}
+
+
+
+function deleteOrder(i){
+
+orders.splice(i,1);
+
+showOrders();
+
+}
+
+
+
+
+function printOrder(i){
+
+
+let o=orders[i];
+
+
+let w=window.open();
+
+
+w.document.write(`
+
+<h1>Einkaufszettel</h1>
+
+${o.items}
+
+`);
+
+w.print();
+
+
+}
+
+
+
+loadProducts();
+
 
 </script>
+
 
 </body>
 </html>
