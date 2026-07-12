@@ -155,7 +155,9 @@ button:hover{
 
     background:#eee;
     padding:15px;
+
     margin:10px;
+
     border-radius:10px;
 
 }
@@ -175,9 +177,11 @@ button:hover{
 GhostShop
 </div>
 
+
 <div class="cartIcon" onclick="openCart()">
 🛒
 </div>
+
 
 </header>
 
@@ -198,9 +202,12 @@ GhostShop
 
 <div class="cartMenu" id="cart">
 
+
 <span class="close" onclick="closeCart()">✖</span>
 
+
 <h2>Warenkorb</h2>
+
 
 <div id="cartItems"></div>
 
@@ -224,6 +231,7 @@ Jetzt bestellen
 
 <div class="admin" id="admin">
 
+
 <h1>
 Bestellungen
 </h1>
@@ -233,9 +241,6 @@ Bestellungen
 
 
 </div>
-
-
-
 <script>
 
 
@@ -513,17 +518,12 @@ ${o.price} €
 
 
 <button onclick="printOrder(${i})">
-🛒 Einkaufszettel
-</button>
-
-
-<button onclick="printInvoice(${i})">
-🧾 Rechnung
+Ausdrucken
 </button>
 
 
 <button onclick="deleteOrder(${i})">
-✅ Erledigen
+Erledigen
 </button>
 
 
@@ -537,9 +537,6 @@ ${o.price} €
 
 
 }
-
-
-
 function deleteOrder(i){
 
 orders.splice(i,1);
@@ -572,6 +569,11 @@ w.print();
 
 
 }
+
+
+
+// NEU: Rechnung drucken
+
 function printInvoice(i){
 
 
@@ -589,7 +591,7 @@ w.document.write(`
 
 <head>
 
-<title>Rechnung GhostShop</title>
+<title>GhostShop Rechnung</title>
 
 
 <style>
@@ -638,7 +640,7 @@ GhostShop Rechnung
 <div class="box">
 
 
-<b>Bestelldatum:</b>
+<b>Datum:</b>
 
 ${o.date}
 
@@ -652,7 +654,6 @@ Artikel:
 
 
 ${o.items}
-
 
 
 <h2>
@@ -674,7 +675,6 @@ Vielen Dank für Ihren Einkauf!
 
 </html>
 
-
 `);
 
 
@@ -684,6 +684,8 @@ w.print();
 }
 
 
+
+
 loadProducts();
 
 
@@ -691,4 +693,5 @@ loadProducts();
 
 
 </body>
+
 </html>
