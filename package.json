@@ -1,7 +1,7 @@
 {
   "name": "ghostshop",
   "version": "1.0.0",
-  "description": "Online Einkaufswagen Shop",
+  "description": "GhostShop - moderner Online-Shop mit Node.js Express",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
