@@ -1,32 +1,55 @@
- // ==========================
+// ======================================
 // pose.js
 // Mecha Chameleon Posen
-// ==========================
+// Three.js Version
+// ======================================
 
 
-// aktueller Zustand
+
 let currentPose = "stand";
 
 
-// Menü
-const poseMenu = document.getElementById("poseMenu");
+
+const poseMenu =
+document.getElementById("poseMenu");
 
 
+
+
+
+// ===============================
 // Taste 1
-window.addEventListener("keydown", (e)=>{
+// ===============================
+
+
+window.addEventListener(
+"keydown",
+(e)=>{
+
 
     if(e.key === "1"){
 
-        poseMenu.classList.toggle("hidden");
+        poseMenu.classList.toggle(
+            "hidden"
+        );
 
     }
+
 
 });
 
 
-// Buttons
 
-document.getElementById("poseStand")
+
+
+
+// ===============================
+// Buttons
+// ===============================
+
+
+document
+.getElementById("poseStand")
 .onclick = ()=>{
 
     setPose("stand");
@@ -34,7 +57,9 @@ document.getElementById("poseStand")
 };
 
 
-document.getElementById("poseLie")
+
+document
+.getElementById("poseLie")
 .onclick = ()=>{
 
     setPose("lie");
@@ -42,7 +67,9 @@ document.getElementById("poseLie")
 };
 
 
-document.getElementById("poseHead")
+
+document
+.getElementById("poseHead")
 .onclick = ()=>{
 
     setPose("headstand");
@@ -51,11 +78,22 @@ document.getElementById("poseHead")
 
 
 
+
+
+
+
+
+// ===============================
 // Pose setzen
+// ===============================
+
 
 function setPose(pose){
 
+
+
     currentPose = pose;
+
 
 
     // zurücksetzen
@@ -67,8 +105,13 @@ function setPose(pose){
     );
 
 
-    player.position.y = 2;
 
+    player.position.y=2;
+
+
+
+    body.rotation.set(0,0,0);
+    head.rotation.set(0,0,0);
 
     leftArm.rotation.set(0,0,0);
     rightArm.rotation.set(0,0,0);
@@ -78,62 +121,120 @@ function setPose(pose){
 
 
 
+
+
+
+    // =========================
     // Stehen
+    // =========================
 
-    if(pose === "stand"){
+    if(pose==="stand"){
 
-        player.rotation.z = 0;
+
+        player.rotation.z=0;
+
 
     }
 
 
 
+
+
+    // =========================
     // Liegen
+    // =========================
 
-    if(pose === "lie"){
-
-        player.rotation.z = Math.PI / 2;
-
-        player.position.y = 0.7;
+    if(pose==="lie"){
 
 
-        leftArm.rotation.z = 0.4;
-        rightArm.rotation.z = -0.4;
+        player.rotation.z =
+        Math.PI/2;
+
+
+        player.position.y=1;
+
+
+
+        leftArm.rotation.z =
+        0.5;
+
+
+        rightArm.rotation.z =
+        -0.5;
+
 
     }
 
 
 
+
+
+
+    // =========================
     // Kopfstand
+    // =========================
 
-    if(pose === "headstand"){
-
-        player.rotation.z = Math.PI;
-
-        player.position.y = 1;
+    if(pose==="headstand"){
 
 
-        leftLeg.rotation.x = 1;
-        rightLeg.rotation.x = 1;
+        player.rotation.z =
+        Math.PI;
 
 
-        leftArm.rotation.x = -1;
-        rightArm.rotation.x = -1;
+
+        player.position.y=3;
+
+
+
+        leftLeg.rotation.x =
+        1;
+
+
+        rightLeg.rotation.x =
+        1;
+
+
+
+        leftArm.rotation.x =
+        -1;
+
+
+        rightArm.rotation.x =
+        -1;
+
 
     }
+
+
 
 }
 
 
 
-// kleine Animation beim Wechsel
+
+
+
+
+
+// ===============================
+// Animation
+// ===============================
+
 
 function animatePose(){
 
-    if(currentPose === "headstand"){
 
-        player.rotation.y += 0.01;
+
+    if(
+        currentPose === "headstand"
+    ){
+
+
+        player.rotation.y +=
+        0.01;
+
 
     }
+
 
 }
