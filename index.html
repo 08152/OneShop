@@ -19,7 +19,7 @@
             overflow: auto;
             padding: 10px;
             box-sizing: border-box;
-            -webkit-overflow-scrolling: touch; /* Sanftes Scrollen auf iOS */
+            -webkit-overflow-scrolling: touch;
         }
         .input-container {
             display: flex;
@@ -54,13 +54,12 @@
             color: #000;
         }
 
-        /* HARDWARE-PRÜFUNG: Wenn das Gerät ein Touchscreen hat (pointer: coarse) */
         @media (pointer: coarse) {
             .input-container {
-                display: none !important; /* Schreibfenster komplett verstecken */
+                display: none !important;
             }
             #log {
-                height: 100vh; /* Log nutzt den vollen Bildschirm */
+                height: 100vh;
             }
         }
     </style>
@@ -83,43 +82,70 @@
         
         let ok = false;
 
-        // Zusätzlicher JavaScript-Schutz: Deaktiviert Eingaben auf Touch-Geräten komplett
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         if (isTouchDevice) {
-            inputArea.style.display = 'none'; // Verstecken
-            i.disabled = true;                // Anklicken/Fokus sperren
-            i.blur();                         // Fokus entziehen
+            inputArea.style.display = 'none';
+            i.disabled = true;
+            i.blur();
         }
 
-        // Hilfsfunktionen für LocalStorage offline-Warteschlange
+        // --- NEU: LocalStorage Funktionen für Verlauf und Warteschlange ---
         const getOfflineQueue = () => JSON.parse(localStorage.getItem('chat_offline_queue') || '[]');
         const saveOfflineQueue = q => localStorage.setItem('chat_offline_queue', JSON.stringify(q));
+        
+        const getLocalHistory = () => JSON.parse(localStorage.getItem('chat_history') || '[]');
+        const saveLocalHistory = h => localStorage.setItem('chat_history', JSON.stringify(h));
 
-        const add = t => {
+        // UI aktualisieren und im lokalen Verlauf sichern
+        const add = (t, shouldSave = true) => {
             l.innerHTML += t + '<br>';
             l.scrollTop = l.scrollHeight;
+
+            if (shouldSave) {
+                const history = getLocalHistory();
+                history.push(t);
+                saveLocalHistory(history);
+            }
         };
 
-        // Event: Verbindung zum Server wiederhergestellt
+        // Beim Start: Zuerst lokal gespeicherten Verlauf laden (Offline-Verfügbarkeit)
+        const loadLocalHistory = () => {
+            l.innerHTML = '';
+            const history = getLocalHistory();
+            history.forEach(msg => add(msg, false));
+        };
+        loadLocalHistory();
+
+        // Event: Verbindung zum Server aufgebaut/wiederhergestellt
         s.on('connect', () => {
             const queue = getOfflineQueue();
             if (queue.length > 0) {
-                add(`[System] Reconnected. Sende ${queue.length} gespeicherte Nachricht(en)...`);
+                add(`[System] Verbindung aktiv. Sende ${queue.length} gespeicherte Nachricht(en)...`, true);
+                
+                // Nachrichten nacheinander an den Server hochladen
                 queue.forEach(msg => s.emit('line', msg));
-                saveOfflineQueue([]); // Warteschlange leeren
+                saveOfflineQueue([]); 
             }
         });
 
+        // Server-Historie überschreibt den lokalen Speicher (Synchronisation)
         s.on('history', h => {
-            l.innerHTML = '';
-            h.forEach(add);
+            saveLocalHistory(h);
+            loadLocalHistory();
         });
 
-        s.on('line', add);
+        // Neue Nachricht vom Server empfangen
+        s.on('line', t => {
+            // Nur hinzufügen, wenn sie nicht schon lokal als "[Offline]" existiert 
+            // (verhindert Dopplungen nach dem Upload)
+            const history = getLocalHistory();
+            if (!history.includes(t)) {
+                add(t, true);
+            }
+        });
 
-        // Zentrale Funktion für das Absenden (Tastatur & Touch-Button)
+        // Zentrale Funktion für das Absenden
         const processInput = () => {
-            // Doppelte Absicherung im Code gegen Umgehung
             if (isTouchDevice) return;
 
             let t = i.value.trim();
@@ -128,24 +154,26 @@
             if (!ok) {
                 if (t === 'Risky_Live') {
                     ok = true;
-                    add('[PIN akzeptiert] - Sie können jetzt Nachrichten senden.');
+                    add('[PIN akzeptiert] - Sie können jetzt Nachrichten senden.', false);
                     i.placeholder = 'Nachricht schreiben...';
                 } else {
-                    add('[System] Falsche PIN. Zugriff verweigert.');
+                    add('[System] Falsche PIN. Zugriff verweigert.', false);
                 }
                 return;
             }
 
             if (t) {
-                // Prüfen, ob der Server aktuell erreichbar ist
                 if (s.connected) {
+                    // Server ist online: Direkt senden
                     s.emit('line', t);
                 } else {
-                    // Offline: Im LocalStorage zwischenspeichern und lokal anzeigen
+                    // Server ist offline: In Warteschlange packen und lokal sichern
                     const queue = getOfflineQueue();
                     queue.push(t);
                     saveOfflineQueue(queue);
-                    add('[Offline-Gespeichert] ' + t);
+                    
+                    // Lokal sofort anzeigen
+                    add('[Offline-Gespeichert] ' + t, true);
                 }
             }
         };
@@ -156,7 +184,7 @@
             processInput();
         };
 
-        // Touchscreen-Button-Event (wird durch das CSS/JS oben auf Touch-Geräten eh nie erreicht)
+        // Button-Event
         btn.addEventListener('click', e => {
             e.preventDefault();
             processInput();
