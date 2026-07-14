@@ -6,37 +6,31 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = process.env.PORT || 3000;
+const history = [];
 
-app.use(express.static("."));
+app.use(express.static(__dirname));
 
-let terminal = [];
+io.on("connection", (socket) => {
+    socket.emit("history", history);
 
-io.on("connection", socket => {
+    socket.on("line", (text) => {
+        if (typeof text !== "string") return;
 
-    socket.emit("history", terminal);
+        text = text.trim();
+        if (!text) return;
 
-    socket.on("line", line => {
+        history.push(text);
 
-        terminal.push(line);
+        if (history.length > 500) {
+            history.shift();
+        }
 
-        if (terminal.length > 1000)
-            terminal.shift();
-
-        io.emit("line", line);
-
+        io.emit("line", text);
     });
-
-    socket.on("clear", () => {
-
-        terminal = [];
-
-        io.emit("clear");
-
-    });
-
 });
 
+const PORT = 3000;
+
 server.listen(PORT, () => {
-    console.log("Server läuft auf Port " + PORT);
+    console.log(`Server läuft auf http://localhost:${PORT}`);
 });
