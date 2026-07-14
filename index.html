@@ -1,1 +1,90 @@
-<!DOCTYPE html><html lang='de'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Live Chat</title><style>body{margin:0;background:#111;color:#0f0;font-family:monospace}#log{height:90vh;overflow:auto;padding:10px}input{width:100%;padding:10px;box-sizing:border-box;background:#000;color:#0f0;border:none}</style></head><body><div id='log'></div><input id='input' placeholder='PIN oder Nachricht'><script src='/socket.io/socket.io.js'></script><script>const s=io(),l=document.getElementById('log'),i=document.getElementById('input');let ok=false;const add=t=>{l.innerHTML+=t+'<br>';l.scrollTop=l.scrollHeight};s.on('history',h=>{l.innerHTML='';h.forEach(add)});s.on('line',add);i.onkeydown=e=>{if(e.key!=='Enter')return;let t=i.value.trim();i.value='';if(!ok){if(t==='Risky_Live'){ok=true;add('[PIN akzeptiert]')}return;}if(t)s.emit('line',t);};</script></body></html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            color: #0f0;
+            font-family: monospace;
+        }
+        #log {
+            height: 90vh;
+            overflow: auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #000;
+            color: #0f0;
+            border: none;
+            outline: none;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="log"></div>
+    <input id="input" placeholder="PIN oder Nachricht eingeben..." autofocus>
+
+    <!-- Socket.io Client-Bibliothek (wird standardmäßig vom Socket.io-Server bereitgestellt) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Verbindung zum Socket.io-Server herstellen
+        const s = io();
+        const l = document.getElementById('log');
+        const i = document.getElementById('input');
+        
+        // Status-Flag für die PIN-Authentifizierung
+        let ok = false;
+
+        // Funktion zum Hinzufügen von Textzeilen in das Chat-Fenster
+        const add = t => {
+            l.innerHTML += t + '<br>';
+            l.scrollTop = l.scrollHeight; // Automatisch nach unten scrollen
+        };
+
+        // Event: Empfang der Chat-Historie vom Server
+        s.on('history', h => {
+            l.innerHTML = '';
+            h.forEach(add);
+        });
+
+        // Event: Empfang einer neuen einzelnen Chat-Zeile
+        s.on('line', add);
+
+        // Event: Tastatureingabe im Textfeld abfangen
+        i.onkeydown = e => {
+            // Nur reagieren, wenn 'Enter' gedrückt wurde
+            if (e.key !== 'Enter') return;
+            
+            let t = i.value.trim();
+            i.value = ''; // Eingabefeld leeren
+
+            // Falls die PIN noch nicht korrekt eingegeben wurde
+            if (!ok) {
+                if (t === 'Risky_Live') {
+                    ok = true;
+                    add('[PIN akzeptiert] - Sie können jetzt Nachrichten senden.');
+                    i.placeholder = 'Nachricht schreiben...';
+                } else {
+                    add('[System] Falsche PIN. Zugriff verweigert.');
+                }
+                return;
+            }
+
+            // Wenn authentifiziert und Text vorhanden ist, Nachricht an Server senden
+            if (t) {
+                s.emit('line', t);
+            }
+        };
+    </script>
+</body>
+</html>
