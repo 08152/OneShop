@@ -1,89 +1,93 @@
-// ==========================
+// ======================================
 // ui.js
 // Mecha Chameleon UI
-// ==========================
+// Three.js Version
+// ======================================
 
 
-const menus = [
+
+const allMenus = [
+
     document.getElementById("poseMenu"),
+
     document.getElementById("paintMenu")
+
 ];
 
 
+
+
+// ===============================
 // Alle Menüs schließen
+// ===============================
 
-function closeMenus(){
 
-    menus.forEach(menu=>{
+function closeAllMenus(){
+
+
+    allMenus.forEach(
+    menu=>{
+
 
         if(menu){
 
-            menu.classList.add("hidden");
+            menu.classList.add(
+                "hidden"
+            );
 
         }
 
+
     });
+
 
 }
 
 
-// Nur ein Menü öffnen
+
+
+
+// ===============================
+// Menü öffnen
+// ===============================
+
 
 function openMenu(menu){
 
-    closeMenus();
 
-    menu.classList.remove("hidden");
+    closeAllMenus();
+
+
+    if(menu){
+
+        menu.classList.remove(
+            "hidden"
+        );
+
+    }
+
 
 }
 
 
-// ESC schließt alles
-
-window.addEventListener("keydown",(e)=>{
-
-    if(e.key === "Escape"){
-
-        closeMenus();
-
-    }
-
-});
 
 
-// Klick außerhalb
 
-document.addEventListener(
-"mousedown",
+
+
+// ===============================
+// ESC
+// ===============================
+
+
+window.addEventListener(
+"keydown",
 (e)=>{
 
 
-    let clickedMenu = false;
+    if(e.key==="Escape"){
 
-
-    menus.forEach(menu=>{
-
-        if(
-            menu &&
-            menu.contains(e.target)
-        ){
-
-            clickedMenu = true;
-
-        }
-
-    });
-
-
-    if(!clickedMenu){
-
-        // nur schließen wenn nicht im Spiel geklickt wird
-
-        if(e.target !== renderer.domElement){
-
-            closeMenus();
-
-        }
+        closeAllMenus();
 
     }
 
@@ -92,57 +96,102 @@ document.addEventListener(
 
 
 
-// HUD Nachricht
+
+
+
+
+
+// ===============================
+// Nachricht anzeigen
+// ===============================
+
 
 function showMessage(text){
 
 
-    let box =
-    document.createElement("div");
+
+    const msg =
+    document.createElement(
+        "div"
+    );
 
 
-    box.innerHTML = text;
+
+    msg.innerText=text;
 
 
-    box.style.position="fixed";
-    box.style.bottom="30px";
-    box.style.left="50%";
-    box.style.transform=
+
+    msg.style.position="fixed";
+
+    msg.style.bottom="30px";
+
+    msg.style.left="50%";
+
+    msg.style.transform=
     "translateX(-50%)";
 
-    box.style.background=
-    "rgba(0,0,0,.7)";
-
-    box.style.color="white";
-
-    box.style.padding="12px 25px";
-
-    box.style.borderRadius="12px";
-
-    box.style.zIndex="999";
 
 
-    document.body.appendChild(box);
+    msg.style.background=
+    "rgba(0,0,0,0.75)";
 
 
 
-    setTimeout(()=>{
+    msg.style.color="white";
 
-        box.remove();
 
-    },2000);
+
+    msg.style.padding=
+    "12px 25px";
+
+
+
+    msg.style.borderRadius=
+    "12px";
+
+
+
+    msg.style.zIndex="9999";
+
+
+
+    document.body.appendChild(
+        msg
+    );
+
+
+
+    setTimeout(
+        ()=>{
+
+            msg.remove();
+
+        },
+
+        2000
+    );
 
 
 }
 
 
 
-// Startmeldung
 
-setTimeout(()=>{
+
+
+// ===============================
+// Startmeldung
+// ===============================
+
+
+setTimeout(
+()=>{
 
     showMessage(
-        "Mecha Chameleon bereit!"
+        "Mecha Chameleon gestartet!"
     );
 
-},1000);
+
+},
+1000
+);
