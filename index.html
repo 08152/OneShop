@@ -34,41 +34,46 @@
     <div id="log"></div>
     <input id="input" placeholder="PIN oder Nachricht eingeben..." autofocus>
 
-    <!-- Socket.io Client-Bibliothek (wird standardmäßig vom Socket.io-Server bereitgestellt) -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // Verbindung zum Socket.io-Server herstellen
         const s = io();
         const l = document.getElementById('log');
         const i = document.getElementById('input');
         
-        // Status-Flag für die PIN-Authentifizierung
         let ok = false;
 
-        // Funktion zum Hinzufügen von Textzeilen in das Chat-Fenster
+        // Hilfsfunktionen für LocalStorage offline-Warteschlange
+        const getOfflineQueue = () => JSON.parse(localStorage.getItem('chat_offline_queue') || '[]');
+        const saveOfflineQueue = q => localStorage.setItem('chat_offline_queue', JSON.stringify(q));
+
         const add = t => {
             l.innerHTML += t + '<br>';
-            l.scrollTop = l.scrollHeight; // Automatisch nach unten scrollen
+            l.scrollTop = l.scrollHeight;
         };
 
-        // Event: Empfang der Chat-Historie vom Server
+        // Event: Verbindung zum Server wiederhergestellt
+        s.on('connect', () => {
+            const queue = getOfflineQueue();
+            if (queue.length > 0) {
+                add(`[System] Reconnected. Sende ${queue.length} gespeicherte Nachricht(en)...`);
+                queue.forEach(msg => s.emit('line', msg));
+                saveOfflineQueue([]); // Warteschlange leeren
+            }
+        });
+
         s.on('history', h => {
             l.innerHTML = '';
             h.forEach(add);
         });
 
-        // Event: Empfang einer neuen einzelnen Chat-Zeile
         s.on('line', add);
 
-        // Event: Tastatureingabe im Textfeld abfangen
         i.onkeydown = e => {
-            // Nur reagieren, wenn 'Enter' gedrückt wurde
             if (e.key !== 'Enter') return;
             
             let t = i.value.trim();
-            i.value = ''; // Eingabefeld leeren
+            i.value = '';
 
-            // Falls die PIN noch nicht korrekt eingegeben wurde
             if (!ok) {
                 if (t === 'Risky_Live') {
                     ok = true;
@@ -80,9 +85,17 @@
                 return;
             }
 
-            // Wenn authentifiziert und Text vorhanden ist, Nachricht an Server senden
             if (t) {
-                s.emit('line', t);
+                // Prüfen, ob der Server aktuell erreichbar ist
+                if (s.connected) {
+                    s.emit('line', t);
+                } else {
+                    // Offline: Im LocalStorage zwischenspeichern und lokal anzeigen
+                    const queue = getOfflineQueue();
+                    queue.push(t);
+                    saveOfflineQueue(queue);
+                    add('[Offline-Gespeichert] ' + t);
+                }
             }
         };
     </script>
