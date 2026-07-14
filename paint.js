@@ -1,85 +1,153 @@
-// ==========================
+// ======================================
 // paint.js
 // Mecha Chameleon Mal-System
-// ==========================
+// Three.js Version
+// ======================================
 
 
-const paintMenu = document.getElementById("paintMenu");
 
-const colorPicker = document.getElementById("paintColor");
-
-const brushSize = document.getElementById("brushSize");
-
-const clearButton = document.getElementById("clearPaint");
+const paintMenu =
+document.getElementById("paintMenu");
 
 
-// Malfarbe
-let paintColor = "#ff0000";
+
+const colorPicker =
+document.getElementById("paintColor");
 
 
-// Taste 2 Menü öffnen/schließen
 
-window.addEventListener("keydown",(e)=>{
+let selectedColor =
+"#00ff00";
+
+
+
+
+
+// ===============================
+// Taste 2
+// ===============================
+
+
+window.addEventListener(
+"keydown",
+(e)=>{
+
 
     if(e.key === "2"){
 
-        paintMenu.classList.toggle("hidden");
+
+        paintMenu.classList.toggle(
+            "hidden"
+        );
+
 
     }
 
+
 });
 
 
+
+
+
+
+
+// ===============================
 // Farbe ändern
+// ===============================
 
-colorPicker.addEventListener("input",()=>{
 
-    paintColor = colorPicker.value;
+colorPicker.addEventListener(
+"input",
+()=>{
+
+
+    selectedColor =
+    colorPicker.value;
+
 
 });
 
 
 
-// Körperteile
 
-const paintParts = [
+
+
+
+// ===============================
+// Raycaster
+// ===============================
+
+
+const raycaster =
+new THREE.Raycaster();
+
+
+const mouse =
+new THREE.Vector2();
+
+
+
+
+
+
+// bemalbare Teile
+
+const paintObjects = [
 
     body,
     head,
+
     leftArm,
     rightArm,
+
     leftLeg,
     rightLeg
 
 ];
 
 
-// Raycaster
-
-const raycaster = new THREE.Raycaster();
-
-const mouse = new THREE.Vector2();
 
 
-// Klick zum Bemalen
+
+
+
+// ===============================
+// Anklicken
+// ===============================
+
 
 renderer.domElement.addEventListener(
 "mousedown",
 (event)=>{
 
 
-    if(paintMenu.classList.contains("hidden"))
-        return;
+
+    if(
+        paintMenu.classList.contains(
+            "hidden"
+        )
+    )
+    return;
+
+
+
 
 
     mouse.x =
     (event.clientX /
-    window.innerWidth) * 2 - 1;
+    window.innerWidth)
+    *2-1;
+
 
 
     mouse.y =
     -(event.clientY /
-    window.innerHeight) * 2 + 1;
+    window.innerHeight)
+    *2+1;
+
+
+
 
 
 
@@ -89,41 +157,61 @@ renderer.domElement.addEventListener(
     );
 
 
-    const hits =
+
+
+
+    const hit =
     raycaster.intersectObjects(
-        paintParts
+        paintObjects
     );
 
 
-    if(hits.length > 0){
 
-        paintObject(
-            hits[0].object
+
+
+    if(hit.length>0){
+
+
+        paintMesh(
+            hit[0].object
         );
 
+
     }
+
 
 
 });
 
 
 
-// Farbe anwenden
-
-function paintObject(object){
 
 
-    object.material =
-    object.material.clone();
 
 
-    object.material.color =
+
+// ===============================
+// Farbe setzen
+// ===============================
+
+
+function paintMesh(mesh){
+
+
+
+    mesh.material =
+    mesh.material.clone();
+
+
+
+    mesh.material.color =
     new THREE.Color(
-        paintColor
+        selectedColor
     );
 
 
-    object.material.needsUpdate =
+
+    mesh.material.needsUpdate =
     true;
 
 
@@ -131,21 +219,41 @@ function paintObject(object){
 
 
 
-// alles zurücksetzen
-
-clearButton.onclick = ()=>{
 
 
-    paintParts.forEach(part=>{
 
 
-        part.material =
-        part.material.clone();
+
+// ===============================
+// Alles zurücksetzen
+// ===============================
 
 
-        part.material.color =
+const clearButton =
+document.getElementById(
+"clearPaint"
+);
+
+
+
+if(clearButton){
+
+
+clearButton.onclick =
+()=>{
+
+
+    paintObjects.forEach(
+    mesh=>{
+
+
+        mesh.material =
+        mesh.material.clone();
+
+
+        mesh.material.color =
         new THREE.Color(
-            0xaaaaaa
+            0x999999
         );
 
 
@@ -153,3 +261,6 @@ clearButton.onclick = ()=>{
 
 
 };
+
+
+}
