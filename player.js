@@ -1,263 +1,542 @@
-// ===============================
+// ==================================
 // player.js
 // Teil 1/3
 // Mecha Chameleon
-// ===============================
+// OHNE THREE.JS
+// ==================================
 
 
-// Szene
-const scene = new THREE.Scene();
+// Canvas
 
-scene.background = new THREE.Color(0x87ceeb);
+const canvas = document.createElement("canvas");
 
-
-// Kamera
-const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-);
-
-
-// Renderer
-const renderer = new THREE.WebGLRenderer({
-    antialias:true
-});
-
-renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-);
-
-renderer.shadowMap.enabled = true;
-
+canvas.id = "canvas3D";
 
 document
 .getElementById("game")
-.appendChild(renderer.domElement);
+.appendChild(canvas);
+
+
+const gl = canvas.getContext("webgl");
 
 
 
-// Licht
-
-const sun = new THREE.DirectionalLight(
-    0xffffff,
-    2
-);
-
-sun.position.set(
-    20,
-    30,
-    20
-);
-
-sun.castShadow = true;
-
-scene.add(sun);
-
-
-
-const ambient =
-new THREE.AmbientLight(
-    0xffffff,
-    0.5
-);
-
-scene.add(ambient);
-
-
-
-// Boden
-
-const ground =
-new THREE.Mesh(
-
-    new THREE.PlaneGeometry(
-        500,
-        500
-    ),
-
-    new THREE.MeshStandardMaterial({
-        color:0x3fa63f
-    })
-
-);
-
-
-ground.rotation.x =
--Math.PI / 2;
-
-
-ground.receiveShadow = true;
-
-scene.add(ground);
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 
 
 
-// ===============================
+// ================================
+// Kamera
+// ================================
+
+const camera = {
+
+    x:0,
+    y:2,
+    z:-6,
+
+    rotY:0,
+    rotX:0
+
+};
+
+
+
+
+// ================================
 // Spieler
-// ===============================
+// ================================
+
+const player = {
+
+    x:0,
+    y:0,
+    z:0,
+
+    rot:0,
+
+    parts:[]
+
+};
 
 
-const player =
-new THREE.Group();
 
 
-scene.add(player);
+// Farben
+
+const metal = [
+    0.5,
+    0.6,
+    0.7,
+    1
+];
 
 
 
-// Material
 
-const mechaMaterial =
-new THREE.MeshStandardMaterial({
+// ================================
+// 3D Würfel erstellen
+// ================================
 
-    color:0xaaaaaa,
-    metalness:0.7,
-    roughness:0.3
+function createCube(
+x,
+y,
+z,
+sx,
+sy,
+sz,
+color
+){
 
-});
+    return {
 
+        x,
+        y,
+        z,
+
+        sx,
+        sy,
+        sz,
+
+        color
+
+    };
+
+}
+
+
+
+
+// ================================
+// Mecha Körper
+// ================================
 
 
 // Körper
 
 const body =
-new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-        1,
-        1.6,
-        0.6
-    ),
-
-    mechaMaterial
-
+createCube(
+0,
+0,
+0,
+1,
+1.6,
+0.6,
+metal
 );
-
-
-body.castShadow=true;
-
-player.add(body);
-
 
 
 // Kopf
 
 const head =
-new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-        0.7,
-        0.7,
-        0.7
-    ),
-
-    mechaMaterial
-
+createCube(
+0,
+1.2,
+0,
+0.7,
+0.7,
+0.7,
+metal
 );
-
-
-head.position.y=1.15;
-
-head.castShadow=true;
-
-player.add(head);
 
 
 
 // Arme
 
 const leftArm =
-new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-        0.25,
-        1,
-        0.25
-    ),
-
-    mechaMaterial
-
+createCube(
+-0.7,
+0.2,
+0,
+0.25,
+1,
+0.25,
+metal
 );
-
-
-leftArm.position.set(
-    -0.7,
-    0.2,
-    0
-);
-
-
-player.add(leftArm);
-
 
 
 const rightArm =
-leftArm.clone();
-
-
-rightArm.position.x=0.7;
-
-player.add(rightArm);
-
+createCube(
+0.7,
+0.2,
+0,
+0.25,
+1,
+0.25,
+metal
+);
 
 
 
 // Beine
 
 const leftLeg =
-new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-        0.3,
-        1.2,
-        0.3
-    ),
-
-    mechaMaterial
-
+createCube(
+-0.22,
+-1.3,
+0,
+0.3,
+1.2,
+0.3,
+metal
 );
-
-
-leftLeg.position.set(
-    -0.22,
-    -1.4,
-    0
-);
-
-
-player.add(leftLeg);
-
 
 
 const rightLeg =
-leftLeg.clone();
+createCube(
+0.22,
+-1.3,
+0,
+0.3,
+1.2,
+0.3,
+metal
+);
 
 
-rightLeg.position.x=0.22;
 
 
-player.add(rightLeg);
+// hinzufügen
+
+player.parts.push(
+
+body,
+head,
+
+leftArm,
+rightArm,
+
+leftLeg,
+rightLeg
+
+);
 
 
 
-// Startposition
 
-player.position.y=2;
-// ===============================
+
+// ================================
+// Resize
+// ================================
+
+
+window.addEventListener(
+"resize",
+()=>{
+
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+
+});
+
+
+
+
+
+// ================================
+// Start
+// ================================
+
+
+console.log(
+"Mecha Chameleon 3D Engine gestartet"
+);
+// ==================================
 // player.js
 // Teil 2/3
-// Bewegung & Animation
-// ===============================
+// Eigener 3D Renderer
+// OHNE THREE.JS
+// ==================================
 
+
+
+const ctx = canvas.getContext("2d");
+
+
+
+
+// einfache 3D Projektion
+
+function project(point){
+
+
+    let x = point.x - camera.x;
+    let y = point.y - camera.y;
+    let z = point.z - camera.z;
+
+
+
+    // Kamera Drehung Y
+
+    let cosY =
+    Math.cos(camera.rotY);
+
+    let sinY =
+    Math.sin(camera.rotY);
+
+
+    let dx =
+    x * cosY -
+    z * sinY;
+
+
+    let dz =
+    x * sinY +
+    z * cosY;
+
+
+
+    // Kamera Drehung X
+
+    let cosX =
+    Math.cos(camera.rotX);
+
+    let sinX =
+    Math.sin(camera.rotX);
+
+
+    let dy =
+    y * cosX -
+    dz * sinX;
+
+
+    dz =
+    y * sinX +
+    dz * cosX;
+
+
+
+    if(dz <= 0.1)
+        return null;
+
+
+
+    let scale =
+    400 / dz;
+
+
+
+    return {
+
+        x:
+        canvas.width/2 +
+        dx * scale,
+
+
+        y:
+        canvas.height/2 -
+        dy * scale,
+
+
+        depth:dz
+
+    };
+
+}
+
+
+
+
+// Würfel Ecken
+
+function cubeVertices(c){
+
+
+    let x=c.x;
+    let y=c.y;
+    let z=c.z;
+
+
+    let sx=c.sx/2;
+    let sy=c.sy/2;
+    let sz=c.sz/2;
+
+
+
+    return [
+
+        {x:x-sx,y:y-sy,z:z-sz},
+        {x:x+sx,y:y-sy,z:z-sz},
+        {x:x+sx,y:y+sy,z:z-sz},
+        {x:x-sx,y:y+sy,z:z-sz},
+
+
+        {x:x-sx,y:y-sy,z:z+sz},
+        {x:x+sx,y:y-sy,z:z+sz},
+        {x:x+sx,y:y+sy,z:z+sz},
+        {x:x-sx,y:y+sy,z:z+sz}
+
+    ];
+
+}
+
+
+
+
+// Würfel zeichnen
+
+function drawCube(c){
+
+
+    let v =
+    cubeVertices(c);
+
+
+    let p =
+    v.map(project);
+
+
+
+    if(p.includes(null))
+        return;
+
+
+
+    const faces=[
+
+        [0,1,2,3],
+        [4,5,6,7],
+        [0,1,5,4],
+        [2,3,7,6],
+        [1,2,6,5],
+        [0,3,7,4]
+
+    ];
+
+
+
+    faces.forEach(face=>{
+
+
+        ctx.beginPath();
+
+
+        face.forEach((i,index)=>{
+
+            if(index===0)
+                ctx.moveTo(
+                    p[i].x,
+                    p[i].y
+                );
+            else
+                ctx.lineTo(
+                    p[i].x,
+                    p[i].y
+                );
+
+        });
+
+
+        ctx.closePath();
+
+
+        ctx.fillStyle =
+        `rgba(
+        ${c.color[0]*255},
+        ${c.color[1]*255},
+        ${c.color[2]*255},
+        1)`;
+
+
+        ctx.fill();
+
+
+    });
+
+
+}
+
+
+
+
+
+
+// Boden
+
+const floor=[];
+
+
+for(let x=-10;x<10;x++){
+
+    for(let z=-10;z<10;z++){
+
+        floor.push({
+
+            x:x,
+            y:-2,
+            z:z,
+            sx:1,
+            sy:0.1,
+            sz:1,
+
+            color:[
+                0.2,
+                0.7,
+                0.2,
+                1
+            ]
+
+        });
+
+    }
+
+}
+
+
+
+
+
+// Render Funktion
+
+function render(){
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+
+    // Boden
+
+    floor.forEach(drawCube);
+
+
+
+    // Spieler
+
+    player.parts.forEach(drawCube);
+
+
+
+    requestAnimationFrame(
+        render
+    );
+
+}
+
+
+render();
+// ==================================
+// player.js
+// Teil 3/3
+// Steuerung & Game Loop
+// OHNE THREE.JS
+// ==================================
+
+
+
+// ================================
+// Tastatur
+// ================================
 
 const keys = {};
 
-
-// Tastatur
 
 window.addEventListener(
 "keydown",
@@ -279,89 +558,70 @@ window.addEventListener(
 
 
 
+// ================================
 // Bewegung
+// ================================
 
-let walkSpeed = 0.08;
-let runSpeed = 0.14;
-
-
-// Physik
+let speed = 0.08;
 
 let velocityY = 0;
 
 let gravity = -0.02;
 
-let jumpPower = 0.35;
+let jump = 0.35;
 
 let grounded = false;
-
-
-
-// Animation
-
-let walkTime = 0;
 
 
 
 function updatePlayer(){
 
 
-    let speed =
-    keys["shift"]
-    ? runSpeed
-    : walkSpeed;
-
-
-
     let moving=false;
 
 
 
-    // Vorwärts
-
     if(keys["w"]){
 
-        player.position.z -= speed;
+        player.z += Math.cos(camera.rotY) * speed;
+        player.x += Math.sin(camera.rotY) * speed;
 
         moving=true;
 
     }
 
 
-
-    // Rückwärts
 
     if(keys["s"]){
 
-        player.position.z += speed;
+        player.z -= Math.cos(camera.rotY) * speed;
+        player.x -= Math.sin(camera.rotY) * speed;
 
         moving=true;
 
     }
 
 
-
-    // Links
 
     if(keys["a"]){
 
-        player.position.x -= speed;
+        player.x -= Math.cos(camera.rotY) * speed;
 
         moving=true;
 
     }
 
 
-
-    // Rechts
 
     if(keys["d"]){
 
-        player.position.x += speed;
+        player.x += Math.cos(camera.rotY) * speed;
 
         moving=true;
 
     }
+
+
 
 
 
@@ -372,7 +632,7 @@ function updatePlayer(){
         grounded
     ){
 
-        velocityY = jumpPower;
+        velocityY=jump;
 
         grounded=false;
 
@@ -380,20 +640,16 @@ function updatePlayer(){
 
 
 
-    // Gravitation
-
     velocityY += gravity;
 
 
-    player.position.y += velocityY;
+    player.y += velocityY;
 
 
 
-    // Boden
+    if(player.y<=0){
 
-    if(player.position.y <= 2){
-
-        player.position.y=2;
+        player.y=0;
 
         velocityY=0;
 
@@ -403,82 +659,70 @@ function updatePlayer(){
 
 
 
-    // Laufanimation
+    // Körper mit Spieler bewegen
 
-    if(moving){
+    player.parts.forEach(
+    p=>{
 
+        p.x =
+        p.startX ?? p.x;
 
-        walkTime += 0.18;
-
-
-
-        leftArm.rotation.x =
-        Math.sin(walkTime)
-        *0.8;
-
-
-
-        rightArm.rotation.x =
-        -Math.sin(walkTime)
-        *0.8;
-
-
-
-        leftLeg.rotation.x =
-        -Math.sin(walkTime)
-        *0.8;
-
-
-
-        rightLeg.rotation.x =
-        Math.sin(walkTime)
-        *0.8;
-
-
-    }
-
-    else{
-
-
-        leftArm.rotation.x=0;
-
-        rightArm.rotation.x=0;
-
-        leftLeg.rotation.x=0;
-
-        rightLeg.rotation.x=0;
-
-
-    }
+    });
 
 
 }
-// ===============================
-// player.js
-// Teil 3/3
-// Game Loop
-// ===============================
 
 
 
-// Fenstergröße ändern
 
-window.addEventListener(
-"resize",
+
+// ================================
+// Maus Kamera
+// ================================
+
+
+let mouseLock=false;
+
+
+canvas.addEventListener(
+"click",
 ()=>{
 
+    canvas.requestPointerLock();
 
-    camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
-
-
-    camera.updateProjectionMatrix();
+});
 
 
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
+
+document.addEventListener(
+"mousemove",
+(e)=>{
+
+
+    if(
+        document.pointerLockElement
+        !== canvas
+    )
+    return;
+
+
+
+    camera.rotY -=
+    e.movementX*0.002;
+
+
+    camera.rotX -=
+    e.movementY*0.002;
+
+
+
+    camera.rotX =
+    Math.max(
+        -1,
+        Math.min(
+            1,
+            camera.rotX
+        )
     );
 
 
@@ -488,34 +732,69 @@ window.addEventListener(
 
 
 
-// Hauptschleife
 
-function animate(){
-
-
-    requestAnimationFrame(
-        animate
-    );
+// ================================
+// Kamera Update Verbindung
+// ================================
 
 
+function updateCamera(){
 
-    // Spieler aktualisieren
+
+    camera.x =
+    player.x -
+    Math.sin(camera.rotY)*6;
+
+
+    camera.y =
+    player.y + 3;
+
+
+    camera.z =
+    player.z -
+    Math.cos(camera.rotY)*6;
+
+
+}
+
+
+
+
+
+// ================================
+// Pose Verbindung
+// ================================
+
+
+function animatePose(){
+
+    // wird von pose.js benutzt
+
+}
+
+
+
+
+
+// ================================
+// Haupt Loop
+// ================================
+
+
+function gameLoop(){
+
 
     updatePlayer();
 
 
 
-    // Kamera aus camera.js
-
-    if (typeof updateCamera === "function") {
+    if(typeof updateCamera === "function") {
 
         updateCamera();
 
     }
 
 
-
-    // Posen aus pose.js
 
     if(typeof animatePose === "function"){
 
@@ -525,18 +804,40 @@ function animate(){
 
 
 
-    // Zeichnen
+    // Teile an Spielerposition anpassen
 
-    renderer.render(
-        scene,
-        camera
+    player.parts.forEach(
+    part=>{
+
+        if(!part.offset)
+            return;
+
+
+        part.x =
+        player.x +
+        part.offset.x;
+
+
+        part.y =
+        player.y +
+        part.offset.y;
+
+
+        part.z =
+        player.z +
+        part.offset.z;
+
+
+    });
+
+
+
+    requestAnimationFrame(
+        gameLoop
     );
-
 
 }
 
 
 
-// Start
-
-animate();
+gameLoop();
