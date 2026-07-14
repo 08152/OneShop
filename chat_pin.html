@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat</title><style>
+body{margin:0;background:#000;color:#0f0;font:16px monospace}#log{height:90vh;overflow:auto;padding:10px}#in{padding:10px;border-top:1px solid #0f0}
+input{width:100%;background:#000;color:#0f0;border:none;outline:none;font:16px monospace}
+</style></head><body><div id='log'></div><div id='in'><input id='i' placeholder='PIN oder Nachricht'></div>
+<script>
+const log=document.getElementById('log'),i=document.getElementById('i');
+let ok=false,ws;
+try{ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);}
+catch(e){}
+function add(t){log.innerHTML+=t+"<br>";log.scrollTop=log.scrollHeight;}
+if(ws){
+ws.onmessage=e=>add(e.data);
+}
+i.onkeydown=e=>{
+ if(e.key!=='Enter')return;
+ const v=i.value;i.value='';
+ if(!ok){
+   if(v==='Risky_Live'){ok=true;add('[Freigeschaltet]');}
+   return;
+ }
+ if(!v)return;
+ if(ws&&ws.readyState===1)ws.send(v); else add(v);
+};
+</script></body></html>
