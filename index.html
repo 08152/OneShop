@@ -1,0 +1,27 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Terminal</title><style>
+html,body{margin:0;height:100%;background:#000;color:#0f0;font:16px Consolas,monospace}
+#t{height:100%;overflow:auto;padding:12px;white-space:pre-wrap}#c{display:inline-block;animation:b 1s step-end infinite}@keyframes b{50%{opacity:0}}
+</style></head><body><div id="t"></div><script src="/socket.io/socket.io.js"></script><script>
+const s=io();const t=document.getElementById('t');let unlocked=false,pinMode=false,pin="",buf="";
+function add(x){t.innerHTML+=x+"<br>";t.scrollTop=t.scrollHeight;}
+s.on("history",h=>{t.innerHTML="";h.forEach(add)});s.on("line",add);s.on("clear",()=>t.innerHTML="");
+document.addEventListener("keydown",e=>{
+ if(e.key==="Control"){pinMode=true;pin="";return;}
+ if(pinMode){
+   e.preventDefault();
+   if(e.key==="Enter"){unlocked=(pin==="Risky_Live");pinMode=false;pin="";return;}
+   if(e.key==="Backspace"){pin=pin.slice(0,-1);return;}
+   if(e.key.length===1)pin+=e.key;
+   return;
+ }
+ if(!unlocked)return;
+ e.preventDefault();
+ if(e.key==="Backspace"){buf=buf.slice(0,-1);render();return;}
+ if(e.key==="Enter"){if(buf){s.emit("line",buf);buf="";render();}return;}
+ if(e.key.length===1){buf+=e.key;render();}
+});
+function render(){let lines=t.innerHTML.split("<br>"); if(lines.length){} 
+ t.querySelector("#input")?.remove();
+ const d=document.createElement("div");d.id="input";d.textContent=buf+"█";t.appendChild(d);t.scrollTop=t.scrollHeight;}
+render();
+</script></body></html>
