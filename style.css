@@ -1,0 +1,197 @@
+/* ===========================
+   Mecha Chameleon
+   style.css
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    user-select:none;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#111;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+/* ===========================
+   HUD
+=========================== */
+
+#hud{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:100;
+    color:white;
+}
+
+#info{
+    background:rgba(0,0,0,.65);
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.15);
+    line-height:1.6;
+}
+
+/* ===========================
+   MENÜS
+=========================== */
+
+.menu{
+
+    position:fixed;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:320px;
+
+    background:rgba(25,25,25,.95);
+
+    color:white;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    border:2px solid #444;
+
+    z-index:500;
+
+    text-align:center;
+
+    box-shadow:0 0 30px rgba(0,0,0,.45);
+
+}
+
+.hidden{
+    display:none;
+}
+
+.menu h2{
+
+    margin-bottom:20px;
+
+    font-size:28px;
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+button{
+
+    width:100%;
+
+    padding:14px;
+
+    margin:8px 0;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#4CAF50;
+
+    color:white;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    background:#5fd566;
+    transform:scale(1.03);
+
+}
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+/* ===========================
+   COLOR PICKER
+=========================== */
+
+input[type=color]{
+
+    width:90px;
+    height:90px;
+
+    border:none;
+
+    background:none;
+
+    cursor:pointer;
+
+}
+
+/* ===========================
+   SLIDER
+=========================== */
+
+input[type=range]{
+
+    width:100%;
+
+    margin-top:10px;
+
+}
+
+p{
+
+    margin-top:10px;
+    color:#ddd;
+
+}
+
+/* ===========================
+   FADEN
+=========================== */
+
+.menu{
+
+    animation:fade .18s;
+
+}
+
+@keyframes fade{
+
+    from{
+
+        opacity:0;
+        transform:translate(-50%,-45%) scale(.95);
+
+    }
+
+    to{
+
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1);
+
+    }
+
+}
