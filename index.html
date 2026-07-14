@@ -89,26 +89,29 @@
             i.blur();
         }
 
-        // --- NEU: LocalStorage Funktionen für Verlauf und Warteschlange ---
+        // --- Speicher-Funktionen ---
         const getOfflineQueue = () => JSON.parse(localStorage.getItem('chat_offline_queue') || '[]');
         const saveOfflineQueue = q => localStorage.setItem('chat_offline_queue', JSON.stringify(q));
         
         const getLocalHistory = () => JSON.parse(localStorage.getItem('chat_history') || '[]');
         const saveLocalHistory = h => localStorage.setItem('chat_history', JSON.stringify(h));
 
-        // UI aktualisieren und im lokalen Verlauf sichern
+        // UI aktualisieren und optional im Verlauf sichern
         const add = (t, shouldSave = true) => {
             l.innerHTML += t + '<br>';
             l.scrollTop = l.scrollHeight;
 
             if (shouldSave) {
                 const history = getLocalHistory();
-                history.push(t);
-                saveLocalHistory(history);
+                // Verhindert doppelte Einträge im lokalen Verlauf
+                if (!history.includes(t)) {
+                    history.push(t);
+                    saveLocalHistory(history);
+                }
             }
         };
 
-        // Beim Start: Zuerst lokal gespeicherten Verlauf laden (Offline-Verfügbarkeit)
+        // Lokalen Verlauf in die UI laden (Sofort-Anzeige beim Öffnen)
         const loadLocalHistory = () => {
             l.innerHTML = '';
             const history = getLocalHistory();
@@ -116,35 +119,47 @@
         };
         loadLocalHistory();
 
-        // Event: Verbindung zum Server aufgebaut/wiederhergestellt
+        // Event: Verbindung zum Render-Server steht
         s.on('connect', () => {
+            // 1. Offline-Warteschlange hochladen
             const queue = getOfflineQueue();
             if (queue.length > 0) {
-                add(`[System] Verbindung aktiv. Sende ${queue.length} gespeicherte Nachricht(en)...`, true);
-                
-                // Nachrichten nacheinander an den Server hochladen
+                add(`[System] Sende ${queue.length} offline verfasste Nachricht(en)...`, false);
                 queue.forEach(msg => s.emit('line', msg));
                 saveOfflineQueue([]); 
             }
         });
 
-        // Server-Historie überschreibt den lokalen Speicher (Synchronisation)
-        s.on('history', h => {
-            saveLocalHistory(h);
-            loadLocalHistory();
+        // Der Server schickt seine aktuelle Historie
+        s.on('history', serverHistory => {
+            const localHistory = getLocalHistory();
+
+            // RENDER-RESTART PRÜFUNG: Wenn der Server leer ist (0 Nachrichten), 
+            // aber wir lokal alte Nachrichten haben, laden wir sie wieder auf den Server hoch!
+            if (serverHistory.length === 0 && localHistory.length > 0) {
+                add('[System] Render-Server wurde neu gestartet. Stelle Chatverlauf wieder her...', false);
+                
+                // Filtere Systemmeldungen heraus, um nur echte Nachrichten hochzuladen
+                localHistory.forEach(msg => {
+                    if (!msg.startsWith('[System]') && !msg.startsWith('[PIN')) {
+                        s.emit('line', msg);
+                    }
+                });
+            } else {
+                // Falls der Server Daten hat (oder beide leer sind), synchronisieren wir normal
+                // Wir mergen Server- und Lokal-Historie, um nichts zu verlieren
+                const combined = Array.from(new Set([...localHistory, ...serverHistory]));
+                saveLocalHistory(combined);
+                loadLocalHistory();
+            }
         });
 
         // Neue Nachricht vom Server empfangen
         s.on('line', t => {
-            // Nur hinzufügen, wenn sie nicht schon lokal als "[Offline]" existiert 
-            // (verhindert Dopplungen nach dem Upload)
-            const history = getLocalHistory();
-            if (!history.includes(t)) {
-                add(t, true);
-            }
+            add(t, true);
         });
 
-        // Zentrale Funktion für das Absenden
+        // Sende-Logik
         const processInput = () => {
             if (isTouchDevice) return;
 
@@ -164,27 +179,23 @@
 
             if (t) {
                 if (s.connected) {
-                    // Server ist online: Direkt senden
                     s.emit('line', t);
                 } else {
-                    // Server ist offline: In Warteschlange packen und lokal sichern
+                    // Server schläft oder ist offline: In Warteschlange und lokalen Verlauf
                     const queue = getOfflineQueue();
                     queue.push(t);
                     saveOfflineQueue(queue);
                     
-                    // Lokal sofort anzeigen
                     add('[Offline-Gespeichert] ' + t, true);
                 }
             }
         };
 
-        // Tastatur-Event
         i.onkeydown = e => {
             if (e.key !== 'Enter') return;
             processInput();
         };
 
-        // Button-Event
         btn.addEventListener('click', e => {
             e.preventDefault();
             processInput();
