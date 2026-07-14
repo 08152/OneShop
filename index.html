@@ -10,37 +10,86 @@
             background: #111;
             color: #0f0;
             font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
         #log {
-            height: 90vh;
+            flex: 1;
             overflow: auto;
             padding: 10px;
             box-sizing: border-box;
+            -webkit-overflow-scrolling: touch; /* Sanftes Scrollen auf iOS */
+        }
+        .input-container {
+            display: flex;
+            background: #000;
+            border-top: 1px solid #0f0;
         }
         input {
-            width: 100%;
-            padding: 10px;
+            flex: 1;
+            padding: 15px 10px;
             box-sizing: border-box;
             background: #000;
             color: #0f0;
             border: none;
             outline: none;
             font-family: monospace;
+            font-size: 16px;
+        }
+        #send-btn {
+            background: #020;
+            color: #0f0;
+            border: none;
+            border-left: 1px solid #0f0;
+            padding: 0 20px;
+            font-family: monospace;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #send-btn:active {
+            background: #0f0;
+            color: #000;
+        }
+
+        /* HARDWARE-PRÜFUNG: Wenn das Gerät ein Touchscreen hat (pointer: coarse) */
+        @media (pointer: coarse) {
+            .input-container {
+                display: none !important; /* Schreibfenster komplett verstecken */
+            }
+            #log {
+                height: 100vh; /* Log nutzt den vollen Bildschirm */
+            }
         }
     </style>
 </head>
 <body>
 
     <div id="log"></div>
-    <input id="input" placeholder="PIN oder Nachricht eingeben..." autofocus>
+    <div class="input-container" id="input-area">
+        <input id="input" placeholder="PIN oder Nachricht eingeben..." autofocus inputmode="text">
+        <button id="send-btn">Senden</button>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const s = io();
         const l = document.getElementById('log');
         const i = document.getElementById('input');
+        const btn = document.getElementById('send-btn');
+        const inputArea = document.getElementById('input-area');
         
         let ok = false;
+
+        // Zusätzlicher JavaScript-Schutz: Deaktiviert Eingaben auf Touch-Geräten komplett
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) {
+            inputArea.style.display = 'none'; // Verstecken
+            i.disabled = true;                // Anklicken/Fokus sperren
+            i.blur();                         // Fokus entziehen
+        }
 
         // Hilfsfunktionen für LocalStorage offline-Warteschlange
         const getOfflineQueue = () => JSON.parse(localStorage.getItem('chat_offline_queue') || '[]');
@@ -68,9 +117,11 @@
 
         s.on('line', add);
 
-        i.onkeydown = e => {
-            if (e.key !== 'Enter') return;
-            
+        // Zentrale Funktion für das Absenden (Tastatur & Touch-Button)
+        const processInput = () => {
+            // Doppelte Absicherung im Code gegen Umgehung
+            if (isTouchDevice) return;
+
             let t = i.value.trim();
             i.value = '';
 
@@ -98,6 +149,19 @@
                 }
             }
         };
+
+        // Tastatur-Event
+        i.onkeydown = e => {
+            if (e.key !== 'Enter') return;
+            processInput();
+        };
+
+        // Touchscreen-Button-Event (wird durch das CSS/JS oben auf Touch-Geräten eh nie erreicht)
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            processInput();
+            if (!isTouchDevice) i.focus();
+        });
     </script>
 </body>
 </html>
