@@ -3,204 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat</title>
-    <style>
-        body {
-            margin: 0;
-            background: #111;
-            color: #0f0;
-            font-family: monospace;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        #log {
-            flex: 1;
-            overflow: auto;
-            padding: 10px;
-            box-sizing: border-box;
-            -webkit-overflow-scrolling: touch;
-        }
-        .input-container {
-            display: flex;
-            background: #000;
-            border-top: 1px solid #0f0;
-        }
-        input {
-            flex: 1;
-            padding: 15px 10px;
-            box-sizing: border-box;
-            background: #000;
-            color: #0f0;
-            border: none;
-            outline: none;
-            font-family: monospace;
-            font-size: 16px;
-        }
-        #send-btn {
-            background: #020;
-            color: #0f0;
-            border: none;
-            border-left: 1px solid #0f0;
-            padding: 0 20px;
-            font-family: monospace;
-            font-size: 16px;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        #send-btn:active {
-            background: #0f0;
-            color: #000;
-        }
+    <title>Mecha Chameleon</title>
 
-        @media (pointer: coarse) {
-            .input-container {
-                display: none !important;
-            }
-            #log {
-                height: 100vh;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="log"></div>
-    <div class="input-container" id="input-area">
-        <input id="input" placeholder="PIN oder Nachricht eingeben..." autofocus inputmode="text">
-        <button id="send-btn">Senden</button>
+<div id="game"></div>
+
+<!-- Pose-Menü -->
+<div id="poseMenu" class="menu hidden">
+    <h2>Posen</h2>
+
+    <button id="poseStand">
+        Stehen
+    </button>
+
+    <button id="poseLie">
+        Liegen
+    </button>
+
+    <button id="poseHead">
+        Kopfstand
+    </button>
+</div>
+
+<!-- Mal-Menü -->
+<div id="paintMenu" class="menu hidden">
+
+    <h2>Malen</h2>
+
+    <input
+        type="color"
+        id="paintColor"
+        value="#ff0000">
+
+    <br><br>
+
+    <input
+        type="range"
+        id="brushSize"
+        min="2"
+        max="50"
+        value="10">
+
+    <p>Pinselgröße</p>
+
+    <button id="clearPaint">
+        Bemalung löschen
+    </button>
+
+</div>
+
+<!-- HUD -->
+<div id="hud">
+
+    <div id="info">
+        WASD = Laufen<br>
+        Maus = Kamera<br>
+        Leertaste = Springen<br>
+        1 = Pose-Menü<br>
+        2 = Mal-Menü
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const s = io();
-        const l = document.getElementById('log');
-        const i = document.getElementById('input');
-        const btn = document.getElementById('send-btn');
-        const inputArea = document.getElementById('input-area');
-        
-        let ok = false;
+</div>
 
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        if (isTouchDevice) {
-            inputArea.style.display = 'none';
-            i.disabled = true;
-            i.blur();
-        }
+<!-- Bibliotheken -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
 
-        // --- Speicher-Funktionen ---
-        const getOfflineQueue = () => JSON.parse(localStorage.getItem('chat_offline_queue') || '[]');
-        const saveOfflineQueue = q => localStorage.setItem('chat_offline_queue', JSON.stringify(q));
-        
-        const getLocalHistory = () => JSON.parse(localStorage.getItem('chat_history') || '[]');
-        const saveLocalHistory = h => localStorage.setItem('chat_history', JSON.stringify(h));
+<!-- Eigene Dateien -->
+<script src="player.js"></script>
+<script src="camera.js"></script>
+<script src="pose.js"></script>
+<script src="paint.js"></script>
+<script src="ui.js"></script>
 
-        // UI aktualisieren und optional im Verlauf sichern
-        const add = (t, shouldSave = true) => {
-            l.innerHTML += t + '<br>';
-            l.scrollTop = l.scrollHeight;
-
-            if (shouldSave) {
-                const history = getLocalHistory();
-                // Verhindert doppelte Einträge im lokalen Verlauf
-                if (!history.includes(t)) {
-                    history.push(t);
-                    saveLocalHistory(history);
-                }
-            }
-        };
-
-        // Lokalen Verlauf in die UI laden (Sofort-Anzeige beim Öffnen)
-        const loadLocalHistory = () => {
-            l.innerHTML = '';
-            const history = getLocalHistory();
-            history.forEach(msg => add(msg, false));
-        };
-        loadLocalHistory();
-
-        // Event: Verbindung zum Render-Server steht
-        s.on('connect', () => {
-            // 1. Offline-Warteschlange hochladen
-            const queue = getOfflineQueue();
-            if (queue.length > 0) {
-                add(`[System] Sende ${queue.length} offline verfasste Nachricht(en)...`, false);
-                queue.forEach(msg => s.emit('line', msg));
-                saveOfflineQueue([]); 
-            }
-        });
-
-        // Der Server schickt seine aktuelle Historie
-        s.on('history', serverHistory => {
-            const localHistory = getLocalHistory();
-
-            // RENDER-RESTART PRÜFUNG: Wenn der Server leer ist (0 Nachrichten), 
-            // aber wir lokal alte Nachrichten haben, laden wir sie wieder auf den Server hoch!
-            if (serverHistory.length === 0 && localHistory.length > 0) {
-                add('[System] Render-Server wurde neu gestartet. Stelle Chatverlauf wieder her...', false);
-                
-                // Filtere Systemmeldungen heraus, um nur echte Nachrichten hochzuladen
-                localHistory.forEach(msg => {
-                    if (!msg.startsWith('[System]') && !msg.startsWith('[PIN')) {
-                        s.emit('line', msg);
-                    }
-                });
-            } else {
-                // Falls der Server Daten hat (oder beide leer sind), synchronisieren wir normal
-                // Wir mergen Server- und Lokal-Historie, um nichts zu verlieren
-                const combined = Array.from(new Set([...localHistory, ...serverHistory]));
-                saveLocalHistory(combined);
-                loadLocalHistory();
-            }
-        });
-
-        // Neue Nachricht vom Server empfangen
-        s.on('line', t => {
-            add(t, true);
-        });
-
-        // Sende-Logik
-        const processInput = () => {
-            if (isTouchDevice) return;
-
-            let t = i.value.trim();
-            i.value = '';
-
-            if (!ok) {
-                if (t === 'Risky_Live') {
-                    ok = true;
-                    add('[PIN akzeptiert] - Sie können jetzt Nachrichten senden.', false);
-                    i.placeholder = 'Nachricht schreiben...';
-                } else {
-                    add('[System] Falsche PIN. Zugriff verweigert.', false);
-                }
-                return;
-            }
-
-            if (t) {
-                if (s.connected) {
-                    s.emit('line', t);
-                } else {
-                    // Server schläft oder ist offline: In Warteschlange und lokalen Verlauf
-                    const queue = getOfflineQueue();
-                    queue.push(t);
-                    saveOfflineQueue(queue);
-                    
-                    add('[Offline-Gespeichert] ' + t, true);
-                }
-            }
-        };
-
-        i.onkeydown = e => {
-            if (e.key !== 'Enter') return;
-            processInput();
-        };
-
-        btn.addEventListener('click', e => {
-            e.preventDefault();
-            processInput();
-            if (!isTouchDevice) i.focus();
-        });
-    </script>
 </body>
 </html>
