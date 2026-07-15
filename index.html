@@ -1,111 +1,338 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Timeline Studio</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Ghost Studio DAW</title>
+
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-    <h1>🎛️ Audio Drag & Drop Studio</h1>
+<header class="topbar">
 
-    <div class="studio-container">
-        
-        <!-- Linke Seite: Soundpool & Aufnahme -->
-        <div class="sound-pool">
-            <h2>Soundpool</h2>
-            <p class="hint">Klicke zum Anhören. Ziehe das <b>[DRAG]</b>-Feld mit der Maus direkt auf eine Spur in der Timeline.</p>
-            
-            <!-- Mikrofon Aufnahme -->
-            <div class="mic-section">
-                <h3>🎙️ Eigene Stimme</h3>
-                <button id="micBtn" class="mic-btn">Aufnahme starten</button>
-                <div id="micSounds" class="sound-grid"></div>
-            </div>
+<h1>🎵 Ghost Studio DAW</h1>
 
-            <!-- Gitarre -->
-            <div class="instrument-section">
-                <div class="instrument-title">🎸 Gitarre (5 Sounds)</div>
-                <div class="sound-grid" id="pool-gitarre"></div>
-            </div>
+<div class="controls">
 
-            <!-- Trommel -->
-            <div class="instrument-section">
-                <div class="instrument-title">🥁 Trommel (5 Sounds)</div>
-                <div class="sound-grid" id="pool-trommel"></div>
-            </div>
+<button id="playBtn">▶ Abspielen</button>
 
-            <!-- Piano -->
-            <div class="instrument-section">
-                <div class="instrument-title">🎹 Piano (15 Sounds)</div>
-                <div class="sound-grid" id="pool-piano"></div>
-            </div>
+<button id="stopBtn">⏹ Stopp</button>
 
-            <!-- Beats -->
-            <div class="instrument-section">
-                <div class="instrument-title">⚡ Elektrische Beats (20 Sounds)</div>
-                <div class="sound-grid" id="pool-beat"></div>
-            </div>
-        </div>
+<button id="clearBtn">🗑 Leeren</button>
 
-        <!-- Rechte Seite: Timeline & Controls -->
-        <div class="main-area">
-            <div class="controls">
-                <button class="control-btn play-btn" onclick="playTimeline()">▶ Abspielen</button>
-                <button class="control-btn stop-btn" onclick="stopTimeline()">⏹ Stopp</button>
-                <button class="control-btn clear-btn" onclick="clearTimeline()">🗑 Leeren</button>
-                <div class="track-add-control">
-                    <label>Spur hinzufügen:</label>
-                    <button class="add-track-btn" onclick="addTrackRow()">+</button>
-                </div>
-                <div class="timeline-length-control">
-                    <label for="timelineLength">Gesamtlänge (Sekunden):</label>
-                    <input type="number" id="timelineLength" value="10" min="5" max="60" onchange="updateTimelineLength()">
-                </div>
-            </div>
+<button id="addTrackBtn">＋ Spur hinzufügen</button>
 
-            <div class="timeline-container">
-                <div class="timeline-tracks" id="timelineTracks">
-                    <div id="playhead"></div>
-                    <!-- Spuren (Tracks) werden dynamisch generiert -->
-                </div>
-            </div>
-        </div>
+<button id="recordBtn">🎤 Aufnahme starten</button>
+
+<label>
+
+Timeline (Sek.)
+
+<input
+id="timelineLength"
+type="number"
+value="30"
+min="5"
+max="600">
+
+</label>
+
+</div>
+
+</header>
+
+<div class="layout">
+
+<!-- ========================================= -->
+<!-- LINKS: SOUNDPOOL -->
+<!-- ========================================= -->
+
+<aside id="soundPool">
+
+<h2>🎼 Soundpool</h2>
+
+<!-- ---------------- GITARRE ---------------- -->
+
+<section class="category">
+
+<h3>🎸 Gitarre</h3>
+
+<div id="guitarList" class="soundList"></div>
+
+</section>
+
+<!-- ---------------- PIANO ---------------- -->
+
+<section class="category">
+
+<h3>🎹 Piano</h3>
+
+<div id="pianoList" class="soundList"></div>
+
+</section>
+
+<!-- ---------------- DRUMS ---------------- -->
+
+<section class="category">
+
+<h3>🥁 Trommel</h3>
+
+<div id="drumList" class="soundList"></div>
+
+</section>
+
+<!-- ---------------- ELEKTRO ---------------- -->
+
+<section class="category">
+
+<h3>⚡ Elektrische Beats</h3>
+
+<div id="electroList" class="soundList"></div>
+
+</section>
+
+<!-- ---------------- STIMMEN ---------------- -->
+
+<section class="category">
+
+<h3>🎤 Aufnahmen</h3>
+
+<div id="voiceList" class="soundList"></div>
+
+</section>
+
+</aside>
+
+<!-- ========================================= -->
+<!-- RECHTS: TIMELINE -->
+<!-- ========================================= -->
+
+<main id="workspace">
+
+<div id="timeScale"></div>
+
+<div id="timelineContainer">
+
+<div class="track" data-track="0">
+
+<div class="trackTitle">
+Track 1
+</div>
+
+<div class="trackLane"></div>
+
+</div>
+
+<div class="track" data-track="1">
+
+<div class="trackTitle">
+Track 2
+</div>
+
+<div class="trackLane"></div>
+
+</div>
+
+<div class="track" data-track="2">
+
+<div class="trackTitle">
+Track 3
+</div>
+
+<div class="trackLane"></div>
+
+</div>
+
+<div class="track" data-track="3">
+
+<div class="trackTitle">
+Track 4
+</div>
+
+<div class="trackLane"></div>
+
+</div>
+
+<div id="playhead"></div>
+
+</div>
+
+</main>
+
+</div>
+
+<!-- ========================================= -->
+<!-- DETAIL MENU -->
+<!-- ========================================= -->
+
+<div id="modal" class="hidden">
+
+<div class="window">
+
+<h2>Sound bearbeiten</h2>
+
+<label>
+
+Startzeit
+
+<input
+id="editStart"
+type="range"
+min="0"
+max="120"
+step="0.1">
+
+<span id="startValue">0</span>
+
+</label>
+
+<label>
+
+Dauer
+
+<input
+id="editDuration"
+type="range"
+min="0.1"
+max="20"
+step="0.1">
+
+<span id="durationValue">1</span>
+
+</label>
+
+<label>
+
+Lautstärke
+
+<input
+id="editVolume"
+type="range"
+min="0"
+max="1"
+step="0.01">
+
+<span id="volumeValue">1</span>
+
+</label>
+
+<label>
+
+Klangfarbe
+
+<select id="editPitch">
+
+<option value="0.5">
+Tief
+</option>
+
+<option value="1" selected>
+Normal
+</option>
+
+<option value="2">
+Hoch
+</option>
+
+</select>
+
+</label>
+
+<div class="modalButtons">
+
+<button id="deleteBlock">
+🗑 Löschen
+</button>
+
+<button id="closeModal">
+Schließen
+</button>
+
+</div>
+
+</div>
+
+</div>
+<!-- ========================================= -->
+<!-- DRAG-VORSCHAU -->
+<!-- ========================================= -->
+
+<div id="dragPreview" class="hidden">
+    <span id="dragName">Sound</span>
+</div>
+
+<!-- ========================================= -->
+<!-- STATUSLEISTE -->
+<!-- ========================================= -->
+
+<footer class="statusbar">
+
+    <div>
+        <strong>Status:</strong>
+        <span id="statusText">Bereit</span>
     </div>
 
-    <!-- Edit Menü / Modal Window -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
-    <div class="modal" id="editModal">
-        <h3 id="modalTitle">Sound bearbeiten</h3>
-        
-        <label>Startzeitpunkt (Sekunden):</label>
-        <input type="range" id="modStart" min="0" max="10" step="0.1">
-        <span id="modStartVal" style="font-size:0.85em; color:#aaa;">0s</span>
-        
-        <label>Länge (Dauer in Sekunden):</label>
-        <input type="range" id="modDuration" min="0.1" max="4.0" step="0.1">
-        <span id="modDurationVal" style="font-size:0.85em; color:#aaa;">0.8s</span>
-        
-        <label>Lautstärke (Volume):</label>
-        <input type="range" id="modVolume" min="0" max="1" step="0.1">
-
-        <label id="pitchLabel">Klangfarbe / Tonhöhe:</label>
-        <select id="modPitch">
-            <option value="low">Tief</option>
-            <option value="normal" selected>Normal</option>
-            <option value="high">Hoch</option>
-        </select>
-
-        <div class="modal-buttons">
-            <!-- Gefordert: Löschen-Knopf direkt im Sound-Menü -->
-            <button class="modal-btn btn-delete" onclick="deleteBlock()">🗑 Löschen</button>
-            <button class="modal-btn btn-save" onclick="saveBlockSettings()">💾 Speichern</button>
-        </div>
+    <div>
+        <strong>Spuren:</strong>
+        <span id="trackCount">4</span>
     </div>
 
-    <!-- JavaScript Dateien laden -->
-    <script src="sound.js"></script>
-    <script src="script.js"></script>
+    <div>
+        <strong>Sounds:</strong>
+        <span id="soundCount">0</span>
+    </div>
+
+</footer>
+
+<!-- ========================================= -->
+<!-- TEMPLATES -->
+<!-- ========================================= -->
+
+<template id="soundTemplate">
+
+    <div class="soundItem" draggable="true">
+
+        <div class="soundName">
+            Name
+        </div>
+
+        <div class="soundButtons">
+
+            <button class="previewButton">
+                ▶
+            </button>
+
+            <div class="dragHandle">
+                DRAG
+            </div>
+
+        </div>
+
+    </div>
+
+</template>
+
+<template id="timelineTemplate">
+
+    <div class="timelineBlock">
+
+        <div class="timelineName">
+            Sound
+        </div>
+
+    </div>
+
+</template>
+
+<!-- ========================================= -->
+<!-- SCRIPTS -->
+<!-- ========================================= -->
+
+<script src="sound.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
