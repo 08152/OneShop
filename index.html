@@ -3,80 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mecha Chameleon</title>
-
+    <title>Audio Timeline Studio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="game"></div>
+    <h1>🎛️ Audio Timeline Studio</h1>
 
-<!-- Pose-Menü -->
-<div id="poseMenu" class="menu hidden">
-    <h2>Posen</h2>
+    <div class="studio-container">
+        
+        <!-- Linke Seite: Soundpool & Aufnahme -->
+        <div class="sound-pool">
+            <h2>Soundpool</h2>
+            <p class="hint">Klicke zum Anhören. Nutze "+ Timeline", um den Sound im Editor zu platzieren.</p>
+            
+            <!-- Mikrofon Aufnahme -->
+            <div class="mic-section">
+                <h3>🎙️ Eigene Stimme</h3>
+                <button id="micBtn" class="mic-btn">Aufnahme starten</button>
+                <div id="micSounds" class="sound-grid"></div>
+            </div>
 
-    <button id="poseStand">
-        Stehen
-    </button>
+            <!-- Gitarre -->
+            <div class="instrument-section">
+                <div class="instrument-title">🎸 Gitarre (5 Sounds)</div>
+                <div class="sound-grid" id="pool-gitarre"></div>
+            </div>
 
-    <button id="poseLie">
-        Liegen
-    </button>
+            <!-- Trommel -->
+            <div class="instrument-section">
+                <div class="instrument-title">🥁 Trommel (5 Sounds)</div>
+                <div class="sound-grid" id="pool-trommel"></div>
+            </div>
 
-    <button id="poseHead">
-        Kopfstand
-    </button>
-</div>
+            <!-- Piano -->
+            <div class="instrument-section">
+                <div class="instrument-title">🎹 Piano (15 Sounds)</div>
+                <div class="sound-grid" id="pool-piano"></div>
+            </div>
 
-<!-- Mal-Menü -->
-<div id="paintMenu" class="menu hidden">
+            <!-- Beats -->
+            <div class="instrument-section">
+                <div class="instrument-title">⚡ Elektrische Beats (20 Sounds)</div>
+                <div class="sound-grid" id="pool-beat"></div>
+            </div>
+        </div>
 
-    <h2>Malen</h2>
+        <!-- Rechte Seite: Timeline & Controls -->
+        <div class="main-area">
+            <div class="controls">
+                <button class="control-btn play-btn" onclick="playTimeline()">▶ Abspielen</button>
+                <button class="control-btn stop-btn" onclick="stopTimeline()">⏹ Stopp</button>
+                <button class="control-btn clear-btn" onclick="clearTimeline()">🗑 Leeren</button>
+                <div class="track-add-control">
+                    <label>Spur hinzufügen:</label>
+                    <button class="add-track-btn" onclick="addTrackRow()">+</button>
+                </div>
+            </div>
 
-    <input
-        type="color"
-        id="paintColor"
-        value="#ff0000">
-
-    <br><br>
-
-    <input
-        type="range"
-        id="brushSize"
-        min="2"
-        max="50"
-        value="10">
-
-    <p>Pinselgröße</p>
-
-    <button id="clearPaint">
-        Bemalung löschen
-    </button>
-
-</div>
-
-<!-- HUD -->
-<div id="hud">
-
-    <div id="info">
-        WASD = Laufen<br>
-        Maus = Kamera<br>
-        Leertaste = Springen<br>
-        1 = Pose-Menü<br>
-        2 = Mal-Menü
+            <div class="timeline-container">
+                <div class="timeline-tracks" id="timelineTracks">
+                    <div id="playhead"></div>
+                    <!-- Spuren werden dynamisch generiert -->
+                </div>
+            </div>
+        </div>
     </div>
 
-</div>
+    <!-- Edit Menü / Modal Window -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+    <div class="modal" id="editModal">
+        <h3 id="modalTitle">Sound bearbeiten</h3>
+        
+        <label>Startzeitpunkt (X-Position):</label>
+        <input type="range" id="modStart" min="0" max="800" step="10">
+        
+        <label>Länge (Dauer):</label>
+        <input type="range" id="modDuration" min="0.2" max="4.0" step="0.1">
+        
+        <label>Lautstärke (Volume):</label>
+        <input type="range" id="modVolume" min="0" max="1" step="0.1">
 
-<!-- Bibliotheken -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+        <label id="pitchLabel">Klangfarbe / Tonhöhe:</label>
+        <select id="modPitch">
+            <option value="low">Tief</option>
+            <option value="normal" selected>Normal</option>
+            <option value="high">Hoch</option>
+        </select>
 
-<!-- Eigene Dateien -->
-<script src="player.js"></script>
-<script src="camera.js"></script>
-<script src="pose.js"></script>
-<script src="paint.js"></script>
-<script src="ui.js"></script>
+        <div class="modal-buttons">
+            <button class="modal-btn btn-delete" onclick="deleteBlock()">Löschen</button>
+            <button class="modal-btn btn-save" onclick="saveBlockSettings()">Speichern</button>
+        </div>
+    </div>
 
+    <!-- JavaScript Dateien laden -->
+    <script src="sound.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
