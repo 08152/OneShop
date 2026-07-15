@@ -1,526 +1,194 @@
-// ======================================
-// MECHA CHAMELEON
-// game.js PART 1/3
-// ======================================
+// --- SOUND DATENBANK ---
+const AVAILABLE_SOUNDS = [
+    { id: 'kick', name: 'Bass Drum', type: 'synth-kick', duration: 0.2 },
+    { id: 'snare', name: 'Snare Drum', type: 'synth-snare', duration: 0.2 },
+    { id: 'hihat', name: 'Hi-Hat', type: 'synth-hat', duration: 0.05 },
+    { id: 'beep-high', name: 'Synth Piep Hoch', type: 'osc', freq: 880, duration: 0.15 },
+    { id: 'beep-low', name: 'Synth Piep Tief', type: 'osc', freq: 220, duration: 0.3 },
+    { id: 'chord', name: 'Synthesizer Akkord', type: 'osc-chord', freq: 440, duration: 0.5 }
+];
 
+// --- AUDIO ENGINE ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-import * as THREE from 
-"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+function playSoundLive(sound, volume = 100, startTime = 0) {
+    const gainNode = audioCtx.createGain();
+    const targetVolume = (volume / 100) * 0.5; 
+    gainNode.gain.setValueAtTime(targetVolume, startTime);
+    gainNode.connect(audioCtx.destination);
 
-
-// =============================
-// GAME VARIABLES
-// =============================
-
-let scene;
-let camera;
-
-
-let player;
-let character = {};
-
-
-let keys = {};
-
-let yaw = 0;
-let pitch = 0;
-
-
-let speed = 0.15;
-
-
-
-// =============================
-// START GAME
-// =============================
-
-export function startGame(world, cam){
-
-
-scene = world;
-
-camera = cam;
-
-
-
-// =============================
-// CREATE PLAYER
-// =============================
-
-
-createCharacter();
-
-
-
-// =============================
-// INPUT
-// =============================
-
-
-window.addEventListener(
-"keydown",
-(e)=>{
-
-keys[e.key.toLowerCase()] = true;
-
-
-}
-);
-
-
-window.addEventListener(
-"keyup",
-(e)=>{
-
-keys[e.key.toLowerCase()] = false;
-
-
-}
-);
-
-
-
-// =============================
-// MOUSE LOOK
-// =============================
-
-
-document.body.addEventListener(
-"click",
-()=>{
-
-document.body.requestPointerLock();
-
-});
-
-
-
-document.addEventListener(
-"mousemove",
-(e)=>{
-
-
-if(document.pointerLockElement){
-
-
-yaw -= e.movementX * 0.002;
-
-
-pitch -= e.movementY * 0.002;
-
-
-pitch =
-Math.max(
--1.2,
-Math.min(
-1.2,
-pitch
-)
-);
-
-
+    if (sound.type === 'osc') {
+        const osc = audioCtx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(sound.freq, startTime);
+        osc.connect(gainNode);
+        osc.start(startTime);
+        osc.stop(startTime + sound.duration);
+    } 
+    else if (sound.type === 'osc-chord') {
+        [sound.freq, sound.freq * 1.25, sound.freq * 1.5].forEach(f => {
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(f, startTime);
+            osc.connect(gainNode);
+            osc.start(startTime);
+            osc.stop(startTime + sound.duration);
+        });
+    }
+    else if (sound.type === 'synth-kick') {
+        const osc = audioCtx.createOscillator();
+        osc.frequency.setValueAtTime(150, startTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, startTime + sound.duration);
+        osc.connect(gainNode);
+        osc.start(startTime);
+        osc.stop(startTime + sound.duration);
+    }
+    else if (sound.type === 'synth-snare' || sound.type === 'synth-hat') {
+        const bufferSize = audioCtx.sampleRate * sound.duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = sound.type === 'synth-hat' ? 'highpass' : 'bandpass';
+        filter.frequency.setValueAtTime(sound.type === 'synth-hat' ? 7000 : 1000, startTime);
+        
+        noise.connect(filter);
+        filter.connect(gainNode);
+        noise.start(startTime);
+        noise.stop(startTime + sound.duration);
+    }
 }
 
+// --- STATE MANAGEMENT ---
+let appState = {
+    selectedSoundId: null,
+    timelineDuration: 10,
+    clips: []
+};
 
-});
-
-
-
-// Boden
-
-createWorld();
-
-
+function saveToLocalStorage() {
+    localStorage.setItem('music_maker_save', JSON.stringify(appState));
 }
 
-
-
-
-
-// =============================
-// CHARACTER SYSTEM
-// =============================
-
-function createCharacter(){
-
-
-const material =
-new THREE.MeshStandardMaterial({
-
-color:0x00ff99
-
-});
-
-
-
-// ROOT
-
-character.root =
-new THREE.Group();
-
-player =
-character.root;
-
-
-
-// BODY
-
-character.body =
-new THREE.Mesh(
-
-new THREE.BoxGeometry(
-1,
-1.5,
-0.6
-),
-
-material
-
-);
-
-
-character.body.position.y=2;
-
-
-
-// HEAD
-
-character.head =
-new THREE.Mesh(
-
-new THREE.SphereGeometry(
-0.45,
-16,
-16
-),
-
-material
-
-);
-
-
-character.head.position.y=3.2;
-
-
-
-
-// ARM LEFT
-
-character.armLeft =
-new THREE.Mesh(
-
-new THREE.BoxGeometry(
-0.25,
-1,
-0.25
-),
-
-material
-
-);
-
-
-character.armLeft.position.set(
--0.8,
-2,
-0
-);
-
-
-
-// ARM RIGHT
-
-character.armRight =
-character.armLeft.clone();
-
-
-character.armRight.position.x=0.8;
-
-
-
-
-// LEG LEFT
-
-character.legLeft =
-new THREE.Mesh(
-
-new THREE.BoxGeometry(
-0.3,
-1,
-0.3
-),
-
-material
-
-);
-
-
-character.legLeft.position.set(
--0.3,
-0.8,
-0
-);
-
-
-
-// LEG RIGHT
-
-character.legRight =
-character.legLeft.clone();
-
-
-character.legRight.position.x=0.3;
-
-
-
-
-// ADD PARTS
-
-character.root.add(
-character.body,
-character.head,
-character.armLeft,
-character.armRight,
-character.legLeft,
-character.legRight
-);
-
-
-
-scene.add(
-character.root
-);
-
-
-
-character.root.position.set(
-0,
-0,
-0
-);
-
-
-}
-// ======================================
-// MECHA CHAMELEON
-// game.js PART 3/3
-// ======================================
-
-
-// =============================
-// WORLD
-// =============================
-
-function createWorld(){
-
-const ground = new THREE.Mesh(
-
-new THREE.PlaneGeometry(
-500,
-500
-),
-
-new THREE.MeshStandardMaterial({
-color:0x328a3a
-})
-
-);
-
-
-ground.rotation.x =
--Math.PI/2;
-
-
-scene.add(ground);
-
-
-
+function loadFromLocalStorage() {
+    const saved = localStorage.getItem('music_maker_save');
+    if (saved) {
+        try {
+            appState = JSON.parse(saved);
+        } catch(e) {
+            console.error("Fehler beim Laden", e);
+        }
+    }
 }
 
+// --- WAV DOWNLOAD RENDERING ---
+function renderWavAndDownload() {
+    const sampleRate = 44100;
+    const renderDuration = appState.timelineDuration;
+    const offlineCtx = new OfflineAudioContext(1, sampleRate * renderDuration, sampleRate);
 
+    appState.clips.forEach(clip => {
+        const sound = AVAILABLE_SOUNDS.find(s => s.id === clip.soundId);
+        if (!sound) return;
 
-// =============================
-// PHYSICS
-// =============================
+        const gainNode = offlineCtx.createGain();
+        const targetVolume = (clip.volume / 100) * 0.5;
+        gainNode.gain.setValueAtTime(targetVolume, clip.time);
+        gainNode.connect(offlineCtx.destination);
 
-let velocityY = 0;
+        if (sound.type === 'osc') {
+            const osc = offlineCtx.createOscillator();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(sound.freq, clip.time);
+            osc.connect(gainNode);
+            osc.start(clip.time);
+            osc.stop(clip.time + sound.duration);
+        } 
+        else if (sound.type === 'osc-chord') {
+            [sound.freq, sound.freq * 1.25, sound.freq * 1.5].forEach(f => {
+                const osc = offlineCtx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, clip.time);
+                osc.connect(gainNode);
+                osc.start(clip.time);
+                osc.stop(clip.time + sound.duration);
+            });
+        }
+        else if (sound.type === 'synth-kick') {
+            const osc = offlineCtx.createOscillator();
+            osc.frequency.setValueAtTime(150, clip.time);
+            osc.frequency.exponentialRampToValueAtTime(0.01, clip.time + sound.duration);
+            osc.connect(gainNode);
+            osc.start(clip.time);
+            osc.stop(clip.time + sound.duration);
+        }
+        else if (sound.type === 'synth-snare' || sound.type === 'synth-hat') {
+            const bufferSize = sampleRate * sound.duration;
+            const buffer = offlineCtx.createBuffer(1, bufferSize, sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = offlineCtx.createBufferSource();
+            noise.buffer = buffer;
+            
+            const filter = offlineCtx.createBiquadFilter();
+            filter.type = sound.type === 'synth-hat' ? 'highpass' : 'bandpass';
+            filter.frequency.setValueAtTime(sound.type === 'synth-hat' ? 7000 : 1000, clip.time);
+            
+            noise.connect(filter);
+            filter.connect(gainNode);
+            noise.start(clip.time);
+            noise.stop(clip.time + sound.duration);
+        }
+    });
 
-let gravity = -0.02;
-
-
-let grounded = false;
-
-
-
-
-function physics(){
-
-
-velocityY += gravity;
-
-
-player.position.y += velocityY;
-
-
-
-if(player.position.y < 0){
-
-
-player.position.y = 0;
-
-
-velocityY = 0;
-
-
-grounded = true;
-
-
+    return offlineCtx.startRendering().then(renderedBuffer => {
+        return bufferToWav(renderedBuffer);
+    });
 }
 
-
-
-}
-
-
-
-
-// =============================
-// WALK ANIMATION
-// =============================
-
-let walkTime = 0;
-
-
-function animateCharacter(){
-
-
-if(
-keys["w"] ||
-keys["a"] ||
-keys["s"] ||
-keys["d"]
-){
-
-
-walkTime +=0.15;
-
-
-
-character.legLeft.rotation.x =
-Math.sin(walkTime)*0.7;
-
-
-character.legRight.rotation.x =
--Math.sin(walkTime)*0.7;
-
-
-
-character.armLeft.rotation.x =
--Math.sin(walkTime)*0.5;
-
-
-character.armRight.rotation.x =
-Math.sin(walkTime)*0.5;
-
-
-
-}
-
-else{
-
-
-character.legLeft.rotation.x *=0.8;
-
-character.legRight.rotation.x *=0.8;
-
-character.armLeft.rotation.x *=0.8;
-
-character.armRight.rotation.x *=0.8;
-
-
-}
-
-
-
-}
-
-
-
-
-// =============================
-// CHAMELEON CAMOUFLAGE
-// =============================
-
-let invisible = false;
-
-
-window.addEventListener(
-"keydown",
-(e)=>{
-
-
-if(e.key.toLowerCase()==="c"){
-
-
-invisible =
-!invisible;
-
-
-
-player.traverse(
-(obj)=>{
-
-
-if(obj.material){
-
-
-obj.material.transparent=true;
-
-
-obj.material.opacity =
-invisible ? 0.15 : 1;
-
-
-}
-
-
-});
-
-
-
-}
-
-
-
-});
-
-
-
-
-
-// =============================
-// MAIN UPDATE
-// =============================
-
-export function updateGame(delta){
-
-
-if(!player)
-return;
-
-
-
-movePlayer();
-
-
-physics();
-
-
-animateCharacter();
-
-
-updateCamera();
-
-
-
+function bufferToWav(buffer) {
+    const numOfChan = buffer.numberOfChannels,
+        length = buffer.length * numOfChan * 2 + 44,
+        bufferArr = new ArrayBuffer(length),
+        view = new DataView(bufferArr),
+        channels = [], sample, pos = 0;
+
+    function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+    function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+
+    setUint32(0x46464952); 
+    setUint32(length - 8); 
+    setUint32(0x45564157); 
+    setUint32(0x20746d66); 
+    setUint32(16);         
+    setUint16(1);          
+    setUint16(numOfChan);
+    setUint32(buffer.sampleRate);
+    setUint32(buffer.sampleRate * 2 * numOfChan); 
+    setUint16(numOfChan * 2);                     
+    setUint16(16);                                
+    setUint32(0x61746164); 
+    setUint32(length - pos - 4);
+
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
+        channels.push(buffer.getChannelData(i));
+    }
+
+    let writePos = pos;
+    for (let i = 0; i < buffer.length; i++) {
+        for (let channel = 0; channel < numOfChan; channel++) {
+            sample = Math.max(-1, Math.min(1, channels[channel][i]));
+            sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+            view.setInt16(writePos, sample, true);
+            writePos += 2;
+        }
+    }
+    return new Blob([bufferArr], { type: 'audio/wav' });
 }
