@@ -1,13 +1,10 @@
 /* =========================================
    Ghost Studio DAW
-   script.js Teil 1/4
+   script.js 1/5
 
-   Neues System:
-   Sound auswählen
-   -> DRAG klicken
-   -> Sekunde wählen
-   -> Spur wählen
-   -> Einfügen
+   Sound auswählen →
+   Platzierungsfenster →
+   Timeline
 ========================================= */
 
 
@@ -19,7 +16,19 @@ let selectedPoolSound = null;
 
 let selectedBlock = null;
 
+
+
 let timelineLength = 30;
+
+
+
+let isPlaying = false;
+
+let playTime = 0;
+
+let playTimer = null;
+
+
 
 
 
@@ -27,6 +36,8 @@ const statusText =
 document.getElementById(
     "statusText"
 );
+
+
 
 
 
@@ -42,31 +53,14 @@ window.addEventListener(
 
     createTracks();
 
+
     createTimeScale();
+
 
     loadSoundPool();
 
 
-
-    document
-    .getElementById(
-        "timelineLength"
-    )
-    .addEventListener(
-    "change",
-    e=>{
-
-
-        timelineLength =
-        Number(
-            e.target.value
-        );
-
-
-        createTimeScale();
-
-
-    });
+    connectButtons();
 
 
 
@@ -76,8 +70,12 @@ window.addEventListener(
 
 
 
+
+
+
+
 /* =========================================
-   TRACK SYSTEM
+   TRACKS ERSTELLEN
 ========================================= */
 
 
@@ -85,6 +83,7 @@ function createTracks(){
 
 
     tracks=[];
+
 
 
     document
@@ -95,10 +94,11 @@ function createTracks(){
     (track,index)=>{
 
 
-        let lane =
+        const lane =
         track.querySelector(
             ".trackLane"
         );
+
 
 
         tracks.push({
@@ -109,7 +109,9 @@ function createTracks(){
 
             lane:lane
 
+
         });
+
 
 
     });
@@ -122,26 +124,30 @@ function createTracks(){
 
 
 
+
+
+
 function addTrack(){
 
 
-    let id =
+    const id =
     tracks.length;
 
 
 
-    let div =
+    const track =
     document.createElement(
         "div"
     );
 
 
-    div.className =
+
+    track.className =
     "track";
 
 
 
-    div.innerHTML=`
+    track.innerHTML=`
 
     <div class="trackTitle">
     Track ${id+1}
@@ -160,13 +166,14 @@ function addTrack(){
         "timelineContainer"
     )
     .appendChild(
-        div
+        track
     );
 
 
 
-    let lane =
-    div.querySelector(
+
+    const lane =
+    track.querySelector(
         ".trackLane"
     );
 
@@ -176,7 +183,7 @@ function addTrack(){
 
         id:id,
 
-        element:div,
+        element:track,
 
         lane:lane
 
@@ -198,87 +205,90 @@ function addTrack(){
 
 
 
+
+
+
+
 /* =========================================
-   ZEITLEISTE
+   ZEITLINIE
 ========================================= */
 
 
 function createTimeScale(){
 
 
-let scale =
-document.getElementById(
-"timeScale"
-);
+    const scale =
+    document.getElementById(
+        "timeScale"
+    );
 
 
 
-scale.innerHTML="";
+    scale.innerHTML="";
 
 
 
-for(
-let i=0;
-i<=timelineLength;
-i++
-){
+    for(
+        let i=0;
+        i<=timelineLength;
+        i++
+    ){
 
 
-let cell =
-document.createElement(
-"div"
-);
+        let cell =
+        document.createElement(
+            "div"
+        );
 
 
-cell.className =
-"timeCell";
+        cell.className =
+        "timeCell";
 
 
-cell.style.width =
-"100px";
+        cell.textContent =
+        i+"s";
 
 
-cell.textContent =
-i+"s";
+        scale.appendChild(
+            cell
+        );
+
+    }
 
 
 
-scale.appendChild(
-cell
-);
+
+    document
+    .querySelectorAll(
+        ".trackLane"
+    )
+    .forEach(
+    lane=>{
+
+
+        lane.style.width =
+        timelineLength *
+        100+
+        "px";
+
+
+    });
+
 
 
 }
+/* =========================================
+   Ghost Studio DAW
+   script.js 2/5
 
-
-
-
-
-document
-.querySelectorAll(
-".trackLane"
-)
-.forEach(
-lane=>{
-
-
-lane.style.width =
-timelineLength *
-100+
-"px";
-
-
-});
-
-
-}
-
-
+   Soundpool System
+   DRAG -> Platzieren
+========================================= */
 
 
 
 /* =========================================
-   SOUNDPOOL
+   SOUNDPOOL LADEN
 ========================================= */
 
 
@@ -309,6 +319,12 @@ document.getElementById(
 electro:
 document.getElementById(
 "electroList"
+),
+
+
+voice:
+document.getElementById(
+"voiceList"
 )
 
 
@@ -341,10 +357,9 @@ target=lists.piano;
 
 
 if(
-["kick","snare","hat"]
-.includes(
-sound.type
-)
+sound.type==="kick" ||
+sound.type==="snare" ||
+sound.type==="hat"
 )
 target=lists.drum;
 
@@ -357,6 +372,14 @@ target=lists.electro;
 
 
 
+if(
+sound.type==="voice"
+)
+target=lists.voice;
+
+
+
+
 
 if(!target)
 return;
@@ -365,7 +388,39 @@ return;
 
 
 
-let item =
+createSoundItem(
+sound,
+target
+);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================================
+   SOUND ITEM ERSTELLEN
+========================================= */
+
+
+function createSoundItem(
+sound,
+target
+){
+
+
+
+const item =
 document.createElement(
 "div"
 );
@@ -377,10 +432,14 @@ item.className =
 
 
 
+
+
 item.innerHTML=`
 
 <div class="soundName">
+
 ${sound.name}
+
 </div>
 
 
@@ -388,18 +447,24 @@ ${sound.name}
 
 
 <button class="previewButton">
+
 ▶
+
 </button>
 
 
 <button class="dragHandle">
+
 DRAG
+
 </button>
 
 
 </div>
 
 `;
+
+
 
 
 
@@ -420,14 +485,18 @@ sound
 );
 
 
+
 };
 
 
 
 
 
+
+
+
 /* NEU:
-DRAG BUTTON
+DRAG öffnet Menü
 */
 
 
@@ -443,7 +512,9 @@ sound
 );
 
 
+
 };
+
 
 
 
@@ -455,75 +526,87 @@ item
 
 
 
-});
-
-
-
-}
-/* =========================================
-   script.js Teil 2/4
-
-   Sound platzieren
-   Timeline Blöcke
-========================================= */
-
-
-
-/* =========================================
-   PLACE MODAL
-========================================= */
-
-
-function openPlaceMenu(sound){
-
-
-    selectedPoolSound =
-    sound;
-
-
-
-    document
-    .getElementById(
-        "placeSoundName"
-    )
-    .textContent =
-    sound.name;
-
-
-
-    document
-    .getElementById(
-        "placeTime"
-    )
-    .value =
-    0;
-
-
-
-    document
-    .getElementById(
-        "placeTrack"
-    )
-    .value =
-    0;
-
-
-
-    document
-    .getElementById(
-        "placeModal"
-    )
-    .classList
-    .remove(
-        "hidden"
-    );
-
-
 }
 
 
 
 
+
+
+
+
+
+
+/* =========================================
+   PLATZIERUNGS-MENÜ
+========================================= */
+
+
+function openPlaceMenu(
+sound
+){
+
+
+selectedPoolSound =
+sound;
+
+
+
+
+document
+.getElementById(
+"placeSoundName"
+)
+.textContent =
+sound.name;
+
+
+
+
+document
+.getElementById(
+"placeTime"
+)
+.value =
+0;
+
+
+
+
+document
+.getElementById(
+"placeTrack"
+)
+.value =
+0;
+
+
+
+
+document
+.getElementById(
+"placeModal"
+)
+.classList
+.remove(
+"hidden"
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================================
+   ABBRECHEN
+========================================= */
 
 
 document
@@ -543,14 +626,17 @@ document
 );
 
 
+
 selectedPoolSound=null;
 
 
 };
+/* =========================================
+   Ghost Studio DAW
+   script.js 3/5
 
-
-
-
+   Timeline Sounds
+========================================= */
 
 
 
@@ -573,7 +659,7 @@ return;
 
 
 
-let time =
+let start =
 Number(
 document
 .getElementById(
@@ -602,10 +688,9 @@ selectedPoolSound,
 
 track,
 
-time
+start
 
 );
-
 
 
 
@@ -626,7 +711,7 @@ selectedPoolSound=null;
 
 
 statusText.textContent =
-"Sound eingefügt";
+"Sound platziert";
 
 
 };
@@ -637,8 +722,10 @@ statusText.textContent =
 
 
 
+
+
 /* =========================================
-   TIMELINE BLOCK
+   BLOCK ERSTELLEN
 ========================================= */
 
 
@@ -650,7 +737,7 @@ start
 
 
 
-let block =
+const block =
 document.createElement(
 "div"
 );
@@ -668,7 +755,8 @@ sound.name;
 
 
 
-let object={
+
+const object={
 
 
 id:
@@ -700,7 +788,6 @@ pitch:
 1,
 
 
-
 speed:
 1,
 
@@ -721,6 +808,13 @@ object
 
 
 
+
+
+
+/*
+Position:
+1 Sekunde = 100px
+*/
 
 
 block.style.left =
@@ -751,8 +845,7 @@ block
 
 
 /*
-   Klick auf Sound
-   öffnet Editor
+Klick auf Sound
 */
 
 
@@ -782,6 +875,12 @@ updateSoundCount();
 
 
 
+
+/* =========================================
+   SOUND COUNT
+========================================= */
+
+
 function updateSoundCount(){
 
 
@@ -795,77 +894,87 @@ timelineObjects.length;
 
 }
 /* =========================================
-   script.js Teil 3/4
+   Ghost Studio DAW
+   script.js 4/5
 
-   Edit Menü
-   Volume
-   Pitch
-   Speed
-   Delete
+   Edit System
 ========================================= */
+
 
 
 /* =========================================
-   EDIT MODAL ÖFFNEN
+   EDIT MENÜ ÖFFNEN
 ========================================= */
 
 
-function openEditMenu(object){
+function openEditMenu(
+object
+){
 
 
-    selectedBlock =
-    object;
-
-
-
-    document
-    .getElementById(
-        "editSoundName"
-    )
-    .textContent =
-    object.sound.name;
+selectedBlock =
+object;
 
 
 
-    document
-    .getElementById(
-        "editVolume"
-    )
-    .value =
-    object.volume;
+document
+.getElementById(
+"editSoundName"
+)
+.textContent =
+object.sound.name;
 
 
 
-    document
-    .getElementById(
-        "editPitch"
-    )
-    .value =
-    object.pitch;
+
+
+document
+.getElementById(
+"editVolume"
+)
+.value =
+object.volume;
 
 
 
-    document
-    .getElementById(
-        "editSpeed"
-    )
-    .value =
-    object.speed;
+
+
+document
+.getElementById(
+"editPitch"
+)
+.value =
+object.pitch;
 
 
 
-    updateEditValues();
+
+
+document
+.getElementById(
+"editSpeed"
+)
+.value =
+object.speed;
 
 
 
-    document
-    .getElementById(
-        "editModal"
-    )
-    .classList
-    .remove(
-        "hidden"
-    );
+
+updateEditValues();
+
+
+
+
+
+document
+.getElementById(
+"editModal"
+)
+.classList
+.remove(
+"hidden"
+);
+
 
 
 }
@@ -875,15 +984,20 @@ function openEditMenu(object){
 
 
 
+
+
+
 /* =========================================
-   WERTE ANZEIGEN
+   ANZEIGE AKTUALISIEREN
 ========================================= */
 
 
 function updateEditValues(){
 
 
-if(!selectedBlock)
+if(
+!selectedBlock
+)
 return;
 
 
@@ -900,17 +1014,20 @@ selectedBlock.volume
 
 
 
+
+
 document
 .getElementById(
 "speedValue"
 )
 .textContent =
-selectedBlock.speed
-+"x";
+selectedBlock.speed+
+"x";
 
 
 
 }
+
 
 
 
@@ -931,7 +1048,9 @@ document
 .oninput=()=>{
 
 
-if(!selectedBlock)
+if(
+!selectedBlock
+)
 return;
 
 
@@ -959,8 +1078,9 @@ updateEditValues();
 
 
 
+
 /* =========================================
-   TONHÖHE
+   HÖHE / PITCH
 ========================================= */
 
 
@@ -971,7 +1091,9 @@ document
 .onchange=()=>{
 
 
-if(!selectedBlock)
+if(
+!selectedBlock
+)
 return;
 
 
@@ -986,7 +1108,9 @@ document
 );
 
 
+
 };
+
 
 
 
@@ -1007,7 +1131,9 @@ document
 .oninput=()=>{
 
 
-if(!selectedBlock)
+if(
+!selectedBlock
+)
 return;
 
 
@@ -1036,8 +1162,9 @@ updateEditValues();
 
 
 
+
 /* =========================================
-   SOUND LÖSCHEN
+   LÖSCHEN
 ========================================= */
 
 
@@ -1048,7 +1175,9 @@ document
 .onclick=()=>{
 
 
-if(!selectedBlock)
+if(
+!selectedBlock
+)
 return;
 
 
@@ -1063,10 +1192,11 @@ selectedBlock
 
 timelineObjects =
 timelineObjects.filter(
-item=>
-item.id !==
+obj=>
+obj.id !==
 selectedBlock.id
 );
+
 
 
 
@@ -1089,7 +1219,6 @@ document
 updateSoundCount();
 
 
-
 };
 
 
@@ -1098,8 +1227,10 @@ updateSoundCount();
 
 
 
+
+
 /* =========================================
-   EDIT SCHLIESSEN
+   SCHLIESSEN
 ========================================= */
 
 
@@ -1126,23 +1257,21 @@ selectedBlock=null;
 
 };
 /* =========================================
-   script.js Teil 4/4
+   Ghost Studio DAW
+   script.js 5/5
 
    Playback
-   Playhead
    Recorder
    Final Setup
 ========================================= */
 
 
 
-let playing=false;
+let playing = false;
 
-let playTimer=null;
+let playPosition = 0;
 
-let playTime=0;
-
-
+let playTimer = null;
 
 
 
@@ -1156,9 +1285,8 @@ document.getElementById(
 
 
 
-
 /* =========================================
-   PLAY
+   ABSPIELEN
 ========================================= */
 
 
@@ -1177,15 +1305,16 @@ return;
 playing=true;
 
 
+
 statusText.textContent =
 "Wiedergabe";
 
 
 
-let start =
+let startTime =
 performance.now()
 -
-playTime*1000;
+playPosition*1000;
 
 
 
@@ -1195,17 +1324,19 @@ setInterval(
 ()=>{
 
 
-playTime =
+playPosition =
 (
 performance.now()
 -
-start
+startTime
 )
 /1000;
 
 
 
+
 updatePlayhead();
+
 
 
 
@@ -1216,11 +1347,10 @@ obj=>{
 
 if(
 Math.abs(
-obj.start-playTime
+obj.start-playPosition
 )
 <0.03
 ){
-
 
 
 playSoundObject({
@@ -1243,7 +1373,6 @@ obj.speed
 });
 
 
-
 }
 
 
@@ -1255,7 +1384,8 @@ obj.speed
 
 
 if(
-playTime>=timelineLength
+playPosition >=
+timelineLength
 ){
 
 stopPlayback();
@@ -1290,10 +1420,7 @@ function updatePlayhead(){
 
 playhead.style.left =
 
-120 +
-
-playTime*
-
+playPosition *
 100+
 
 "px";
@@ -1307,8 +1434,10 @@ playTime*
 
 
 
+
+
 /* =========================================
-   STOP
+   STOPP
 ========================================= */
 
 
@@ -1318,6 +1447,7 @@ document
 )
 .onclick =
 stopPlayback;
+
 
 
 
@@ -1338,7 +1468,7 @@ playTimer
 playTimer=null;
 
 
-playTime=0;
+playPosition=0;
 
 
 
@@ -1350,6 +1480,7 @@ statusText.textContent =
 "Bereit";
 
 
+
 }
 
 
@@ -1359,8 +1490,9 @@ statusText.textContent =
 
 
 
+
 /* =========================================
-   CLEAR
+   TIMELINE LEEREN
 ========================================= */
 
 
@@ -1387,6 +1519,7 @@ timelineObjects=[];
 
 
 updateSoundCount();
+
 
 
 };
@@ -1433,7 +1566,6 @@ let recording=false;
 
 
 
-
 document
 .getElementById(
 "recordBtn"
@@ -1443,7 +1575,7 @@ async()=>{
 
 
 
-let button =
+const btn =
 document
 .getElementById(
 "recordBtn"
@@ -1452,9 +1584,7 @@ document
 
 
 
-
 if(!recording){
-
 
 
 await startRecording();
@@ -1465,7 +1595,7 @@ recording=true;
 
 
 
-button.textContent =
+btn.textContent =
 "⏹ Aufnahme stoppen";
 
 
@@ -1474,11 +1604,9 @@ statusText.textContent =
 "Aufnahme läuft";
 
 
-
 }
 
 else{
-
 
 
 stopRecording();
@@ -1489,14 +1617,13 @@ recording=false;
 
 
 
-button.textContent =
+btn.textContent =
 "🎤 Aufnahme starten";
 
 
 
 statusText.textContent =
-"Gespeichert";
-
+"Aufnahme gespeichert";
 
 
 }
@@ -1514,14 +1641,14 @@ statusText.textContent =
 
 
 /* =========================================
-   STIMMEN SOUNDPOOL
+   VOICE POOL AKTUALISIEREN
 ========================================= */
 
 
 function refreshVoiceList(){
 
 
-let list =
+const list =
 document
 .getElementById(
 "voiceList"
@@ -1538,7 +1665,7 @@ voiceSounds.forEach(
 voice=>{
 
 
-let item =
+const item =
 document.createElement(
 "div"
 );
@@ -1547,7 +1674,6 @@ document.createElement(
 
 item.className =
 "soundItem";
-
 
 
 
@@ -1578,8 +1704,6 @@ DRAG
 
 
 
-
-
 item
 .querySelector(
 ".previewButton"
@@ -1593,7 +1717,6 @@ voice
 
 
 };
-
 
 
 
@@ -1636,8 +1759,82 @@ item
 
 
 
+
 /* =========================================
-   START CHECK
+   TASTEN
+========================================= */
+
+
+window.addEventListener(
+"keydown",
+e=>{
+
+
+if(
+e.code==="Space"
+){
+
+e.preventDefault();
+
+
+
+if(playing)
+stopPlayback();
+
+else
+document
+.getElementById(
+"playBtn"
+)
+.click();
+
+
+}
+
+
+
+if(
+e.code==="Escape"
+){
+
+
+document
+.getElementById(
+"placeModal"
+)
+.classList
+.add(
+"hidden"
+);
+
+
+
+document
+.getElementById(
+"editModal"
+)
+.classList
+.add(
+"hidden"
+);
+
+
+
+}
+
+
+
+});
+
+
+
+
+
+
+
+
+/* =========================================
+   FERTIG
 ========================================= */
 
 
@@ -1646,13 +1843,12 @@ window.addEventListener(
 ()=>{
 
 
-statusText.textContent =
-"DAW bereit";
-
-
-
 createTimeScale();
 
+
+
+statusText.textContent =
+"Ghost Studio bereit";
 
 
 });
