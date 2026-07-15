@@ -42,6 +42,7 @@ h1, h2 {
 .hint {
     font-size: 0.8em; 
     color: #aaa;
+    line-height: 1.4;
 }
 
 .instrument-section {
@@ -61,31 +62,26 @@ h1, h2 {
     gap: 5px;
 }
 
-.sound-pool-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 .sound-btn {
     background: #444;
     color: #fff;
     border: none;
-    padding: 8px 4px;
+    padding: 12px 4px;
     border-radius: 4px;
-    cursor: pointer;
+    cursor: grab;
     font-size: 0.85em;
     text-align: center;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
+    user-select: none;
+}
+
+.sound-btn:active {
+    cursor: grabbing;
+    transform: scale(0.95);
 }
 
 .sound-btn:hover { 
     background: #555; 
-}
-
-.add-to-timeline-btn {
-    font-size: 0.7em;
-    cursor: pointer;
 }
         
 /* Instrumentenspezifische Farben */
@@ -190,24 +186,30 @@ h1, h2 {
     background: #222;
     padding: 10px;
     border-radius: 6px;
-    min-height: 200px;
+    min-height: 220px;
     position: relative;
 }
 
 .track-row {
-    height: 50px;
+    height: 54px;
     background: #2a2a2a;
     border-radius: 4px;
     position: relative;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-    /* Die genaue Pixelbreite wird dynamisch über script.js gesetzt */
+    border: 2px dashed transparent;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.track-row.drag-over {
+    background: #3a3a3a;
+    border-color: var(--accent-color);
 }
 
 /* Audio Blöcke */
 .audio-block {
     position: absolute;
-    height: 42px;
-    top: 4px;
+    height: 44px;
+    top: 3px;
     background: #555;
     color: white;
     border-radius: 4px;
@@ -215,11 +217,13 @@ h1, h2 {
     align-items: center;
     justify-content: center;
     font-size: 0.8em;
-    cursor: pointer;
+    cursor: move;
     user-select: none;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.1);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .audio-block.selected {
@@ -250,22 +254,34 @@ h1, h2 {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     z-index: 100;
-    min-width: 280px;
+    min-width: 300px;
 }
 
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 99;
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+.modal-close-x {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.modal-close-x:hover {
+    color: white;
 }
 
 .modal label {
     display: block;
     margin-bottom: 2px;
     font-size: 0.9em;
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
 .modal input, .modal select {
@@ -273,18 +289,25 @@ h1, h2 {
     margin-bottom: 2px;
 }
 
+.value-display {
+    font-size: 0.85em; 
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
 .modal-buttons {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .modal-btn {
-    padding: 6px 12px;
+    padding: 8px 16px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .btn-save { background: #4caf50; color: white; }
