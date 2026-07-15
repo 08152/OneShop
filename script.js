@@ -1,345 +1,1583 @@
-// Globale Steuergrößen
-let timelineBlocks = [];
-let activeBlockId = null;
+/* =========================================
+   Ghost Studio DAW
+   script.js Teil 1/4
+
+   Grundsystem
+   Soundpool
+   Timeline
+========================================= */
+
+
+let tracks = [];
+
+let timelineLength = 30;
+
+let timelineObjects = [];
+
+let selectedBlock = null;
+
 let isPlaying = false;
-let playInterval = null;
-let playheadPos = 0;
-let trackCounter = 0;
 
-const pixelsPerSecond = 100; // 1 Sekunde auf der Timeline entspricht 100 Pixeln Breite
-let timelineSeconds = 10;
+let playTimer = null;
 
-// Recorder Zustand
-let mediaRecorder;
-let audioChunks = [];
+let playPosition = 0;
 
-// App beim Laden initialisieren
-window.addEventListener('DOMContentLoaded', () => {
-    buildSoundPoolUI();
-    initTracks();
-    setupMicrophone();
-    updateTimelineLength();
-});
 
-// Erzeugt die Benutzeroberfläche für den Soundpool
-function buildSoundPoolUI() {
-    for (const [key, list] of Object.entries(soundsData)) {
-        const container = document.getElementById(`pool-${key}`);
-        container.innerHTML = ''; // Platzhalter entfernen
 
-        list.forEach(sound => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'sound-pool-item';
+const timelineContainer =
+    document.getElementById(
+        "timelineContainer"
+    );
 
-            // Vorschau-Button zum schnellen Anhören
-            const btn = document.createElement('button');
-            btn.className = `sound-btn btn-${sound.type}`;
-            btn.innerText = sound.name;
-            btn.onclick = () => playAudioResource(sound.id, false);
 
-            // Drag & Drop Griff
-            const dragHandle = document.createElement('div');
-            dragHandle.className = 'drag-handle';
-            dragHandle.innerText = 'DRAG';
-            dragHandle.setAttribute('draggable', 'true');
-            
-            // Drag-Daten verpacken
-            dragHandle.ondragstart = (e) => {
-                e.dataTransfer.setData('text/plain', JSON.stringify({
-                    soundId: sound.id,
-                    name: sound.name,
-                    type: sound.type,
-                    isMic: false
-                }));
+const workspace =
+    document.getElementById(
+        "workspace"
+    );
+
+
+const playhead =
+    document.getElementById(
+        "playhead"
+    );
+
+
+const statusText =
+    document.getElementById(
+        "statusText"
+    );
+
+
+
+/* =========================================
+   INITIALISIERUNG
+========================================= */
+
+
+window.addEventListener(
+    "DOMContentLoaded",
+    ()=>{
+
+
+        createDefaultTracks();
+
+        createTimeScale();
+
+        loadSoundPool();
+
+
+        document
+        .getElementById(
+            "timelineLength"
+        )
+        .addEventListener(
+            "change",
+            e=>{
+
+                timelineLength =
+                    Number(
+                        e.target.value
+                    );
+
+                createTimeScale();
+
+            }
+        );
+
+
+    }
+);
+
+
+
+/* =========================================
+   SPUREN
+========================================= */
+
+
+function createDefaultTracks(){
+
+
+    tracks=[];
+
+
+    document
+    .querySelectorAll(
+        ".track"
+    )
+    .forEach(
+        (track,index)=>{
+
+            tracks.push({
+
+                id:index,
+
+                element:track,
+
+                lane:
+                track.querySelector(
+                    ".trackLane"
+                )
+
+            });
+
+
+            setupDropZone(
+                track.querySelector(
+                    ".trackLane"
+                ),
+                index
+            );
+
+        }
+    );
+
+
+}
+
+
+
+function addTrack(){
+
+
+    const id =
+        tracks.length;
+
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.className =
+        "track";
+
+
+    div.dataset.track=id;
+
+
+
+    div.innerHTML=`
+
+        <div class="trackTitle">
+            Track ${id+1}
+        </div>
+
+        <div class="trackLane"></div>
+
+    `;
+
+
+
+    timelineContainer.appendChild(
+        div
+    );
+
+
+    const lane =
+        div.querySelector(
+            ".trackLane"
+        );
+
+
+    tracks.push({
+
+        id:id,
+
+        element:div,
+
+        lane:lane
+
+    });
+
+
+
+    setupDropZone(
+        lane,
+        id
+    );
+
+
+
+    document
+    .getElementById(
+        "trackCount"
+    )
+    .textContent =
+        tracks.length;
+
+
+}
+
+
+
+/* =========================================
+   ZEITSKALA
+========================================= */
+
+
+function createTimeScale(){
+
+
+    const scale =
+        document.getElementById(
+            "timeScale"
+        );
+
+
+    scale.innerHTML="";
+
+
+    for(
+        let i=0;
+        i<=timelineLength;
+        i++
+    ){
+
+        const cell =
+            document.createElement(
+                "div"
+            );
+
+
+        cell.className =
+            "timeCell";
+
+
+        cell.textContent =
+            i+"s";
+
+
+        scale.appendChild(
+            cell
+        );
+
+    }
+
+
+    document
+    .querySelectorAll(
+        ".trackLane"
+    )
+    .forEach(
+        lane=>{
+
+            lane.style.width =
+                timelineLength*
+                100+
+                "px";
+
+        }
+    );
+
+}
+
+
+/* =========================================
+   SOUNDPOOL LADEN
+========================================= */
+
+
+function loadSoundPool(){
+
+
+    const lists={
+
+        guitar:
+        document.getElementById(
+            "guitarList"
+        ),
+
+        piano:
+        document.getElementById(
+            "pianoList"
+        ),
+
+        drum:
+        document.getElementById(
+            "drumList"
+        ),
+
+        electro:
+        document.getElementById(
+            "electroList"
+        )
+
+    };
+
+
+
+    soundPoolData.forEach(
+        sound=>{
+
+
+            let target;
+
+
+
+            if(
+                sound.type==="guitar"
+            )
+                target=lists.guitar;
+
+
+            if(
+                sound.type==="piano"
+            )
+                target=lists.piano;
+
+
+            if(
+                ["kick","snare","hat"]
+                .includes(sound.type)
+            )
+                target=lists.drum;
+
+
+
+            if(
+                sound.type==="electro"
+            )
+                target=lists.electro;
+
+
+
+            if(!target)
+                return;
+
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "soundItem";
+
+
+            item.draggable=true;
+
+
+
+            item.innerHTML=`
+
+                <div class="soundName">
+                    ${sound.name}
+                </div>
+
+                <div class="soundButtons">
+
+                    <button class="previewButton">
+                    ▶
+                    </button>
+
+                    <div class="dragHandle">
+                    DRAG
+                    </div>
+
+                </div>
+
+            `;
+
+
+
+            item.querySelector(
+                ".previewButton"
+            )
+            .onclick=()=>{
+
+                playSoundObject(
+                    sound
+                );
+
             };
 
-            wrapper.appendChild(btn);
-            wrapper.appendChild(dragHandle);
-            container.appendChild(wrapper);
-        });
-    }
-}
 
-// Generiert die 4 Standardspuren zu Beginn
-function initTracks() {
-    for(let i = 0; i < 4; i++) {
-        addTrackRow();
-    }
-}
 
-// Erstellt eine neue Spur in der Timeline samt Drag-and-Drop Erkennung
-function addTrackRow() {
-    trackCounter++;
-    const tracksContainer = document.getElementById('timelineTracks');
-    const row = document.createElement('div');
-    row.className = 'track-row';
-    row.dataset.trackId = 'track_' + trackCounter;
-    
-    // Optisches Highlight beim Darüberziehen eines Tons
-    row.ondragover = (e) => {
-        e.preventDefault();
-        row.classList.add('drag-over');
-    };
+            item.addEventListener(
+                "dragstart",
+                e=>{
 
-    row.ondragleave = () => {
-        row.classList.remove('drag-over');
-    };
+                    e.dataTransfer.setData(
+                        "sound",
+                        JSON.stringify(
+                            sound
+                        )
+                    );
 
-    // Ablegen des Elements an der präzisen Maus-Pixelposition
-    row.ondrop = (e) => {
-        e.preventDefault();
-        row.classList.remove('drag-over');
-        
-        try {
-            const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
-            
-            // Berechnen der genauen Sekunde auf der Timeline
-            const rect = row.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            
-            let calculatedTime = parseFloat((clickX / pixelsPerSecond).toFixed(1));
-            if (calculatedTime < 0) calculatedTime = 0;
-            if (calculatedTime > timelineSeconds - 0.2) calculatedTime = timelineSeconds - 0.2;
+                }
+            );
 
-            dropNewSoundOnTimeline(dragData, calculatedTime, row);
-        } catch(err) {
-            console.error("Fehler beim Verarbeiten des Drops:", err);
+
+
+            target.appendChild(
+                item
+            );
+
+
         }
-    };
+    );
 
-    tracksContainer.appendChild(row);
-    updateTimelineLength();
+
 }
+/* =========================================
+   script.js Teil 2/4
 
-// Aktualisiert die visuelle Breite der Timeline-Spuren
-function updateTimelineLength() {
-    const inputVal = parseInt(document.getElementById('timelineLength').value);
-    if (isNaN(inputVal) || inputVal < 5) return;
-    
-    timelineSeconds = inputVal;
-    const totalWidthPx = timelineSeconds * pixelsPerSecond;
-    
-    document.querySelectorAll('.track-row').forEach(row => {
-        row.style.width = totalWidthPx + 'px';
-        row.style.minWidth = totalWidthPx + 'px';
-    });
+   Drag & Drop Timeline
+   Sound Blöcke
+========================================= */
 
-    document.getElementById('modStart').max = timelineSeconds;
-}
 
-// Speichert das gedroppte Element dauerhaft ab
-function dropNewSoundOnTimeline(dragData, startTime, rowElement) {
-    const blockId = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    
-    const blockData = {
-        id: blockId,
-        name: dragData.name,
-        type: dragData.type,
-        soundId: dragData.soundId,
-        isMic: dragData.isMic,
-        startTime: startTime,
-        duration: 0.6, // Standard-Dauer in Sekunden
-        volume: 0.7,
-        pitch: 'normal',
-        trackId: rowElement.dataset.trackId
-    };
+/* =========================================
+   DROP ZONE
+========================================= */
 
-    timelineBlocks.push(blockData);
-    renderBlock(blockData, rowElement);
-}
 
-// Rendert das visuelle Rechteck auf der Spur
-function renderBlock(data, rowElement) {
-    const block = document.createElement('div');
-    block.className = `audio-block btn-${data.type}`;
-    block.id = data.id;
-    block.innerText = data.name;
-    
-    block.style.left = (data.startTime * pixelsPerSecond) + 'px';
-    block.style.width = (data.duration * pixelsPerSecond) + 'px';
+function setupDropZone(
+    lane,
+    trackID
+){
 
-    block.onclick = (e) => {
-        e.stopPropagation();
-        openEditMenu(data.id);
-    };
 
-    rowElement.appendChild(block);
-}
+    lane.addEventListener(
+        "dragover",
+        e=>{
 
-// Öffnet das Einstellungsmenü für den angeklickten Block
-function openEditMenu(id) {
-    activeBlockId = id;
-    const data = timelineBlocks.find(b => b.id === id);
-    if(!data) return;
+            e.preventDefault();
 
-    document.querySelectorAll('.audio-block').forEach(b => b.classList.remove('selected'));
-    document.getElementById(id).classList.add('selected');
+            lane.classList.add(
+                "dragOver"
+            );
 
-    document.getElementById('modalTitle').innerText = `Menü: ${data.name}`;
-    
-    const startSlider = document.getElementById('modStart');
-    startSlider.max = timelineSeconds;
-    startSlider.value = data.startTime;
-    document.getElementById('modStartVal').innerText = data.startTime + "s";
-    
-    const durationSlider = document.getElementById('modDuration');
-    durationSlider.value = data.duration;
-    document.getElementById('modDurationVal').innerText = data.duration + "s";
-
-    document.getElementById('modVolume').value = data.volume;
-    document.getElementById('modPitch').value = data.pitch;
-
-    // Echtzeit-Textanzeige beim Schieben der Regler
-    startSlider.oninput = (e) => document.getElementById('modStartVal').innerText = e.target.value + "s";
-    durationSlider.oninput = (e) => document.getElementById('modDurationVal').innerText = e.target.value + "s";
-
-    document.getElementById('editModal').style.display = 'block';
-    document.getElementById('modalOverlay').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-    document.getElementById('modalOverlay').style.display = 'none';
-}
-
-// Sichert die Einstellungen aus dem Menü
-function saveBlockSettings() {
-    const data = timelineBlocks.find(b => b.id === activeBlockId);
-    if(!data) return;
-
-    data.startTime = parseFloat(document.getElementById('modStart').value);
-    data.duration = parseFloat(document.getElementById('modDuration').value);
-    data.volume = parseFloat(document.getElementById('modVolume').value);
-    data.pitch = document.getElementById('modPitch').value;
-
-    const el = document.getElementById(activeBlockId);
-    if(el) {
-        el.style.left = (data.startTime * pixelsPerSecond) + 'px';
-        el.style.width = (data.duration * pixelsPerSecond) + 'px';
-    }
-    closeModal();
-}
-
-// Löscht den Block über das Einstellungsmenü
-function deleteBlock() {
-    timelineBlocks = timelineBlocks.filter(b => b.id !== activeBlockId);
-    const el = document.getElementById(activeBlockId);
-    if(el) el.remove();
-    closeModal();
-}
-
-// Spielt die gesamte Timeline ab
-function playTimeline() {
-    if(isPlaying) return;
-    isPlaying = true;
-    
-    const totalDurationMs = timelineSeconds * 1000;
-    
-    // Reihenfolgensteuerung über Timeouts gesteuert an die Audio-Engine übergeben
-    timelineBlocks.forEach(block => {
-        setTimeout(() => {
-            if(!isPlaying) return;
-            playAudioResource(block.soundId, block.isMic, block.duration, block.volume, block.pitch);
-        }, block.startTime * 1000);
-    });
-
-    // Bewegung des roten Abspielbalkens (Playhead)
-    const startTime = Date.now();
-    playInterval = setInterval(() => {
-        const elapsedMs = Date.now() - startTime;
-        playheadPos = (elapsedMs / 1000) * pixelsPerSecond;
-        
-        if(elapsedMs >= totalDurationMs) {
-            stopTimeline();
-        } else {
-            document.getElementById('playhead').style.left = playheadPos + 'px';
         }
-    }, 25);
-}
+    );
 
-function stopTimeline() {
-    isPlaying = false;
-    clearInterval(playInterval);
-    document.getElementById('playhead').style.left = '0px';
-}
 
-function clearTimeline() {
-    stopTimeline();
-    timelineBlocks = [];
-    document.querySelectorAll('.track-row').forEach(row => {
-        const blocks = row.querySelectorAll('.audio-block');
-        blocks.forEach(b => b.remove());
-    });
-}
 
-// Stimm-Aufnahme Logik via MediaRecorder API
-function setupMicrophone() {
-    const micBtn = document.getElementById('micBtn');
-    
-    micBtn.onclick = async () => {
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            micBtn.innerText = "Aufnahme starten";
-            micBtn.classList.remove('recording');
-        } else {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Mikrofon wird nicht unterstützt.");
+    lane.addEventListener(
+        "dragleave",
+        ()=>{
+
+            lane.classList.remove(
+                "dragOver"
+            );
+
+        }
+    );
+
+
+
+    lane.addEventListener(
+        "drop",
+        e=>{
+
+
+            e.preventDefault();
+
+
+            lane.classList.remove(
+                "dragOver"
+            );
+
+
+            const data =
+                e.dataTransfer.getData(
+                    "sound"
+                );
+
+
+            if(!data)
                 return;
+
+
+
+            const sound =
+                JSON.parse(
+                    data
+                );
+
+
+
+            const rect =
+                lane.getBoundingClientRect();
+
+
+
+            const x =
+                e.clientX -
+                rect.left;
+
+
+
+            const seconds =
+                Math.max(
+                    0,
+                    x / 100
+                );
+
+
+
+            addTimelineBlock(
+                sound,
+                trackID,
+                seconds
+            );
+
+
+        }
+    );
+
+
+}
+
+
+
+
+
+/* =========================================
+   BLOCK ERSTELLEN
+========================================= */
+
+
+function addTimelineBlock(
+    sound,
+    trackID,
+    start
+){
+
+
+    const block =
+        document.createElement(
+            "div"
+        );
+
+
+    block.className =
+        "timelineBlock";
+
+
+
+    block.textContent =
+        sound.name;
+
+
+
+    const duration =
+        1;
+
+
+
+    block.style.left =
+        start *
+        100 +
+        "px";
+
+
+
+    block.style.width =
+        duration *
+        100 +
+        "px";
+
+
+
+    const object={
+
+
+        id:
+        Date.now(),
+
+
+        sound:sound,
+
+
+        track:
+        trackID,
+
+
+        start:start,
+
+
+        duration:duration,
+
+
+        volume:1,
+
+
+        pitch:"normal",
+
+
+        element:block
+
+
+    };
+
+
+
+    timelineObjects.push(
+        object
+    );
+
+
+
+    tracks[trackID]
+    .lane
+    .appendChild(
+        block
+    );
+
+
+
+    block.onclick=
+        ()=>{
+
+
+            openEditor(
+                object
+            );
+
+
+        };
+
+
+
+    updateSoundCount();
+
+}
+
+
+
+
+
+function updateSoundCount(){
+
+
+    document
+    .getElementById(
+        "soundCount"
+    )
+    .textContent =
+        timelineObjects.length;
+
+
+}
+
+
+
+
+
+/* =========================================
+   BLOCK LÖSCHEN
+========================================= */
+
+
+function deleteBlock(
+    object
+){
+
+
+    if(
+        !object
+    )
+        return;
+
+
+
+    object.element.remove();
+
+
+
+    timelineObjects =
+        timelineObjects.filter(
+            item=>
+            item.id !== object.id
+        );
+
+
+
+    selectedBlock=null;
+
+
+    updateSoundCount();
+
+
+}
+
+
+
+
+
+
+/* =========================================
+   BLOCK VERSCHIEBEN
+========================================= */
+
+
+function moveBlock(
+    object,
+    newStart
+){
+
+
+    object.start =
+        Math.max(
+            0,
+            newStart
+        );
+
+
+
+    object.element.style.left =
+        object.start *
+        100 +
+        "px";
+
+
+}
+
+
+
+
+
+/* =========================================
+   BLOCK BREITE ÄNDERN
+========================================= */
+
+
+function resizeBlock(
+    object
+){
+
+
+    object.element.style.width =
+        object.duration *
+        100 +
+        "px";
+
+
+}
+/* =========================================
+   script.js Teil 3/4
+
+   Modal Editor
+   Playback
+   Playhead
+========================================= */
+
+
+/* =========================================
+   MODAL ELEMENTE
+========================================= */
+
+
+const modal =
+    document.getElementById(
+        "modal"
+    );
+
+
+const editStart =
+    document.getElementById(
+        "editStart"
+    );
+
+
+const editDuration =
+    document.getElementById(
+        "editDuration"
+    );
+
+
+const editVolume =
+    document.getElementById(
+        "editVolume"
+    );
+
+
+const editPitch =
+    document.getElementById(
+        "editPitch"
+    );
+
+
+const startValue =
+    document.getElementById(
+        "startValue"
+    );
+
+
+const durationValue =
+    document.getElementById(
+        "durationValue"
+    );
+
+
+const volumeValue =
+    document.getElementById(
+        "volumeValue"
+    );
+
+
+
+/* =========================================
+   EDITOR ÖFFNEN
+========================================= */
+
+
+function openEditor(
+    object
+){
+
+
+    selectedBlock =
+        object;
+
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+
+    editStart.value =
+        object.start;
+
+
+
+    editDuration.value =
+        object.duration;
+
+
+
+    editVolume.value =
+        object.volume;
+
+
+
+    editPitch.value =
+        object.pitch;
+
+
+
+    updateEditorLabels();
+
+
+
+}
+
+
+
+
+
+function closeEditor(){
+
+    modal.classList.add(
+        "hidden"
+    );
+
+    selectedBlock=null;
+
+}
+
+
+
+
+/* =========================================
+   SLIDER UPDATE
+========================================= */
+
+
+function updateEditorLabels(){
+
+
+    startValue.textContent =
+        Number(
+            editStart.value
+        ).toFixed(1);
+
+
+
+    durationValue.textContent =
+        Number(
+            editDuration.value
+        ).toFixed(1);
+
+
+
+    volumeValue.textContent =
+        Number(
+            editVolume.value
+        ).toFixed(2);
+
+
+}
+
+
+
+
+
+editStart.oninput=()=>{
+
+    if(!selectedBlock)
+        return;
+
+
+    selectedBlock.start =
+        Number(
+            editStart.value
+        );
+
+
+    moveBlock(
+        selectedBlock,
+        selectedBlock.start
+    );
+
+
+    updateEditorLabels();
+
+};
+
+
+
+editDuration.oninput=()=>{
+
+    if(!selectedBlock)
+        return;
+
+
+    selectedBlock.duration =
+        Number(
+            editDuration.value
+        );
+
+
+    resizeBlock(
+        selectedBlock
+    );
+
+
+    updateEditorLabels();
+
+};
+
+
+
+
+editVolume.oninput=()=>{
+
+    if(!selectedBlock)
+        return;
+
+
+    selectedBlock.volume =
+        Number(
+            editVolume.value
+        );
+
+
+    updateEditorLabels();
+
+};
+
+
+
+editPitch.onchange=()=>{
+
+
+    if(!selectedBlock)
+        return;
+
+
+    selectedBlock.pitch =
+        editPitch.value;
+
+
+};
+
+
+
+
+
+document
+.getElementById(
+    "closeModal"
+)
+.onclick =
+    closeEditor;
+
+
+
+
+
+document
+.getElementById(
+    "deleteBlock"
+)
+.onclick =
+    ()=>{
+
+
+        deleteBlock(
+            selectedBlock
+        );
+
+
+        closeEditor();
+
+
+    };
+
+
+
+
+
+/* =========================================
+   PLAYBACK
+========================================= */
+
+
+document
+.getElementById(
+    "playBtn"
+)
+.onclick =
+    startPlayback;
+
+
+
+document
+.getElementById(
+    "stopBtn"
+)
+.onclick =
+    stopPlayback;
+
+
+
+
+function startPlayback(){
+
+
+    if(isPlaying)
+        return;
+
+
+
+    isPlaying=true;
+
+
+    statusText.textContent =
+        "Wiedergabe";
+
+
+
+    playPosition=0;
+
+
+
+    const startTime =
+        performance.now();
+
+
+
+    playTimer =
+        setInterval(
+            ()=>{
+
+
+                const now =
+                    performance.now();
+
+
+
+                playPosition =
+                    (now-startTime)
+                    /1000;
+
+
+
+                updatePlayhead();
+
+
+
+                timelineObjects.forEach(
+                    obj=>{
+
+
+                        if(
+                            Math.abs(
+                                obj.start -
+                                playPosition
+                            )
+                            <0.03
+                        ){
+
+                            playSoundObject(
+                                obj.sound
+                            );
+
+                        }
+
+
+                    }
+                );
+
+
+
+                if(
+                    playPosition >=
+                    timelineLength
+                ){
+
+                    stopPlayback();
+
+                }
+
+
+
+            },
+            20
+        );
+
+}
+
+
+
+
+function updatePlayhead(){
+
+
+    playhead.style.left =
+        120 +
+        playPosition *
+        100 +
+        "px";
+
+
+}
+
+
+
+
+
+function stopPlayback(){
+
+
+    isPlaying=false;
+
+
+    clearInterval(
+        playTimer
+    );
+
+
+    playTimer=null;
+
+
+    playPosition=0;
+
+
+    updatePlayhead();
+
+
+    statusText.textContent =
+        "Bereit";
+
+
+}
+/* =========================================
+   script.js Teil 4/4
+
+   Recorder
+   Voice Pool
+   Buttons
+   Final Setup
+========================================= */
+
+
+/* =========================================
+   AUFNAHME BUTTON
+========================================= */
+
+
+const recordBtn =
+    document.getElementById(
+        "recordBtn"
+    );
+
+
+let recording=false;
+
+
+
+recordBtn.onclick=async()=>{
+
+
+    if(!recording){
+
+
+        try{
+
+
+            await startRecording();
+
+
+            recording=true;
+
+
+            recordBtn.textContent =
+                "⏹ Aufnahme stoppen";
+
+
+            statusText.textContent =
+                "Aufnahme läuft";
+
+
+        }
+        catch(error){
+
+
+            console.error(error);
+
+
+            statusText.textContent =
+                "Mikrofon Fehler";
+
+
+        }
+
+
+    }
+    else{
+
+
+        stopRecording();
+
+
+        recording=false;
+
+
+        recordBtn.textContent =
+            "🎤 Aufnahme starten";
+
+
+        statusText.textContent =
+            "Aufnahme gespeichert";
+
+
+    }
+
+
+};
+
+
+
+
+
+/* =========================================
+   VOICE SOUNDPOOL
+========================================= */
+
+
+function refreshVoiceList(){
+
+
+    const list =
+        document.getElementById(
+            "voiceList"
+        );
+
+
+    list.innerHTML="";
+
+
+
+    voiceSounds.forEach(
+        voice=>{
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "soundItem";
+
+
+            item.draggable=true;
+
+
+
+            item.innerHTML=`
+
+            <div class="soundName">
+                ${voice.name}
+            </div>
+
+
+            <div class="soundButtons">
+
+                <button class="previewButton">
+                    ▶
+                </button>
+
+                <div class="dragHandle">
+                    DRAG
+                </div>
+
+            </div>
+
+            `;
+
+
+
+            item.querySelector(
+                ".previewButton"
+            )
+            .onclick=()=>{
+
+
+                playVoice(
+                    voice
+                );
+
+
+            };
+
+
+
+            item.addEventListener(
+                "dragstart",
+                e=>{
+
+
+                    e.dataTransfer.setData(
+                        "sound",
+                        JSON.stringify(
+                            voice
+                        )
+                    );
+
+
+                }
+            );
+
+
+
+            list.appendChild(
+                item
+            );
+
+
+        }
+    );
+
+
+}
+
+
+
+
+
+/* =========================================
+   SPUR HINZUFÜGEN
+========================================= */
+
+
+document
+.getElementById(
+    "addTrackBtn"
+)
+.onclick =
+    ()=>{
+
+
+        addTrack();
+
+
+    };
+
+
+
+
+
+/* =========================================
+   TIMELINE LEEREN
+========================================= */
+
+
+document
+.getElementById(
+    "clearBtn"
+)
+.onclick =
+    ()=>{
+
+
+        timelineObjects.forEach(
+            obj=>{
+
+                obj.element.remove();
+
             }
-            audioChunks = [];
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-mediaRecorder.onstop = async () => {
-const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-const arrayBuffer = await audioBlob.arrayBuffer();
+        );
 
-audioCtx.decodeAudioData(arrayBuffer, (buffer) => {
-recordedCount++;
-const soundId = mic_sound_${recordedCount};
-recordedBuffers[soundId] = buffer;
 
-const customSound = { id: soundId, name: Stimme ${recordedCount}, type: 'mic' };
-createMicSoundUI(customSound);
-});
-};
 
-mediaRecorder.start();
-micBtn.innerText = "⏹ Aufnahme stoppen...";
-micBtn.classList.add('recording');
-} catch (err) {
-alert("Mikrofonzugriff verweigert.");
-}
-}
-};
-}
+        timelineObjects=[];
 
-function createMicSoundUI(customSound) {
-const container = document.getElementById('micSounds');
-const wrapper = document.createElement('div');
-wrapper.className = 'sound-pool-item';
 
-const btn = document.createElement('button');
-btn.className = sound-btn btn-mic;
-btn.innerText = customSound.name;
-btn.onclick = () => playAudioResource(customSound.id, true);
+        updateSoundCount();
 
-const dragHandle = document.createElement('div');
-dragHandle.className = 'drag-handle';
-dragHandle.innerText = 'DRAG';
-dragHandle.setAttribute('draggable', 'true');
-dragHandle.ondragstart = (e) => {
-e.dataTransfer.setData('text/plain', JSON.stringify({
-soundId: customSound.id,
-name: customSound.name,
-type: customSound.type,
-isMic: true
-}));
-};
 
-wrapper.appendChild(btn);
-wrapper.appendChild(dragHandle);
-container.appendChild(wrapper);
-}
+        statusText.textContent =
+            "Timeline geleert";
+
+
+    };
+
+
+
+
+
+/* =========================================
+   TASTENKÜRZEL
+========================================= */
+
+
+window.addEventListener(
+    "keydown",
+    e=>{
+
+
+        if(e.code==="Space"){
+
+
+            e.preventDefault();
+
+
+
+            if(isPlaying)
+                stopPlayback();
+
+            else
+                startPlayback();
+
+
+        }
+
+
+
+        if(
+            e.code==="Escape"
+        ){
+
+            closeEditor();
+
+        }
+
+
+    }
+);
+
+
+
+
+
+/* =========================================
+   TIMELINE ZOOM / SCROLL
+========================================= */
+
+
+workspace.addEventListener(
+    "wheel",
+    e=>{
+
+
+        if(e.ctrlKey){
+
+
+            e.preventDefault();
+
+
+
+            let scale =
+                Number(
+                    timelineContainer
+                    .dataset.scale ||
+                    1
+                );
+
+
+
+            scale +=
+                e.deltaY *
+                -0.001;
+
+
+
+            scale =
+                Math.min(
+                    2,
+                    Math.max(
+                        0.5,
+                        scale
+                    )
+                );
+
+
+
+            timelineContainer.style.transform =
+                `scaleX(${scale})`;
+
+
+
+            timelineContainer.dataset.scale =
+                scale;
+
+
+        }
+
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+
+
+
+/* =========================================
+   START
+========================================= */
+
+
+window.addEventListener(
+    "load",
+    ()=>{
+
+
+        createDefaultTracks();
+
+
+        createTimeScale();
+
+
+        loadSoundPool();
+
+
+        statusText.textContent =
+            "DAW bereit";
+
+
+    }
+);
