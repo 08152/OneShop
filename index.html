@@ -3,351 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL // RENDER_LIVE_LOGS</title>
+    <title>Live Terminal Diary</title>
     <style>
         :root {
-            --color-bg: #0a0a0a;
-            --color-terminal: #00ff33;
-            --color-dim: #003300;
-            --font-terminal: 'Courier New', Courier, monospace;
+            --bg-color: #0a0a0a;
+            --term-green: #33ff33;
+            --term-dim: #11aa11;
+            --term-dark: #051a05;
         }
 
         body {
-            background-color: var(--color-bg);
-            color: var(--color-terminal);
-            font-family: var(--font-terminal);
-            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--term-green);
+            font-family: 'Courier New', Courier, monospace;
             padding: 20px;
+            margin: 0;
         }
 
         #terminal {
             max-width: 900px;
             margin: 0 auto;
-            border: 1px solid var(--color-terminal);
+            border: 2px solid var(--term-green);
+            background-color: var(--term-dark);
             padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 51, 0.2);
-        }
-
-        header {
-            border-bottom: 1px dashed var(--color-terminal);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        h1 { font-size: 1.4rem; margin: 0; }
-        
-        .status-bar {
-            font-size: 0.8rem;
-            color: #00aa22;
+            box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
+            min-height: 80vh;
             display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
+            flex-direction: column;
         }
 
-        #write-zone {
-            display: none;
-            margin-bottom: 30px;
-            border-bottom: 1px dashed var(--color-dim);
-            padding-bottom: 20px;
-        }
-
-        .terminal-editor-container {
-            position: relative;
-            width: 100%;
-            min-height: 100px;
-            background: #000;
-            border: 1px solid var(--color-terminal);
-            padding: 10px;
-            box-sizing: border-box;
-            cursor: text;
-        }
-
-        #hidden-textarea {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0;
-            cursor: text;
-            resize: none;
-            border: none;
-        }
-
-        #visual-text {
+        #output {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
             white-space: pre-wrap;
             word-wrap: break-word;
-            line-height: 1.5;
-            color: var(--color-terminal);
-            display: inline;
-        }
-
-        /* Fester dicker grüner Balken - kein Blinken, kein Standard-Caret */
-        .custom-cursor {
-            display: inline-block;
-            width: 10px;
-            height: 17px;
-            background-color: var(--color-terminal);
-            vertical-align: middle;
-            margin-left: 2px;
         }
 
         .log-entry {
-            border-left: 2px solid var(--color-terminal);
-            padding-left: 15px;
-            margin-bottom: 25px;
+            border-bottom: 1px dashed var(--term-dim);
+            padding: 10px 0;
+            margin-bottom: 10px;
         }
 
-        .log-date { font-weight: bold; color: #fff; margin-bottom: 5px; font-size: 0.9rem; }
-        .log-text { line-height: 1.6; white-space: pre-wrap; }
+        .meta {
+            color: var(--term-dim);
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
 
-        #auth-zone {
-            margin-top: 20px;
+        #auth-zone, #write-zone, #admin-zone {
+            border-top: 2px dashed var(--term-green);
             padding-top: 20px;
-            border-top: 1px dashed var(--color-terminal);
+            margin-top: auto;
         }
 
-        .prompt-line { display: flex; align-items: center; }
-        .prompt { color: var(--color-terminal); margin-right: 10px; }
-        
-        #auth-code {
-            background: transparent; border: none; color: var(--color-terminal);
-            font-family: var(--font-terminal); font-size: 1rem; width: 100%; outline: none;
-            caret-color: var(--color-terminal);
+        #write-zone, #admin-zone {
+            display: none;
         }
 
-        .sync-indicator { font-size: 0.8rem; color: #ff9900; }
-        .online { color: var(--color-terminal); }
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+
+        .prompt {
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        input[type="text"], input[type="password"], textarea {
+            background: transparent;
+            border: none;
+            color: var(--term-green);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            outline: none;
+            width: 100%;
+        }
+
+        textarea {
+            resize: none;
+            height: 100px;
+        }
+
+        #live-preview {
+            color: var(--term-dim);
+            margin-top: 10px;
+            min-height: 20px;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        #live-preview::after {
+            content: "█";
+            background: var(--term-green);
+            color: var(--term-green);
+            display: inline-block;
+            width: 10px;
+            margin-left: 2px;
+            animation: none;
+        }
+
+        .btn {
+            background: var(--term-dark);
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: var(--term-green);
+            color: var(--term-dark);
+        }
+
+        .admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--term-dim);
+            padding: 8px 0;
+        }
+
+        .admin-text {
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .delete-btn {
+            background: #200000;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .delete-btn:hover {
+            background: #ff3333;
+            color: #000000;
+        }
     </style>
-    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
 <div id="terminal">
-    <header>
-        <h1>RENDER_CLOUD_TERMINAL // DIARY_v2.5</h1>
-        <div class="status-bar">
-            <div>NODE_SERVER: <span id="server-status">WAKING_UP...</span></div>
-            <div id="sync-status" class="sync-indicator">BUFFER_LOKAL</div>
-        </div>
-    </header>
+    <div id="output"></div>
 
-    <!-- Schreibbereich oben -->
-    <div id="write-zone">
-        <div class="prompt" style="margin-bottom: 5px;">[LIVE_UPLOADER_ACTIVE] INTERFACES_INPUT:</div>
-        <div class="terminal-editor-container" onclick="focusEditor()">
-            <span id="visual-text"></span><span class="custom-cursor"></span>
-            <textarea id="hidden-textarea" oninput="updateText(this.value)" onkeydown="handleKeys(event)"></textarea>
+    <div id="auth-zone">
+        <div class="input-line">
+            <span class="prompt">CLEARANCE_CODE ></span>
+            <input type="password" id="clearance-input" autofocus>
         </div>
-        <button onclick="submitLog()" style="background:transparent; border:1px solid var(--color-terminal); color:var(--color-terminal); padding:8px 15px; margin-top:10px; cursor:pointer; font-family:var(--font-terminal);">SUBMIT_TO_CLOUD (STRG+ENTER)</button>
     </div>
 
-    <!-- Logs Verlauf -->
-    <main id="log-container">
-        <div class="log-entry"><div class="log-text">Verbindung zum Cloud-Server wird aufgebaut... (Falls der Server schläft, kann dies bis zu 50 Sekunden dauern)</div></div>
-    </main>
-
-    <!-- Auth unten (wird ausgeblendet) -->
-    <div id="auth-zone">
-        <div class="prompt-line">
-            <span class="prompt">guest@render-node:~# enter_clearance_code:</span>
-            <input type="text" id="auth-code" autocomplete="off" onkeydown="checkAuth(event)">
+    <div id="write-zone">
+        <div class="input-line">
+            <span class="prompt">INPUT_LOG ></span>
+            <textarea id="log-input" placeholder="Tippe deinen Eintrag... (STRG+ENTER zum Speichern, /clear zum Zurücksetzen)"></textarea>
         </div>
+        <button class="btn" id="save-btn">SAVE_LOG</button>
+        <div id="live-preview"></div>
+    </div>
+
+    <div id="admin-zone">
+        <div style="color: #ff3333; margin-bottom: 15px;">--- ADMIN CONTROL PANEL (RISKY_DELETE) ---</div>
+        <div id="admin-list"></div>
     </div>
 </div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
-    const RENDER_URL = 'https://onrender.com';
-    
-    const socket = io(RENDER_URL, {
-        transports: ['websocket', 'polling']
-    });
-    let isAuthorized = false;
+    const socket = io('https://oneshop-1.onrender.com');
 
-    socket.on('connect', () => {
-        document.getElementById('server-status').textContent = "ONLINE";
-        document.getElementById('server-status').className = "online";
-        syncLocalToServer(); 
-    });
+    const authZone = document.getElementById('auth-zone');
+    const writeZone = document.getElementById('write-zone');
+    const adminZone = document.getElementById('admin-zone');
+    const clearanceInput = document.getElementById('clearance-input');
+    const logInput = document.getElementById('log-input');
+    const saveBtn = document.getElementById('save-btn');
+    const output = document.getElementById('output');
+    const livePreview = document.getElementById('live-preview');
+    const adminList = document.getElementById('admin-list');
 
-    socket.on('disconnect', () => {
-        document.getElementById('server-status').textContent = "STANDBY (INACTIVE)";
-        document.getElementById('server-status').className = "";
-    });
+    let allEntries = [];
 
-    socket.on('live_type', (data) => {
-        let liveDiv = document.getElementById('live-broadcast-preview');
-        if (!liveDiv) {
-            liveDiv = document.createElement('div');
-            liveDiv.id = 'live-broadcast-preview';
-            liveDiv.style.border = '1px dashed #ff3333';
-            liveDiv.style.padding = '10px';
-            liveDiv.style.marginBottom = '20px';
-            document.getElementById('log-container').prepend(liveDiv);
+    const savedBuffer = localStorage.getItem('diary_buffer');
+    if (savedBuffer) {
+        logInput.value = savedBuffer;
+        livePreview.textContent = savedBuffer;
+    }
+
+    clearanceInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if (val === 'Risky_Live') {
+            authZone.style.display = 'none';
+            adminZone.style.display = 'none';
+            writeZone.style.display = 'block';
+            logInput.focus();
+        } else if (val === 'Risky_Delete') {
+            authZone.style.display = 'none';
+            writeZone.style.display = 'none';
+            adminZone.style.display = 'block';
+            renderAdminList();
         }
-        liveDiv.innerHTML = `<div style="color:#ff3333; font-size:0.75rem;">[LIVE_BROADCAST_RECEIVING...]</div><div>${data.text}</div>`;
-        if(data.text === "") liveDiv.remove();
     });
 
-    socket.on('update_logs', (logs) => {
-        renderLogs(logs);
-        const liveDiv = document.getElementById('live-broadcast-preview');
-        if(liveDiv) liveDiv.remove();
+    logInput.addEventListener('input', (e) => {
+        const text = e.target.value;
+        livePreview.textContent = text;
+        localStorage.setItem('diary_buffer', text);
+        socket.emit('typing', { text: text });
     });
 
-    function focusEditor() {
-        document.getElementById('hidden-textarea').focus();
-    }
+    function handleSave() {
+        const text = logInput.value;
+        if (!text) return;
 
-    function updateText(val) {
-        document.getElementById('visual-text').textContent = val;
-        localStorage.setItem('diary_current_buffer', val);
-        socket.emit('typing', { text: val });
-    }
-
-    function handleKeys(e) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            submitLog();
-        }
-    }
-
-    function checkAuth(e) {
-        if (e.key === 'Enter') {
-            const input = document.getElementById('auth-code');
-            if (input.value === 'Risky_Live') {
-                isAuthorized = true;
-                document.getElementById('auth-zone').style.display = 'none';
-                document.getElementById('write-zone').style.display = 'block';
-                
-                const savedBuffer = localStorage.getItem('diary_current_buffer') || "";
-                document.getElementById('hidden-textarea').value = savedBuffer;
-                updateText(savedBuffer);
-                
-                focusEditor();
-            } else {
-                input.value = '';
-                alert("ZUGRIFF VERWEIGERT");
-            }
-        }
-    }
-
-    function renderLogs(logs) {
-        const container = document.getElementById("log-container");
-        container.innerHTML = "";
-        if(logs.length === 0) {
-            container.innerHTML = `<div class="log-entry"><div class="log-text">[System] Keine Einträge auf der Cloud vorhanden.</div></div>`;
+        if (text.trim() === '/clear') {
+            logInput.value = '';
+            livePreview.textContent = '';
+            localStorage.removeItem('diary_buffer');
+            socket.emit('typing', { text: '' });
             return;
         }
-        logs.forEach(log => {
-            container.innerHTML += `
-                <div class="log-entry">
-                    <div class="log-date">${log.date}</div>
-                    <div class="log-text">${log.text}</div>
-                </div>`;
+
+        socket.emit('new_entry', { text: text });
+        logInput.value = '';
+        livePreview.textContent = '';
+        localStorage.removeItem('diary_buffer');
+    }
+
+    saveBtn.addEventListener('click', handleSave);
+
+    logInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            handleSave();
+        }
+    });
+
+    function formatDate(isoString) {
+        const d = new Date(isoString);
+        return d.toLocaleString('de-DE');
+    }
+
+    function renderLogs(entries) {
+        output.innerHTML = '';
+        entries.forEach(entry => {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `
+                <div class="meta">[TIMESTAMP: ${formatDate(entry.timestamp)}] [ID: ${entry.id}]</div>
+                <div>${entry.text}</div>
+            `;
+            output.appendChild(div);
+        });
+        output.scrollTop = output.scrollHeight;
+    }
+
+    function renderAdminList() {
+        adminList.innerHTML = '';
+        if (allEntries.length === 0) {
+            adminList.innerHTML = '<div style="color: var(--term-dim);">Keine Einträge vorhanden.</div>';
+            return;
+        }
+        allEntries.forEach(entry => {
+            const div = document.createElement('div');
+            div.className = 'admin-item';
+            div.innerHTML = `
+                <div class="admin-text">[${formatDate(entry.timestamp)}] ${entry.text}</div>
+                <button class="delete-btn" onclick="deleteLog('${entry.id}')">[DELETE_LOG]</button>
+            `;
+            adminList.appendChild(div);
         });
     }
 
-    function submitLog() {
-        const textarea = document.getElementById('hidden-textarea');
-        const text = textarea.value.trim();
-        if(!text) return;
-
-        const now = new Date();
-        const timestamp = `[ LOG_DATE: ${now.toISOString().split('T')} // ${now.toTimeString().split(' ')} ]`;
-        const newLog = { date: timestamp, text: text };
-
-        let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
-        offlineQueue.push(newLog);
-        localStorage.setItem('diary_offline_queue', JSON.stringify(offlineQueue));
-
-        textarea.value = "";
-        updateText("");
-        localStorage.removeItem('diary_current_buffer');
-        socket.emit('typing', { text: "" });
-
-        syncLocalToServer();
-    }
-
-    async function syncLocalToServer() {
-        let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
-        if(offlineQueue.length === 0) {
-            document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
-            return;
-        }
-
-        document.getElementById('sync-status').textContent = "UPLOADING_BUFFER...";
-
-        try {
-            const response = await fetch(`${RENDER_URL}/api/logs/sync`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ entries: offlineQueue })
-            });
-
-            if (response.ok) {
-                localStorage.setItem('diary_offline_queue', JSON.stringify([]));
-                document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
-        } catch (err) {
-            console.log("SYNC_FAILED:", err);
-            document.getElementById('sync-status').textContent = "OFFLINE_BUFFER_ACTIVE";
-        }
-    }
-
-    // Beim Start gespeicherten Text wiederherstellen
-    window.onload = () => {
-        const saved = localStorage.getItem('diary_current_buffer') || "";
-        document.getElementById('hidden-textarea').value = saved;
-        document.getElementById('visual-text').textContent = saved;
-
-        // Verbindung prüfen
-        if(socket.connected) {
-            document.getElementById('server-status').textContent = "ONLINE";
+    window.deleteLog = function(id) {
+        if (confirm(`Eintrag ${id} wirklich löschen?`)) {
+            socket.emit('delete_entry', id);
         }
     };
 
-
-    // Automatisches Speichern während des Schreibens
-    setInterval(() => {
-        const text = document.getElementById('hidden-textarea').value;
-        if(text.length > 0) {
-            localStorage.setItem('diary_current_buffer', text);
-        }
-    }, 2000);
-
-
-    // Enter im Editor ohne neue Zeile abschicken (optional)
-    document.getElementById('hidden-textarea').addEventListener('keydown', e => {
-        if(e.ctrlKey && e.key === "Enter") {
-            e.preventDefault();
-            submitLog();
+    socket.on('init', (entries) => {
+        allEntries = entries;
+        renderLogs(entries);
+        if (adminZone.style.display === 'block') {
+            renderAdminList();
         }
     });
 
-
-    // Server fragt nach aktuellen Logs
-    socket.on('request_logs', () => {
-        socket.emit('get_logs');
-    });
-
-
-    // Fehleranzeige Socket
-    socket.on('connect_error', () => {
-        document.getElementById('server-status').textContent = "SERVER_ERROR";
-        document.getElementById('sync-status').textContent = "LOCAL_ONLY_MODE";
-    });
-
-
-    // Sicherheitsfeature: kein Rechtsklick
-    document.addEventListener('contextmenu', e => {
-        e.preventDefault();
-    });
-
-
-    // Tastenkürzel für Auth
-    document.addEventListener('keydown', e => {
-        if(e.ctrlKey && e.key === "l") {
-            document.getElementById('auth-code').focus();
+    socket.on('entry_added', (entries) => {
+        allEntries = entries;
+        renderLogs(entries);
+        if (adminZone.style.display === 'block') {
+            renderAdminList();
         }
     });
 
+    socket.on('entry_deleted', (entries) => {
+        allEntries = entries;
+        renderLogs(entries);
+        if (adminZone.style.display === 'block') {
+            renderAdminList();
+        }
+    });
+
+    socket.on('typing', (data) => {
+        if (authZone.style.display !== 'none' || adminZone.style.display === 'block') {
+            livePreview.textContent = data.text;
+        }
+    });
 </script>
-
 </body>
 </html>
