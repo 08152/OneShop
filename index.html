@@ -90,7 +90,6 @@
         .input-wrapper {
             position: relative;
             flex-grow: 1;
-            display: inline-block;
         }
 
         input[type="password"], textarea {
@@ -105,20 +104,34 @@
             margin: 0;
             padding: 0;
             line-height: 1.2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         textarea {
             resize: none;
-            height: 60px;
+            height: 80px;
         }
 
-        #cursor-follower {
+        .block-cursor {
             position: absolute;
             background: var(--term-green);
             width: 12px;
             height: 18px;
-            display: none;
             pointer-events: none;
+            display: block;
+        }
+
+        #hidden-measure {
+            position: absolute;
+            visibility: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1em;
+            line-height: 1.2;
+            top: 0;
+            left: 0;
         }
 
         #viewer-live {
@@ -175,13 +188,15 @@
 <div id="terminal">
     <div id="output"></div>
 
+    <div id="hidden-measure"></div>
+
     <div id="input-container">
         <!-- Auth Zone -->
         <div class="input-line" id="auth-zone">
             <span class="prompt">CLEARANCE_CODE ></span>
             <div class="input-wrapper">
                 <input type="password" id="clearance-input" autofocus autocomplete="off">
-                <div id="auth-cursor" style="position: absolute; left: 0; top: 0; background: var(--term-green); width: 12px; height: 18px; pointer-events: none;"></div>
+                <div id="auth-cursor" class="block-cursor"></div>
             </div>
         </div>
 
@@ -190,7 +205,7 @@
             <span class="prompt">INPUT_LOG ></span>
             <div class="input-wrapper">
                 <textarea id="log-input" placeholder="Schreibe direkt im Terminal... (STRG+ENTER speichert, /clear setzt zurück)"></textarea>
-                <div id="cursor-follower"></div>
+                <div id="write-cursor" class="block-cursor"></div>
             </div>
         </div>
 
@@ -219,20 +234,29 @@
     const adminList = document.getElementById('admin-list');
     
     const authCursor = document.getElementById('auth-cursor');
-    const writeCursor = document.getElementById('cursor-follower');
+    const writeCursor = document.getElementById('write-cursor');
+    const hiddenMeasure = document.getElementById('hidden-measure');
 
     let allEntries = [];
     let isAuthor = false;
 
-    function updateBlockCursor(inputEl, cursorEl) {
-        const textLength = inputEl.value.length;
-        const fontWidth = 9.6; 
-        cursorEl.style.display = 'block';
-        cursorEl.style.left = (textLength * fontWidth) + 'px';
+    function trackCursor(inputEl, cursorEl) {
+        const text = inputEl.value;
+        hiddenMeasure.style.width = inputEl.clientWidth + 'px';
+        
+        hiddenMeasure.textContent = text;
+        
+        const span = document.createElement('span');
+        span.textContent = 'X';
+        hiddenMeasure.appendChild(span);
+        
+        cursorEl.style.left = span.offsetLeft + 'px';
+        cursorEl.style.top = span.offsetTop + 'px';
+        hiddenMeasure.removeChild(span);
     }
 
     clearanceInput.addEventListener('input', (e) => {
-        updateBlockCursor(clearanceInput, authCursor);
+        trackCursor(clearanceInput, authCursor);
         const val = e.target.value.trim();
         if (val === 'Risky_Live') {
             isAuthor = true;
@@ -246,7 +270,7 @@
                 logInput.value = savedBuffer;
             }
             logInput.focus();
-            updateBlockCursor(logInput, writeCursor);
+            setTimeout(() => trackCursor(logInput, writeCursor), 10);
         } else if (val === 'Risky_Delete') {
             isAuthor = true;
             authZone.style.display = 'none';
@@ -258,14 +282,25 @@
     });
 
     logInput.addEventListener('input', (e) => {
+        trackCursor(logInput, writeCursor);
         const text = e.target.value;
-        updateBlockCursor(logInput, writeCursor);
         localStorage.setItem('diary_buffer', text);
         socket.emit('typing', { text: text });
     });
 
-    logInput.addEventListener('focus', () => updateBlockCursor(logInput, writeCursor));
-    clearanceInput.addEventListener('focus', () => updateBlockCursor(clearanceInput, authCursor));
+    logInput.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            handleSave();
+        } else {
+            setTimeout(() => trackCursor(logInput, writeCursor), 5);
+        }
+    });
+
+    logInput.addEventListener('keyup', () => trackCursor(logInput, writeCursor));
+    logInput.addEventListener('click', () => trackCursor(logInput, writeCursor));
+    logInput.addEventListener('focus', () => trackCursor(logInput, writeCursor));
+    clearanceInput.addEventListener('focus', () => trackCursor(clearanceInput, authCursor));
 
     function handleSave() {
         const text = logInput.value;
@@ -273,7 +308,7 @@
 
         if (text.trim() === '/clear') {
             logInput.value = '';
-            updateBlockCursor(logInput, writeCursor);
+            trackCursor(logInput, writeCursor);
             localStorage.removeItem('diary_buffer');
             socket.emit('typing', { text: '' });
             return;
@@ -281,16 +316,9 @@
 
         socket.emit('new_entry', { text: text });
         logInput.value = '';
-        updateBlockCursor(logInput, writeCursor);
+        trackCursor(logInput, writeCursor);
         localStorage.removeItem('diary_buffer');
     }
-
-    logInput.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            handleSave();
-        }
-    });
 
     function formatDate(isoString) {
         const d = new Date(isoString);
@@ -303,30 +331,27 @@
             const div = document.createElement('div');
             div.className = 'log-entry';
             div.innerHTML = `
-                <div class="meta">[TIMESTAMP: ${formatDate(entry.timestamp)}] [ID: ${entry.id}]</div>
-                <div>${entry.text}</div>
-            `;
-            output.appendChild(div);
-        });
-        output.scrollTop = output.scrollHeight;
-    }
+[TIMESTAMP: ${formatDate(entry.timestamp)}] [ID: ${entry.id}]
+${entry.text}
+`;
+output.appendChild(div);
+});
+output.scrollTop = output.scrollHeight;
+}
 
-    function renderAdminList() {
-        adminList.innerHTML = '';
-        if (allEntries.length === 0) {
-            adminList.innerHTML = '<div style="color: var(--term-dim);">Keine Einträge vorhanden.</div>';
-            return;
-        }
-        allEntries.forEach(entry => {
-            const div = document.createElement('div');
-            div.className = 'admin-item';
-            div.innerHTML = `
-                <div class="admin-text">[${formatDate(entry.timestamp)}] ${entry.text}</div>
-                <button class="delete-btn" onclick="deleteLog('${entry.id}')">[DELETE_LOG]</button>
-            `;
-            adminList.appendChild(div);
-        });
-    }
+function renderAdminList() {
+adminList.innerHTML = '';
+if (allEntries.length === 0) {
+adminList.innerHTML = 'Keine Einträge vorhanden.';
+return;
+}
+allEntries.forEach(entry => {
+const div = document.createElement('div');
+div.className = 'admin-item';
+div.innerHTML = <div class="admin-text">[${formatDate(entry.timestamp)}] ${entry.text}</div> <button class="delete-btn" onclick="deleteLog('${entry.id}')">[DELETE_LOG]</button>;
+adminList.appendChild(div);
+});
+}
 
 window.deleteLog = function(id) {
 if (confirm(Eintrag ${id} wirklich löschen?)) {
@@ -370,5 +395,5 @@ viewerLive.textContent = "";
 }
 });
 
-updateBlockCursor(clearanceInput, authCursor);
+trackCursor(clearanceInput, authCursor);
 
