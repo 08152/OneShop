@@ -29,10 +29,8 @@
         #terminal {
             width: 100vw;
             height: 100vh;
-            border: none;
             background-color: var(--term-dark);
             padding: 20px;
-            box-shadow: none;
             display: flex;
             flex-direction: column;
         }
@@ -69,28 +67,33 @@
             margin-bottom: 5px;
         }
 
-        #auth-zone, #write-zone, #admin-zone {
+        #input-container {
             border-top: 2px dashed var(--term-green);
             padding-top: 20px;
             flex-shrink: 0;
         }
 
-        #write-zone, #admin-zone {
-            display: none;
-        }
-
         .input-line {
             display: flex;
             align-items: flex-start;
+            position: relative;
+            width: 100%;
         }
 
         .prompt {
             margin-right: 10px;
             white-space: nowrap;
             line-height: 1.2;
+            flex-shrink: 0;
         }
 
-        input[type="text"], input[type="password"], textarea {
+        .input-wrapper {
+            position: relative;
+            flex-grow: 1;
+            display: inline-block;
+        }
+
+        input[type="password"], textarea {
             background: transparent;
             border: none;
             color: var(--term-green);
@@ -99,48 +102,42 @@
             outline: none;
             width: 100%;
             caret-color: transparent;
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
         }
 
         textarea {
             resize: none;
-            height: 80px;
-            line-height: 1.2;
+            height: 60px;
         }
 
-        #live-preview {
-            color: var(--term-dim);
-            margin-top: 10px;
-            min-height: 20px;
-            white-space: pre-wrap;
-            position: relative;
-            line-height: 1.2;
-            word-wrap: break-word;
-        }
-
-        #live-preview::after {
-            content: "█";
+        #cursor-follower {
+            position: absolute;
             background: var(--term-green);
-            color: var(--term-green);
-            display: inline-block;
             width: 12px;
             height: 18px;
-            margin-left: 2px;
-            vertical-align: middle;
+            display: none;
+            pointer-events: none;
         }
 
-        .btn {
-            background: var(--term-dark);
-            border: 1px solid var(--term-green);
-            color: var(--term-green);
-            padding: 5px 15px;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
+        #viewer-live {
+            color: #ffff33;
+            font-style: italic;
+            border-top: 1px dashed #ffff33;
+            padding-top: 10px;
             margin-top: 10px;
+            min-height: 25px;
+            display: none;
         }
 
-        .btn:hover {
-            background: var(--term-green);
-            color: var(--term-dark);
+        #admin-zone {
+            border-top: 2px dashed var(--term-green);
+            padding-top: 20px;
+            flex-shrink: 0;
+            display: none;
+            max-height: 40vh;
+            overflow-y: auto;
         }
 
         .admin-item {
@@ -178,22 +175,30 @@
 <div id="terminal">
     <div id="output"></div>
 
-    <div id="auth-zone">
-        <div class="input-line">
+    <div id="input-container">
+        <!-- Auth Zone -->
+        <div class="input-line" id="auth-zone">
             <span class="prompt">CLEARANCE_CODE ></span>
-            <input type="password" id="clearance-input" autofocus>
+            <div class="input-wrapper">
+                <input type="password" id="clearance-input" autofocus autocomplete="off">
+                <div id="auth-cursor" style="position: absolute; left: 0; top: 0; background: var(--term-green); width: 12px; height: 18px; pointer-events: none;"></div>
+            </div>
         </div>
-    </div>
 
-    <div id="write-zone">
-        <div class="input-line">
+        <!-- Write Zone -->
+        <div class="input-line" id="write-zone" style="display: none;">
             <span class="prompt">INPUT_LOG ></span>
-            <textarea id="log-input" placeholder="Tippe deinen Eintrag... (STRG+ENTER zum Speichern, /clear zum Zurücksetzen)"></textarea>
+            <div class="input-wrapper">
+                <textarea id="log-input" placeholder="Schreibe direkt im Terminal... (STRG+ENTER speichert, /clear setzt zurück)"></textarea>
+                <div id="cursor-follower"></div>
+            </div>
         </div>
-        <button class="btn" id="save-btn">SAVE_LOG</button>
-        <div id="live-preview"></div>
+
+        <!-- Live-Anzeige für Zuschauer -->
+        <div id="viewer-live"></div>
     </div>
 
+    <!-- Admin Control Zone -->
     <div id="admin-zone">
         <div style="color: #ff3333; margin-bottom: 15px;">--- ADMIN CONTROL PANEL (RISKY_DELETE) ---</div>
         <div id="admin-list"></div>
@@ -209,29 +214,44 @@
     const adminZone = document.getElementById('admin-zone');
     const clearanceInput = document.getElementById('clearance-input');
     const logInput = document.getElementById('log-input');
-    const saveBtn = document.getElementById('save-btn');
     const output = document.getElementById('output');
-    const livePreview = document.getElementById('live-preview');
+    const viewerLive = document.getElementById('viewer-live');
     const adminList = document.getElementById('admin-list');
+    
+    const authCursor = document.getElementById('auth-cursor');
+    const writeCursor = document.getElementById('cursor-follower');
 
     let allEntries = [];
+    let isAuthor = false;
 
-    const savedBuffer = localStorage.getItem('diary_buffer');
-    if (savedBuffer) {
-        logInput.value = savedBuffer;
-        livePreview.textContent = savedBuffer;
+    function updateBlockCursor(inputEl, cursorEl) {
+        const textLength = inputEl.value.length;
+        const fontWidth = 9.6; 
+        cursorEl.style.display = 'block';
+        cursorEl.style.left = (textLength * fontWidth) + 'px';
     }
 
     clearanceInput.addEventListener('input', (e) => {
+        updateBlockCursor(clearanceInput, authCursor);
         const val = e.target.value.trim();
         if (val === 'Risky_Live') {
+            isAuthor = true;
             authZone.style.display = 'none';
             adminZone.style.display = 'none';
-            writeZone.style.display = 'block';
+            viewerLive.style.display = 'none';
+            writeZone.style.display = 'flex';
+            
+            const savedBuffer = localStorage.getItem('diary_buffer');
+            if (savedBuffer) {
+                logInput.value = savedBuffer;
+            }
             logInput.focus();
+            updateBlockCursor(logInput, writeCursor);
         } else if (val === 'Risky_Delete') {
+            isAuthor = true;
             authZone.style.display = 'none';
             writeZone.style.display = 'none';
+            viewerLive.style.display = 'none';
             adminZone.style.display = 'block';
             renderAdminList();
         }
@@ -239,10 +259,13 @@
 
     logInput.addEventListener('input', (e) => {
         const text = e.target.value;
-        livePreview.textContent = text;
+        updateBlockCursor(logInput, writeCursor);
         localStorage.setItem('diary_buffer', text);
         socket.emit('typing', { text: text });
     });
+
+    logInput.addEventListener('focus', () => updateBlockCursor(logInput, writeCursor));
+    clearanceInput.addEventListener('focus', () => updateBlockCursor(clearanceInput, authCursor));
 
     function handleSave() {
         const text = logInput.value;
@@ -250,7 +273,7 @@
 
         if (text.trim() === '/clear') {
             logInput.value = '';
-            livePreview.textContent = '';
+            updateBlockCursor(logInput, writeCursor);
             localStorage.removeItem('diary_buffer');
             socket.emit('typing', { text: '' });
             return;
@@ -258,11 +281,9 @@
 
         socket.emit('new_entry', { text: text });
         logInput.value = '';
-        livePreview.textContent = '';
+        updateBlockCursor(logInput, writeCursor);
         localStorage.removeItem('diary_buffer');
     }
-
-    saveBtn.addEventListener('click', handleSave);
 
     logInput.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.key === 'Enter') {
@@ -307,41 +328,47 @@
         });
     }
 
-    window.deleteLog = function(id) {
-        if (confirm(`Eintrag ${id} wirklich löschen?`)) {
-            socket.emit('delete_entry', id);
-        }
-    };
+window.deleteLog = function(id) {
+if (confirm(Eintrag ${id} wirklich löschen?)) {
+socket.emit('delete_entry', id);
+}
+};
 
-    socket.on('init', (entries) => {
-        allEntries = entries;
-        renderLogs(entries);
-        if (adminZone.style.display === 'block') {
-            renderAdminList();
-        }
-    });
+socket.on('init', (entries) => {
+allEntries = entries;
+renderLogs(entries);
+if (adminZone.style.display === 'block') {
+renderAdminList();
+}
+});
 
-    socket.on('entry_added', (entries) => {
-        allEntries = entries;
-        renderLogs(entries);
-        if (adminZone.style.display === 'block') {
-            renderAdminList();
-        }
-    });
+socket.on('entry_added', (entries) => {
+allEntries = entries;
+renderLogs(entries);
+if (adminZone.style.display === 'block') {
+renderAdminList();
+}
+});
 
-    socket.on('entry_deleted', (entries) => {
-        allEntries = entries;
-        renderLogs(entries);
-        if (adminZone.style.display === 'block') {
-            renderAdminList();
-        }
-    });
+socket.on('entry_deleted', (entries) => {
+allEntries = entries;
+renderLogs(entries);
+if (adminZone.style.display === 'block') {
+renderAdminList();
+}
+});
 
-    socket.on('typing', (data) => {
-        if (authZone.style.display !== 'none' || adminZone.style.display === 'block') {
-            livePreview.textContent = data.text;
-        }
-    });
-</script>
-</body>
-</html>
+socket.on('typing', (data) => {
+if (!isAuthor) {
+if (data.text && data.text.trim().length > 0) {
+viewerLive.style.display = 'block';
+viewerLive.textContent = "USER IS TYPING LIVE: " + data.text + "█";
+} else {
+viewerLive.style.display = 'none';
+viewerLive.textContent = "";
+}
+}
+});
+
+updateBlockCursor(clearanceInput, authCursor);
+
