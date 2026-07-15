@@ -1,9 +1,3 @@
----
-
-### 2. `server.js`
-Render weist dem Server dynamisch Ports zu. Dieses Skript fängt `process.env.PORT` ab und läuft perfekt in der Cloud.
-
-```javascript
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -14,7 +8,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Render nutzt Umgebungsvariablen für den Port
 const PORT = process.env.PORT || 3000;
 const FILE_PATH = path.join(__dirname, 'entries.json');
 
