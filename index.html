@@ -8,14 +8,14 @@
 </head>
 <body>
 
-    <h1>🎛️ Audio Timeline Studio</h1>
+    <h1>🎛️ Audio Drag & Drop Studio</h1>
 
     <div class="studio-container">
         
         <!-- Linke Seite: Soundpool & Aufnahme -->
         <div class="sound-pool">
             <h2>Soundpool</h2>
-            <p class="hint">Ziehe einen Sound per Drag & Drop auf die Timeline oder klicke ihn zum Anhören an.</p>
+            <p class="hint">Klicke zum Anhören. Ziehe das <b>[DRAG]</b>-Feld mit der Maus direkt auf eine Spur in der Timeline.</p>
             
             <!-- Mikrofon Aufnahme -->
             <div class="mic-section">
@@ -27,25 +27,25 @@
             <!-- Gitarre -->
             <div class="instrument-section">
                 <div class="instrument-title">🎸 Gitarre (5 Sounds)</div>
-                <div class="sound-grid" id="pool-gitarre">Lade echte Sounds...</div>
+                <div class="sound-grid" id="pool-gitarre"></div>
             </div>
 
             <!-- Trommel -->
             <div class="instrument-section">
                 <div class="instrument-title">🥁 Trommel (5 Sounds)</div>
-                <div class="sound-grid" id="pool-trommel">Lade echte Sounds...</div>
+                <div class="sound-grid" id="pool-trommel"></div>
             </div>
 
             <!-- Piano -->
             <div class="instrument-section">
                 <div class="instrument-title">🎹 Piano (15 Sounds)</div>
-                <div class="sound-grid" id="pool-piano">Lade echte Sounds...</div>
+                <div class="sound-grid" id="pool-piano"></div>
             </div>
 
             <!-- Beats -->
             <div class="instrument-section">
                 <div class="instrument-title">⚡ Elektrische Beats (20 Sounds)</div>
-                <div class="sound-grid" id="pool-beat">Lade echte Sounds...</div>
+                <div class="sound-grid" id="pool-beat"></div>
             </div>
         </div>
 
@@ -60,7 +60,7 @@
                     <button class="add-track-btn" onclick="addTrackRow()">+</button>
                 </div>
                 <div class="timeline-length-control">
-                    <label for="timelineLength">Timeline-Länge (Sekunden):</label>
+                    <label for="timelineLength">Gesamtlänge (Sekunden):</label>
                     <input type="number" id="timelineLength" value="10" min="5" max="60" onchange="updateTimelineLength()">
                 </div>
             </div>
@@ -68,7 +68,7 @@
             <div class="timeline-container">
                 <div class="timeline-tracks" id="timelineTracks">
                     <div id="playhead"></div>
-                    <!-- Spuren werden dynamisch generiert -->
+                    <!-- Spuren (Tracks) werden dynamisch generiert -->
                 </div>
             </div>
         </div>
@@ -77,23 +77,20 @@
     <!-- Edit Menü / Modal Window -->
     <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
     <div class="modal" id="editModal">
-        <div class="modal-header">
-            <h3 id="modalTitle">Sound bearbeiten</h3>
-            <button class="modal-close-x" onclick="closeModal()">&times;</button>
-        </div>
+        <h3 id="modalTitle">Sound bearbeiten</h3>
         
         <label>Startzeitpunkt (Sekunden):</label>
-        <input type="range" id="modStart" min="0" max="10" step="0.05">
-        <span id="modStartVal" class="value-display">0s</span>
+        <input type="range" id="modStart" min="0" max="10" step="0.1">
+        <span id="modStartVal" style="font-size:0.85em; color:#aaa;">0s</span>
         
         <label>Länge (Dauer in Sekunden):</label>
-        <input type="range" id="modDuration" min="0.1" max="6.0" step="0.05">
-        <span id="modDurationVal" class="value-display">0.8s</span>
+        <input type="range" id="modDuration" min="0.1" max="4.0" step="0.1">
+        <span id="modDurationVal" style="font-size:0.85em; color:#aaa;">0.8s</span>
         
         <label>Lautstärke (Volume):</label>
-        <input type="range" id="modVolume" min="0" max="1" step="0.05">
+        <input type="range" id="modVolume" min="0" max="1" step="0.1">
 
-        <label id="pitchLabel">Klangfarbe / Tonhöhe (Abspieltempo):</label>
+        <label id="pitchLabel">Klangfarbe / Tonhöhe:</label>
         <select id="modPitch">
             <option value="low">Tief</option>
             <option value="normal" selected>Normal</option>
@@ -101,8 +98,9 @@
         </select>
 
         <div class="modal-buttons">
+            <!-- Gefordert: Löschen-Knopf direkt im Sound-Menü -->
             <button class="modal-btn btn-delete" onclick="deleteBlock()">🗑 Löschen</button>
-            <button class="modal-btn btn-save" onclick="saveBlockSettings()">Speichern</button>
+            <button class="modal-btn btn-save" onclick="saveBlockSettings()">💾 Speichern</button>
         </div>
     </div>
 
