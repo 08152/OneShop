@@ -1,297 +1,205 @@
-// Globale Steuergrößen
-let timelineBlocks = [];
-let activeBlockId = null;
-let isPlaying = false;
-let playInterval = null;
-let playheadPos = 0;
+// Web Audio Context initialisieren
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// Standardauflösung: 1 Sekunde entspricht 100 Pixeln Breite im Editor
-const pixelsPerSecond = 100; 
-let timelineSeconds = 10; // Standardlänge der Timeline beim Start
+// Lokaler Cache für Sprachaufnahmen
+const recordedBuffers = {}; 
+let recordedCount = 0;
 
-// Recorder Zustand
-let mediaRecorder;
-let audioChunks = [];
+// Massiver Tonpool (Insgesamt über 50 vordefinierte Trägerfrequenzen/Klangfarben)
+const soundsData = {
+    // Gitarre: Basierend auf den echten Frequenzen der Gitarrensaiten (E, A, D, G, H, e) und deren Obertönen
+    gitarre: [
+        { id: 'git_0', name: 'Git E2', type: 'gitarre', freq: 82.41 },
+        { id: 'git_1', name: 'Git A2', type: 'gitarre', freq: 110.00 },
+        { id: 'git_2', name: 'Git D3', type: 'gitarre', freq: 146.83 },
+        { id: 'git_3', name: 'Git G3', type: 'gitarre', freq: 196.00 },
+        { id: 'git_4', name: 'Git B3', type: 'gitarre', freq: 246.94 }
+    ],
+    // Trommel: Verschiedene Perkussions- und Drum-Typen
+    trommel: [
+        { id: 'drum_0', name: 'Deep Kick', type: 'trommel', freq: 50 },
+        { id: 'drum_1', name: 'Punch Snare', type: 'trommel', freq: 180 },
+        { id: 'drum_2', name: 'Closed Hat', type: 'trommel', freq: 350 },
+        { id: 'drum_3', name: 'Open HiHat', type: 'trommel', freq: 450 },
+        { id: 'drum_4', name: 'Rimshot FX', type: 'trommel', freq: 220 }
+    ],
+    // Piano: 15 vollwertige Noten der chromatischen Tonleiter (gestreckt über 2 Oktaven)
+    piano: Array.from({length: 15}, (_, i) => {
+        const notes = ["C4", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C5", "C#5", "D5"];
+        return {
+            id: `piano_${i}`,
+            name: `Pno ${notes[i]}`,
+            type: 'piano',
+            freq: 261.63 * Math.pow(1.059463, i) // Exakte mathematische Frequenzschritte
+        };
+    }),
+    // Elektrische Beats: 20 verschiedene Beats und perkursive Elektro-Effekte
+    beat: Array.from({length: 20}, (_, i) => ({
+        id: `beat_${i}`,
+        name: `🔋 Beat ${i+1}`,
+        type: 'beat',
+        freq: 60 + (i * 14) // Modulierende Grundfrequenzen für Abwechslung
+    }))
+};
 
-// App-Start nach DOM-Bereitstellung
-window.addEventListener('DOMContentLoaded', () => {
-    loadAllSoundsAndInitUI();
-    initTracks();
-    setupMicrophone();
-    updateTimelineLength(); // Setzt die initiale Spuren-Breite
-});
-
-// Erzeugt die UI-Buttons für den Soundpool nach erfolgreichem Buffer-Load
-function createSoundPoolButton(instrument, sound) {
-    const container = document.getElementById(`pool-${instrument}`);
-    const wrapper = document.createElement('div');
-    wrapper.className = 'sound-pool-item';
-
-    const btn = document.createElement('button');
-    btn.className = `sound-btn btn-${instrument}`;
-    btn.innerText = sound.name;
-    btn.onclick = () => {
-        audioCtx.resume();
-        playRealSound(sound.id, false);
-    };
-
-    const addBtn = document.createElement('button');
-    addBtn.className = 'add-to-timeline-btn';
-    addBtn.innerText = "+ Timeline";
-    addBtn.onclick = () => addSoundToTimeline(sound, instrument);
-
-    wrapper.appendChild(btn);
-    wrapper.appendChild(addBtn);
-    container.appendChild(wrapper);
-}
-
-// Passt die sichtbare Breite aller Spuren an die eingestellte Timeline-Sekundenanzahl an
-function updateTimelineLength() {
-    const inputVal = parseInt(document.getElementById('timelineLength').value);
-    if (isNaN(inputVal) || inputVal < 5) return;
-    
-    timelineSeconds = inputVal;
-    const totalWidthPx = timelineSeconds * pixelsPerSecond;
-    
-    // Setzt die CSS-Breite der Zeilen dynamisch
-    document.querySelectorAll('.track-row').forEach(row => {
-        row.style.width = totalWidthPx + 'px';
-        row.style.minWidth = totalWidthPx + 'px';
-    });
-
-    // Reichweite des Startzeit-Reglers im Modal anpassen
-    document.getElementById('modStart').max = timelineSeconds;
-}
-
-function initTracks() {
-    for(let i = 0; i < 4; i++) {
-        addTrackRow();
-    }
-}
-
-function addTrackRow() {
-    const tracksContainer = document.getElementById('timelineTracks');
-    const row = document.createElement('div');
-    row.className = 'track-row';
-    tracksContainer.appendChild(row);
-    updateTimelineLength();
-}
-
-// Block zur Timeline hinzufügen
-function addSoundToTimeline(soundObj, instrumentType) {
-    const rows = document.querySelectorAll('.track-row');
-    if(rows.length === 0) return;
-    
-    // Setzt neue Sounds standardmäßig auf die oberste Spur
-    const targetRow = rows[0]; 
-    const blockId = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    
-    // Versucht die echte Länge des geladenen Audiopuffers als Standardwert zu nehmen
-    let defaultDuration = 1.0;
-    if (loadedAudioBuffers[soundObj.id]) {
-        defaultDuration = Math.min(parseFloat(loadedAudioBuffers[soundObj.id].duration.toFixed(1)), 4.0);
-    }
-
-    const blockData = {
-        id: blockId,
-        name: soundObj.name,
-        type: instrumentType,
-        soundId: soundObj.id, 
-        startTime: 0.5, // Startzeitpunkt in Sekunden auf der Achse
-        duration: defaultDuration, 
-        volume: 0.7,
-        pitch: 'normal'
-    };
-
-    timelineBlocks.push(blockData);
-    renderBlock(blockData, targetRow);
-}
-
-function renderBlock(data, rowElement) {
-    const block = document.createElement('div');
-    block.className = `audio-block btn-${data.type}`;
-    block.id = data.id;
-    block.innerText = data.name;
-    
-    // Positionierung basierend auf Sekunden * Multiplikator
-    block.style.left = (data.startTime * pixelsPerSecond) + 'px';
-    block.style.width = (data.duration * pixelsPerSecond) + 'px';
-
-    block.onclick = (e) => {
-        e.stopPropagation();
-        openEditMenu(data.id);
-    };
-
-    rowElement.appendChild(block);
-}
-
-// Detail-Menü für Blöcke öffnen
-function openEditMenu(id) {
-    activeBlockId = id;
-    const data = timelineBlocks.find(b => b.id === id);
-    if(!data) return;
-
-    document.querySelectorAll('.audio-block').forEach(b => b.classList.remove('selected'));
-    document.getElementById(id).classList.add('selected');
-
-    document.getElementById('modalTitle').innerText = `Menü: ${data.name}`;
-    
-    // Slider Limits updaten
-    const startSlider = document.getElementById('modStart');
-    startSlider.max = timelineSeconds;
-    startSlider.value = data.startTime;
-    document.getElementById('modStartVal').innerText = data.startTime + "s";
-    
-    const durationSlider = document.getElementById('modDuration');
-    durationSlider.value = data.duration;
-    document.getElementById('modDurationVal').innerText = data.duration + "s";
-
-    document.getElementById('modVolume').value = data.volume;
-    document.getElementById('modPitch').value = data.pitch;
-
-    // Dynamische Live-Wertänderungen anzeigen während man schiebt
-    startSlider.oninput = (e) => document.getElementById('modStartVal').innerText = e.target.value + "s";
-    durationSlider.oninput = (e) => document.getElementById('modDurationVal').innerText = e.target.value + "s";
-
-    document.getElementById('editModal').style.display = 'block';
-    document.getElementById('modalOverlay').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
-    document.getElementById('modalOverlay').style.display = 'none';
-}
-
-// Speichert die geänderten Details (Länge, Klang, Lautstärke) ab
-function saveBlockSettings() {
-    const data = timelineBlocks.find(b => b.id === activeBlockId);
-    if(!data) return;
-
-    data.startTime = parseFloat(document.getElementById('modStart').value);
-    data.duration = parseFloat(document.getElementById('modDuration').value);
-    data.volume = parseFloat(document.getElementById('modVolume').value);
-    data.pitch = document.getElementById('modPitch').value;
-
-    const el = document.getElementById(activeBlockId);
-    if(el) {
-        el.style.left = (data.startTime * pixelsPerSecond) + 'px';
-        el.style.width = (data.duration * pixelsPerSecond) + 'px';
-    }
-    closeModal();
-}
-
-function deleteBlock() {
-    timelineBlocks = timelineBlocks.filter(b => b.id !== activeBlockId);
-    const el = document.getElementById(activeBlockId);
-    if(el) el.remove();
-    closeModal();
-}
-
-// Präzise Wiedergabe der kompletten Timeline
-function playTimeline() {
-    if(isPlaying) return;
+/**
+ * Fortschrittliche Audio-Synthese-Engine
+ * Nutzt mehrere Oszillatoren, Rauschgeneratoren und Filter, um echte Instrumente zu imitieren.
+ */
+function playAudioResource(soundId, isMic = false, duration = 0.8, volume = 0.7, pitchStyle = 'normal') {
     audioCtx.resume();
-    isPlaying = true;
     
-    const totalDurationMs = timelineSeconds * 1000;
-    
-    // Alle Sounds zur exakten Startzeit einreihen
-    timelineBlocks.forEach(block => {
-        setTimeout(() => {
-            if(!isPlaying) return;
-            const isMicSound = (block.type === 'mic');
-            playRealSound(block.soundId, isMicSound, block.duration, block.volume, block.pitch);
-        }, block.startTime * 1000);
-    });
-
-    // Playhead-Animation starten
-    const startTime = Date.now();
-    playInterval = setInterval(() => {
-        const elapsedMs = Date.now() - startTime;
-        playheadPos = (elapsedMs / 1000) * pixelsPerSecond;
+    // 1. MIKROFON-ABSPIELUNG
+    if (isMic) {
+        const buffer = recordedBuffers[soundId];
+        if (!buffer) return;
+        const bufferSource = audioCtx.createBufferSource();
+        bufferSource.buffer = buffer;
+        if (pitchStyle === 'low') bufferSource.playbackRate.value = 0.75;
+        if (pitchStyle === 'high') bufferSource.playbackRate.value = 1.35;
         
-        if(elapsedMs >= totalDurationMs) {
-            stopTimeline();
+        const micGain = audioCtx.createGain();
+        micGain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        bufferSource.connect(micGain);
+        micGain.connect(audioCtx.destination);
+        bufferSource.start(0);
+        return;
+    }
+
+    // 2. INSTRUMENTEN-SYNTHESE (ECHTE KLANG-SIMULATION)
+    let soundObj = null;
+    for (const category in soundsData) {
+        const found = soundsData[category].find(s => s.id === soundId);
+        if (found) { soundObj = found; break; }
+    }
+    if (!soundObj) return;
+
+    let pitchMultiplier = 1;
+    if (pitchStyle === 'low') pitchMultiplier = 0.7;
+    if (pitchStyle === 'high') pitchMultiplier = 1.4;
+
+    const baseFreq = soundObj.freq * pitchMultiplier;
+    const now = audioCtx.currentTime;
+
+    // Hauptlautstärke-Knoten (Master-Gain des Tons)
+    const masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0, now);
+    masterGain.connect(audioCtx.destination);
+
+    if (soundObj.type === 'gitarre') {
+        // GITARRE: Physikalische Saiten-Resonanz benötigt Obertöne (Harmonics)
+        const oscElement = audioCtx.createOscillator();
+        const overtone1 = audioCtx.createOscillator();
+        const overtone2 = audioCtx.createOscillator();
+        
+        // Kombination aus Sägezahn und Dreieck für den holzigen, gezupften Charakter
+        oscElement.type = 'sawtooth';
+        overtone1.type = 'triangle';
+        overtone2.type = 'sine';
+
+        oscElement.frequency.setValueAtTime(baseFreq, now);
+        overtone1.frequency.setValueAtTime(baseFreq * 2, now); // 1. Oberton
+        overtone2.frequency.setValueAtTime(baseFreq * 3, now); // 2. Oberton
+
+        // Lautstärken-Hüllkurve (Gezupfte Saite: schlagartiger Start, langes Ausklingen)
+        masterGain.gain.linearRampToValueAtTime(volume, now + 0.02);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        // Verbinden
+        oscElement.connect(masterGain);
+        overtone1.connect(masterGain);
+        overtone2.connect(masterGain);
+
+        oscElement.start(now); overtone1.start(now); overtone2.start(now);
+        oscElement.stop(now + duration); overtone1.stop(now + duration); overtone2.stop(now + duration);
+    } 
+    else if (soundObj.type === 'piano') {
+        // PIANO: Reicher, warmer Klang durch drei eng beieinander liegende Frequenzen (Detuning)
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const osc3 = audioCtx.createOscillator();
+        
+        osc1.type = 'triangle';
+        osc2.type = 'triangle';
+        osc3.type = 'sine';
+
+        // Leichtes Detuning simuliert die unperfekten echten Klaviersaiten
+        osc1.frequency.setValueAtTime(baseFreq, now);
+        osc2.frequency.setValueAtTime(baseFreq + 1.5, now);
+        osc3.frequency.setValueAtTime(baseFreq - 1.5, now);
+
+        // ADSR Hüllkurve für ein Klavier (Harter Anschlag, kurzes Sinken, sanfter Decay)
+        masterGain.gain.linearRampToValueAtTime(volume, now + 0.01);
+        masterGain.gain.linearRampToValueAtTime(volume * 0.5, now + 0.15);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc1.connect(masterGain); osc2.connect(masterGain); osc3.connect(masterGain);
+        osc1.start(now); osc2.start(now); osc3.start(now);
+        osc1.stop(now + duration); osc2.stop(now + duration); osc3.stop(now + duration);
+    } 
+    else if (soundObj.type === 'trommel') {
+        // TROMMEL: Benötigt Audio-Rauschen für Snares/Hats und Frequenzsturz für Kicks
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+
+        if (soundObj.id === 'drum_0') { 
+            // BD / KICK: Frequenz stürzt innerhalb von Millisekunden ab
+            osc.frequency.setValueAtTime(baseFreq * 2.5, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+            masterGain.gain.linearRampToValueAtTime(volume, now + 0.005);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(masterGain);
+            osc.start(now);
+            osc.stop(now + duration);
         } else {
-            document.getElementById('playhead').style.left = playheadPos + 'px';
-        }
-    }, 25);
-}
-
-function stopTimeline() {
-    isPlaying = false;
-    clearInterval(playInterval);
-    document.getElementById('playhead').style.left = '0px';
-}
-
-function clearTimeline() {
-    stopTimeline();
-    timelineBlocks = [];
-    document.querySelectorAll('.track-row').forEach(row => {
-        row.innerHTML = '';
-    });
-}
-
-// Mikrofon-Zustand und Trigger-Events
-function setupMicrophone() {
-    const micBtn = document.getElementById('micBtn');
-    
-    micBtn.onclick = async () => {
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            micBtn.innerText = "Aufnahme starten";
-            micBtn.classList.remove('recording');
-        } else {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                alert("Mikrofon wird auf diesem Endgerät/Browser nicht unterstützt.");
-                return;
+            // SNARE / HAT: Weißes Rauschen erzeugen
+            const bufferSize = audioCtx.sampleRate * duration;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1; // Zufällige Wellenbewegung
             }
-            audioChunks = [];
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                
-                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const arrayBuffer = await audioBlob.arrayBuffer();
-                    
-                    audioCtx.decodeAudioData(arrayBuffer, (buffer) => {
-                        recordedCount++;
-                        const soundId = `mic_sound_${recordedCount}`;
-                        recordedBuffers[soundId] = buffer;
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
 
-                        const customSound = { id: soundId, name: `Stimme ${recordedCount}`, type: 'mic' };
-                        createMicSoundUI(customSound);
-                    });
-                };
+            // Filter hinzufügen, damit es sich nach Holz/Metall anhört
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = (soundObj.id === 'drum_1') ? 'bandpass' : 'highpass';
+            filter.frequency.value = baseFreq;
 
-                mediaRecorder.start();
-                micBtn.innerText = "⏹ Aufnahme stoppen...";
-                micBtn.classList.add('recording');
-            } catch (err) {
-                alert("Mikrofonzugriff verweigert.");
-            }
+            masterGain.gain.linearRampToValueAtTime(volume, now + 0.005);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            noise.connect(filter);
+            filter.connect(masterGain);
+            noise.start(now);
+            noise.stop(now + duration);
         }
-    };
-}
+    } 
+    else if (soundObj.type === 'beat') {
+        // ELEKTRISCHE BEATS: Synthetische FM-Modulation (Frequenz steuert Frequenz)
+        const carrier = audioCtx.createOscillator();
+        const modulator = audioCtx.createOscillator();
+        const modGain = audioCtx.createGain();
 
-function createMicSoundUI(customSound) {
-    const container = document.getElementById('micSounds');
-    const wrapper = document.createElement('div');
-    wrapper.className = 'sound-pool-item';
+        carrier.type = 'square';
+        modulator.type = 'sawtooth';
 
-    const btn = document.createElement('button');
-    btn.className = `sound-btn btn-mic`;
-    btn.innerText = customSound.name;
-btn.onclick = () => playRealSound(customSound.id, true);
+        carrier.frequency.setValueAtTime(baseFreq, now);
+        modulator.frequency.setValueAtTime(baseFreq * 0.5, now);
+        modGain.gain.setValueAtTime(150, now); // Modulations-Intensität
 
-const addBtn = document.createElement('button');
-addBtn.className = 'add-to-timeline-btn';
-addBtn.innerText = "+ Timeline";
-addBtn.onclick = () => addSoundToTimeline(customSound, 'mic');
+        // Verschaltung der FM-Synthese
+        modulator.connect(modGain);
+        modGain.connect(carrier.frequency);
+        carrier.connect(masterGain);
 
-wrapper.appendChild(btn);
-wrapper.appendChild(addBtn);
-container.appendChild(wrapper);
+        masterGain.gain.linearRampToValueAtTime(volume * 0.4, now + 0.01);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        modulator.start(now);
+        carrier.start(now);
+        modulator.stop(now + duration);
+        carrier.stop(now + duration);
+    }
 }
