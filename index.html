@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL // LIVE_DIARY</title>
+    <title>TERMINAL // RENDER_LIVE_LOGS</title>
     <style>
         :root {
             --color-bg: #0a0a0a;
@@ -34,16 +34,16 @@
             margin-bottom: 20px;
         }
 
-        h1 { font-size: 1.5rem; margin: 0; }
+        h1 { font-size: 1.4rem; margin: 0; }
         
         .status-bar {
             font-size: 0.8rem;
             color: #00aa22;
             display: flex;
             justify-content: space-between;
+            margin-top: 5px;
         }
 
-        /* Schreibbereich oben - Standardmäßig unsichtbar */
         #write-zone {
             display: none;
             margin-bottom: 30px;
@@ -51,11 +51,10 @@
             padding-bottom: 20px;
         }
 
-        /* Custom Editor für den dicken grünen Block-Cursor */
         .terminal-editor-container {
             position: relative;
             width: 100%;
-            min-height: 120px;
+            min-height: 100px;
             background: #000;
             border: 1px solid var(--color-terminal);
             padding: 10px;
@@ -63,7 +62,6 @@
             cursor: text;
         }
 
-        /* Unsichtbare echte Textarea, die den Input abfängt */
         #hidden-textarea {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -73,7 +71,6 @@
             border: none;
         }
 
-        /* Sichtbarer Text-Spiegel */
         #visual-text {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -82,27 +79,25 @@
             display: inline;
         }
 
-        /* Dicker grüner Balken als Cursor (kein Blinken) */
+        /* Fester dicker grüner Balken - kein Blinken, kein Standard-Caret */
         .custom-cursor {
             display: inline-block;
             width: 10px;
-            height: 18px;
+            height: 17px;
             background-color: var(--color-terminal);
             vertical-align: middle;
             margin-left: 2px;
         }
 
-        /* Log-Einträge Verlauf */
         .log-entry {
             border-left: 2px solid var(--color-terminal);
             padding-left: 15px;
             margin-bottom: 25px;
         }
 
-        .log-date { font-weight: bold; color: #fff; margin-bottom: 5px; }
+        .log-date { font-weight: bold; color: #fff; margin-bottom: 5px; font-size: 0.9rem; }
         .log-text { line-height: 1.6; white-space: pre-wrap; }
 
-        /* Auth-Sektion unten */
         #auth-zone {
             margin-top: 20px;
             padding-top: 20px;
@@ -115,46 +110,44 @@
         #auth-code {
             background: transparent; border: none; color: var(--color-terminal);
             font-family: var(--font-terminal); font-size: 1rem; width: 100%; outline: none;
-            /* Blauer Cursor auch hier verstecken, stattdessen Fake-Balken möglich, hier simpel gelöst: */
             caret-color: var(--color-terminal);
         }
 
         .sync-indicator { font-size: 0.8rem; color: #ff9900; }
         .online { color: var(--color-terminal); }
     </style>
-    <!-- Socket.io für Live-Übertragung laden -->
     <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
 <div id="terminal">
     <header>
-        <h1>SECURE_LIVE_DIARY_v2.0</h1>
+        <h1>RENDER_CLOUD_TERMINAL // DIARY_v2.5</h1>
         <div class="status-bar">
-            <div>STATUS: <span id="server-status">CONNECTING...</span></div>
-            <div id="sync-status" class="sync-indicator">Lokal gesichert</div>
+            <div>NODE_SERVER: <span id="server-status">WAKING_UP...</span></div>
+            <div id="sync-status" class="sync-indicator">BUFFER_LOKAL</div>
         </div>
     </header>
 
-    <!-- SCHREIBBEREICH (Wird nach Code-Eingabe OBEN angezeigt) -->
+    <!-- Schreibbereich oben -->
     <div id="write-zone">
-        <div class="prompt" style="margin-bottom: 5px;">[LIVE_STREAM_ACTIVE] SCHREIBE NEUEN EINTRAG:</div>
+        <div class="prompt" style="margin-bottom: 5px;">[LIVE_UPLOADER_ACTIVE] INTERFACES_INPUT:</div>
         <div class="terminal-editor-container" onclick="focusEditor()">
             <span id="visual-text"></span><span class="custom-cursor"></span>
             <textarea id="hidden-textarea" oninput="updateText(this.value)" onkeydown="handleKeys(event)"></textarea>
         </div>
-        <button onclick="submitLog()" style="background:transparent; border:1px solid var(--color-terminal); color:var(--color-terminal); padding:8px 15px; margin-top:10px; cursor:pointer; font-family:var(--font-terminal);">LOG_SPEICHERN (STRG+ENTER)</button>
+        <button onclick="submitLog()" style="background:transparent; border:1px solid var(--color-terminal); color:var(--color-terminal); padding:8px 15px; margin-top:10px; cursor:pointer; font-family:var(--font-terminal);">SUBMIT_TO_CLOUD (STRG+ENTER)</button>
     </div>
 
-    <!-- LOG VERLAUF -->
+    <!-- Logs Verlauf -->
     <main id="log-container">
-        <!-- Logs werden hier gerendert -->
+        <div class="log-entry"><div class="log-text">Verbindung zum Cloud-Server wird aufgebaut... (Falls der Server schläft, kann dies bis zu 50 Sekunden dauern)</div></div>
     </main>
 
-    <!-- AUTH-BEREICH (Verschwindet nach Aktivierung) -->
+    <!-- Auth unten (wird gelöscht) -->
     <div id="auth-zone">
         <div class="prompt-line">
-            <span class="prompt">guest@fsociety:~# enter_clearance_code:</span>
+            <span class="prompt">guest@render-node:~# enter_clearance_code:</span>
             <input type="text" id="auth-code" autocomplete="off" onkeydown="checkAuth(event)">
         </div>
     </div>
@@ -164,19 +157,17 @@
     const socket = io();
     let isAuthorized = false;
 
-    // Synchronisations-Logik bei Server-Schlaf/Wachwechsel
     socket.on('connect', () => {
-        document.getElementById('server-status').textContent = "ONLINE (LIVE)";
+        document.getElementById('server-status').textContent = "ONLINE";
         document.getElementById('server-status').className = "online";
-        syncLocalToServer(); // Wenn Server aufwacht, lokale Daten hochladen
+        syncLocalToServer(); 
     });
 
     socket.on('disconnect', () => {
-        document.getElementById('server-status').textContent = "OFFLINE (SERVER_SLEEP)";
+        document.getElementById('server-status').textContent = "STANDBY (INACTIVE)";
         document.getElementById('server-status').className = "";
     });
 
-    // Empfange Live-Einträge von anderen Sendern in Echtzeit
     socket.on('live_type', (data) => {
         let liveDiv = document.getElementById('live-broadcast-preview');
         if (!liveDiv) {
@@ -187,53 +178,40 @@
             liveDiv.style.marginBottom = '20px';
             document.getElementById('log-container').prepend(liveDiv);
         }
-        liveDiv.innerHTML = `<div style="color:#ff3333; font-size:0.8rem;">[REMOTE_USER_TYPING...]</div><div>${data.text}</div>`;
+        liveDiv.innerHTML = `<div style="color:#ff3333; font-size:0.75rem;">[LIVE_BROADCAST_RECEIVING...]</div><div>${data.text}</div>`;
         if(data.text === "") liveDiv.remove();
     });
 
     socket.on('update_logs', (logs) => {
         renderLogs(logs);
-        // Wenn ein Live-Vorschau-Fenster existierte, nach dem Speichern entfernen
         const liveDiv = document.getElementById('live-broadcast-preview');
         if(liveDiv) liveDiv.remove();
     });
 
-    // Editor-Steuerung
     function focusEditor() {
         document.getElementById('hidden-textarea').focus();
     }
 
     function updateText(val) {
         document.getElementById('visual-text').textContent = val;
-        
-        // 1. Live im LocalStorage sichern (falls Server weg ist)
         localStorage.setItem('diary_current_buffer', val);
-        
-        // 2. Live per WebSocket an alle anderen senden
         socket.emit('typing', { text: val });
     }
 
     function handleKeys(e) {
-        // STRG + ENTER zum Absenden
         if (e.ctrlKey && e.key === 'Enter') {
             submitLog();
         }
     }
 
-    // Code-Prüfung
     function checkAuth(e) {
         if (e.key === 'Enter') {
             const input = document.getElementById('auth-code');
             if (input.value === 'Risky_Live') {
                 isAuthorized = true;
-                
-                // 1. Code-Bereich komplett löschen/verstecken
                 document.getElementById('auth-zone').style.display = 'none';
-                
-                // 2. Schreibbereich OBEN einblenden
                 document.getElementById('write-zone').style.display = 'block';
                 
-                // Vorhandenen Buffer aus LocalStorage wiederherstellen (falls vorhanden)
                 const savedBuffer = localStorage.getItem('diary_current_buffer') || "";
                 document.getElementById('hidden-textarea').value = savedBuffer;
                 updateText(savedBuffer);
@@ -249,6 +227,10 @@
     function renderLogs(logs) {
         const container = document.getElementById("log-container");
         container.innerHTML = "";
+        if(logs.length === 0) {
+            container.innerHTML = `<div class="log-entry"><div class="log-text">[System] Keine Einträge auf der Cloud vorhanden.</div></div>`;
+            return;
+        }
         logs.forEach(log => {
             container.innerHTML += `
                 <div class="log-entry">
@@ -258,7 +240,6 @@
         });
     }
 
-    // Eintrag abschicken
     function submitLog() {
         const textarea = document.getElementById('hidden-textarea');
         const text = textarea.value.trim();
@@ -266,44 +247,41 @@
 
         const now = new Date();
         const timestamp = `[ LOG_DATE: ${now.toISOString().split('T')[0]} // ${now.toTimeString().split(' ')[0]} ]`;
-        
         const newLog = { date: timestamp, text: text };
 
-        // Im LocalStorage in die Warteschlange einreihen
         let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
         offlineQueue.push(newLog);
         localStorage.setItem('diary_offline_queue', JSON.stringify(offlineQueue));
 
-        // Buffer leeren
         textarea.value = "";
         updateText("");
         localStorage.removeItem('diary_current_buffer');
-        socket.emit('typing', { text: "" }); // Live-Vorschau bei anderen leeren
-// Direkt versuchen zu synchronisieren
-syncLocalToServer();
-}
+        socket.emit('typing', { text: "" });
 
-// Warteschlange an Server senden, sobald er da ist
-async function syncLocalToServer() {
-let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
-if(offlineQueue.length === 0) return;
+        syncLocalToServer();
+    }
 
-document.getElementById('sync-status').textContent = "SYNCHRONISIERE MIT SERVER...";
+    async function syncLocalToServer() {
+        let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
+        if(offlineQueue.length === 0) {
+            document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
+            return;
+        }
 
-try {
-const response = await fetch('/api/logs/sync', {
-method: 'POST',
-headers: { 'Content-Type': 'application/json' },
-body: JSON.stringify({ entries: offlineQueue })
-});
+        document.getElementById('sync-status').textContent = "UPLOADING_BUFFER...";
 
-if (response.ok) {
-localStorage.setItem('diary_offline_queue', JSON.stringify([]));
-document.getElementById('sync-status').textContent = "ALLE DATEN AUF SERVER GESICHERT";
-// Server triggert über WebSockets ein Update der Logliste für alle
-}
-} catch (e) {
-document.getElementById('sync-status').textContent = "SERVER SCHLÄFT - LOKAL GEPUFFERT";
-}
-}
+        try {
+            const response = await fetch('/api/logs/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ entries: offlineQueue })
+            });
 
+            if (response.ok) {
+                localStorage.setItem('diary_offline_queue', JSON.stringify([]));
+                document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
+            }
+        } catch (e) {
+            document.getElementById('sync-status').textContent = "SERVER_STANDBY_LOKAL_SAFE";
+        }
+    }
