@@ -154,11 +154,11 @@
 </div>
 
 <script>
-    // DEINE RENDER-URL DIREKT ALS VERBINDUNGSZIEL DEFINIERT
     const RENDER_URL = 'https://onrender.com';
     
-    // Erzwingt die Verbindung direkt zu deiner Render-Instanz via Socket.io
-    const socket = io(RENDER_URL);
+    const socket = io(RENDER_URL, {
+        transports: ['websocket', 'polling']
+    });
     let isAuthorized = false;
 
     socket.on('connect', () => {
@@ -275,7 +275,6 @@
         document.getElementById('sync-status').textContent = "UPLOADING_BUFFER...";
 
         try {
-            // Verwendet die fest definierte Variable für den Cloud-Sync
             const response = await fetch(`${RENDER_URL}/api/logs/sync`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -283,10 +282,72 @@
             });
 
             if (response.ok) {
-localStorage.setItem('diary_offline_queue', JSON.stringify([]));
-document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
-}
-} catch (e) {
-document.getElementById('sync-status').textContent = "SERVER_STANDBY_LOKAL_SAFE";
-}
-}
+                localStorage.setItem('diary_offline_queue', JSON.stringify([]));
+                document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
+        } catch (err) {
+            console.log("SYNC_FAILED:", err);
+            document.getElementById('sync-status').textContent = "OFFLINE_BUFFER_ACTIVE";
+        }
+    }
+
+    // Beim Start gespeicherten Text wiederherstellen
+    window.onload = () => {
+        const saved = localStorage.getItem('diary_current_buffer') || "";
+        document.getElementById('hidden-textarea').value = saved;
+        document.getElementById('visual-text').textContent = saved;
+
+        // Verbindung prüfen
+        if(socket.connected) {
+            document.getElementById('server-status').textContent = "ONLINE";
+        }
+    };
+
+
+    // Automatisches Speichern während des Schreibens
+    setInterval(() => {
+        const text = document.getElementById('hidden-textarea').value;
+        if(text.length > 0) {
+            localStorage.setItem('diary_current_buffer', text);
+        }
+    }, 2000);
+
+
+    // Enter im Editor ohne neue Zeile abschicken (optional)
+    document.getElementById('hidden-textarea').addEventListener('keydown', e => {
+        if(e.ctrlKey && e.key === "Enter") {
+            e.preventDefault();
+            submitLog();
+        }
+    });
+
+
+    // Server fragt nach aktuellen Logs
+    socket.on('request_logs', () => {
+        socket.emit('get_logs');
+    });
+
+
+    // Fehleranzeige Socket
+    socket.on('connect_error', () => {
+        document.getElementById('server-status').textContent = "SERVER_ERROR";
+        document.getElementById('sync-status').textContent = "LOCAL_ONLY_MODE";
+    });
+
+
+    // Sicherheitsfeature: kein Rechtsklick
+    document.addEventListener('contextmenu', e => {
+        e.preventDefault();
+    });
+
+
+    // Tastenkürzel für Auth
+    document.addEventListener('keydown', e => {
+        if(e.ctrlKey && e.key === "l") {
+            document.getElementById('auth-code').focus();
+        }
+    });
+
+</script>
+
+</body>
+</html>
