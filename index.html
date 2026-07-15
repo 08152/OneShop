@@ -144,7 +144,7 @@
         <div class="log-entry"><div class="log-text">Verbindung zum Cloud-Server wird aufgebaut... (Falls der Server schläft, kann dies bis zu 50 Sekunden dauern)</div></div>
     </main>
 
-    <!-- Auth unten (wird gelöscht) -->
+    <!-- Auth unten (wird ausgeblendet) -->
     <div id="auth-zone">
         <div class="prompt-line">
             <span class="prompt">guest@render-node:~# enter_clearance_code:</span>
@@ -154,7 +154,11 @@
 </div>
 
 <script>
-    const socket = io();
+    // DEINE RENDER-URL DIREKT ALS VERBINDUNGSZIEL DEFINIERT
+    const RENDER_URL = 'https://onrender.com';
+    
+    // Erzwingt die Verbindung direkt zu deiner Render-Instanz via Socket.io
+    const socket = io(RENDER_URL);
     let isAuthorized = false;
 
     socket.on('connect', () => {
@@ -246,7 +250,7 @@
         if(!text) return;
 
         const now = new Date();
-        const timestamp = `[ LOG_DATE: ${now.toISOString().split('T')[0]} // ${now.toTimeString().split(' ')[0]} ]`;
+        const timestamp = `[ LOG_DATE: ${now.toISOString().split('T')} // ${now.toTimeString().split(' ')} ]`;
         const newLog = { date: timestamp, text: text };
 
         let offlineQueue = JSON.parse(localStorage.getItem('diary_offline_queue')) || [];
@@ -271,17 +275,18 @@
         document.getElementById('sync-status').textContent = "UPLOADING_BUFFER...";
 
         try {
-            const response = await fetch('/api/logs/sync', {
+            // Verwendet die fest definierte Variable für den Cloud-Sync
+            const response = await fetch(`${RENDER_URL}/api/logs/sync`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ entries: offlineQueue })
             });
 
             if (response.ok) {
-                localStorage.setItem('diary_offline_queue', JSON.stringify([]));
-                document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
-            }
-        } catch (e) {
-            document.getElementById('sync-status').textContent = "SERVER_STANDBY_LOKAL_SAFE";
-        }
-    }
+localStorage.setItem('diary_offline_queue', JSON.stringify([]));
+document.getElementById('sync-status').textContent = "CLOUD_SYNCHRONIZED";
+}
+} catch (e) {
+document.getElementById('sync-status').textContent = "SERVER_STANDBY_LOKAL_SAFE";
+}
+}
