@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 
 const corsOptions = {
-  origin: 'https://oneshop-1.onrender.com',
+  origin: 'https://onrender.com',
   methods: ['GET', 'POST'],
   credentials: true
 };
