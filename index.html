@@ -41,7 +41,7 @@
 
 
 <button id="addTrackBtn">
-＋ Spur hinzufügen
+➕ Spur hinzufügen
 </button>
 
 
@@ -50,17 +50,19 @@
 </button>
 
 
+
 <label>
 
-Timeline:
+Länge:
 
 <input
 id="timelineLength"
 type="number"
 value="30"
-min="5">
+min="5"
+>
 
-Sek.
+Sekunden
 
 </label>
 
@@ -73,11 +75,16 @@ Sek.
 
 
 
+
+
 <div class="layout">
 
 
 
-<!-- SOUNDPOOL -->
+<!-- =========================
+ SOUNDPOOL
+========================= -->
+
 
 <aside id="soundPool">
 
@@ -88,79 +95,90 @@ Sek.
 
 
 
-<section class="category">
+<div class="category">
 
 <h3>
 🎸 Gitarre
 </h3>
 
+
 <div id="guitarList"
 class="soundList">
 </div>
 
-</section>
+</div>
 
 
 
 
-<section class="category">
+
+<div class="category">
 
 <h3>
 🎹 Piano
 </h3>
 
+
 <div id="pianoList"
 class="soundList">
 </div>
 
-</section>
+</div>
 
 
 
 
 
-<section class="category">
+
+<div class="category">
 
 <h3>
 🥁 Trommel
 </h3>
 
+
 <div id="drumList"
 class="soundList">
 </div>
 
-</section>
+</div>
 
 
 
 
 
-<section class="category">
+
+
+<div class="category">
 
 <h3>
 ⚡ Elektrische Beats
 </h3>
 
+
 <div id="electroList"
 class="soundList">
 </div>
 
-</section>
+</div>
 
 
 
 
-<section class="category">
+
+
+<div class="category">
 
 <h3>
 🎤 Stimmen
 </h3>
 
+
 <div id="voiceList"
 class="soundList">
 </div>
 
-</section>
+</div>
 
 
 
@@ -170,22 +188,30 @@ class="soundList">
 
 
 
-<!-- TIMELINE -->
+
+
+
+
+<!-- =========================
+ TIMELINE
+========================= -->
 
 
 <main id="workspace">
 
 
 <div id="timeScale">
+
 </div>
+
 
 
 
 <div id="timelineContainer">
 
 
-<div class="track"
-data-track="0">
+
+<div class="track">
 
 
 <div class="trackTitle">
@@ -202,8 +228,8 @@ Track 1
 
 
 
-<div class="track"
-data-track="1">
+
+<div class="track">
 
 
 <div class="trackTitle">
@@ -221,8 +247,7 @@ Track 2
 
 
 
-<div class="track"
-data-track="2">
+<div class="track">
 
 
 <div class="trackTitle">
@@ -239,8 +264,8 @@ Track 3
 
 
 
-<div class="track"
-data-track="3">
+
+<div class="track">
 
 
 <div class="trackTitle">
@@ -257,8 +282,11 @@ Track 4
 
 
 
+
 <div id="playhead">
+
 </div>
+
 
 
 </div>
@@ -269,10 +297,12 @@ Track 4
 
 
 
+
 </div>
-<!-- ======================================
-     SOUND PLATZIEREN MODAL
-====================================== -->
+<!-- =====================================
+     SOUND PLATZIEREN FENSTER
+===================================== -->
+
 
 <div id="placeModal" class="hidden">
 
@@ -285,6 +315,7 @@ Track 4
 </h2>
 
 
+
 <p id="placeSoundName">
 Sound
 </p>
@@ -293,22 +324,23 @@ Sound
 
 <label>
 
-Startzeit (Sekunden)
+Startzeit in Sekunden:
 
 <input
 id="placeTime"
 type="number"
-value="0"
 min="0"
-step="0.1">
+step="0.1"
+value="0">
 
 </label>
 
 
 
+
 <label>
 
-Spur auswählen
+Spur:
 
 <select id="placeTrack">
 
@@ -339,23 +371,29 @@ Track 4
 
 
 
+
+
 <div class="modalButtons">
 
 
 <button id="placeConfirm">
+
 ✅ Einfügen
+
 </button>
+
 
 
 <button id="placeCancel">
+
 ❌ Abbrechen
+
 </button>
 
 
 </div>
 
 
-
 </div>
 
 
@@ -366,9 +404,11 @@ Track 4
 
 
 
-<!-- ======================================
-     SOUND BEARBEITEN MODAL
-====================================== -->
+
+
+<!-- =====================================
+     SOUND BEARBEITEN FENSTER
+===================================== -->
 
 
 <div id="editModal" class="hidden">
@@ -393,7 +433,7 @@ Sound
 
 <label>
 
-Lautstärke
+Lautstärke:
 
 <input
 id="editVolume"
@@ -415,9 +455,12 @@ value="1">
 
 
 
+
+
+
 <label>
 
-Höhe
+Tonhöhe:
 
 <select id="editPitch">
 
@@ -440,7 +483,11 @@ Hoch
 
 </select>
 
+
 </label>
+
+
+
 
 
 
@@ -448,7 +495,7 @@ Hoch
 
 <label>
 
-Geschwindigkeit
+Geschwindigkeit:
 
 <input
 id="editSpeed"
@@ -470,20 +517,30 @@ value="1">
 
 
 
+
+
+
 <div class="modalButtons">
 
 
 <button id="deleteBlock">
+
 🗑 Löschen
+
 </button>
 
 
 
 <button id="closeEdit">
+
 Schließen
+
 </button>
 
 
+</div>
+
+
 
 </div>
 
@@ -491,7 +548,6 @@ Schließen
 </div>
 
 
-</div>
 
 
 
@@ -499,48 +555,46 @@ Schließen
 
 
 
-<!-- ======================================
-     STATUS
-====================================== -->
+<!-- =====================================
+ STATUS BAR
+===================================== -->
 
 
 <footer class="statusbar">
 
 
-<div>
-
+<span>
 Status:
+</span>
+
 
 <span id="statusText">
 Bereit
 </span>
 
-</div>
 
 
 
-<div>
-
+<span>
 Spuren:
+</span>
+
 
 <span id="trackCount">
 4
 </span>
 
-</div>
 
 
 
-
-<div>
-
+<span>
 Sounds:
+</span>
+
 
 <span id="soundCount">
 0
 </span>
-
-</div>
 
 
 
@@ -552,76 +606,11 @@ Sounds:
 
 
 
-<!-- ======================================
-     TEMPLATES
-====================================== -->
 
 
-<template id="soundTemplate">
-
-
-<div class="soundItem">
-
-
-<div class="soundName">
-Sound
-</div>
-
-
-
-<div class="soundButtons">
-
-
-<button class="previewButton">
-▶
-</button>
-
-
-
-<button class="dragHandle">
-DRAG
-</button>
-
-
-
-</div>
-
-
-</div>
-
-
-</template>
-
-
-
-
-
-
-
-<template id="blockTemplate">
-
-
-<div class="timelineBlock">
-
-<div class="timelineName">
-Sound
-</div>
-
-
-</div>
-
-
-</template>
-
-
-
-
-
-
-
-<!-- ======================================
-     JAVASCRIPT
-====================================== -->
+<!-- =====================================
+ JAVASCRIPT
+===================================== -->
 
 
 <script src="sound.js"></script>
