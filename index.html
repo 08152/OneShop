@@ -1,208 +1,395 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Ghost Studio DAW</title>
 
 <link rel="stylesheet" href="style.css">
+
 </head>
 
+
 <body>
+
 
 <header class="topbar">
 
 <h1>🎵 Ghost Studio DAW</h1>
 
+
 <div class="controls">
 
-<button id="playBtn">▶ Abspielen</button>
 
-<button id="stopBtn">⏹ Stopp</button>
+<button id="playBtn">
+▶ Abspielen
+</button>
 
-<button id="clearBtn">🗑 Leeren</button>
 
-<button id="addTrackBtn">＋ Spur hinzufügen</button>
+<button id="stopBtn">
+⏹ Stopp
+</button>
 
-<button id="recordBtn">🎤 Aufnahme starten</button>
+
+<button id="clearBtn">
+🗑 Leeren
+</button>
+
+
+<button id="addTrackBtn">
+＋ Spur hinzufügen
+</button>
+
+
+<button id="recordBtn">
+🎤 Aufnahme starten
+</button>
+
 
 <label>
 
-Timeline (Sek.)
+Timeline:
 
 <input
 id="timelineLength"
 type="number"
 value="30"
-min="5"
-max="600">
+min="5">
+
+Sek.
 
 </label>
 
+
 </div>
+
 
 </header>
 
+
+
+
 <div class="layout">
 
-<!-- ========================================= -->
-<!-- LINKS: SOUNDPOOL -->
-<!-- ========================================= -->
+
+
+<!-- SOUNDPOOL -->
 
 <aside id="soundPool">
 
-<h2>🎼 Soundpool</h2>
 
-<!-- ---------------- GITARRE ---------------- -->
+<h2>
+🎼 Soundpool
+</h2>
 
-<section class="category">
 
-<h3>🎸 Gitarre</h3>
-
-<div id="guitarList" class="soundList"></div>
-
-</section>
-
-<!-- ---------------- PIANO ---------------- -->
 
 <section class="category">
 
-<h3>🎹 Piano</h3>
+<h3>
+🎸 Gitarre
+</h3>
 
-<div id="pianoList" class="soundList"></div>
+<div id="guitarList"
+class="soundList">
+</div>
 
 </section>
 
-<!-- ---------------- DRUMS ---------------- -->
+
+
 
 <section class="category">
 
-<h3>🥁 Trommel</h3>
+<h3>
+🎹 Piano
+</h3>
 
-<div id="drumList" class="soundList"></div>
+<div id="pianoList"
+class="soundList">
+</div>
 
 </section>
 
-<!-- ---------------- ELEKTRO ---------------- -->
+
+
+
 
 <section class="category">
 
-<h3>⚡ Elektrische Beats</h3>
+<h3>
+🥁 Trommel
+</h3>
 
-<div id="electroList" class="soundList"></div>
+<div id="drumList"
+class="soundList">
+</div>
 
 </section>
 
-<!-- ---------------- STIMMEN ---------------- -->
+
+
+
 
 <section class="category">
 
-<h3>🎤 Aufnahmen</h3>
+<h3>
+⚡ Elektrische Beats
+</h3>
 
-<div id="voiceList" class="soundList"></div>
+<div id="electroList"
+class="soundList">
+</div>
 
 </section>
+
+
+
+
+<section class="category">
+
+<h3>
+🎤 Stimmen
+</h3>
+
+<div id="voiceList"
+class="soundList">
+</div>
+
+</section>
+
+
 
 </aside>
 
-<!-- ========================================= -->
-<!-- RECHTS: TIMELINE -->
-<!-- ========================================= -->
+
+
+
+
+<!-- TIMELINE -->
+
 
 <main id="workspace">
 
-<div id="timeScale"></div>
+
+<div id="timeScale">
+</div>
+
+
 
 <div id="timelineContainer">
 
-<div class="track" data-track="0">
+
+<div class="track"
+data-track="0">
+
 
 <div class="trackTitle">
 Track 1
 </div>
 
-<div class="trackLane"></div>
+
+<div class="trackLane">
+</div>
+
 
 </div>
 
-<div class="track" data-track="1">
+
+
+
+<div class="track"
+data-track="1">
+
 
 <div class="trackTitle">
 Track 2
 </div>
 
-<div class="trackLane"></div>
+
+<div class="trackLane">
+</div>
+
 
 </div>
 
-<div class="track" data-track="2">
+
+
+
+
+<div class="track"
+data-track="2">
+
 
 <div class="trackTitle">
 Track 3
 </div>
 
-<div class="trackLane"></div>
+
+<div class="trackLane">
+</div>
+
 
 </div>
 
-<div class="track" data-track="3">
+
+
+
+<div class="track"
+data-track="3">
+
 
 <div class="trackTitle">
 Track 4
 </div>
 
-<div class="trackLane"></div>
+
+<div class="trackLane">
+</div>
+
 
 </div>
 
-<div id="playhead"></div>
+
+
+
+<div id="playhead">
+</div>
+
 
 </div>
+
+
 
 </main>
 
+
+
 </div>
+<!-- ======================================
+     SOUND PLATZIEREN MODAL
+====================================== -->
 
-<!-- ========================================= -->
-<!-- DETAIL MENU -->
-<!-- ========================================= -->
+<div id="placeModal" class="hidden">
 
-<div id="modal" class="hidden">
 
 <div class="window">
 
-<h2>Sound bearbeiten</h2>
+
+<h2>
+🎵 Sound platzieren
+</h2>
+
+
+<p id="placeSoundName">
+Sound
+</p>
+
+
 
 <label>
 
-Startzeit
+Startzeit (Sekunden)
 
 <input
-id="editStart"
-type="range"
+id="placeTime"
+type="number"
+value="0"
 min="0"
-max="120"
 step="0.1">
 
-<span id="startValue">0</span>
-
 </label>
+
+
 
 <label>
 
-Dauer
+Spur auswählen
 
-<input
-id="editDuration"
-type="range"
-min="0.1"
-max="20"
-step="0.1">
+<select id="placeTrack">
 
-<span id="durationValue">1</span>
+
+<option value="0">
+Track 1
+</option>
+
+
+<option value="1">
+Track 2
+</option>
+
+
+<option value="2">
+Track 3
+</option>
+
+
+<option value="3">
+Track 4
+</option>
+
+
+</select>
 
 </label>
+
+
+
+<div class="modalButtons">
+
+
+<button id="placeConfirm">
+✅ Einfügen
+</button>
+
+
+<button id="placeCancel">
+❌ Abbrechen
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<!-- ======================================
+     SOUND BEARBEITEN MODAL
+====================================== -->
+
+
+<div id="editModal" class="hidden">
+
+
+<div class="window">
+
+
+<h2>
+🎚 Sound bearbeiten
+</h2>
+
+
+
+<p id="editSoundName">
+Sound
+</p>
+
+
+
+
 
 <label>
 
@@ -213,126 +400,236 @@ id="editVolume"
 type="range"
 min="0"
 max="1"
-step="0.01">
+step="0.01"
+value="1">
 
-<span id="volumeValue">1</span>
+
+<span id="volumeValue">
+1
+</span>
+
 
 </label>
 
+
+
+
+
 <label>
 
-Klangfarbe
+Höhe
 
 <select id="editPitch">
+
 
 <option value="0.5">
 Tief
 </option>
 
-<option value="1" selected>
+
+<option value="1"
+selected>
 Normal
 </option>
+
 
 <option value="2">
 Hoch
 </option>
 
+
 </select>
 
 </label>
 
+
+
+
+
+<label>
+
+Geschwindigkeit
+
+<input
+id="editSpeed"
+type="range"
+min="0.5"
+max="2"
+step="0.01"
+value="1">
+
+
+<span id="speedValue">
+1x
+</span>
+
+
+</label>
+
+
+
+
+
 <div class="modalButtons">
+
 
 <button id="deleteBlock">
 🗑 Löschen
 </button>
 
-<button id="closeModal">
+
+
+<button id="closeEdit">
 Schließen
 </button>
 
-</div>
+
 
 </div>
 
-</div>
-<!-- ========================================= -->
-<!-- DRAG-VORSCHAU -->
-<!-- ========================================= -->
 
-<div id="dragPreview" class="hidden">
-    <span id="dragName">Sound</span>
 </div>
 
-<!-- ========================================= -->
-<!-- STATUSLEISTE -->
-<!-- ========================================= -->
+
+</div>
+
+
+
+
+
+
+
+<!-- ======================================
+     STATUS
+====================================== -->
+
 
 <footer class="statusbar">
 
-    <div>
-        <strong>Status:</strong>
-        <span id="statusText">Bereit</span>
-    </div>
 
-    <div>
-        <strong>Spuren:</strong>
-        <span id="trackCount">4</span>
-    </div>
+<div>
 
-    <div>
-        <strong>Sounds:</strong>
-        <span id="soundCount">0</span>
-    </div>
+Status:
+
+<span id="statusText">
+Bereit
+</span>
+
+</div>
+
+
+
+<div>
+
+Spuren:
+
+<span id="trackCount">
+4
+</span>
+
+</div>
+
+
+
+
+<div>
+
+Sounds:
+
+<span id="soundCount">
+0
+</span>
+
+</div>
+
+
 
 </footer>
 
-<!-- ========================================= -->
-<!-- TEMPLATES -->
-<!-- ========================================= -->
+
+
+
+
+
+
+<!-- ======================================
+     TEMPLATES
+====================================== -->
+
 
 <template id="soundTemplate">
 
-    <div class="soundItem" draggable="true">
 
-        <div class="soundName">
-            Name
-        </div>
+<div class="soundItem">
 
-        <div class="soundButtons">
 
-            <button class="previewButton">
-                ▶
-            </button>
+<div class="soundName">
+Sound
+</div>
 
-            <div class="dragHandle">
-                DRAG
-            </div>
 
-        </div>
 
-    </div>
+<div class="soundButtons">
+
+
+<button class="previewButton">
+▶
+</button>
+
+
+
+<button class="dragHandle">
+DRAG
+</button>
+
+
+
+</div>
+
+
+</div>
+
 
 </template>
 
-<template id="timelineTemplate">
 
-    <div class="timelineBlock">
 
-        <div class="timelineName">
-            Sound
-        </div>
 
-    </div>
+
+
+
+<template id="blockTemplate">
+
+
+<div class="timelineBlock">
+
+<div class="timelineName">
+Sound
+</div>
+
+
+</div>
+
 
 </template>
 
-<!-- ========================================= -->
-<!-- SCRIPTS -->
-<!-- ========================================= -->
+
+
+
+
+
+
+<!-- ======================================
+     JAVASCRIPT
+====================================== -->
+
 
 <script src="sound.js"></script>
+
 <script src="script.js"></script>
 
+
+
 </body>
+
 </html>
