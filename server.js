@@ -62,6 +62,7 @@ io.on('connection', (socket) => {
     entries.push(newEntry);
     writeEntries(entries);
     io.emit('entry_added', entries);
+    io.emit('typing', { text: '' });
   });
 
   socket.on('delete_entry', (id) => {
