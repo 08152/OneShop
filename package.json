@@ -1,13 +1,19 @@
 {
-  "name": "render-hacker-diary",
-  "version": "2.5.0",
-  "description": "Live Terminal Diary für Render.com",
+  "name": "live-terminal-diary",
+  "version": "1.0.0",
+  "description": "Ein Live-Terminal-Tagebuch mit Socket.io auf Render.com",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "socket.io": "^4.7.5"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
