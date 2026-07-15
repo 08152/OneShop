@@ -27,25 +27,25 @@
             <!-- Gitarre -->
             <div class="instrument-section">
                 <div class="instrument-title">🎸 Gitarre (5 Sounds)</div>
-                <div class="sound-grid" id="pool-gitarre"></div>
+                <div class="sound-grid" id="pool-gitarre">Lade echte Sounds...</div>
             </div>
 
             <!-- Trommel -->
             <div class="instrument-section">
                 <div class="instrument-title">🥁 Trommel (5 Sounds)</div>
-                <div class="sound-grid" id="pool-trommel"></div>
+                <div class="sound-grid" id="pool-trommel">Lade echte Sounds...</div>
             </div>
 
             <!-- Piano -->
             <div class="instrument-section">
                 <div class="instrument-title">🎹 Piano (15 Sounds)</div>
-                <div class="sound-grid" id="pool-piano"></div>
+                <div class="sound-grid" id="pool-piano">Lade echte Sounds...</div>
             </div>
 
             <!-- Beats -->
             <div class="instrument-section">
                 <div class="instrument-title">⚡ Elektrische Beats (20 Sounds)</div>
-                <div class="sound-grid" id="pool-beat"></div>
+                <div class="sound-grid" id="pool-beat">Lade echte Sounds...</div>
             </div>
         </div>
 
@@ -58,6 +58,11 @@
                 <div class="track-add-control">
                     <label>Spur hinzufügen:</label>
                     <button class="add-track-btn" onclick="addTrackRow()">+</button>
+                </div>
+                <!-- NEU: Einstellbare Timeline-Länge -->
+                <div class="timeline-length-control">
+                    <label for="timelineLength">Timeline-Länge (Sekunden):</label>
+                    <input type="number" id="timelineLength" value="10" min="5" max="60" onchange="updateTimelineLength()">
                 </div>
             </div>
 
@@ -75,16 +80,18 @@
     <div class="modal" id="editModal">
         <h3 id="modalTitle">Sound bearbeiten</h3>
         
-        <label>Startzeitpunkt (X-Position):</label>
-        <input type="range" id="modStart" min="0" max="800" step="10">
+        <label>Startzeitpunkt (Sekunden):</label>
+        <input type="range" id="modStart" min="0" max="10" step="0.1">
+        <span id="modStartVal" style="font-size:0.85em; color:#aaa;">0s</span>
         
-        <label>Länge (Dauer):</label>
-        <input type="range" id="modDuration" min="0.2" max="4.0" step="0.1">
+        <label>Länge (Dauer in Sekunden):</label>
+        <input type="range" id="modDuration" min="0.1" max="4.0" step="0.1">
+        <span id="modDurationVal" style="font-size:0.85em; color:#aaa;">0.8s</span>
         
         <label>Lautstärke (Volume):</label>
         <input type="range" id="modVolume" min="0" max="1" step="0.1">
 
-        <label id="pitchLabel">Klangfarbe / Tonhöhe:</label>
+        <label id="pitchLabel">Klangfarbe / Tonhöhe (Abspieltempo):</label>
         <select id="modPitch">
             <option value="low">Tief</option>
             <option value="normal" selected>Normal</option>
