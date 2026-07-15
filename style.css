@@ -24,9 +24,9 @@ h1, h2 {
 
 .studio-container {
     display: grid;
-    grid-template-columns: 320px 1fr;
+    grid-template-columns: 340px 1fr;
     gap: 20px;
-    max-width: 1500px;
+    max-width: 1600px;
     margin: 0 auto;
 }
 
@@ -42,7 +42,7 @@ h1, h2 {
 .hint {
     font-size: 0.8em; 
     color: #aaa;
-    line-height: 1.4;
+    margin-bottom: 15px;
 }
 
 .instrument-section {
@@ -57,31 +57,52 @@ h1, h2 {
 }
 
 .sound-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sound-pool-item {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
-    gap: 5px;
+    grid-template-columns: 1fr 70px;
+    gap: 4px;
+    background: #3a3a3a;
+    padding: 4px;
+    border-radius: 4px;
 }
 
 .sound-btn {
     background: #444;
     color: #fff;
     border: none;
-    padding: 12px 4px;
+    padding: 8px 4px;
     border-radius: 4px;
-    cursor: grab;
+    cursor: pointer;
     font-size: 0.85em;
     text-align: center;
-    transition: background 0.2s, transform 0.1s;
-    user-select: none;
-}
-
-.sound-btn:active {
-    cursor: grabbing;
-    transform: scale(0.95);
 }
 
 .sound-btn:hover { 
     background: #555; 
+}
+
+/* Drag-Griffe-Design */
+.drag-handle {
+    background: #555;
+    color: #fff;
+    border: 1px dashed #aaa;
+    border-radius: 4px;
+    font-size: 0.75em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    font-weight: bold;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
         
 /* Instrumentenspezifische Farben */
@@ -170,7 +191,7 @@ h1, h2 {
     cursor: pointer;
 }
 
-/* Timeline Container */
+/* Timeline */
 .timeline-container {
     background: var(--panel-color);
     padding: 20px;
@@ -186,30 +207,30 @@ h1, h2 {
     background: #222;
     padding: 10px;
     border-radius: 6px;
-    min-height: 220px;
+    min-height: 250px;
     position: relative;
 }
 
+/* Dragover-Zustand für Spuren */
 .track-row {
-    height: 54px;
+    height: 55px;
     background: #2a2a2a;
     border-radius: 4px;
     position: relative;
     box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
-    border: 2px dashed transparent;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background 0.15s ease;
 }
 
 .track-row.drag-over {
-    background: #3a3a3a;
-    border-color: var(--accent-color);
+    background: #3a4a3a;
+    border: 1px dashed var(--accent-color);
 }
 
 /* Audio Blöcke */
 .audio-block {
     position: absolute;
-    height: 44px;
-    top: 3px;
+    height: 46px;
+    top: 4px;
     background: #555;
     color: white;
     border-radius: 4px;
@@ -217,13 +238,11 @@ h1, h2 {
     align-items: center;
     justify-content: center;
     font-size: 0.8em;
-    cursor: move;
+    cursor: pointer;
     user-select: none;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.1);
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 .audio-block.selected {
@@ -242,7 +261,7 @@ h1, h2 {
     z-index: 10;
 }
 
-/* Edit Menü (Modal Popup) */
+/* Edit Menü Modal */
 .modal {
     display: none;
     position: fixed;
@@ -254,34 +273,22 @@ h1, h2 {
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     z-index: 100;
-    min-width: 300px;
+    min-width: 280px;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #444;
-    padding-bottom: 8px;
-}
-
-.modal-close-x {
-    background: none;
-    border: none;
-    color: #aaa;
-    font-size: 1.5em;
-    cursor: pointer;
-}
-
-.modal-close-x:hover {
-    color: white;
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 99;
 }
 
 .modal label {
     display: block;
     margin-bottom: 2px;
     font-size: 0.9em;
-    margin-top: 14px;
+    margin-top: 12px;
 }
 
 .modal input, .modal select {
@@ -289,21 +296,15 @@ h1, h2 {
     margin-bottom: 2px;
 }
 
-.value-display {
-    font-size: 0.85em; 
-    color: var(--accent-color);
-    font-weight: bold;
-}
-
 .modal-buttons {
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    margin-top: 25px;
+    margin-top: 20px;
 }
 
 .modal-btn {
-    padding: 8px 16px;
+    padding: 8px 14px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
