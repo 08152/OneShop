@@ -1,13 +1,13 @@
 {
-  "name": "live-chat",
-  "version": "1.0.0",
-  "description": "Einfacher Live-Chat",
+  "name": "render-hacker-diary",
+  "version": "2.5.0",
+  "description": "Live Terminal Diary für Render.com",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.7.5"
   }
 }
