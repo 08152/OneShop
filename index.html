@@ -12,22 +12,27 @@
             --term-dark: #051a05;
         }
 
-        body {
+        * {
+            box-sizing: border-box;
+        }
+
+        body, html {
             background-color: var(--bg-color);
             color: var(--term-green);
             font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
             margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
         }
 
         #terminal {
-            max-width: 900px;
-            margin: 0 auto;
-            border: 2px solid var(--term-green);
+            width: 100vw;
+            height: 100vh;
+            border: none;
             background-color: var(--term-dark);
             padding: 20px;
-            box-shadow: 0 0 20px rgba(51, 255, 51, 0.2);
-            min-height: 80vh;
+            box-shadow: none;
             display: flex;
             flex-direction: column;
         }
@@ -38,6 +43,18 @@
             margin-bottom: 20px;
             white-space: pre-wrap;
             word-wrap: break-word;
+            padding-right: 10px;
+        }
+
+        #output::-webkit-scrollbar {
+            width: 8px;
+        }
+        #output::-webkit-scrollbar-track {
+            background: var(--term-dark);
+        }
+        #output::-webkit-scrollbar-thumb {
+            background: var(--term-dim);
+            border-radius: 4px;
         }
 
         .log-entry {
@@ -55,7 +72,7 @@
         #auth-zone, #write-zone, #admin-zone {
             border-top: 2px dashed var(--term-green);
             padding-top: 20px;
-            margin-top: auto;
+            flex-shrink: 0;
         }
 
         #write-zone, #admin-zone {
@@ -64,12 +81,13 @@
 
         .input-line {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .prompt {
             margin-right: 10px;
             white-space: nowrap;
+            line-height: 1.2;
         }
 
         input[type="text"], input[type="password"], textarea {
@@ -80,11 +98,13 @@
             font-size: 1em;
             outline: none;
             width: 100%;
+            caret-color: transparent;
         }
 
         textarea {
             resize: none;
-            height: 100px;
+            height: 80px;
+            line-height: 1.2;
         }
 
         #live-preview {
@@ -93,6 +113,8 @@
             min-height: 20px;
             white-space: pre-wrap;
             position: relative;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
 
         #live-preview::after {
@@ -100,9 +122,10 @@
             background: var(--term-green);
             color: var(--term-green);
             display: inline-block;
-            width: 10px;
+            width: 12px;
+            height: 18px;
             margin-left: 2px;
-            animation: none;
+            vertical-align: middle;
         }
 
         .btn {
@@ -179,7 +202,7 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    const socket = io('https://oneshop-1.onrender.com');
+    const socket = io('https://onrender.com');
 
     const authZone = document.getElementById('auth-zone');
     const writeZone = document.getElementById('write-zone');
