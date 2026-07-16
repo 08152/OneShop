@@ -1,7 +1,6 @@
 {
-  "name": "mini-ki-v1-1",
+  "name": "miniki-v1-1",
   "version": "1.1.0",
-  "description": "Eigene kleine KI mit JSON Datenmodell",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
