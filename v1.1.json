@@ -1,55 +1,87 @@
 {
   "name": "MiniKI",
   "version": "1.1",
-  "description": "Eigenes KI-Wissensmodell",
+  "type": "generative_knowledge",
 
   "knowledge": [
     {
-      "question": "hallo",
-      "answer": "Hallo! Ich bin MiniKI v1.1. Wie kann ich dir helfen?"
+      "topic": "webseite",
+      "keywords": [
+        "html",
+        "css",
+        "javascript",
+        "webseite",
+        "website"
+      ],
+      "concepts": [
+        "HTML erstellt die Struktur einer Webseite.",
+        "CSS gestaltet das Aussehen einer Webseite.",
+        "JavaScript macht Webseiten interaktiv."
+      ],
+      "templates": [
+        "Eine Webseite besteht aus {0}, {1} und {2}.",
+        "Um eine Webseite zu bauen, nutzt man {0}, {1} und {2}."
+      ]
     },
+
     {
-      "question": "wer bist du",
-      "answer": "Ich bin MiniKI, eine eigene KI mit einem JSON-Wissensmodell und Server."
+      "topic": "computer",
+      "keywords": [
+        "computer",
+        "pc",
+        "rechner"
+      ],
+      "concepts": [
+        "Ein Computer verarbeitet Daten.",
+        "Ein Computer besteht aus Hardware und Software.",
+        "Programme geben dem Computer Aufgaben."
+      ],
+      "templates": [
+        "Ein Computer {0} Außerdem {1}"
+      ]
     },
+
     {
-      "question": "was kannst du",
-      "answer": "Ich kann Fragen beantworten, Daten speichern und mit neuen Informationen erweitert werden."
-    },
-    {
-      "question": "html",
-      "answer": "HTML erstellt die Struktur einer Webseite. CSS macht das Design und JavaScript die Funktionen."
-    },
-    {
-      "question": "javascript",
-      "answer": "JavaScript macht Webseiten interaktiv und kann auch Server mit Node.js erstellen."
-    },
-    {
-      "question": "node",
-      "answer": "Node.js ermöglicht es, JavaScript auf Servern auszuführen."
-    },
-    {
-      "question": "render",
-      "answer": "Render ist eine Plattform, auf der Webserver und Anwendungen online gehostet werden können."
-    },
-    {
-      "question": "ki",
-      "answer": "Eine KI verarbeitet Informationen und erzeugt Antworten anhand von Daten und Modellen."
-    },
-    {
-      "question": "lernen",
-      "answer": "Ich kann neue Antworten in meinem Speicher speichern, wenn ein Lernsystem aktiviert ist."
-    },
-    {
-      "question": "musik",
-      "answer": "Ich kann bei Ideen für Songs, Beats, Texte und Musikproduktion helfen."
+      "topic": "musik",
+      "keywords": [
+        "musik",
+        "beat",
+        "song"
+      ],
+      "concepts": [
+        "Musik besteht aus Rhythmus, Melodie und Klang.",
+        "Ein Beat gibt einem Song das Tempo.",
+        "Sounds können zu Liedern kombiniert werden."
+      ],
+      "templates": [
+        "Musik entsteht durch {0} und {1}.",
+        "Ein Song braucht {0}."
+      ]
     }
   ],
 
-  "settings": {
-    "language": "de",
-    "learning": true,
-    "memory": true,
-    "model_type": "JSON Knowledge Model"
+
+  "generator": {
+
+    "enabled": true,
+
+    "method": [
+      "keyword_match",
+      "concept_mix",
+      "template_fill"
+    ],
+
+    "max_concepts": 3
+  },
+
+
+  "learning": {
+
+    "enabled": true,
+
+    "save_new_answers": true,
+
+    "memory_file": "memory.json"
+
   }
 }
