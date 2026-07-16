@@ -58,6 +58,148 @@
         "Ein Song braucht {0}."
       ]
     }
+    [
+    [
+{
+"topic":"minecraft",
+"keywords":["minecraft","block","crafting","creeper"],
+"concepts":[
+"Minecraft ist ein Sandbox-Spiel mit einer Welt aus Blöcken.",
+"Spieler können bauen, abbauen und Gegenstände herstellen.",
+"Die Welt besitzt viele Biome mit unterschiedlichen Landschaften."
+],
+"templates":[
+"Minecraft ist {0}. Außerdem kann man {1}.",
+"In Minecraft kann man {0} und {1}."
+]
+},
+
+{
+"topic":"tiere",
+"keywords":["tier","hund","katze","natur"],
+"concepts":[
+"Tiere leben in verschiedenen Umgebungen.",
+"Viele Tiere haben besondere Fähigkeiten.",
+"Menschen können Tiere als Haustiere halten."
+],
+"templates":[
+"Tiere sind {0}. Außerdem können sie {1}.",
+"In der Tierwelt gibt es {0} und {1}."
+]
+},
+
+{
+"topic":"weltraum",
+"keywords":["planet","stern","rakete","universum"],
+"concepts":[
+"Der Weltraum enthält viele Planeten und Sterne.",
+"Raketen ermöglichen Reisen ins All.",
+"Forscher untersuchen fremde Galaxien."
+],
+"templates":[
+"Der Weltraum ist {0}. Außerdem kann man {1}.",
+"Im Universum gibt es {0} und {1}."
+]
+},
+
+{
+"topic":"programmieren",
+"keywords":["code","programm","software","entwickler"],
+"concepts":[
+"Programmieren erstellt Anweisungen für Computer.",
+"Code kann Spiele und Anwendungen erschaffen.",
+"Programmiersprachen besitzen eigene Regeln."
+],
+"templates":[
+"Programmieren bedeutet {0}. Außerdem kann man {1}.",
+"Mit Code kann man {0} und {1}."
+]
+},
+
+{
+"topic":"roblox",
+"keywords":["roblox","spiel","studio","avatar"],
+"concepts":[
+"Roblox ist eine Plattform für viele Spiele.",
+"Spieler können eigene Welten erstellen.",
+"Avatare können angepasst werden."
+],
+"templates":[
+"Roblox ist {0}. Außerdem können Spieler {1}.",
+"Bei Roblox kann man {0} und {1}."
+]
+},
+
+{
+"topic":"fortnite",
+"keywords":["fortnite","battle royale","bauen","map"],
+"concepts":[
+"Fortnite ist ein Online-Spiel mit verschiedenen Modi.",
+"Spieler können bauen und kämpfen.",
+"Benutzer erstellen eigene Karten."
+],
+"templates":[
+"Fortnite ist {0}. Außerdem kann man {1}.",
+"In Fortnite gibt es {0} und {1}."
+]
+},
+
+{
+"topic":"ki",
+"keywords":["ki","lernen","daten","modell"],
+"concepts":[
+"Künstliche Intelligenz verarbeitet Informationen.",
+"KI kann Muster in Daten erkennen.",
+"Modelle können Aufgaben automatisch lösen."
+],
+"templates":[
+"KI ist {0}. Außerdem kann sie {1}.",
+"Künstliche Intelligenz kann {0} und {1}."
+]
+},
+
+{
+"topic":"autos",
+"keywords":["auto","motor","fahrzeug","straße"],
+"concepts":[
+"Autos transportieren Menschen und Güter.",
+"Motoren erzeugen die Bewegung eines Fahrzeugs.",
+"Moderne Fahrzeuge besitzen viele Technologien."
+],
+"templates":[
+"Autos sind {0}. Außerdem können sie {1}.",
+"Ein Fahrzeug besitzt {0} und {1}."
+]
+},
+
+{
+"topic":"garten",
+"keywords":["pflanze","blume","erde","gemüse"],
+"concepts":[
+"Pflanzen wachsen mit Wasser und Licht.",
+"Gärten können Gemüse und Blumen enthalten.",
+"Menschen pflegen Pflanzen regelmäßig."
+],
+"templates":[
+"Ein Garten ist {0}. Außerdem kann man {1}.",
+"Im Garten findet man {0} und {1}."
+]
+},
+
+{
+"topic":"kochen",
+"keywords":["essen","rezept","küche","zutaten"],
+"concepts":[
+"Kochen verbindet verschiedene Zutaten.",
+"Rezepte erklären die Zubereitung von Speisen.",
+"Küchen verwenden viele Werkzeuge."
+],
+"templates":[
+"Kochen ist {0}. Außerdem kann man {1}.",
+"Beim Kochen gibt es {0} und {1}."
+]
+}
+]
   ],
 
 
