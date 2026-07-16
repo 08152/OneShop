@@ -1,0 +1,55 @@
+{
+  "name": "MiniKI",
+  "version": "1.1",
+  "description": "Eigenes KI-Wissensmodell",
+
+  "knowledge": [
+    {
+      "question": "hallo",
+      "answer": "Hallo! Ich bin MiniKI v1.1. Wie kann ich dir helfen?"
+    },
+    {
+      "question": "wer bist du",
+      "answer": "Ich bin MiniKI, eine eigene KI mit einem JSON-Wissensmodell und Server."
+    },
+    {
+      "question": "was kannst du",
+      "answer": "Ich kann Fragen beantworten, Daten speichern und mit neuen Informationen erweitert werden."
+    },
+    {
+      "question": "html",
+      "answer": "HTML erstellt die Struktur einer Webseite. CSS macht das Design und JavaScript die Funktionen."
+    },
+    {
+      "question": "javascript",
+      "answer": "JavaScript macht Webseiten interaktiv und kann auch Server mit Node.js erstellen."
+    },
+    {
+      "question": "node",
+      "answer": "Node.js ermöglicht es, JavaScript auf Servern auszuführen."
+    },
+    {
+      "question": "render",
+      "answer": "Render ist eine Plattform, auf der Webserver und Anwendungen online gehostet werden können."
+    },
+    {
+      "question": "ki",
+      "answer": "Eine KI verarbeitet Informationen und erzeugt Antworten anhand von Daten und Modellen."
+    },
+    {
+      "question": "lernen",
+      "answer": "Ich kann neue Antworten in meinem Speicher speichern, wenn ein Lernsystem aktiviert ist."
+    },
+    {
+      "question": "musik",
+      "answer": "Ich kann bei Ideen für Songs, Beats, Texte und Musikproduktion helfen."
+    }
+  ],
+
+  "settings": {
+    "language": "de",
+    "learning": true,
+    "memory": true,
+    "model_type": "JSON Knowledge Model"
+  }
+}
