@@ -1,229 +1,257 @@
 {
-  "name": "MiniKI",
-  "version": "1.1",
+  "name": "MiniKI_Test",
+  "version": "1.0",
   "type": "generative_knowledge",
 
   "knowledge": [
     {
-      "topic": "webseite",
+      "topic": "hunde",
       "keywords": [
-        "html",
-        "css",
-        "javascript",
-        "webseite",
-        "website"
+        "hund",
+        "hunde",
+        "welpe"
       ],
       "concepts": [
-        "HTML erstellt die Struktur einer Webseite.",
-        "CSS gestaltet das Aussehen einer Webseite.",
-        "JavaScript macht Webseiten interaktiv."
+        "Hunde sind Haustiere.",
+        "Hunde können Menschen begleiten.",
+        "Viele Hunde lernen Tricks."
       ],
       "templates": [
-        "Eine Webseite besteht aus {0}, {1} und {2}.",
-        "Um eine Webseite zu bauen, nutzt man {0}, {1} und {2}."
+        "Ein Hund ist {0}. Außerdem kann er {1}.",
+        "Hunde können {0} und {1}."
       ]
     },
 
     {
-      "topic": "computer",
+      "topic": "autos",
       "keywords": [
-        "computer",
-        "pc",
-        "rechner"
+        "auto",
+        "fahrzeug",
+        "motor"
       ],
       "concepts": [
-        "Ein Computer verarbeitet Daten.",
-        "Ein Computer besteht aus Hardware und Software.",
-        "Programme geben dem Computer Aufgaben."
+        "Autos transportieren Menschen.",
+        "Ein Motor erzeugt Bewegung.",
+        "Fahrzeuge nutzen verschiedene Technologien."
       ],
       "templates": [
-        "Ein Computer {0} Außerdem {1}"
+        "Ein Auto ist {0}. Außerdem besitzt es {1}.",
+        "Fahrzeuge können {0} und {1}."
       ]
     },
 
     {
-      "topic": "musik",
+      "topic": "spiele",
       "keywords": [
-        "musik",
-        "beat",
-        "song"
+        "spiel",
+        "gaming",
+        "computer"
       ],
       "concepts": [
-        "Musik besteht aus Rhythmus, Melodie und Klang.",
-        "Ein Beat gibt einem Song das Tempo.",
-        "Sounds können zu Liedern kombiniert werden."
+        "Spiele bieten Unterhaltung.",
+        "Computer können Spiele ausführen.",
+        "Spieler können virtuelle Welten erkunden."
       ],
       "templates": [
-        "Musik entsteht durch {0} und {1}.",
-        "Ein Song braucht {0}."
+        "Ein Spiel ist {0}. Außerdem kann man {1}.",
+        "Gaming bedeutet {0} und {1}."
       ]
     }
-    [
-    [
-{
-"topic":"minecraft",
-"keywords":["minecraft","block","crafting","creeper"],
-"concepts":[
-"Minecraft ist ein Sandbox-Spiel mit einer Welt aus Blöcken.",
-"Spieler können bauen, abbauen und Gegenstände herstellen.",
-"Die Welt besitzt viele Biome mit unterschiedlichen Landschaften."
-],
-"templates":[
-"Minecraft ist {0}. Außerdem kann man {1}.",
-"In Minecraft kann man {0} und {1}."
-]
+    {
+  "topic": "musik",
+  "keywords": [
+    "musik",
+    "lied",
+    "song",
+    "ton"
+  ],
+  "concepts": [
+    "Musik kann Gefühle ausdrücken.",
+    "Songs bestehen aus Melodie und Rhythmus.",
+    "Menschen hören Musik zur Unterhaltung."
+  ],
+  "templates": [
+    "Musik ist {0}. Außerdem kann man {1}.",
+    "Ein Song besteht aus {0} und {1}."
+  ]
 },
-
 {
-"topic":"tiere",
-"keywords":["tier","hund","katze","natur"],
-"concepts":[
-"Tiere leben in verschiedenen Umgebungen.",
-"Viele Tiere haben besondere Fähigkeiten.",
-"Menschen können Tiere als Haustiere halten."
-],
-"templates":[
-"Tiere sind {0}. Außerdem können sie {1}.",
-"In der Tierwelt gibt es {0} und {1}."
-]
+  "topic": "tiere",
+  "keywords": [
+    "tier",
+    "hund",
+    "katze",
+    "natur"
+  ],
+  "concepts": [
+    "Tiere leben in verschiedenen Lebensräumen.",
+    "Viele Tiere haben besondere Fähigkeiten.",
+    "Menschen kümmern sich um Haustiere."
+  ],
+  "templates": [
+    "Ein Tier ist {0}. Es kann außerdem {1}.",
+    "Tiere leben in {0} und können {1}."
+  ]
 },
-
 {
-"topic":"weltraum",
-"keywords":["planet","stern","rakete","universum"],
-"concepts":[
-"Der Weltraum enthält viele Planeten und Sterne.",
-"Raketen ermöglichen Reisen ins All.",
-"Forscher untersuchen fremde Galaxien."
-],
-"templates":[
-"Der Weltraum ist {0}. Außerdem kann man {1}.",
-"Im Universum gibt es {0} und {1}."
-]
+  "topic": "weltraum",
+  "keywords": [
+    "weltall",
+    "planet",
+    "stern",
+    "universum"
+  ],
+  "concepts": [
+    "Das Universum enthält viele Planeten und Sterne.",
+    "Die Erde ist ein Planet im Sonnensystem.",
+    "Forscher untersuchen den Weltraum."
+  ],
+  "templates": [
+    "Der Weltraum ist {0}. Dort gibt es {1}.",
+    "Ein Planet ist {0} und kann {1}."
+  ]
 },
-
 {
-"topic":"programmieren",
-"keywords":["code","programm","software","entwickler"],
-"concepts":[
-"Programmieren erstellt Anweisungen für Computer.",
-"Code kann Spiele und Anwendungen erschaffen.",
-"Programmiersprachen besitzen eigene Regeln."
-],
-"templates":[
-"Programmieren bedeutet {0}. Außerdem kann man {1}.",
-"Mit Code kann man {0} und {1}."
-]
+  "topic": "computer",
+  "keywords": [
+    "pc",
+    "computer",
+    "hardware",
+    "software"
+  ],
+  "concepts": [
+    "Computer verarbeiten Informationen.",
+    "Hardware sind die Bauteile eines Computers.",
+    "Software sind Programme für Geräte."
+  ],
+  "templates": [
+    "Ein Computer kann {0}. Er benutzt {1}.",
+    "Software ist {0} und Hardware ist {1}."
+  ]
 },
-
 {
-"topic":"roblox",
-"keywords":["roblox","spiel","studio","avatar"],
-"concepts":[
-"Roblox ist eine Plattform für viele Spiele.",
-"Spieler können eigene Welten erstellen.",
-"Avatare können angepasst werden."
-],
-"templates":[
-"Roblox ist {0}. Außerdem können Spieler {1}.",
-"Bei Roblox kann man {0} und {1}."
-]
+  "topic": "sport",
+  "keywords": [
+    "sport",
+    "training",
+    "fussball",
+    "laufen"
+  ],
+  "concepts": [
+    "Sport verbessert die Fitness.",
+    "Training hilft Menschen besser zu werden.",
+    "Teams arbeiten gemeinsam für ein Ziel."
+  ],
+  "templates": [
+    "Sport ist {0}. Außerdem kann man {1}.",
+    "Training bedeutet {0} und {1}."
+  ]
 },
-
 {
-"topic":"fortnite",
-"keywords":["fortnite","battle royale","bauen","map"],
-"concepts":[
-"Fortnite ist ein Online-Spiel mit verschiedenen Modi.",
-"Spieler können bauen und kämpfen.",
-"Benutzer erstellen eigene Karten."
-],
-"templates":[
-"Fortnite ist {0}. Außerdem kann man {1}.",
-"In Fortnite gibt es {0} und {1}."
-]
+  "topic": "essen",
+  "keywords": [
+    "essen",
+    "kochen",
+    "lebensmittel",
+    "gerichte"
+  ],
+  "concepts": [
+    "Essen gibt dem Körper Energie.",
+    "Kochen verändert Zutaten zu Gerichten.",
+    "Menschen essen verschiedene Speisen."
+  ],
+  "templates": [
+    "Essen ist {0}. Man kann außerdem {1}.",
+    "Kochen bedeutet {0} und {1}."
+  ]
 },
-
 {
-"topic":"ki",
-"keywords":["ki","lernen","daten","modell"],
-"concepts":[
-"Künstliche Intelligenz verarbeitet Informationen.",
-"KI kann Muster in Daten erkennen.",
-"Modelle können Aufgaben automatisch lösen."
-],
-"templates":[
-"KI ist {0}. Außerdem kann sie {1}.",
-"Künstliche Intelligenz kann {0} und {1}."
-]
+  "topic": "natur",
+  "keywords": [
+    "wald",
+    "pflanzen",
+    "umwelt",
+    "natur"
+  ],
+  "concepts": [
+    "Die Natur umfasst Pflanzen und Tiere.",
+    "Wälder sind wichtige Lebensräume.",
+    "Menschen sollten die Umwelt schützen."
+  ],
+  "templates": [
+    "Die Natur ist {0}. Sie bietet {1}.",
+    "Umwelt bedeutet {0} und {1}."
+  ]
 },
-
 {
-"topic":"autos",
-"keywords":["auto","motor","fahrzeug","straße"],
-"concepts":[
-"Autos transportieren Menschen und Güter.",
-"Motoren erzeugen die Bewegung eines Fahrzeugs.",
-"Moderne Fahrzeuge besitzen viele Technologien."
-],
-"templates":[
-"Autos sind {0}. Außerdem können sie {1}.",
-"Ein Fahrzeug besitzt {0} und {1}."
-]
+  "topic": "technik",
+  "keywords": [
+    "technik",
+    "maschine",
+    "gerät",
+    "innovation"
+  ],
+  "concepts": [
+    "Technik hilft Menschen im Alltag.",
+    "Maschinen können Aufgaben übernehmen.",
+    "Neue Erfindungen verändern die Welt."
+  ],
+  "templates": [
+    "Technik ist {0}. Sie kann {1}.",
+    "Eine Maschine ist {0} und hilft bei {1}."
+  ]
 },
-
 {
-"topic":"garten",
-"keywords":["pflanze","blume","erde","gemüse"],
-"concepts":[
-"Pflanzen wachsen mit Wasser und Licht.",
-"Gärten können Gemüse und Blumen enthalten.",
-"Menschen pflegen Pflanzen regelmäßig."
-],
-"templates":[
-"Ein Garten ist {0}. Außerdem kann man {1}.",
-"Im Garten findet man {0} und {1}."
-]
+  "topic": "schule",
+  "keywords": [
+    "lernen",
+    "schule",
+    "unterricht",
+    "wissen"
+  ],
+  "concepts": [
+    "Schule vermittelt Wissen.",
+    "Lernen verbessert Fähigkeiten.",
+    "Unterricht hilft beim Verstehen neuer Themen."
+  ],
+  "templates": [
+    "Schule ist {0}. Dort kann man {1}.",
+    "Lernen bedeutet {0} und {1}."
+  ]
 },
-
 {
-"topic":"kochen",
-"keywords":["essen","rezept","küche","zutaten"],
-"concepts":[
-"Kochen verbindet verschiedene Zutaten.",
-"Rezepte erklären die Zubereitung von Speisen.",
-"Küchen verwenden viele Werkzeuge."
-],
-"templates":[
-"Kochen ist {0}. Außerdem kann man {1}.",
-"Beim Kochen gibt es {0} und {1}."
-]
+  "topic": "programmieren",
+  "keywords": [
+    "code",
+    "programmieren",
+    "javascript",
+    "html"
+  ],
+  "concepts": [
+    "Programmieren erstellt digitale Anwendungen.",
+    "Code besteht aus Befehlen für Computer.",
+    "Entwickler bauen Webseiten und Programme."
+  ],
+  "templates": [
+    "Programmieren ist {0}. Man kann damit {1}.",
+    "Code bedeutet {0} und ermöglicht {1}."
+  ]
 }
-]
   ],
 
-
   "generator": {
-
     "enabled": true,
-
     "method": [
       "keyword_match",
       "concept_mix",
       "template_fill"
     ],
-
-    "max_concepts": 3
+    "max_concepts": 2
   },
 
-
   "learning": {
-
     "enabled": true,
-
     "save_new_answers": true,
-
     "memory_file": "memory.json"
-
   }
 }
