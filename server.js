@@ -2,43 +2,150 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 
+
 const app = express();
+
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static("./"));
 
-let model = JSON.parse(
+
+// KI Daten laden
+
+let aiData = JSON.parse(
     fs.readFileSync("v1.1.json", "utf8")
 );
 
 
-app.post("/api/chat", (req,res)=>{
 
-    let input = req.body.message
-        .toLowerCase();
+function loadMemory(){
 
-    let answer =
-    "Ich kenne diese Information noch nicht.";
+    return JSON.parse(
+        fs.readFileSync("memory.json","utf8")
+    );
 
-    for(let item of model.knowledge){
+}
 
-        if(input.includes(item.question)){
-            answer=item.answer;
-            break;
-        }
 
-    }
 
+function saveMemory(data){
+
+    fs.writeFileSync(
+        "memory.json",
+        JSON.stringify(data,null,2)
+    );
+
+}
+
+
+
+
+app.get("/api/status",(req,res)=>{
 
     res.json({
-        ai:"MiniKI v1.1",
-        answer:answer
+        online:true,
+        version:"MiniKI v1.1"
     });
 
 });
 
 
-app.listen(3000,()=>{
-    console.log("MiniKI läuft auf Port 3000");
+
+
+
+app.post("/api/chat",(req,res)=>{
+
+
+    let question =
+    req.body.message.toLowerCase();
+
+
+
+    let answer =
+    "Das weiß ich noch nicht.";
+
+
+
+    // Hauptmodell
+
+    for(let item of aiData.knowledge){
+
+        if(question.includes(item.question)){
+
+            answer=item.answer;
+
+        }
+
+    }
+
+
+
+
+    // Speicher durchsuchen
+
+    let memory=loadMemory();
+
+
+    for(let item of memory.knowledge){
+
+        if(question.includes(item.question)){
+
+            answer=item.answer;
+
+        }
+
+    }
+
+
+
+
+
+    // Lernen
+
+    if(req.body.learn){
+
+
+        memory.knowledge.push({
+
+            question:question,
+            answer:req.body.learn
+
+        });
+
+
+        saveMemory(memory);
+
+
+        answer="Gespeichert. Ich habe das gelernt.";
+
+    }
+
+
+
+
+    res.json({
+
+        ai:"MiniKI v1.1",
+        answer:answer
+
+    });
+
+
 });
+
+
+
+
+
+app.listen(
+
+process.env.PORT || 3000,
+
+()=>{
+
+console.log("MiniKI läuft");
+
+}
+
+);
