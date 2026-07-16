@@ -3,397 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Terminal Diary</title>
+    <title>3D Infinite Model Game</title>
     <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --term-green: #33ff33;
-            --term-dim: #11aa11;
-            --term-dark: #051a05;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body, html {
-            background-color: var(--bg-color);
-            color: var(--term-green);
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        #terminal {
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--term-dark);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #output {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            padding-right: 10px;
-        }
-
-        #output::-webkit-scrollbar {
-            width: 8px;
-        }
-        #output::-webkit-scrollbar-track {
-            background: var(--term-dark);
-        }
-        #output::-webkit-scrollbar-thumb {
-            background: var(--term-dim);
-            border-radius: 4px;
-        }
-
-        .log-entry {
-            border-bottom: 1px dashed var(--term-dim);
-            padding: 10px 0;
-            margin-bottom: 10px;
-        }
-
-        .meta {
-            color: var(--term-dim);
-            font-size: 0.85em;
-            margin-bottom: 5px;
-        }
-
-        #input-container {
-            border-top: 2px dashed var(--term-green);
-            padding-top: 20px;
-            flex-shrink: 0;
-        }
-
-        .input-line {
-            display: flex;
-            align-items: flex-start;
-            position: relative;
-            width: 100%;
-        }
-
-        .prompt {
-            margin-right: 10px;
-            white-space: nowrap;
-            line-height: 1.2;
-            flex-shrink: 0;
-        }
-
-        .input-wrapper {
-            position: relative;
-            flex-grow: 1;
-        }
-
-        input[type="password"], textarea {
-            background: transparent;
-            border: none;
-            color: var(--term-green);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1em;
-            outline: none;
-            width: 100%;
-            caret-color: transparent;
-            margin: 0;
-            padding: 0;
-            line-height: 1.2;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        textarea {
-            resize: none;
-            height: 80px;
-        }
-
-        .block-cursor {
-            position: absolute;
-            background: var(--term-green);
-            width: 12px;
-            height: 18px;
-            pointer-events: none;
-            display: block;
-        }
-
-        #hidden-measure {
-            position: absolute;
-            visibility: hidden;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1em;
-            line-height: 1.2;
-            top: 0;
-            left: 0;
-        }
-
-        #viewer-live {
-            color: #ffff33;
-            font-style: italic;
-            border-top: 1px dashed #ffff33;
-            padding-top: 10px;
-            margin-top: 10px;
-            min-height: 25px;
-            display: none;
-        }
-
-        #admin-zone {
-            border-top: 2px dashed var(--term-green);
-            padding-top: 20px;
-            flex-shrink: 0;
-            display: none;
-            max-height: 40vh;
-            overflow-y: auto;
-        }
-
-        .admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--term-dim);
-            padding: 8px 0;
-        }
-
-        .admin-text {
-            max-width: 70%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .delete-btn {
-            background: #200000;
-            border: 1px solid #ff3333;
-            color: #ff3333;
-            padding: 2px 8px;
-            cursor: pointer;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        .delete-btn:hover {
-            background: #ff3333;
-            color: #000000;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.5; }
+        #instructions { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; cursor: pointer; }
     </style>
+    <!-- Three.js und GLTFLoader via CDN -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
-<div id="terminal">
-    <div id="output"></div>
-
-    <div id="hidden-measure"></div>
-
-    <div id="input-container">
-        <!-- Auth Zone -->
-        <div class="input-line" id="auth-zone">
-            <span class="prompt">CLEARANCE_CODE ></span>
-            <div class="input-wrapper">
-                <input type="password" id="clearance-input" autofocus autocomplete="off">
-                <div id="auth-cursor" class="block-cursor"></div>
-            </div>
-        </div>
-
-        <!-- Write Zone -->
-        <div class="input-line" id="write-zone" style="display: none;">
-            <span class="prompt">INPUT_LOG ></span>
-            <div class="input-wrapper">
-                <textarea id="log-input" placeholder="Schreibe direkt im Terminal... (STRG+ENTER speichert, /clear setzt zurück)"></textarea>
-                <div id="write-cursor" class="block-cursor"></div>
-            </div>
-        </div>
-
-        <!-- Live-Anzeige für Zuschauer -->
-        <div id="viewer-live"></div>
+    <div id="crosshair"></div>
+    <div id="instructions">
+        <h1>Klicke zum Spielen</h1>
+        <p>W, A, S, D = Bewegen<br>Maus = Umsehen<br>ESC = Pause</p>
     </div>
 
-    <!-- Admin Control Zone -->
-    <div id="admin-zone">
-        <div style="color: #ff3333; margin-bottom: 15px;">--- ADMIN CONTROL PANEL (RISKY_DELETE) ---</div>
-        <div id="admin-list"></div>
-    </div>
-</div>
+    <script>
+        // --- CONFIGURATION ---
+        const CHUNK_SIZE = 100;       // Größe eines quadratischen Chunks
+        const RENDER_DISTANCE = 2;   // Wie viele Chunks in jede Richtung laden (2 = 5x5 Chunks Sichtweite)
+        const MODELS_PER_CHUNK = 15;  // Wie viele Modell-Kopien pro Chunk platziert werden
+        const MOVE_SPEED = 30;       // Bewegungsgeschwindigkeit des Spielers
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io('https://onrender.com');
-
-    const authZone = document.getElementById('auth-zone');
-    const writeZone = document.getElementById('write-zone');
-    const adminZone = document.getElementById('admin-zone');
-    const clearanceInput = document.getElementById('clearance-input');
-    const logInput = document.getElementById('log-input');
-    const output = document.getElementById('output');
-    const viewerLive = document.getElementById('viewer-live');
-    const adminList = document.getElementById('admin-list');
-    
-    const authCursor = document.getElementById('auth-cursor');
-    const writeCursor = document.getElementById('write-cursor');
-    const hiddenMeasure = document.getElementById('hidden-measure');
-
-    let allEntries = [];
-    let isAuthor = false;
-
-    function trackCursor(inputEl, cursorEl) {
-        const text = inputEl.value;
-        hiddenMeasure.style.width = inputEl.clientWidth + 'px';
+        // --- GAME STATE ---
+        let scene, camera, renderer, clock;
+        let originalModelMesh = null;
+        let activeChunks = new Map(); // Speichert geladene Chunks: "x,z" -> InstancedMesh
         
-        hiddenMeasure.textContent = text;
-        
-        const span = document.createElement('span');
-        span.textContent = 'X';
-        hiddenMeasure.appendChild(span);
-        
-        cursorEl.style.left = span.offsetLeft + 'px';
-        cursorEl.style.top = span.offsetTop + 'px';
-        hiddenMeasure.removeChild(span);
-    }
+        // Controls state
+        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+        let yaw = 0, pitch = 0;
+        const player = { pos: new THREE.Vector3(0, 2, 0) }; // Startposition (Y=2 ist Augenhöhe)
 
-    clearanceInput.addEventListener('input', (e) => {
-        trackCursor(clearanceInput, authCursor);
-        const val = e.target.value.trim();
-        if (val === 'Risky_Live') {
-            isAuthor = true;
-            authZone.style.display = 'none';
-            adminZone.style.display = 'none';
-            viewerLive.style.display = 'none';
-            writeZone.style.display = 'flex';
-            
-            const savedBuffer = localStorage.getItem('diary_buffer');
-            if (savedBuffer) {
-                logInput.value = savedBuffer;
+        const instructions = document.getElementById('instructions');
+
+        // --- POINTER LOCK (Mausfang) ---
+        instructions.addEventListener('click', () => {
+            document.body.requestPointerLock();
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === document.body) {
+                instructions.style.display = 'none';
+            } else {
+                instructions.style.display = 'block';
             }
-            logInput.focus();
-            setTimeout(() => trackCursor(logInput, writeCursor), 10);
-        } else if (val === 'Risky_Delete') {
-            isAuthor = true;
-            authZone.style.display = 'none';
-            writeZone.style.display = 'none';
-            viewerLive.style.display = 'none';
-            adminZone.style.display = 'block';
-            renderAdminList();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement !== document.body) return;
+            yaw -= e.movementX * 0.002;
+            pitch -= e.movementY * 0.002;
+            pitch = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, pitch)); // Blickwinkel limitieren
+        });
+
+        // --- KEYBOARD CONTROLS ---
+        const onKeyDown = (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = true; break;
+                case 'KeyS': moveBackward = true; break;
+                case 'KeyA': moveLeft = true; break;
+                case 'KeyD': moveRight = true; break;
+            }
+        };
+        const onKeyUp = (e) => {
+            switch (e.code) {
+                case 'KeyW': moveForward = false; break;
+                case 'KeyS': moveBackward = false; break;
+                case 'KeyA': moveLeft = false; break;
+                case 'KeyD': moveRight = false; break;
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keyup', onKeyUp);
+
+        // --- INITIALIZATION ---
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb); // Himmelblau
+            scene.fog = new THREE.FogExp2(0x87ceeb, 0.005); // Nebel gegen abruptes Aufploppen
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            clock = new THREE.Clock();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            // Licht
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(20, 40, 20);
+            scene.add(dirLight);
+
+            // Unendliche grüne Fläche (Boden-Kachel, die mit dem Spieler wandert)
+            const floorGeo = new THREE.PlaneGeometry(2000, 2000);
+            const floorMat = new THREE.MeshLambertMaterial({ color: 0x3b7a3b }); // Grün
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            scene.add(floor);
+
+            // GLB Modell laden
+            const loader = new THREE.GLTFLoader();
+            loader.load('1.glb', (gltf) => {
+                // Sucht das erste nutzbare 3D-Mesh im GLB-Modell
+                gltf.scene.traverse((child) => {
+                    if (child.isMesh && !originalModelMesh) {
+                        originalModelMesh = child;
+                    }
+                });
+
+                if (originalModelMesh) {
+                    animate(); // Spiel-Loop erst starten, wenn Modell geladen ist
+                } else {
+                    console.error("Kein Mesh in der GLB-Datei gefunden.");
+                }
+            }, undefined, (error) => {
+                console.error("Fehler beim Laden von 1.glb. Hast du einen lokalen Server aktiv?", error);
+            });
+
+            window.addEventListener('resize', onWindowResize);
         }
-    });
 
-    logInput.addEventListener('input', (e) => {
-        trackCursor(logInput, writeCursor);
-        const text = e.target.value;
-        localStorage.setItem('diary_buffer', text);
-        socket.emit('typing', { text: text });
-    });
+        // --- CHUNK ENGINE ---
+        function updateChunks() {
+            // Aktuellen Chunk des Spielers berechnen
+            const currentChunkX = Math.floor(player.pos.x / CHUNK_SIZE);
+            const currentChunkZ = Math.floor(player.pos.z / CHUNK_SIZE);
 
-    logInput.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            handleSave();
-        } else {
-            setTimeout(() => trackCursor(logInput, writeCursor), 5);
-        }
-    });
+            const visibleKeys = new Set();
 
-    logInput.addEventListener('keyup', () => trackCursor(logInput, writeCursor));
-    logInput.addEventListener('click', () => trackCursor(logInput, writeCursor));
-    logInput.addEventListener('focus', () => trackCursor(logInput, writeCursor));
-    clearanceInput.addEventListener('focus', () => trackCursor(clearanceInput, authCursor));
+            // Sichtbare Chunks generieren
+            for (let x = -RENDER_DISTANCE; x <= RENDER_DISTANCE; x++) {
+                for (let z = -RENDER_DISTANCE; z <= RENDER_DISTANCE; z++) {
+                    const chunkX = currentChunkX + x;
+                    const chunkZ = currentChunkZ + z;
+                    const key = `${chunkX},${chunkZ}`;
+                    visibleKeys.add(key);
 
-    function handleSave() {
-        const text = logInput.value;
-        if (!text) return;
+                    if (!activeChunks.has(key)) {
+                        createChunk(chunkX, chunkZ, key);
+                    }
+                }
+            }
 
-        if (text.trim() === '/clear') {
-            logInput.value = '';
-            trackCursor(logInput, writeCursor);
-            localStorage.removeItem('diary_buffer');
-            socket.emit('typing', { text: '' });
-            return;
+            // Chunks außerhalb der Sichtweite löschen (Performance-Schutz)
+            for (let [key, instancedMesh] of activeChunks.entries()) {
+                if (!visibleKeys.has(key)) {
+                    scene.remove(instancedMesh);
+                    instancedMesh.geometry.dispose();
+                    activeChunks.delete(key);
+                }
+            }
         }
 
-        socket.emit('new_entry', { text: text });
-        logInput.value = '';
-        trackCursor(logInput, writeCursor);
-        localStorage.removeItem('diary_buffer');
-    }
+        // Einen einzelnen Chunk voller Modell-Instanzen erzeugen
+        function createChunk(cx, cz, key) {
+            // InstancedMesh sorgt dafür, dass alle Kopien in EINEM einzigen Befehl gerendert werden (kein Lagg)
+            const instancedMesh = new THREE.InstancedMesh(
+                originalModelMesh.geometry,
+                originalModelMesh.material,
+                MODELS_PER_CHUNK
+            );
 
-    function formatDate(isoString) {
-        const d = new Date(isoString);
-        return d.toLocaleString('de-DE');
-    }
+            const dummy = new THREE.Object3D();
+            
+            // Pseudo-Zufall basierend auf den Chunk-Koordinaten, damit ein Chunk immer gleich aussieht
+            let seed = Math.sin(cx * 12.9898 + cz * 78.233) * 43758.5453;
+            function random() {
+                let x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
 
-    function renderLogs(entries) {
-        output.innerHTML = '';
-        entries.forEach(entry => {
-            const div = document.createElement('div');
-            div.className = 'log-entry';
-            div.innerHTML = `
-[TIMESTAMP: ${formatDate(entry.timestamp)}] [ID: ${entry.id}]
-${entry.text}
-`;
-output.appendChild(div);
-});
-output.scrollTop = output.scrollHeight;
+            for (let i = 0; i < MODELS_PER_CHUNK; i++) {
+                // Positionen innerhalb des Chunks zufällig bestimmen
+                const localX = random() * CHUNK_SIZE;
+                const localZ = random() * CHUNK_SIZE;
+                
+                const worldX = cx * CHUNK_SIZE + localX;
+                const worldZ = cz * CHUNK_SIZE + localZ;
+
+                dummy.position.set(worldX, 0, worldZ); // Auf dem Boden platzieren
+                dummy.rotation.y = random() * Math.PI * 2; // Zufällige Drehung um die eigene Achse
+                
+                // Optional: Zufällige Skalierung (z.B. zwischen 0.8 und 1.5)
+                const scale = 0.8 + random() * 0.7;
+                dummy.scale.set(scale, scale, scale);
+
+                dummy.updateMatrix();
+                instancedMesh.setMatrixAt(i, dummy.matrix);
+            }
+
+            scene.add(instancedMesh);
+            activeChunks.set(key, instancedMesh);
+        }
+
+        // --- GAME LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const delta = clock.getDelta();
+
+            if (document.pointerLockElement === document.body) {
+                // Richtungsvektoren berechnen anhand des Kamerawinkels
+                const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
+                const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize();
+
+                // Bewegung anwenden
+                if (moveForward) player.pos.addScaledVector(forward, MOVE_SPEED * delta);
+                if (moveBackward) player.pos.addScaledVector(forward, -MOVE_SPEED * delta);
+                if (moveLeft) player.pos.addScaledVector(right, -MOVE_SPEED * delta);
+                if (moveRight) player.pos.addScaledVector(right, MOVE_SPEED * delta);
+
+                // Dynamisch Chunks basierend auf neuer Position updaten
+                updateChunks();
+            }
+        // Kameraausrichtung aktualisieren
+camera.position.copy(player.pos);
+
+const target = new THREE.Vector3();
+target.x = player.pos.x + Math.sin(yaw) * Math.cos(pitch);
+target.y = player.pos.y + Math.sin(pitch);
+target.z = player.pos.z + Math.cos(yaw) * Math.cos(pitch);
+camera.lookAt(target);
+
+renderer.render(scene, camera);
 }
 
-function renderAdminList() {
-adminList.innerHTML = '';
-if (allEntries.length === 0) {
-adminList.innerHTML = 'Keine Einträge vorhanden.';
-return;
-}
-allEntries.forEach(entry => {
-const div = document.createElement('div');
-div.className = 'admin-item';
-div.innerHTML = <div class="admin-text">[${formatDate(entry.timestamp)}] ${entry.text}</div> <button class="delete-btn" onclick="deleteLog('${entry.id}')">[DELETE_LOG]</button>;
-adminList.appendChild(div);
-});
+function onWindowResize() {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-window.deleteLog = function(id) {
-if (confirm(Eintrag ${id} wirklich löschen?)) {
-socket.emit('delete_entry', id);
-}
-};
-
-socket.on('init', (entries) => {
-allEntries = entries;
-renderLogs(entries);
-if (adminZone.style.display === 'block') {
-renderAdminList();
-}
-});
-
-socket.on('entry_added', (entries) => {
-allEntries = entries;
-renderLogs(entries);
-if (adminZone.style.display === 'block') {
-renderAdminList();
-}
-});
-
-socket.on('entry_deleted', (entries) => {
-allEntries = entries;
-renderLogs(entries);
-if (adminZone.style.display === 'block') {
-renderAdminList();
-}
-});
-
-socket.on('typing', (data) => {
-if (!isAuthor) {
-if (data.text && data.text.trim().length > 0) {
-viewerLive.style.display = 'block';
-viewerLive.textContent = "USER IS TYPING LIVE: " + data.text + "█";
-} else {
-viewerLive.style.display = 'none';
-viewerLive.textContent = "";
-}
-}
-});
-
-trackCursor(clearanceInput, authCursor);
+// Start
+init();
 
