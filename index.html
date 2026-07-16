@@ -1,266 +1,383 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Chromebook Optimized Infinite 3D Game</title>
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #709cd0; font-family: sans-serif; }
-        canvas { display: block; width: 100vw; height: 100vh; }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: white; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.7; }
-        #instructions { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; background: rgba(0,0,0,0.85); padding: 25px; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 80%; }
-        #fps { position: absolute; top: 10px; left: 10px; color: #00ff00; font-family: monospace; font-size: 14px; background: rgba(0,0,0,0.5); padding: 5px; border-radius: 4px; pointer-events: none; }
-    </style>
-    <!-- Stabile Three.js Core-Bibliothek -->
-    <script src="https://cloudflare.com"></script>
-    <!-- GLTFLoader für das 1.glb Modell -->
-    <script src="https://jsdelivr.net"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Offline Beat AI</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+background:#111;
+color:#0f0;
+font-family:Arial;
+padding:20px;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+#top{
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
+margin-bottom:20px;
+}
+
+button{
+padding:12px;
+font-size:18px;
+cursor:pointer;
+background:#222;
+color:#0f0;
+border:1px solid #0f0;
+}
+
+button:hover{
+background:#0f0;
+color:#000;
+}
+
+#status{
+margin-top:15px;
+text-align:center;
+font-size:20px;
+}
+
+#playlist{
+margin-top:25px;
+border:1px solid #0f0;
+padding:10px;
+height:250px;
+overflow:auto;
+}
+
+.track{
+padding:5px;
+border-bottom:1px solid #333;
+}
+
+audio{
+width:100%;
+margin-top:4px;
+}
+
+input{
+padding:10px;
+font-size:18px;
+width:250px;
+}
+
+#timeline{
+margin-top:20px;
+height:20px;
+background:#222;
+}
+
+#playhead{
+height:20px;
+width:0%;
+background:#0f0;
+}
+
+</style>
 </head>
+
 <body>
 
-    <div id="fps">FPS: --</div>
-    <div id="crosshair"></div>
-    <div id="instructions">
-        <h2>Chromebook 3D Game</h2>
-        <p style="font-size: 14px; color: #ccc;">Klicke hier zum Starten</p>
-        <p style="margin-top: 15px;"><b>WASD</b> = Bewegen<br><b>Maus</b> = Umsehen<br><b>ESC</b> = Pause</p>
-    </div>
+<h1>Offline Beat AI</h1>
 
-    <script>
-        // --- CHROMEBOOK PERFORMANCE CONFIG ---
-        const CHUNK_SIZE = 80;        // Kleinere Chunks für schnelleres Laden
-        const RENDER_DISTANCE = 1;    // Reduziert auf 1 (3x3 Chunks). Perfekt für schwache Grafikchips!
-        const MODELS_PER_CHUNK = 8;   // Weniger Modelle gleichzeitig rendern
-        const MOVE_SPEED = 20;        // Angepasste Geschwindigkeit
+<div id="top">
 
-        // --- GAME ENGINE VARIABLES ---
-        let scene, camera, renderer, clock;
-        let originalGeometry = null;
-        let originalMaterial = null;
-        let activeChunks = new Map();
-        
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let yaw = 0, pitch = 0;
-        const player = { pos: new THREE.Vector3(0, 1.8, 0) }; // Augenhöhe auf 1.8 Meter gesetzt
+<input
+id="prompt"
+placeholder="HipHop mit Piano">
 
-        // FPS Counter Variablen
-        let lastFpsUpdate = 0;
-        let frames = 0;
-        const fpsElement = document.getElementById('fps');
-        const instructions = document.getElementById('instructions');
+<button id="generate">
+Song erstellen
+</button>
 
-        // --- POINTER LOCK (Maussteuerung aktivieren) ---
-        instructions.addEventListener('click', () => {
-            document.body.requestPointerLock();
+<button id="play">
+Play
+</button>
+
+<button id="stop">
+Stop
+</button>
+
+</div>
+
+<div id="status">
+
+Bereit.
+
+</div>
+
+<div id="timeline">
+<div id="playhead"></div>
+</div>
+
+<div id="playlist">
+
+</div>
+
+<script>
+
+const SOUND_FOLDER="1/";
+
+const sounds=[
+
+"kick_1.wav",
+"kick_2.wav",
+
+"snare_1.wav",
+"snare_2.wav",
+
+"hihat_1.wav",
+"hihat_2.wav",
+
+"piano_1.wav",
+"piano_2.wav",
+
+"bass_1.wav",
+"bass_2.wav",
+
+"guitar_1.wav",
+"guitar_2.wav"
+
+];
+
+const audio={};
+
+let generated=[];
+
+let bpm=120;
+
+let seconds=10;
+
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+function loadSounds(){
+
+    sounds.forEach(name=>{
+
+        const a=new Audio(SOUND_FOLDER+name);
+        a.preload="auto";
+        audio[name]=a;
+
+    });
+
+}
+
+loadSounds();
+
+function random(list){
+    return list[Math.floor(Math.random()*list.length)];
+}
+
+function byType(type){
+    return sounds.filter(s=>s.startsWith(type));
+}
+
+function generateSong(){
+
+    generated=[];
+
+    const kick=byType("kick");
+    const snare=byType("snare");
+    const hihat=byType("hihat");
+    const piano=byType("piano");
+    const bass=byType("bass");
+    const guitar=byType("guitar");
+
+    // 10 Sekunden Song
+    for(let t=0;t<seconds;t+=0.5){
+
+        generated.push({
+            time:t,
+            sound:random(kick)
         });
 
-        document.body.addEventListener('click', () => {
-            if (document.pointerLockElement !== document.body && instructions.style.display === 'none') {
-                document.body.requestPointerLock();
-            }
-        });
-
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === document.body) {
-                instructions.style.display = 'none';
-            } else {
-                instructions.style.display = 'block';
-            }
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (document.pointerLockElement !== document.body) return;
-            yaw -= e.movementX * 0.0025;
-            pitch -= e.movementY * 0.0025;
-            pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
-        });
-
-        // --- STEUERUNG ---
-        const keyHandler = (e, isDown) => {
-            switch (e.code) {
-                case 'KeyW': case 'ArrowUp': moveForward = isDown; break;
-                case 'KeyS': case 'ArrowDown': moveBackward = isDown; break;
-                case 'KeyA': case 'ArrowLeft': moveLeft = isDown; break;
-                case 'KeyD': case 'ArrowRight': moveRight = isDown; break;
-            }
-        };
-        document.addEventListener('keydown', (e) => keyHandler(e, true));
-        document.addEventListener('keyup', (e) => keyHandler(e, false));
-
-        // --- ENGINE START ---
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x709cd0); // Hellerer, freundlicher Himmel
-            scene.fog = new THREE.FogExp2(0x709cd0, 0.015); // Stärkerer Nebel verbirgt das Laden von Chunks auf Chromebooks
-
-            camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 300); // Kleineres Sichtfeld spart Performance
-            clock = new THREE.Clock();
-
-            // Antialiasing deaktiviert für massive Performance-Gewinne auf integrierten Intel/ARM-Grafikkarten
-            renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            
-            // Begrenzt die Pixeldichte auf maximal 1.2, um 4K/DPI-Overhead auf Chromebook-Bildschirmen zu vermeiden
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.2));
-            document.body.appendChild(renderer.domElement);
-
-            // --- LICHT-FIX GEGEN SCHWARZEN SCREEN ---
-            // Unidirektionales, starkes Umgebungslicht (wichtig für GLTF-Materialien)
-            const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-            scene.add(ambientLight);
-
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-            dirLight.position.set(10, 20, 10);
-            scene.add(dirLight);
-
-            // Unendlicher grüner Boden
-            const floorGeo = new THREE.PlaneGeometry(1000, 1000);
-            // MeshLambertMaterial ist extrem hardware-schonend
-            const floorMat = new THREE.MeshLambertMaterial({ color: 0x4d8c4d }); 
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            scene.add(floor);
-
-            // --- GLB MODELL LADEN ---
-            const loader = new THREE.GLTFLoader();
-            loader.load('1.glb', (gltf) => {
-                gltf.scene.traverse((child) => {
-                    if (child.isMesh && !originalGeometry) {
-                        originalGeometry = child.geometry;
-                        originalMaterial = child.material;
-                        
-                        // Erzwingt, dass das Material auf Licht reagiert und nicht schwarz bleibt
-                        if(originalMaterial) {
-                            originalMaterial.side = THREE.DoubleSide;
-                            originalMaterial.needsUpdate = true;
-                        }
-                    }
-                });
-
-                if (originalGeometry && originalMaterial) {
-                    // Erste Chunk-Generierung vor dem Start
-                    updateChunks();
-                    animate(0);
-                } else {
-                    alert("Fehler: Das GLB-Modell enthält keine sichtbaren 3D-Daten.");
-                }
-            }, undefined, (error) => {
-                console.error(error);
-                alert("Modell '1.glb' konnte nicht geladen werden. Bitte nutze einen lokalen Server (z.B. Web Server for Chrome).");
+        if(Math.random()>0.5){
+            generated.push({
+                time:t+0.25,
+                sound:random(hihat)
             });
-
-            window.addEventListener('resize', onWindowResize);
         }
 
-        // --- OPTIMIERTES CHUNK SYSTEM ---
-        function updateChunks() {
-            const currentChunkX = Math.floor(player.pos.x / CHUNK_SIZE);
-            const currentChunkZ = Math.floor(player.pos.z / CHUNK_SIZE);
-            const visibleKeys = new Set();
-
-            for (let x = -RENDER_DISTANCE; x <= RENDER_DISTANCE; x++) {
-                for (let z = -RENDER_DISTANCE; z <= RENDER_DISTANCE; z++) {
-                    const chunkX = currentChunkX + x;
-                    const chunkZ = currentChunkZ + z;
-                    const key = `${chunkX},${chunkZ}`;
-                    visibleKeys.add(key);
-
-                    if (!activeChunks.has(key)) {
-                        createChunk(chunkX, chunkZ, key);
-                    }
-                }
-            }
-
-            // Sofortiges Löschen nicht mehr sichtbarer Chunks zur RAM-Entlastung
-            for (let [key, instancedMesh] of activeChunks.entries()) {
-                if (!visibleKeys.has(key)) {
-                    scene.remove(instancedMesh);
-                    instancedMesh.dispose(); // Gibt Grafikspeicher sofort frei
-                    activeChunks.delete(key);
-                }
-            }
+        if(Math.random()>0.65){
+            generated.push({
+                time:t+0.5,
+                sound:random(snare)
+            });
         }
 
-        function createChunk(cx, cz, key) {
-            // InstancedMesh rendert alle Kopien in exakt einem Rechenschritt
-            const instancedMesh = new THREE.InstancedMesh(
-                originalGeometry,
-                originalMaterial,
-                MODELS_PER_CHUNK
-            );
+        if(Math.random()>0.75){
+            generated.push({
+                time:t,
+                sound:random(piano)
+            });
+        }
 
-            const dummy = new THREE.Object3D();
-            let seed = Math.sin(cx * 12.98 + cz * 78.23) * 43758.54;
-            
-            function random() {
-                let x = Math.sin(seed++) * 10000;
-                return x - Math.floor(x);
-            }
+        if(Math.random()>0.80){
+            generated.push({
+                time:t,
+                sound:random(bass)
+            });
+        }
 
-            for (let i = 0; i < MODELS_PER_CHUNK; i++) {
-                const localX = random() * CHUNK_SIZE;
-                const localZ = random() * CHUNK_SIZE;
-                
-                const worldX = cx * CHUNK_SIZE + localX;
-                const worldZ = cz * CHUNK_SIZE + localZ;
+        if(Math.random()>0.88){
+            generated.push({
+                time:t,
+                sound:random(guitar)
+            });
+        }
 
-                dummy.position.set(worldX, 0, worldZ);
-                dummy.rotation.y = random() * Math.PI * 2;
-                
-                const scale = 0.7 + random() * 0.6;
-                dummy.scale.set(scale, scale, scale);
+    }
 
-                dummy.updateMatrix();
-                instancedMesh.setMatrixAt(i, dummy.matrix);
+    document.getElementById("status").textContent=
+        "Song erstellt ("+generated.length+" Sounds)";
+
+    showPlaylist();
+
+}
+function showPlaylist(){
+
+    const list=document.getElementById("playlist");
+    list.innerHTML="";
+
+    generated.sort((a,b)=>a.time-b.time);
+
+    generated.forEach((item,i)=>{
+
+        const div=document.createElement("div");
+        div.className="track";
+
+        div.innerHTML=
+        "<b>"+(i+1)+".</b> "+
+        item.sound+
+        " | "+item.time.toFixed(2)+" s";
+
+        list.appendChild(div);
+
+    });
+
 }
 
-scene.add(instancedMesh);
-activeChunks.set(key, instancedMesh);
+let timers=[];
+let playing=false;
+
+function playSong(){
+
+    stopSong();
+
+    playing=true;
+
+    const start=performance.now();
+
+    generated.forEach(note=>{
+
+        const timer=setTimeout(()=>{
+
+            if(!playing) return;
+
+            const a=new Audio(SOUND_FOLDER+note.sound);
+            a.volume=0.8;
+            a.play();
+
+        },note.time*1000);
+
+        timers.push(timer);
+
+    });
+
+    animateTimeline(start);
+
 }
 
-// --- GAME LOOP ---
-function animate(timestamp) {
-requestAnimationFrame(animate);
+function animateTimeline(start){
 
-const delta = Math.min(clock.getDelta(), 0.1); // Deckelt Lag-Spikes bei Frame-Einbrüchen
+    const bar=document.getElementById("playhead");
 
-// FPS Berechnung
-frames++;
-if (timestamp > lastFpsUpdate + 1000) {
-fpsElement.textContent = FPS: ${Math.round((frames * 1000) / (timestamp - lastFpsUpdate))};
-frames = 0;
-lastFpsUpdate = timestamp;
+    function update(){
+
+        if(!playing) return;
+
+        const elapsed=(performance.now()-start)/1000;
+
+        let p=(elapsed/seconds)*100;
+
+        if(p>100)p=100;
+
+        bar.style.width=p+"%";
+
+        if(elapsed<seconds){
+
+            requestAnimationFrame(update);
+
+        }else{
+
+            playing=false;
+
+            bar.style.width="100%";
+
+        }
+
+    }
+
+    update();
+
+}
+function stopSong(){
+
+    playing=false;
+
+    timers.forEach(t=>clearTimeout(t));
+    timers=[];
+
+    document.getElementById("playhead").style.width="0%";
+
 }
 
-if (document.pointerLockElement === document.body) {
-const forward = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
-const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize();
+document.getElementById("generate").onclick=()=>{
 
-if (moveForward) player.pos.addScaledVector(forward, MOVE_SPEED * delta);
-if (moveBackward) player.pos.addScaledVector(forward, -MOVE_SPEED * delta);
-if (moveLeft) player.pos.addScaledVector(right, -MOVE_SPEED * delta);
-if (moveRight) player.pos.addScaledVector(right, MOVE_SPEED * delta);
+    const prompt=document
+        .getElementById("prompt")
+        .value
+        .toLowerCase();
 
-updateChunks();
-}
+    // Einfacher Stil-Einfluss
+    if(prompt.includes("slow")) bpm=80;
+    else if(prompt.includes("fast")) bpm=160;
+    else bpm=120;
 
-camera.position.copy(player.pos);
+    generateSong();
 
-const target = new THREE.Vector3(
-player.pos.x + Math.sin(yaw) * Math.cos(pitch),
-player.pos.y + Math.sin(pitch),
-player.pos.z + Math.cos(yaw) * Math.cos(pitch)
-);
-camera.lookAt(target);
+};
 
-renderer.render(scene, camera);
-}
+document.getElementById("play").onclick=async()=>{
 
-function onWindowResize() {
-camera.aspect = window.innerWidth / window.innerHeight;
-camera.updateProjectionMatrix();
-renderer.setSize(window.innerWidth, window.innerHeight);
-}
+    if(ctx.state==="suspended"){
+        await ctx.resume();
+    }
 
-init();
+    playSong();
 
+};
+
+document.getElementById("stop").onclick=()=>{
+
+    stopSong();
+
+};
+
+// Beim Start direkt einen Song erzeugen
+generateSong();
+
+</script>
+
+</body>
+</html>
