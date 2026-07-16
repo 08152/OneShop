@@ -1,28 +1,30 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-
+const path = require("path");
 
 const app = express();
-
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static("./"));
 
 
-// KI Daten laden
-
-let aiData = JSON.parse(
-    fs.readFileSync("v1.1.json", "utf8")
+let model = JSON.parse(
+    fs.readFileSync(
+        path.join(__dirname,"v1.1.json"),
+        "utf8"
+    )
 );
-
 
 
 function loadMemory(){
 
     return JSON.parse(
-        fs.readFileSync("memory.json","utf8")
+        fs.readFileSync(
+            path.join(__dirname,"memory.json"),
+            "utf8"
+        )
     );
 
 }
@@ -32,25 +34,11 @@ function loadMemory(){
 function saveMemory(data){
 
     fs.writeFileSync(
-        "memory.json",
+        path.join(__dirname,"memory.json"),
         JSON.stringify(data,null,2)
     );
 
 }
-
-
-
-
-app.get("/api/status",(req,res)=>{
-
-    res.json({
-        online:true,
-        version:"MiniKI v1.1"
-    });
-
-});
-
-
 
 
 
@@ -61,19 +49,21 @@ app.post("/api/chat",(req,res)=>{
     req.body.message.toLowerCase();
 
 
-
-    let answer =
-    "Das weiß ich noch nicht.";
+    let memory = loadMemory();
 
 
+    let answer = null;
 
-    // Hauptmodell
 
-    for(let item of aiData.knowledge){
+
+    // Hauptwissen durchsuchen
+
+    for(let item of model.knowledge){
 
         if(question.includes(item.question)){
 
             answer=item.answer;
+            break;
 
         }
 
@@ -81,17 +71,14 @@ app.post("/api/chat",(req,res)=>{
 
 
 
-
-    // Speicher durchsuchen
-
-    let memory=loadMemory();
-
+    // Lernspeicher durchsuchen
 
     for(let item of memory.knowledge){
 
         if(question.includes(item.question)){
 
             answer=item.answer;
+            break;
 
         }
 
@@ -99,37 +86,61 @@ app.post("/api/chat",(req,res)=>{
 
 
 
+    // Nicht gefunden
 
+    if(!answer){
 
-    // Lernen
-
-    if(req.body.learn){
-
-
-        memory.knowledge.push({
-
-            question:question,
-            answer:req.body.learn
-
-        });
-
-
-        saveMemory(memory);
-
-
-        answer="Gespeichert. Ich habe das gelernt.";
+        answer=
+        "Das weiß ich nicht. Schreibe mir die richtige Antwort mit /lernen.";
 
     }
 
 
 
-
     res.json({
 
-        ai:"MiniKI v1.1",
         answer:answer
 
     });
+
+
+
+});
+
+
+
+
+
+// Lernen
+
+app.post("/api/learn",(req,res)=>{
+
+
+    let memory = loadMemory();
+
+
+    memory.knowledge.push({
+
+        question:req.body.question.toLowerCase(),
+
+        answer:req.body.answer
+
+    });
+
+
+
+    saveMemory(memory);
+
+
+
+    res.json({
+
+        status:"gelernt",
+
+        data:req.body
+
+    });
+
 
 
 });
@@ -142,10 +153,6 @@ app.listen(
 
 process.env.PORT || 3000,
 
-()=>{
-
-console.log("MiniKI läuft");
-
-}
+()=>console.log("MiniKI Lernserver läuft")
 
 );
