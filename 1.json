@@ -68,6 +68,145 @@
       ]
     },
     {
+  "topic": "menschen",
+  "keywords": [
+    "mensch",
+    "menschen",
+    "person",
+    "leute"
+  ],
+  "concepts": [
+    "Menschen können denken, lernen und miteinander kommunizieren.",
+    "Jeder Mensch ist einzigartig."
+  ]
+},
+{
+  "topic": "tiere",
+  "keywords": [
+    "tier",
+    "tiere",
+    "hund",
+    "katze",
+    "vogel"
+  ],
+  "concepts": [
+    "Tiere sind Lebewesen, die in verschiedenen Lebensräumen leben.",
+    "Viele Tiere können lernen und sich an ihre Umgebung anpassen."
+  ]
+},
+{
+  "topic": "natur",
+  "keywords": [
+    "natur",
+    "wald",
+    "pflanzen",
+    "umwelt",
+    "erde"
+  ],
+  "concepts": [
+    "Die Natur umfasst Pflanzen, Tiere, Wasser und Landschaften.",
+    "Menschen sollten die Umwelt schützen."
+  ]
+},
+{
+  "topic": "computer",
+  "keywords": [
+    "computer",
+    "pc",
+    "laptop",
+    "technik",
+    "rechner"
+  ],
+  "concepts": [
+    "Computer können Daten verarbeiten und Programme ausführen.",
+    "Technik hilft Menschen bei vielen Aufgaben."
+  ]
+},
+{
+  "topic": "schule",
+  "keywords": [
+    "schule",
+    "lernen",
+    "unterricht",
+    "lehrer",
+    "schüler"
+  ],
+  "concepts": [
+    "In der Schule lernen Menschen neue Fähigkeiten und Wissen.",
+    "Lehrer helfen Schülern beim Lernen."
+  ]
+},
+{
+  "topic": "essen",
+  "keywords": [
+    "essen",
+    "nahrung",
+    "lebensmittel",
+    "trinken",
+    "mahlzeit"
+  ],
+  "concepts": [
+    "Essen und Trinken geben Menschen Energie.",
+    "Gesunde Lebensmittel unterstützen den Körper."
+  ]
+},
+{
+  "topic": "sport",
+  "keywords": [
+    "sport",
+    "training",
+    "laufen",
+    "spielen",
+    "bewegung"
+  ],
+  "concepts": [
+    "Sport verbessert die Fitness und Gesundheit.",
+    "Training hilft Menschen ihre Fähigkeiten zu verbessern."
+  ]
+},
+{
+  "topic": "haus",
+  "keywords": [
+    "haus",
+    "wohnung",
+    "zimmer",
+    "gebäude",
+    "tür"
+  ],
+  "concepts": [
+    "Ein Haus bietet Menschen einen Ort zum Wohnen.",
+    "Gebäude bestehen aus verschiedenen Materialien."
+  ]
+},
+{
+  "topic": "fahrzeuge",
+  "keywords": [
+    "auto",
+    "fahrzeug",
+    "bus",
+    "zug",
+    "fahrrad"
+  ],
+  "concepts": [
+    "Fahrzeuge helfen Menschen sich fortzubewegen.",
+    "Es gibt verschiedene Arten von Verkehrsmitteln."
+  ]
+},
+{
+  "topic": "sprache",
+  "keywords": [
+    "sprache",
+    "wort",
+    "satz",
+    "deutsch",
+    "kommunikation"
+  ],
+  "concepts": [
+    "Sprache ermöglicht Menschen miteinander zu kommunizieren.",
+    "Wörter und Sätze bilden die Grundlage für Gespräche."
+  ]
+},
+    {
       "topic": "tiere",
       "keywords": [
         "tier",
@@ -105,6 +244,286 @@
         "Die ersten Zahlen sind 0, 1, 2, 3 und so weiter."
       ]
     },
+    {
+  "topic": "familie",
+  "keywords": [
+    "familie",
+    "eltern",
+    "mutter",
+    "vater",
+    "kind"
+  ],
+  "concepts": [
+    "Eine Familie besteht aus Menschen, die zusammenleben und sich unterstützen.",
+    "Eltern kümmern sich um ihre Kinder und helfen ihnen beim Lernen."
+  ]
+},
+{
+  "topic": "freunde",
+  "keywords": [
+    "freund",
+    "freunde",
+    "freundschaft",
+    "treffen",
+    "zusammen"
+  ],
+  "concepts": [
+    "Freunde verbringen Zeit miteinander und helfen sich gegenseitig.",
+    "Menschen können Freundschaften aufbauen und pflegen."
+  ]
+},
+{
+  "topic": "zeit",
+  "keywords": [
+    "zeit",
+    "uhr",
+    "tag",
+    "woche",
+    "monat"
+  ],
+  "concepts": [
+    "Die Zeit zeigt, wann Ereignisse passieren.",
+    "Menschen planen ihren Tag und nutzen ihre Zeit."
+  ]
+},
+{
+  "topic": "wetter",
+  "keywords": [
+    "wetter",
+    "sonne",
+    "regen",
+    "wind",
+    "wolken"
+  ],
+  "concepts": [
+    "Das Wetter verändert sich und beeinflusst das Leben.",
+    "Menschen beobachten das Wetter und passen ihre Kleidung an."
+  ]
+},
+{
+  "topic": "körper",
+  "keywords": [
+    "körper",
+    "kopf",
+    "hand",
+    "fuß",
+    "auge"
+  ],
+  "concepts": [
+    "Der menschliche Körper kann sich bewegen und fühlen.",
+    "Menschen benutzen ihre Sinne, um ihre Umgebung wahrzunehmen."
+  ]
+},
+{
+  "topic": "kleidung",
+  "keywords": [
+    "kleidung",
+    "hose",
+    "shirt",
+    "schuhe",
+    "jacke"
+  ],
+  "concepts": [
+    "Menschen tragen Kleidung, um sich zu schützen und auszudrücken.",
+    "Kleidung kann verschiedene Farben und Formen haben."
+  ]
+},
+{
+  "topic": "arbeit",
+  "keywords": [
+    "arbeit",
+    "beruf",
+    "job",
+    "machen",
+    "helfen"
+  ],
+  "concepts": [
+    "Menschen arbeiten, um Aufgaben zu erledigen und Ziele zu erreichen.",
+    "Viele Berufe helfen anderen Menschen."
+  ]
+},
+{
+  "topic": "garten",
+  "keywords": [
+    "garten",
+    "blume",
+    "baum",
+    "pflanzen",
+    "wachsen"
+  ],
+  "concepts": [
+    "Pflanzen wachsen im Garten und brauchen Wasser.",
+    "Menschen pflanzen Blumen und pflegen die Natur."
+  ]
+},
+{
+  "topic": "wasser",
+  "keywords": [
+    "wasser",
+    "fluss",
+    "see",
+    "meer",
+    "trinken"
+  ],
+  "concepts": [
+    "Wasser ist wichtig für Menschen, Tiere und Pflanzen.",
+    "Menschen trinken Wasser und nutzen es im Alltag."
+  ]
+},
+{
+  "topic": "reisen",
+  "keywords": [
+    "reisen",
+    "urlaub",
+    "land",
+    "besuchen",
+    "fahren"
+  ],
+  "concepts": [
+    "Menschen reisen, um neue Orte zu entdecken.",
+    "Beim Reisen besuchen Menschen andere Städte und Länder."
+  ]
+},
+{
+  "topic": "musik",
+  "keywords": [
+    "musik",
+    "lied",
+    "ton",
+    "singen",
+    "hören"
+  ],
+  "concepts": [
+    "Musik besteht aus Tönen und Klängen.",
+    "Menschen hören Musik und können Lieder singen."
+  ]
+},
+{
+  "topic": "kunst",
+  "keywords": [
+    "kunst",
+    "bild",
+    "malen",
+    "zeichnen",
+    "farbe"
+  ],
+  "concepts": [
+    "Kunst zeigt Ideen und Gefühle von Menschen.",
+    "Menschen malen Bilder und erschaffen neue Werke."
+  ]
+},
+{
+  "topic": "spiele",
+  "keywords": [
+    "spiel",
+    "spielen",
+    "regel",
+    "spieler",
+    "gewinn"
+  ],
+  "concepts": [
+    "Spiele haben Regeln und machen Spaß.",
+    "Spieler lernen Strategien und lösen Aufgaben."
+  ]
+},
+{
+  "topic": "lesen",
+  "keywords": [
+    "buch",
+    "lesen",
+    "geschichte",
+    "text",
+    "seite"
+  ],
+  "concepts": [
+    "Menschen lesen Texte, um Informationen zu erhalten.",
+    "Bücher erzählen Geschichten und vermitteln Wissen."
+  ]
+},
+{
+  "topic": "bauen",
+  "keywords": [
+    "bauen",
+    "bauen",
+    "werkzeug",
+    "material",
+    "erschaffen"
+  ],
+  "concepts": [
+    "Menschen bauen Dinge aus verschiedenen Materialien.",
+    "Beim Bauen benutzen Menschen Werkzeuge und planen ihre Arbeit."
+  ]
+},
+{
+  "topic": "kommunikation",
+  "keywords": [
+    "reden",
+    "sprechen",
+    "fragen",
+    "antworten",
+    "erzählen"
+  ],
+  "concepts": [
+    "Menschen sprechen miteinander und tauschen Informationen aus.",
+    "Fragen und Antworten helfen beim Verstehen."
+  ]
+},
+{
+  "topic": "bewegung",
+  "keywords": [
+    "gehen",
+    "laufen",
+    "springen",
+    "bewegen",
+    "rennen"
+  ],
+  "concepts": [
+    "Menschen bewegen ihren Körper durch verschiedene Aktivitäten.",
+    "Bewegung hilft dem Körper gesund zu bleiben."
+  ]
+},
+{
+  "topic": "lernen",
+  "keywords": [
+    "lernen",
+    "wissen",
+    "üben",
+    "verstehen",
+    "merken"
+  ],
+  "concepts": [
+    "Menschen lernen neue Informationen durch Übung.",
+    "Üben hilft dabei, Fähigkeiten zu verbessern."
+  ]
+},
+{
+  "topic": "technik",
+  "keywords": [
+    "maschine",
+    "gerät",
+    "elektronik",
+    "roboter",
+    "entwickeln"
+  ],
+  "concepts": [
+    "Technik besteht aus Geräten und Maschinen, die Aufgaben erledigen.",
+    "Menschen entwickeln neue Technologien."
+  ]
+},
+{
+  "topic": "gefühle",
+  "keywords": [
+    "gefühl",
+    "freude",
+    "traurig",
+    "glücklich",
+    "lieben"
+  ],
+  "concepts": [
+    "Menschen haben Gefühle und können diese zeigen.",
+    "Gefühle beeinflussen, wie Menschen denken und handeln."
+  ]
+}
     {
       "topic": "wetter",
       "keywords": [
