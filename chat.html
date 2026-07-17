@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Velo KI</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#ffffff;
+    height:100vh;
+    display:flex;
+}
+
+
+/* Linke Chat-Leiste */
+
+.sidebar{
+    width:260px;
+    border-right:1px solid #ddd;
+    padding:15px;
+    display:flex;
+    flex-direction:column;
+}
+
+
+.logo{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+
+.new{
+    background:#000;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+
+.new:hover{
+    background:#333;
+}
+
+
+.chatlist{
+    margin-top:20px;
+}
+
+
+.chatitem{
+    padding:12px;
+    background:#f1f1f1;
+    border-radius:10px;
+}
+
+
+
+/* Hauptbereich */
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+
+.header{
+    padding:18px;
+    border-bottom:1px solid #ddd;
+    font-size:22px;
+    font-weight:bold;
+}
+
+
+#chat{
+    flex:1;
+    overflow-y:auto;
+    padding:20px;
+}
+
+
+.msg{
+    padding:12px;
+    margin:12px 0;
+    border-radius:12px;
+    max-width:70%;
+}
+
+
+.user{
+    background:#e9e9e9;
+    margin-left:auto;
+}
+
+
+.ki{
+    background:#f7f7f7;
+}
+
+
+
+.bottom{
+    border-top:1px solid #ddd;
+    padding:15px;
+    display:flex;
+}
+
+
+input{
+    flex:1;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    font-size:16px;
+}
+
+
+.send{
+    margin-left:10px;
+    padding:14px 20px;
+    background:#000;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- Seitenleiste -->
+
+<div class="sidebar">
+
+<div class="logo">
+🤖 Velo
+</div>
+
+
+<button class="new" onclick="neuerChat()">
++ Neuer Chat
+</button>
+
+
+<div class="chatlist">
+
+<div class="chatitem">
+Chat 1
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- Chat -->
+
+<div class="main">
+
+
+<div class="header">
+Velo
+</div>
+
+
+
+<div id="chat">
+
+<div class="msg ki">
+Hallo! Ich bin Velo. Wie kann ich helfen?
+</div>
+
+</div>
+
+
+
+
+<div class="bottom">
+
+<input id="eingabe" placeholder="Nachricht an Velo...">
+
+
+<button class="send" onclick="senden()">
+Senden
+</button>
+
+</div>
+
+
+</div>
+
+
+
+
+<script>
+
+
+let wissen=[];
+
+
+// Daten aus 1.json laden
+
+fetch("1.json")
+.then(response=>response.json())
+.then(data=>{
+
+wissen=data.knowledge;
+
+})
+.catch(()=>{
+
+anzeigen("Velo: Ich konnte meine Daten nicht laden.","ki");
+
+});
+
+
+
+
+// Nachricht senden
+
+function senden(){
+
+let feld=document.getElementById("eingabe");
+
+let text=feld.value.trim();
+
+
+if(text==="") return;
+
+
+
+anzeigen("Du: "+text,"user");
+
+
+
+let antwort="Das weiß ich noch nicht.";
+
+
+
+for(let thema of wissen){
+
+    for(let wort of thema.keywords){
+
+        if(text.toLowerCase().includes(wort.toLowerCase())){
+
+
+            let antworten=thema.concepts;
+
+
+            antwort=
+            antworten[
+            Math.floor(Math.random()*antworten.length)
+            ];
+
+
+        }
+
+    }
+
+}
+
+
+
+anzeigen("Velo: "+antwort,"ki");
+
+
+feld.value="";
+
+}
+
+
+
+
+
+// Nachricht anzeigen
+
+function anzeigen(text,klasse){
+
+let chat=document.getElementById("chat");
+
+
+let div=document.createElement("div");
+
+
+div.className="msg "+klasse;
+
+
+div.innerText=text;
+
+
+chat.appendChild(div);
+
+
+chat.scrollTop=chat.scrollHeight;
+
+}
+
+
+
+
+
+// Neuer Chat
+
+function neuerChat(){
+
+document.getElementById("chat").innerHTML=
+
+`
+<div class="msg ki">
+Neuer Chat gestartet.<br>
+Hallo! Ich bin Velo.
+</div>
+`;
+
+}
+
+
+
+
+
+// Enter senden
+
+document.getElementById("eingabe")
+.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+senden();
+
+}
+
+});
+
+
+</script>
+
+
+</body>
+</html>
