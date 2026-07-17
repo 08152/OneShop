@@ -1,304 +1,67 @@
+// server.js
+
 const express = require("express");
-const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// JSON-Dateien lesen
 app.use(express.json());
-app.use(express.static("./"));
 
+// Alle Dateien aus diesem Ordner bereitstellen
+app.use(express.static(__dirname));
 
-// KI Modell laden
+// Wissen aus 1.json laden
+let knowledge = { knowledge: [] };
 
-const ai = JSON.parse(
-    fs.readFileSync(
-        path.join(__dirname, "v1.1.json"),
-        "utf8"
-    )
-);
-
-
-
-function loadMemory(){
-
-    return JSON.parse(
-        fs.readFileSync(
-            path.join(__dirname,"memory.json"),
-            "utf8"
-        )
-    );
-
-}
-
-
-
-function saveMemory(data){
-
-    fs.writeFileSync(
-        path.join(__dirname,"memory.json"),
-        JSON.stringify(data,null,2)
-    );
-
-}
-
-
-
-// Zufälliges Element
-
-function random(array){
-
-    return array[
-        Math.floor(Math.random()*array.length)
-    ];
-
-}
-
-
-
-// Generator
-
-function generateAnswer(question){
-
-
-    question = question.toLowerCase();
-
-
-
-    for(let topic of ai.knowledge){
-
-
-        let found = false;
-
-
-        for(let word of topic.keywords){
-
-            if(question.includes(word)){
-
-                found=true;
-                break;
-
-            }
-
-        }
-
-
-
-        if(found){
-
-
-            let concepts =
-            topic.concepts.slice(
-                0,
-                ai.generator.max_concepts
-            );
-
-
-
-            let template =
-            random(topic.templates);
-
-
-
-            let answer = template;
-
-
-
-            concepts.forEach((text,index)=>{
-
-                answer =
-                answer.replace(
-                    "{"+index+"}",
-                    text
-                );
-
-            });
-
-
-
-            return answer;
-
-        }
-
+function loadKnowledge() {
+    try {
+        knowledge = JSON.parse(fs.readFileSync(path.join(__dirname, "1.json"), "utf8"));
+        console.log("1.json erfolgreich geladen.");
+    } catch (err) {
+        console.log("Fehler beim Laden von 1.json:", err.message);
+        knowledge = { knowledge: [] };
     }
-
-
-
-    return null;
-
 }
 
+loadKnowledge();
 
-
-
-
-// Chat API
-
-app.post("/api/chat",(req,res)=>{
-
-
-    let question =
-    req.body.message;
-
-
-
-    let memory = loadMemory();
-
-
-
-    // zuerst Erinnerung prüfen
-
-    for(let item of memory.knowledge){
-
-
-        if(question.toLowerCase()
-        .includes(item.question)){
-
-
-            return res.json({
-
-                answer:item.answer,
-                source:"memory"
-
-            });
-
-
-        }
-
-    }
-
-
-
-
-
-    // neue Antwort erzeugen
-
-    let answer =
-    generateAnswer(question);
-
-
-
-    if(answer){
-
-
-        // speichern
-
-        memory.knowledge.push({
-
-            question:question.toLowerCase(),
-
-            answer:answer
-
-        });
-
-
-
-        saveMemory(memory);
-
-
-
-        return res.json({
-
-            answer:answer,
-
-            source:"generated"
-
-        });
-
-
-    }
-
-
-
-
-
-    res.json({
-
-        answer:
-        "Das weiß ich noch nicht. Ich brauche mehr Daten.",
-
-        source:"unknown"
-
-    });
-
-
-
+// API: Wissen abrufen
+app.get("/api/data", (req, res) => {
+    res.json(knowledge);
 });
 
-
-
-
-
-
-// Manuelles Lernen
-
-app.post("/api/learn",(req,res)=>{
-
-
-    let memory=loadMemory();
-
-
-
-    memory.knowledge.push({
-
-        question:req.body.question.toLowerCase(),
-
-        answer:req.body.answer
-
-    });
-
-
-
-    saveMemory(memory);
-
-
-
+// API: Wissen neu laden (praktisch nach Änderungen an 1.json)
+app.get("/api/reload", (req, res) => {
+    loadKnowledge();
     res.json({
-
-        status:"gelernt"
-
+        success: true,
+        message: "1.json neu geladen."
     });
-
-
 });
 
-
-
-
-
-
-app.get("/api/status",(req,res)=>{
-
-
-    res.json({
-
-        online:true,
-
-        model:ai.name,
-
-        version:ai.version
-
-    });
-
-
+// Startseite
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// Chatseite
+app.get("/chat", (req, res) => {
+    res.sendFile(path.join(__dirname, "chat.html"));
+});
 
+// Fehlerseite
+app.use((req, res) => {
+    res.status(404).send("404 - Seite nicht gefunden");
+});
 
-
-
-
-app.listen(
-
-process.env.PORT || 3000,
-
-()=>{
-
-console.log(
-"MiniKI v1.1 Generative Server läuft"
-);
-
-}
-
-);
+// Server starten
+app.listen(PORT, () => {
+    console.log("--------------------------------");
+    console.log("MiniKI gestartet");
+    console.log("Port:", PORT);
+    console.log("Öffne: http://localhost:" + PORT);
+    console.log("--------------------------------");
+});
