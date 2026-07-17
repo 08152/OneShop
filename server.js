@@ -1,67 +1,80 @@
-// server.js
-
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// JSON-Dateien lesen
 app.use(express.json());
-
-// Alle Dateien aus diesem Ordner bereitstellen
 app.use(express.static(__dirname));
 
-// Wissen aus 1.json laden
-let knowledge = { knowledge: [] };
 
-function loadKnowledge() {
-    try {
-        knowledge = JSON.parse(fs.readFileSync(path.join(__dirname, "1.json"), "utf8"));
-        console.log("1.json erfolgreich geladen.");
-    } catch (err) {
-        console.log("Fehler beim Laden von 1.json:", err.message);
-        knowledge = { knowledge: [] };
-    }
-}
+let wissen = JSON.parse(
+    fs.readFileSync("1.json","utf8")
+);
 
-loadKnowledge();
 
-// API: Wissen abrufen
-app.get("/api/data", (req, res) => {
-    res.json(knowledge);
-});
+let memory = JSON.parse(
+    fs.readFileSync("memory.json","utf8")
+);
 
-// API: Wissen neu laden (praktisch nach Änderungen an 1.json)
-app.get("/api/reload", (req, res) => {
-    loadKnowledge();
+
+
+app.get("/api/data",(req,res)=>{
+
     res.json({
-        success: true,
-        message: "1.json neu geladen."
+        knowledge: wissen.knowledge,
+        memory: memory.learned
     });
+
 });
 
-// Startseite
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+
+
+// Velo lernt neue Antworten
+
+app.post("/api/learn",(req,res)=>{
+
+    let daten=req.body;
+
+
+    if(daten.question && daten.answer){
+
+        memory.learned.push({
+
+            question:daten.question,
+
+            answer:daten.answer
+
+        });
+
+
+        fs.writeFileSync(
+            "memory.json",
+            JSON.stringify(memory,null,2)
+        );
+
+
+        res.json({
+            success:true,
+            message:"Velo hat gelernt."
+        });
+
+    }
+
+    else{
+
+        res.json({
+            success:false
+        });
+
+    }
+
 });
 
-// Chatseite
-app.get("/chat", (req, res) => {
-    res.sendFile(path.join(__dirname, "chat.html"));
-});
 
-// Fehlerseite
-app.use((req, res) => {
-    res.status(404).send("404 - Seite nicht gefunden");
-});
 
-// Server starten
-app.listen(PORT, () => {
-    console.log("--------------------------------");
-    console.log("MiniKI gestartet");
-    console.log("Port:", PORT);
-    console.log("Öffne: http://localhost:" + PORT);
-    console.log("--------------------------------");
+app.listen(3000,()=>{
+
+console.log("Velo läuft auf Port 3000");
+
 });
