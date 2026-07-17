@@ -1,0 +1,134 @@
+{
+  "name": "Velo",
+  "version": "1.0",
+  "knowledge": [
+    {
+      "topic": "begrüßung",
+      "keywords": [
+        "hallo",
+        "hi",
+        "hey",
+        "guten morgen",
+        "guten tag"
+      ],
+      "concepts": [
+        "Hallo! Ich bin Velo.",
+        "Hi! Schön, dass du mit mir schreibst.",
+        "Guten Tag! Wie kann ich dir helfen?"
+      ]
+    },
+    {
+      "topic": "verabschiedung",
+      "keywords": [
+        "tschüss",
+        "bye",
+        "auf wiedersehen",
+        "bis später"
+      ],
+      "concepts": [
+        "Tschüss! Bis zum nächsten Mal.",
+        "Auf Wiedersehen!",
+        "Bis später!"
+      ]
+    },
+    {
+      "topic": "name",
+      "keywords": [
+        "wie heißt du",
+        "dein name",
+        "wer bist du"
+      ],
+      "concepts": [
+        "Ich heiße Velo.",
+        "Mein Name ist Velo. Ich bin eine kleine KI."
+      ]
+    },
+    {
+      "topic": "danke",
+      "keywords": [
+        "danke",
+        "vielen dank"
+      ],
+      "concepts": [
+        "Gerne!",
+        "Kein Problem!",
+        "Ich helfe gerne."
+      ]
+    },
+    {
+      "topic": "deutsch",
+      "keywords": [
+        "deutsch",
+        "sprache",
+        "wörter"
+      ],
+      "concepts": [
+        "Deutsch ist eine Sprache, die hauptsächlich in Deutschland, Österreich und der Schweiz gesprochen wird.",
+        "Die deutsche Sprache hat viele Wörter und Regeln."
+      ]
+    },
+    {
+      "topic": "tiere",
+      "keywords": [
+        "tier",
+        "tiere",
+        "hund",
+        "katze"
+      ],
+      "concepts": [
+        "Tiere sind Lebewesen.",
+        "Hunde und Katzen gehören zu den beliebtesten Haustieren."
+      ]
+    },
+    {
+      "topic": "menschen",
+      "keywords": [
+        "mensch",
+        "menschen",
+        "person"
+      ],
+      "concepts": [
+        "Menschen können denken, lernen und miteinander kommunizieren.",
+        "Jeder Mensch ist einzigartig."
+      ]
+    },
+    {
+      "topic": "zahlen",
+      "keywords": [
+        "zahl",
+        "zahlen",
+        "eins",
+        "zwei"
+      ],
+      "concepts": [
+        "Zahlen werden zum Zählen und Rechnen benutzt.",
+        "Die ersten Zahlen sind 0, 1, 2, 3 und so weiter."
+      ]
+    },
+    {
+      "topic": "wetter",
+      "keywords": [
+        "wetter",
+        "regen",
+        "sonne",
+        "schnee"
+      ],
+      "concepts": [
+        "Das Wetter kann sonnig, regnerisch, windig oder kalt sein.",
+        "Die Sonne gibt Licht und Wärme."
+      ]
+    },
+    {
+      "topic": "schule",
+      "keywords": [
+        "schule",
+        "lernen",
+        "unterricht"
+      ],
+      "concepts": [
+        "In der Schule lernen Menschen neue Dinge.",
+        "Unterricht hilft beim Erlernen von Wissen."
+      ]
+    }
+  ]
+}
