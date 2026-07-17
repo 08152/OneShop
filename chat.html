@@ -10,133 +10,139 @@
 <style>
 
 *{
-    box-sizing:border-box;
+box-sizing:border-box;
 }
 
 body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#ffffff;
-    height:100vh;
-    display:flex;
+margin:0;
+font-family:Arial,sans-serif;
+height:100vh;
+display:flex;
+background:white;
 }
 
 
-/* Linke Chat-Leiste */
+/* links */
 
 .sidebar{
-    width:260px;
-    border-right:1px solid #ddd;
-    padding:15px;
-    display:flex;
-    flex-direction:column;
+
+width:260px;
+border-right:1px solid #ddd;
+padding:15px;
+
 }
 
 
 .logo{
-    font-size:24px;
-    font-weight:bold;
-    margin-bottom:20px;
+
+font-size:24px;
+font-weight:bold;
+margin-bottom:20px;
+
 }
 
 
-.new{
-    background:#000;
-    color:white;
-    border:none;
-    padding:12px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:16px;
+button{
+
+border:none;
+background:#000;
+color:white;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+
 }
 
 
-.new:hover{
-    background:#333;
-}
+.chat{
 
+margin-top:20px;
+background:#eee;
+padding:12px;
+border-radius:10px;
 
-.chatlist{
-    margin-top:20px;
-}
-
-
-.chatitem{
-    padding:12px;
-    background:#f1f1f1;
-    border-radius:10px;
 }
 
 
 
-/* Hauptbereich */
+/* rechts */
 
 .main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
+
+flex:1;
+display:flex;
+flex-direction:column;
+
 }
 
 
 .header{
-    padding:18px;
-    border-bottom:1px solid #ddd;
-    font-size:22px;
-    font-weight:bold;
+
+padding:18px;
+border-bottom:1px solid #ddd;
+font-size:22px;
+font-weight:bold;
+
 }
 
 
 #chat{
-    flex:1;
-    overflow-y:auto;
-    padding:20px;
+
+flex:1;
+overflow:auto;
+padding:20px;
+
 }
 
 
 .msg{
-    padding:12px;
-    margin:12px 0;
-    border-radius:12px;
-    max-width:70%;
+
+padding:12px;
+margin:10px 0;
+border-radius:12px;
+max-width:70%;
+
 }
 
 
 .user{
-    background:#e9e9e9;
-    margin-left:auto;
+
+background:#eee;
+margin-left:auto;
+
 }
 
 
-.ki{
-    background:#f7f7f7;
-}
+.velo{
 
+background:#f7f7f7;
+
+}
 
 
 .bottom{
-    border-top:1px solid #ddd;
-    padding:15px;
-    display:flex;
+
+display:flex;
+padding:15px;
+border-top:1px solid #ddd;
+
 }
 
 
 input{
-    flex:1;
-    padding:14px;
-    border:1px solid #ccc;
-    border-radius:10px;
-    font-size:16px;
+
+flex:1;
+padding:14px;
+border:1px solid #ccc;
+border-radius:10px;
+
 }
 
 
 .send{
-    margin-left:10px;
-    padding:14px 20px;
-    background:#000;
-    color:white;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
+
+margin-left:10px;
+
 }
 
 </style>
@@ -147,7 +153,6 @@ input{
 <body>
 
 
-<!-- Seitenleiste -->
 
 <div class="sidebar">
 
@@ -156,25 +161,21 @@ input{
 </div>
 
 
-<button class="new" onclick="neuerChat()">
+<button onclick="neuerChat()">
 + Neuer Chat
 </button>
 
 
-<div class="chatlist">
-
-<div class="chatitem">
+<div class="chat">
 Chat 1
 </div>
 
-</div>
-
 
 </div>
 
 
 
-<!-- Chat -->
+
 
 <div class="main">
 
@@ -184,11 +185,10 @@ Velo
 </div>
 
 
-
 <div id="chat">
 
-<div class="msg ki">
-Hallo! Ich bin Velo. Wie kann ich helfen?
+<div class="msg velo">
+Hallo! Ich bin Velo.
 </div>
 
 </div>
@@ -199,7 +199,6 @@ Hallo! Ich bin Velo. Wie kann ich helfen?
 <div class="bottom">
 
 <input id="eingabe" placeholder="Nachricht an Velo...">
-
 
 <button class="send" onclick="senden()">
 Senden
@@ -216,86 +215,183 @@ Senden
 <script>
 
 
-let wissen=[];
+let grundwissen=[];
+
+let wortwissen=[];
+
+let memory=[];
 
 
-// Daten aus 1.json laden
+
+// 1.json laden
 
 fetch("1.json")
-.then(response=>response.json())
+.then(r=>r.json())
 .then(data=>{
 
-wissen=data.knowledge;
+grundwissen=data.knowledge;
 
-})
-.catch(()=>{
+});
 
-anzeigen("Velo: Ich konnte meine Daten nicht laden.","ki");
+
+
+// 2.json laden
+
+fetch("2.json")
+.then(r=>r.json())
+.then(data=>{
+
+wortwissen=data.words;
+
+});
+
+
+
+// Memory laden
+
+fetch("/api/data")
+.then(r=>r.json())
+.then(data=>{
+
+memory=data.memory || [];
 
 });
 
 
 
 
-// Nachricht senden
 
 function senden(){
+
 
 let feld=document.getElementById("eingabe");
 
 let text=feld.value.trim();
 
 
-if(text==="") return;
-
+if(text=="") return;
 
 
 anzeigen("Du: "+text,"user");
 
 
 
-let antwort="Das weiß ich noch nicht.";
+let antwort=denken(text);
 
 
 
-for(let thema of wissen){
-
-    for(let wort of thema.keywords){
-
-        if(text.toLowerCase().includes(wort.toLowerCase())){
-
-
-            let antworten=thema.concepts;
-
-
-            antwort=
-            antworten[
-            Math.floor(Math.random()*antworten.length)
-            ];
-
-
-        }
-
-    }
-
-}
-
-
-
-anzeigen("Velo: "+antwort,"ki");
+anzeigen("Velo: "+antwort,"velo");
 
 
 feld.value="";
 
+
 }
 
 
 
 
 
-// Nachricht anzeigen
+function denken(text){
+
+
+let klein=text.toLowerCase();
+
+
+// 1.json durchsuchen
+
+for(let thema of grundwissen){
+
+
+for(let wort of thema.keywords){
+
+
+if(klein.includes(wort)){
+
+
+let a=thema.concepts;
+
+
+return a[Math.floor(Math.random()*a.length)];
+
+
+}
+
+}
+
+}
+
+
+
+// 2.json Wörter prüfen
+
+let gefundene=[];
+
+
+for(let wort of wortwissen){
+
+
+if(klein.includes(wort.word)){
+
+
+gefundene.push(wort.meaning);
+
+
+for(let c of wort.connections){
+
+
+if(klein.includes(c.word)){
+
+gefundene.push(c.meaning);
+
+}
+
+}
+
+
+}
+
+}
+
+
+
+if(gefundene.length>0){
+
+return gefundene.join(" ");
+
+}
+
+
+
+
+
+// Memory prüfen
+
+for(let m of memory){
+
+
+if(klein.includes(m.question.toLowerCase())){
+
+return m.answer;
+
+}
+
+}
+
+
+
+
+return "Das muss ich noch lernen.";
+
+}
+
+
+
+
+
 
 function anzeigen(text,klasse){
+
 
 let chat=document.getElementById("chat");
 
@@ -314,20 +410,20 @@ chat.appendChild(div);
 
 chat.scrollTop=chat.scrollHeight;
 
+
 }
 
 
 
 
 
-// Neuer Chat
-
 function neuerChat(){
+
 
 document.getElementById("chat").innerHTML=
 
 `
-<div class="msg ki">
+<div class="msg velo">
 Neuer Chat gestartet.<br>
 Hallo! Ich bin Velo.
 </div>
@@ -337,9 +433,6 @@ Hallo! Ich bin Velo.
 
 
 
-
-
-// Enter senden
 
 document.getElementById("eingabe")
 .addEventListener("keydown",function(e){
