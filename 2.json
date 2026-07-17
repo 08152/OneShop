@@ -1,0 +1,129 @@
+{
+  "name": "Velo Wortnetz",
+  "version": "1.0",
+
+  "words": [
+    {
+      "word": "hund",
+      "meaning": "Ein Hund ist ein Tier und ein Haustier.",
+      "type": "Nomen",
+      "connections": [
+        {
+          "word": "bellen",
+          "meaning": "Hunde können bellen."
+        },
+        {
+          "word": "laufen",
+          "meaning": "Hunde können laufen."
+        },
+        {
+          "word": "mensch",
+          "meaning": "Hunde können Menschen begleiten."
+        }
+      ]
+    },
+
+    {
+      "word": "laufen",
+      "meaning": "Sich mit den Beinen fortbewegen.",
+      "type": "Verb",
+      "connections": [
+        {
+          "word": "schnell",
+          "meaning": "Man kann schnell laufen."
+        },
+        {
+          "word": "mensch",
+          "meaning": "Menschen können laufen."
+        },
+        {
+          "word": "hund",
+          "meaning": "Hunde können laufen."
+        }
+      ]
+    },
+
+    {
+      "word": "lernen",
+      "meaning": "Neue Informationen aufnehmen und verstehen.",
+      "type": "Verb",
+      "connections": [
+        {
+          "word": "wissen",
+          "meaning": "Durch Lernen entsteht Wissen."
+        },
+        {
+          "word": "schule",
+          "meaning": "In der Schule lernen Menschen."
+        },
+        {
+          "word": "ki",
+          "meaning": "Eine KI kann aus Daten lernen."
+        }
+      ]
+    },
+
+    {
+      "word": "mensch",
+      "meaning": "Ein Lebewesen, das denken und sprechen kann.",
+      "type": "Nomen",
+      "connections": [
+        {
+          "word": "sprechen",
+          "meaning": "Menschen können sprechen."
+        },
+        {
+          "word": "denken",
+          "meaning": "Menschen können denken."
+        },
+        {
+          "word": "lernen",
+          "meaning": "Menschen können lernen."
+        }
+      ]
+    }
+  ],
+
+
+  "sentences": [
+    {
+      "pattern": [
+        "ich",
+        "bin",
+        "mensch"
+      ],
+      "meaning": "Eine Person beschreibt sich selbst."
+    },
+
+    {
+      "pattern": [
+        "hund",
+        "kann",
+        "laufen"
+      ],
+      "meaning": "Ein Hund besitzt die Fähigkeit zu laufen."
+    },
+
+    {
+      "pattern": [
+        "mensch",
+        "lernt",
+        "wissen"
+      ],
+      "meaning": "Menschen können Wissen aufnehmen."
+    }
+  ],
+
+
+  "learning_rules": [
+    {
+      "rule": "Wenn zwei Wörter oft zusammen vorkommen, entsteht eine Verbindung."
+    },
+    {
+      "rule": "Ein einzelnes Wort kann eine Bedeutung haben."
+    },
+    {
+      "rule": "Mehrere Wörter zusammen können eine neue Bedeutung bilden."
+    }
+  ]
+}
