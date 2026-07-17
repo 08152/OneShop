@@ -1,280 +1,122 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI Beat Generator (CC0 Web Audio)</title>
-    <style>
-        body {
-            background-color: #121214;
-            color: #e2e8f0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: #1e1e24;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-        h1 { margin-bottom: 5px; color: #3b82f6; }
-        p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; }
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-        button {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        button:hover { background: #2563eb; transform: translateY(-2px); }
-        button.stop { background: #ef4444; }
-        button.stop:hover { background: #dc2626; }
-        button.ai { background: #10b981; }
-        button.ai:hover { background: #059669; }
-        .status {
-            font-weight: bold;
-            color: #10b981;
-            margin-bottom: 20px;
-            height: 20px;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .track-label {
-            grid-column: span 4;
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            margin-top: 10px;
-        }
-        .step {
-            height: 30px;
-            background: #334155;
-            border-radius: 4px;
-            transition: background 0.1s;
-        }
-        .step.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-        .step.playing { border: 2px solid #ffffff; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniKI Login</title>
+
+<style>
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.login{
+    width:340px;
+    background:#ffffff;
+    border-radius:12px;
+    padding:25px;
+    box-shadow:0 5px 20px rgba(0,0,0,.15);
+    text-align:center;
+}
+
+h1{
+    margin-top:0;
+    color:#222;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    font-size:16px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:15px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    font-size:16px;
+    border:none;
+    border-radius:8px;
+    background:#000;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#333;
+}
+
+#error{
+    color:red;
+    margin-top:12px;
+}
+</style>
+
 </head>
 <body>
 
-<div class="container">
-    <h1>KI Beat Generator</h1>
-    <p>Generiert mathematisch reine CC0-Audio-Synthesen via Web Audio API.</p>
-    
-    <div class="controls">
-        <button id="playBtn" onclick="togglePlayback()">Play</button>
-        <button class="ai" onclick="generateAIBeat()">KI Rhythmus generieren</button>
-    </div>
+<div class="login">
 
-    <div class="status" id="statusText">Bereit. Drücke KI Rhythmus!</div>
+<h1>MiniKI</h1>
 
-    <div class="grid" id="sequencerGrid">
-        <!-- Rhythmus-Visualisierung wird hier generiert -->
-    </div>
+<p>Bitte PIN eingeben</p>
+
+<input
+type="password"
+id="pin"
+placeholder="PIN eingeben"
+autocomplete="off">
+
+<button onclick="login()">
+Anmelden
+</button>
+
+<p id="error"></p>
+
 </div>
 
 <script>
-    // Web Audio Context Initialisierung
-    let audioCtx = null;
-    let isPlaying = false;
-    let currentStep = 0;
-    let intervalId = null;
-    let bpm = 125;
-    
-    // Rhythmus-Muster für 3 Spuren (Kick, Snare, Hi-Hat) über 16 Steps
-    const tracks = {
-        kick:  new Array(16).fill(false),
-        snare: new Array(16).fill(false),
-        hihat: new Array(16).fill(false)
-    };
 
-    // KI-Rhythmus-Wahrscheinlichkeiten (Probabilistische Matrix)
-    const aiRules = {
-        kick:  [0.9, 0.1, 0.2, 0.1, 0.8, 0.1, 0.3, 0.1, 0.9, 0.1, 0.2, 0.2, 0.8, 0.1, 0.4, 0.1],
-        snare: [0.0, 0.1, 0.1, 0.2, 0.9, 0.1, 0.1, 0.3, 0.0, 0.1, 0.2, 0.1, 0.9, 0.1, 0.2, 0.4],
-        hihat: [0.8, 0.4, 0.7, 0.5, 0.8, 0.3, 0.7, 0.6, 0.8, 0.4, 0.7, 0.5, 0.8, 0.4, 0.9, 0.7]
-    };
+const PIN = "081508151235180Rss#";
 
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+function login(){
+
+    const eingabe = document.getElementById("pin").value;
+
+    if(eingabe === PIN){
+
+        window.location.href = "chat.html";
+
+    }else{
+
+        document.getElementById("error").textContent = "Falscher PIN.";
+
     }
 
-    // --- Synthesizer für CC0 Sound-Erzeugung ---
-    function playKick(time) {
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+}
 
-        osc.frequency.setValueAtTime(120, time);
-        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.3);
-        
-        gain.gain.setValueAtTime(1, time);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+document.getElementById("pin").addEventListener("keydown",function(e){
 
-        osc.start(time);
-        osc.stop(time + 0.3);
+    if(e.key==="Enter"){
+
+        login();
+
     }
 
-    function playSnare(time) {
-        // Weißes Rauschen erzeugen für den Snare-Teppich
-        let bufferSize = audioCtx.sampleRate * 0.2;
-        let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        let data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
+});
 
-        let noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'highpass';
-        filter.frequency.value = 1000;
-
-        let gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.7, time);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        noise.start(time);
-        noise.stop(time + 0.2);
-    }
-
-    function playHiHat(time) {
-        let osc = audioCtx.createOscillator();
-        let gain = audioCtx.createGain();
-        let filter = audioCtx.createBiquadFilter();
-
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(10000, time);
-        
-        filter.type = 'highpass';
-        filter.frequency.value = 7000;
-
-        gain.gain.setValueAtTime(0.3, time);
-        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start(time);
-        osc.stop(time + 0.06);
-    }
-
-    // --- KI-Generierungs-Logik ---
-    function generateAIBeat() {
-        initAudio();
-        // Berechne Rhythmus basierend auf Wahrscheinlichkeiten der KI-Matrix
-        for (let step = 0; step < 16; step++) {
-            tracks.kick[step] = Math.random() < aiRules.kick[step];
-            tracks.snare[step] = Math.random() < aiRules.snare[step];
-            tracks.hihat[step] = Math.random() < aiRules.hihat[step];
-        }
-        document.getElementById('statusText').innerText = "Neuer KI-Beat generiert!";
-        renderGrid();
-    }
-
-    // --- Sequencer Core Loop ---
-    function togglePlayback() {
-        initAudio();
-        const playBtn = document.getElementById('playBtn');
-        
-        if (isPlaying) {
-            clearInterval(intervalId);
-            isPlaying = false;
-            playBtn.innerText = "Play";
-            playBtn.classList.remove('stop');
-            currentStep = 0;
-            renderGrid();
-        } else {
-            isPlaying = true;
-            playBtn.innerText = "Stop";
-            playBtn.classList.add('stop');
-            
-            let stepDuration = (60 / bpm) / 4; // 16tel Noten
-            let nextStepTime = audioCtx.currentTime;
-
-            intervalId = setInterval(() => {
-                // Audio-Scheduler vorausschauend triggern
-                if (audioCtx.currentTime >= nextStepTime - 0.02) {
-                    if (tracks.kick[currentStep]) playKick(nextStepTime);
-                    if (tracks.snare[currentStep]) playSnare(nextStepTime);
-                    if (tracks.hihat[currentStep]) playHiHat(nextStepTime);
-                    
-                    highlightStep(currentStep);
-                    
-                    nextStepTime += stepDuration;
-                    currentStep = (currentStep + 1) % 16;
-                }
-            }, 25);
-        }
-    }
-
-    // --- UI Rendering ---
-    function renderGrid() {
-        const grid = document.getElementById('sequencerGrid');
-        grid.innerHTML = '';
-
-        for (let trackName in tracks) {
-            let label = document.createElement('div');
-            label.className = 'track-label';
-            label.innerText = trackName;
-            grid.appendChild(label);
-
-            for (let i = 0; i < 16; i++) {
-                let stepDiv = document.createElement('div');
-                stepDiv.className = 'step';
-                if (tracks[trackName][i]) stepDiv.classList.add('active');
-                stepDiv.id = `${trackName}-${i}`;
-                grid.appendChild(stepDiv);
-            }
-        }
-    }
-
-    function highlightStep(stepIndex) {
-        // Entferne alten Playhead-Marker
-        document.querySelectorAll('.step').forEach(el => el.classList.remove('playing'));
-        // Setze neuen Playhead-Marker auf aktuellen Step
-        for (let trackName in tracks) {
-            let el = document.getElementById(`${trackName}-${stepIndex}`);
-            if (el) el.classList.add('playing');
-        }
-    }
-
-    // Initiales Grid beim Laden anzeigen
-    renderGrid();
 </script>
+
 </body>
 </html>
