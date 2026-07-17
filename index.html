@@ -1,308 +1,280 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MiniKI v1.1</title>
-
-<style>
-
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    height:100vh;
-    background:#212121;
-    color:white;
-    font-family:Arial, Helvetica, sans-serif;
-    display:flex;
-}
-
-
-/* Seitenleiste */
-
-.sidebar{
-
-    width:260px;
-    background:#171717;
-    padding:15px;
-    display:flex;
-    flex-direction:column;
-
-}
-
-
-.logo{
-
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:20px;
-
-}
-
-
-.new{
-
-    background:#2f2f2f;
-    border:1px solid #555;
-    padding:12px;
-    border-radius:8px;
-    cursor:pointer;
-    color:white;
-
-}
-
-
-.info{
-
-    margin-top:auto;
-    color:#aaa;
-    font-size:13px;
-
-}
-
-
-/* Hauptbereich */
-
-.main{
-
-    flex:1;
-    display:flex;
-    flex-direction:column;
-
-}
-
-
-/* Chat */
-
-#chat{
-
-    flex:1;
-    overflow-y:auto;
-    padding:30px;
-
-}
-
-
-.message{
-
-    max-width:800px;
-    margin:auto;
-    padding:18px;
-    line-height:1.5;
-
-}
-
-
-.user{
-
-    background:#2f2f2f;
-    border-radius:12px;
-    margin-bottom:15px;
-
-}
-
-
-.ai{
-
-    background:#444;
-    border-radius:12px;
-    margin-bottom:15px;
-
-}
-
-
-/* Eingabe */
-
-.input-area{
-
-    padding:20px;
-    display:flex;
-    justify-content:center;
-
-}
-
-
-.input-box{
-
-    width:80%;
-    max-width:850px;
-    background:#2f2f2f;
-    border-radius:15px;
-    display:flex;
-    padding:10px;
-
-}
-
-
-input{
-
-    flex:1;
-    background:none;
-    border:0;
-    outline:none;
-    color:white;
-    font-size:16px;
-
-}
-
-
-button{
-
-    background:#10a37f;
-    border:0;
-    color:white;
-    padding:10px 18px;
-    border-radius:10px;
-    cursor:pointer;
-
-}
-
-
-button:hover{
-
-    background:#13c896;
-
-}
-
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Beat Generator (CC0 Web Audio)</title>
+    <style>
+        body {
+            background-color: #121214;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #1e1e24;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 { margin-bottom: 5px; color: #3b82f6; }
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 25px; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: #2563eb; transform: translateY(-2px); }
+        button.stop { background: #ef4444; }
+        button.stop:hover { background: #dc2626; }
+        button.ai { background: #10b981; }
+        button.ai:hover { background: #059669; }
+        .status {
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 20px;
+            height: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .track-label {
+            grid-column: span 4;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-top: 10px;
+        }
+        .step {
+            height: 30px;
+            background: #334155;
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
+        .step.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+        .step.playing { border: 2px solid #ffffff; }
+    </style>
 </head>
-
-
 <body>
 
+<div class="container">
+    <h1>KI Beat Generator</h1>
+    <p>Generiert mathematisch reine CC0-Audio-Synthesen via Web Audio API.</p>
+    
+    <div class="controls">
+        <button id="playBtn" onclick="togglePlayback()">Play</button>
+        <button class="ai" onclick="generateAIBeat()">KI Rhythmus generieren</button>
+    </div>
 
-<div class="sidebar">
+    <div class="status" id="statusText">Bereit. Drücke KI Rhythmus!</div>
 
-<div class="logo">
-🤖 MiniKI
+    <div class="grid" id="sequencerGrid">
+        <!-- Rhythmus-Visualisierung wird hier generiert -->
+    </div>
 </div>
-
-
-<button class="new">
-+ Neuer Chat
-</button>
-
-
-<div class="info">
-
-MiniKI v1.1<br>
-Eigenes JSON Modell
-
-</div>
-
-
-</div>
-
-
-
-<div class="main">
-
-
-<div id="chat">
-
-
-<div class="message ai">
-
-Hallo! Ich bin MiniKI v1.1.<br>
-Wie kann ich dir helfen?
-
-</div>
-
-
-</div>
-
-
-
-<div class="input-area">
-
-<div class="input-box">
-
-<input id="msg" placeholder="Nachricht an MiniKI...">
-
-
-<button onclick="send()">
-➤
-</button>
-
-
-</div>
-
-</div>
-
-
-
-</div>
-
-
-
 
 <script>
+    // Web Audio Context Initialisierung
+    let audioCtx = null;
+    let isPlaying = false;
+    let currentStep = 0;
+    let intervalId = null;
+    let bpm = 125;
+    
+    // Rhythmus-Muster für 3 Spuren (Kick, Snare, Hi-Hat) über 16 Steps
+    const tracks = {
+        kick:  new Array(16).fill(false),
+        snare: new Array(16).fill(false),
+        hihat: new Array(16).fill(false)
+    };
 
+    // KI-Rhythmus-Wahrscheinlichkeiten (Probabilistische Matrix)
+    const aiRules = {
+        kick:  [0.9, 0.1, 0.2, 0.1, 0.8, 0.1, 0.3, 0.1, 0.9, 0.1, 0.2, 0.2, 0.8, 0.1, 0.4, 0.1],
+        snare: [0.0, 0.1, 0.1, 0.2, 0.9, 0.1, 0.1, 0.3, 0.0, 0.1, 0.2, 0.1, 0.9, 0.1, 0.2, 0.4],
+        hihat: [0.8, 0.4, 0.7, 0.5, 0.8, 0.3, 0.7, 0.6, 0.8, 0.4, 0.7, 0.5, 0.8, 0.4, 0.9, 0.7]
+    };
 
-async function send(){
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
 
-let input=document.getElementById("msg");
+    // --- Synthesizer für CC0 Sound-Erzeugung ---
+    function playKick(time) {
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
 
-let text=input.value.trim();
+        osc.frequency.setValueAtTime(120, time);
+        osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.3);
+        
+        gain.gain.setValueAtTime(1, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
 
-if(!text)return;
+        osc.start(time);
+        osc.stop(time + 0.3);
+    }
 
+    function playSnare(time) {
+        // Weißes Rauschen erzeugen für den Snare-Teppich
+        let bufferSize = audioCtx.sampleRate * 0.2;
+        let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        let data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
 
-chat.innerHTML +=
-`
-<div class="message user">
-${text}
-</div>
-`;
+        let noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
 
+        let filter = audioCtx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.value = 1000;
 
-input.value="";
+        let gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.7, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
 
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
 
-let response=await fetch("/api/chat",{
+        noise.start(time);
+        noise.stop(time + 0.2);
+    }
 
-method:"POST",
+    function playHiHat(time) {
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        let filter = audioCtx.createBiquadFilter();
 
-headers:{
-"Content-Type":"application/json"
-},
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(10000, time);
+        
+        filter.type = 'highpass';
+        filter.frequency.value = 7000;
 
-body:JSON.stringify({
+        gain.gain.setValueAtTime(0.3, time);
+        gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
 
-message:text
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
 
-})
+        osc.start(time);
+        osc.stop(time + 0.06);
+    }
 
-});
+    // --- KI-Generierungs-Logik ---
+    function generateAIBeat() {
+        initAudio();
+        // Berechne Rhythmus basierend auf Wahrscheinlichkeiten der KI-Matrix
+        for (let step = 0; step < 16; step++) {
+            tracks.kick[step] = Math.random() < aiRules.kick[step];
+            tracks.snare[step] = Math.random() < aiRules.snare[step];
+            tracks.hihat[step] = Math.random() < aiRules.hihat[step];
+        }
+        document.getElementById('statusText').innerText = "Neuer KI-Beat generiert!";
+        renderGrid();
+    }
 
+    // --- Sequencer Core Loop ---
+    function togglePlayback() {
+        initAudio();
+        const playBtn = document.getElementById('playBtn');
+        
+        if (isPlaying) {
+            clearInterval(intervalId);
+            isPlaying = false;
+            playBtn.innerText = "Play";
+            playBtn.classList.remove('stop');
+            currentStep = 0;
+            renderGrid();
+        } else {
+            isPlaying = true;
+            playBtn.innerText = "Stop";
+            playBtn.classList.add('stop');
+            
+            let stepDuration = (60 / bpm) / 4; // 16tel Noten
+            let nextStepTime = audioCtx.currentTime;
 
-let data=await response.json();
+            intervalId = setInterval(() => {
+                // Audio-Scheduler vorausschauend triggern
+                if (audioCtx.currentTime >= nextStepTime - 0.02) {
+                    if (tracks.kick[currentStep]) playKick(nextStepTime);
+                    if (tracks.snare[currentStep]) playSnare(nextStepTime);
+                    if (tracks.hihat[currentStep]) playHiHat(nextStepTime);
+                    
+                    highlightStep(currentStep);
+                    
+                    nextStepTime += stepDuration;
+                    currentStep = (currentStep + 1) % 16;
+                }
+            }, 25);
+        }
+    }
 
+    // --- UI Rendering ---
+    function renderGrid() {
+        const grid = document.getElementById('sequencerGrid');
+        grid.innerHTML = '';
 
+        for (let trackName in tracks) {
+            let label = document.createElement('div');
+            label.className = 'track-label';
+            label.innerText = trackName;
+            grid.appendChild(label);
 
-chat.innerHTML +=
-`
-<div class="message ai">
-${data.answer}
-</div>
-`;
+            for (let i = 0; i < 16; i++) {
+                let stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                if (tracks[trackName][i]) stepDiv.classList.add('active');
+                stepDiv.id = `${trackName}-${i}`;
+                grid.appendChild(stepDiv);
+            }
+        }
+    }
 
+    function highlightStep(stepIndex) {
+        // Entferne alten Playhead-Marker
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('playing'));
+        // Setze neuen Playhead-Marker auf aktuellen Step
+        for (let trackName in tracks) {
+            let el = document.getElementById(`${trackName}-${stepIndex}`);
+            if (el) el.classList.add('playing');
+        }
+    }
 
-
-chat.scrollTop=chat.scrollHeight;
-
-
-}
-
-
-
+    // Initiales Grid beim Laden anzeigen
+    renderGrid();
 </script>
-
-
 </body>
 </html>
