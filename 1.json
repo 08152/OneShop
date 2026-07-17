@@ -68,47 +68,47 @@
       ]
     },
     {
-  "topic": "menschen",
-  "keywords": [
-    "mensch",
-    "menschen",
-    "person",
-    "leute"
-  ],
-  "concepts": [
-    "Menschen können denken, lernen und miteinander kommunizieren.",
-    "Jeder Mensch ist einzigartig."
-  ]
-},
-{
-  "topic": "tiere",
-  "keywords": [
-    "tier",
-    "tiere",
-    "hund",
-    "katze",
-    "vogel"
-  ],
-  "concepts": [
-    "Tiere sind Lebewesen, die in verschiedenen Lebensräumen leben.",
-    "Viele Tiere können lernen und sich an ihre Umgebung anpassen."
-  ]
-},
-{
-  "topic": "natur",
-  "keywords": [
-    "natur",
-    "wald",
-    "pflanzen",
-    "umwelt",
-    "erde"
-  ],
-  "concepts": [
-    "Die Natur umfasst Pflanzen, Tiere, Wasser und Landschaften.",
-    "Menschen sollten die Umwelt schützen."
-  ]
-},
-{
+      "topic": "menschen",
+      "keywords": [
+        "mensch",
+        "menschen",
+        "person",
+        "leute"
+      ],
+      "concepts": [
+        "Menschen können denken, lernen und miteinander kommunizieren.",
+        "Jeder Mensch ist einzigartig."
+      ]
+    },
+    {
+      "topic": "tiere",
+      "keywords": [
+        "tier",
+        "tiere",
+        "hund",
+        "katze",
+        "vogel"
+      ],
+      "concepts": [
+        "Tiere sind Lebewesen, die in verschiedenen Lebensräumen leben.",
+        "Viele Tiere können lernen und sich an ihre Umgebung anpassen."
+      ]
+    },
+    {
+      "topic": "natur",
+      "keywords": [
+        "natur",
+        "wald",
+        "pflanzen",
+        "umwelt",
+        "erde"
+      ],
+      "concepts": [
+        "Die Natur umfasst Pflanzen, Tiere, Wasser und Landschaften.",
+        "Menschen sollten die Umwelt schützen."
+      ]
+    },
+    {
   "topic": "computer",
   "keywords": [
     "computer",
@@ -198,53 +198,29 @@
     "sprache",
     "wort",
     "satz",
-    "deutsch",
-    "kommunikation"
+    "kommunikation",
+    "reden"
   ],
   "concepts": [
     "Sprache ermöglicht Menschen miteinander zu kommunizieren.",
     "Wörter und Sätze bilden die Grundlage für Gespräche."
   ]
 },
-    {
-      "topic": "tiere",
-      "keywords": [
-        "tier",
-        "tiere",
-        "hund",
-        "katze"
-      ],
-      "concepts": [
-        "Tiere sind Lebewesen.",
-        "Hunde und Katzen gehören zu den beliebtesten Haustieren."
-      ]
-    },
-    {
-      "topic": "menschen",
-      "keywords": [
-        "mensch",
-        "menschen",
-        "person"
-      ],
-      "concepts": [
-        "Menschen können denken, lernen und miteinander kommunizieren.",
-        "Jeder Mensch ist einzigartig."
-      ]
-    },
-    {
-      "topic": "zahlen",
-      "keywords": [
-        "zahl",
-        "zahlen",
-        "eins",
-        "zwei"
-      ],
-      "concepts": [
-        "Zahlen werden zum Zählen und Rechnen benutzt.",
-        "Die ersten Zahlen sind 0, 1, 2, 3 und so weiter."
-      ]
-    },
-    {
+{
+  "topic": "zahlen",
+  "keywords": [
+    "zahl",
+    "zahlen",
+    "eins",
+    "zwei",
+    "rechnen"
+  ],
+  "concepts": [
+    "Zahlen werden zum Zählen und Rechnen benutzt.",
+    "Die ersten Zahlen sind 0, 1, 2, 3 und so weiter."
+  ]
+},
+{
   "topic": "familie",
   "keywords": [
     "familie",
@@ -255,7 +231,7 @@
   ],
   "concepts": [
     "Eine Familie besteht aus Menschen, die zusammenleben und sich unterstützen.",
-    "Eltern kümmern sich um ihre Kinder und helfen ihnen beim Lernen."
+    "Eltern kümmern sich um ihre Kinder."
   ]
 },
 {
@@ -334,7 +310,6 @@
     "arbeit",
     "beruf",
     "job",
-    "machen",
     "helfen"
   ],
   "concepts": [
@@ -356,6 +331,7 @@
     "Menschen pflanzen Blumen und pflegen die Natur."
   ]
 },
+,
 {
   "topic": "wasser",
   "keywords": [
@@ -444,7 +420,6 @@
   "topic": "bauen",
   "keywords": [
     "bauen",
-    "bauen",
     "werkzeug",
     "material",
     "erschaffen"
@@ -524,30 +499,6 @@
     "Gefühle beeinflussen, wie Menschen denken und handeln."
   ]
 }
-    {
-      "topic": "wetter",
-      "keywords": [
-        "wetter",
-        "regen",
-        "sonne",
-        "schnee"
-      ],
-      "concepts": [
-        "Das Wetter kann sonnig, regnerisch, windig oder kalt sein.",
-        "Die Sonne gibt Licht und Wärme."
-      ]
-    },
-    {
-      "topic": "schule",
-      "keywords": [
-        "schule",
-        "lernen",
-        "unterricht"
-      ],
-      "concepts": [
-        "In der Schule lernen Menschen neue Dinge.",
-        "Unterricht hilft beim Erlernen von Wissen."
-      ]
-    }
   ]
 }
+    
