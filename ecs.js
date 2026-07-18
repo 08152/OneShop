@@ -1,21 +1,19 @@
-"use strict";
+// ecs.js
 
 /**
- * ecs.js
- * Minimalistisches, performantes Entity Component System (ECS)
- * Keine externen Abhängigkeiten.
+ * Minimalistisches Entity Component System (ECS)
+ * ES-Modul
  */
 
-/* ============================
-   EntityManager
-============================ */
-
-class EntityManager {
+export class World {
     constructor() {
         this._nextEntityId = 1;
 
         // Map<ComponentClass, Map<EntityId, Component>>
-        this._components = new Map();
+        this._componentStores = new Map();
+
+        // Set<EntityId>
+        this._entities = new Set();
     }
 
     /**
@@ -23,166 +21,89 @@ class EntityManager {
      * @returns {number}
      */
     createEntity() {
-        return this._nextEntityId++;
+        const id = this._nextEntityId++;
+        this._entities.add(id);
+        return id;
     }
 
     /**
      * Fügt einer Entity eine Komponente hinzu.
      * @param {number} entityId
      * @param {object} componentInstance
+     * @returns {object}
      */
     addComponent(entityId, componentInstance) {
-        if (typeof entityId !== "number") {
-            throw new TypeError("entityId muss eine Zahl sein.");
-        }
-
-        if (componentInstance == null) {
-            throw new TypeError("componentInstance darf nicht null sein.");
+        if (!this._entities.has(entityId)) {
+            throw new Error(`Entity ${entityId} existiert nicht.`);
         }
 
         const componentClass = componentInstance.constructor;
 
-        let storage = this._components.get(componentClass);
+        let store = this._componentStores.get(componentClass);
 
-        if (!storage) {
-            storage = new Map();
-            this._components.set(componentClass, storage);
+        if (!store) {
+            store = new Map();
+            this._componentStores.set(componentClass, store);
         }
 
-        storage.set(entityId, componentInstance);
+        store.set(entityId, componentInstance);
+
+        return componentInstance;
     }
 
     /**
-     * Gibt eine Komponente zurück.
+     * Gibt die gewünschte Komponente einer Entity zurück.
      * @param {number} entityId
      * @param {Function} componentClass
-     * @returns {*|undefined}
+     * @returns {object|null}
      */
     getComponent(entityId, componentClass) {
-        const storage = this._components.get(componentClass);
+        const store = this._componentStores.get(componentClass);
 
-        if (!storage) {
-            return undefined;
+        if (!store) {
+            return null;
         }
 
-        return storage.get(entityId);
+        return store.get(entityId) ?? null;
     }
 
     /**
-     * Entfernt eine Komponente.
-     * @param {number} entityId
-     * @param {Function} componentClass
-     */
-    removeComponent(entityId, componentClass) {
-        const storage = this._components.get(componentClass);
-
-        if (storage) {
-            storage.delete(entityId);
-
-            if (storage.size === 0) {
-                this._components.delete(componentClass);
-            }
-        }
-    }
-
-    /**
-     * Entfernt alle Komponenten einer Entity.
-     * @param {number} entityId
-     */
-    removeEntity(entityId) {
-        for (const storage of this._components.values()) {
-            storage.delete(entityId);
-        }
-    }
-
-    /**
-     * Prüft, ob eine Entity eine bestimmte Komponente besitzt.
-     * @param {number} entityId
-     * @param {Function} componentClass
-     * @returns {boolean}
-     */
-    hasComponent(entityId, componentClass) {
-        const storage = this._components.get(componentClass);
-        return storage ? storage.has(entityId) : false;
-    }
-
-    /**
-     * Gibt alle Komponenten eines Typs zurück.
-     * @param {Function} componentClass
-     * @returns {Map<number, object>}
-     */
-    getComponentStorage(componentClass) {
-        return this._components.get(componentClass) || new Map();
-    }
-
-    /**
-     * Liefert alle Entities, die alle angegebenen Komponenten besitzen.
-     * @param  {...Function} componentClasses
+     * Gibt alle Entities zurück,
+     * die sämtliche angegebenen Komponenten besitzen.
+     *
+     * @param {Function[]} componentsArray
      * @returns {number[]}
      */
-    getEntitiesWith(...componentClasses) {
-        if (componentClasses.length === 0) {
+    getEntitiesWith(componentsArray) {
+        if (!Array.isArray(componentsArray) || componentsArray.length === 0) {
             return [];
         }
 
-        const firstStorage = this._components.get(componentClasses[0]);
+        const firstStore = this._componentStores.get(componentsArray[0]);
 
-        if (!firstStorage) {
+        if (!firstStore) {
             return [];
         }
 
         const result = [];
 
-        outer:
-        for (const entityId of firstStorage.keys()) {
-            for (let i = 1; i < componentClasses.length; i++) {
-                const storage = this._components.get(componentClasses[i]);
+        for (const entityId of firstStore.keys()) {
+            let valid = true;
 
-                if (!storage || !storage.has(entityId)) {
-                    continue outer;
+            for (let i = 1; i < componentsArray.length; i++) {
+                const store = this._componentStores.get(componentsArray[i]);
+
+                if (!store || !store.has(entityId)) {
+                    valid = false;
+                    break;
                 }
             }
 
-            result.push(entityId);
+            if (valid) {
+                result.push(entityId);
+            }
         }
 
         return result;
     }
-}
-
-/* ============================
-   Basisklasse für Systeme
-============================ */
-
-class System {
-    /**
-     * @param {EntityManager} ecs
-     */
-    constructor(ecs) {
-        this.ecs = ecs;
-    }
-
-    /**
-     * Wird pro Frame aufgerufen.
-     * @param {number} dt Delta-Time in Sekunden
-     */
-    update(dt) {
-        // Von Unterklassen überschreiben.
-    }
-}
-
-/* ============================
-   Optionaler Export
-============================ */
-
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-        EntityManager,
-        System
-    };
-}
-
-if (typeof window !== "undefined") {
-    window.EntityManager = EntityManager;
-    window.System = System;
 }
