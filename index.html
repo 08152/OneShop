@@ -1,252 +1,663 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Engine Editor</title>
+<meta charset="UTF-8">
+<title>Offline 3D Game Engine</title>
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Inter,Segoe UI,Arial,sans-serif;
-        }
+<style>
+html,body{
+    margin:0;
+    overflow:hidden;
+    background:#000;
+}
 
-        :root{
-            --bg:#1a1a1a;
-            --panel:#232323;
-            --panel2:#2c2c2c;
-            --border:#3b3b3b;
-            --text:#f2f2f2;
-            --muted:#bcbcbc;
-            --accent:#4ea3ff;
-        }
+canvas{
+    display:block;
+}
 
-        html,body{
-            width:100%;
-            height:100%;
-            background:var(--bg);
-            color:var(--text);
-            overflow:hidden;
-        }
+#info{
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:white;
+    font-family:Arial;
+    background:rgba(0,0,0,.5);
+    padding:10px;
+}
+</style>
 
-        body{
-            display:grid;
-            grid-template-columns:260px 1fr 300px;
-        }
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
 
-        aside{
-            background:var(--panel);
-            border-right:1px solid var(--border);
-            display:flex;
-            flex-direction:column;
-            overflow:hidden;
-        }
-
-        .right{
-            border-right:none;
-            border-left:1px solid var(--border);
-        }
-
-        .panel-title{
-            background:var(--panel2);
-            padding:16px;
-            font-size:18px;
-            font-weight:700;
-            border-bottom:1px solid var(--border);
-        }
-
-        .content{
-            flex:1;
-            overflow:auto;
-            padding:16px;
-        }
-
-        .asset-list{
-            list-style:none;
-        }
-
-        .asset-list li{
-            padding:10px 12px;
-            margin-bottom:8px;
-            border:1px solid var(--border);
-            border-radius:8px;
-            background:#2b2b2b;
-            cursor:pointer;
-            transition:.2s;
-        }
-
-        .asset-list li:hover{
-            background:#343434;
-            border-color:var(--accent);
-        }
-
-        main{
-            display:flex;
-            flex-direction:column;
-            background:#111;
-        }
-
-        .toolbar{
-            height:50px;
-            background:var(--panel);
-            border-bottom:1px solid var(--border);
-            display:flex;
-            align-items:center;
-            padding:0 16px;
-            font-weight:600;
-        }
-
-        .canvas-container{
-            flex:1;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            padding:20px;
-        }
-
-        canvas{
-            width:100%;
-            height:100%;
-            background:#0f0f0f;
-            border:1px solid var(--border);
-            border-radius:10px;
-            display:block;
-        }
-
-        .group{
-            margin-bottom:24px;
-        }
-
-        .group h3{
-            margin-bottom:12px;
-            color:var(--muted);
-            font-size:15px;
-        }
-
-        .field{
-            display:flex;
-            flex-direction:column;
-            margin-bottom:14px;
-        }
-
-        label{
-            margin-bottom:6px;
-            font-size:13px;
-            color:var(--muted);
-        }
-
-        input[type=number]{
-            background:#2e2e2e;
-            color:var(--text);
-            border:1px solid var(--border);
-            border-radius:6px;
-            padding:10px;
-            outline:none;
-            transition:.2s;
-        }
-
-        input[type=number]:focus{
-            border-color:var(--accent);
-        }
-
-        @media(max-width:1000px){
-            body{
-                grid-template-columns:220px 1fr;
-            }
-
-            .right{
-                display:none;
-            }
-        }
-
-        @media(max-width:700px){
-            body{
-                grid-template-columns:1fr;
-            }
-
-            aside{
-                display:none;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
-    <aside class="left">
-        <div class="panel-title">
-            Assets
-        </div>
+<div id="info">
+WASD / Pfeiltasten = Bewegen<br>
+Third Person Kamera<br>
+Offline-Prozedurale Texturen
+</div>
 
-        <div class="content">
-            <ul class="asset-list">
-                <li>Sprites</li>
-                <li>Texturen</li>
-                <li>Modelle</li>
-                <li>Audio</li>
-                <li>Skripte</li>
-                <li>Szenen</li>
-                <li>Materialien</li>
-                <li>Shader</li>
-            </ul>
-        </div>
-    </aside>
 
-    <main>
+<script>
 
-        <div class="toolbar">
-            Web Game Engine Editor
-        </div>
+// =======================================
+// 1. ENGINE GRUNDSETUP
+// =======================================
 
-        <div class="canvas-container">
-            <canvas id="gameCanvas"></canvas>
-        </div>
+const scene = new THREE.Scene();
 
-    </main>
+scene.background = new THREE.Color(0x87ceeb);
 
-    <aside class="right">
 
-        <div class="panel-title">
-            Inspector
-        </div>
+// Nebel für Atmosphäre
+scene.fog = new THREE.FogExp2(
+    0x88aacc,
+    0.0025
+);
 
-        <div class="content">
 
-            <div class="group">
-                <h3>Position</h3>
+// Kamera
+const camera = new THREE.PerspectiveCamera(
+    70,
+    window.innerWidth/window.innerHeight,
+    0.1,
+    2000
+);
 
-                <div class="field">
-                    <label for="posX">X</label>
-                    <input id="posX" type="number" value="0" step="1">
-                </div>
 
-                <div class="field">
-                    <label for="posY">Y</label>
-                    <input id="posY" type="number" value="0" step="1">
-                </div>
-            </div>
+// Renderer
+const renderer = new THREE.WebGLRenderer({
+    antialias:true
+});
 
-            <div class="group">
-                <h3>Skalierung</h3>
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
 
-                <div class="field">
-                    <label for="scaleW">W</label>
-                    <input id="scaleW" type="number" value="100" step="1">
-                </div>
 
-                <div class="field">
-                    <label for="scaleH">H</label>
-                    <input id="scaleH" type="number" value="100" step="1">
-                </div>
-            </div>
+// Schatten aktivieren
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type =
+THREE.PCFSoftShadowMap;
 
-        </div>
 
-    </aside>
+document.body.appendChild(
+    renderer.domElement
+);
 
-    <script type="module" src="main.js"></script>
+
+// =======================================
+// 2. PROZEDURALE TEXTUREN
+// =======================================
+
+
+// Boden-Schachbrett
+function createGroundTexture(){
+
+    let canvas=document.createElement("canvas");
+
+    canvas.width=256;
+    canvas.height=256;
+
+    let ctx=canvas.getContext("2d");
+
+
+    let size=32;
+
+
+    for(let y=0;y<8;y++){
+
+        for(let x=0;x<8;x++){
+
+            if((x+y)%2===0)
+                ctx.fillStyle="#4b8f3b";
+            else
+                ctx.fillStyle="#3c7630";
+
+
+            ctx.fillRect(
+                x*size,
+                y*size,
+                size,
+                size
+            );
+        }
+    }
+
+
+    let texture =
+    new THREE.CanvasTexture(canvas);
+
+
+    texture.wrapS =
+    THREE.RepeatWrapping;
+
+    texture.wrapT =
+    THREE.RepeatWrapping;
+
+
+    texture.repeat.set(20,20);
+
+
+    return texture;
+}
+
+
+
+// Kisten-Rausch-Textur
+
+function createBoxTexture(){
+
+    let canvas=document.createElement("canvas");
+
+    canvas.width=128;
+    canvas.height=128;
+
+
+    let ctx=canvas.getContext("2d");
+
+
+    for(let y=0;y<128;y+=8){
+
+        for(let x=0;x<128;x+=8){
+
+            let r=
+            100+
+            Math.random()*80;
+
+
+            ctx.fillStyle=
+            `rgb(${r},${r/2},20)`;
+
+
+            ctx.fillRect(
+                x,
+                y,
+                8,
+                8
+            );
+
+        }
+    }
+
+
+    return new THREE.CanvasTexture(canvas);
+}
+
+
+
+const groundTexture =
+createGroundTexture();
+
+
+const boxTexture =
+createBoxTexture();
+
+
+// =======================================
+// 3. LICHTSYSTEM
+// =======================================
+
+
+const ambient =
+new THREE.AmbientLight(
+    0xffffff,
+    0.5
+);
+
+scene.add(ambient);
+
+
+
+const sun =
+new THREE.DirectionalLight(
+    0xffffff,
+    1
+);
+
+
+sun.position.set(
+    50,
+   100,
+   50
+);
+
+
+sun.castShadow=true;
+
+
+sun.shadow.mapSize.width=2048;
+sun.shadow.mapSize.height=2048;
+
+
+scene.add(sun);
+
+
+
+// =======================================
+// 4. BODENPLATTE
+// =======================================
+
+
+const groundGeometry =
+new THREE.PlaneGeometry(
+    500,
+    500
+);
+
+
+const groundMaterial =
+new THREE.MeshStandardMaterial({
+
+    map:groundTexture
+
+});
+
+
+const ground =
+new THREE.Mesh(
+    groundGeometry,
+    groundMaterial
+);
+
+
+ground.rotation.x=
+-Math.PI/2;
+
+
+ground.receiveShadow=true;
+
+
+scene.add(ground);
+
+
+
+// =======================================
+// 5. MAP OBJEKTE
+// =======================================
+
+
+const obstacles=[];
+
+
+const boxGeometry =
+new THREE.BoxGeometry(
+    8,
+    8,
+    8
+);
+
+
+const boxMaterial =
+new THREE.MeshStandardMaterial({
+
+    map:boxTexture
+
+});
+
+
+
+// mindestens 30 Objekte
+
+for(let i=0;i<50;i++){
+
+    let box =
+    new THREE.Mesh(
+        boxGeometry,
+        boxMaterial
+    );
+
+
+    box.position.x =
+    Math.random()*400-200;
+
+
+    box.position.z =
+    Math.random()*400-200;
+
+
+    box.position.y=4;
+
+
+    box.castShadow=true;
+    box.receiveShadow=true;
+
+
+    scene.add(box);
+
+
+    obstacles.push(box);
+
+}
+
+
+
+// =======================================
+// 6. SPIELER
+// =======================================
+
+
+const playerGeometry =
+new THREE.SphereGeometry(
+    2,
+    32,
+    32
+);
+
+
+const playerMaterial =
+new THREE.MeshStandardMaterial({
+
+    color:0xff3333
+
+});
+
+
+const player =
+new THREE.Mesh(
+    playerGeometry,
+    playerMaterial
+);
+
+
+player.position.set(
+    0,
+    2,
+    0
+);
+
+
+player.castShadow=true;
+
+
+scene.add(player);
+
+
+
+// Spieler Geschwindigkeit
+
+const velocity =
+new THREE.Vector3();
+
+
+const keys={};
+
+
+document.addEventListener(
+"keydown",
+e=>{
+
+    keys[e.key.toLowerCase()]=true;
+
+});
+
+
+document.addEventListener(
+"keyup",
+e=>{
+
+    keys[e.key.toLowerCase()]=false;
+
+});
+
+
+// =======================================
+// 7. KOLLISION AABB
+// =======================================
+
+
+function checkCollision(newPos){
+
+
+    let playerBox =
+    new THREE.Box3()
+    .setFromCenterAndSize(
+
+        newPos,
+
+        new THREE.Vector3(
+            4,
+            4,
+            4
+        )
+
+    );
+
+
+    for(let obj of obstacles){
+
+        let box =
+        new THREE.Box3()
+        .setFromObject(obj);
+
+
+        if(playerBox.intersectsBox(box)){
+            return true;
+        }
+
+    }
+
+
+    return false;
+
+}
+// =======================================
+// 8. SPIELER BEWEGUNG
+// =======================================
+
+const moveSpeed = 0.35;
+
+
+function updatePlayer(){
+
+    let direction =
+    new THREE.Vector3();
+
+
+    // WASD + Pfeiltasten
+
+    if(keys["w"] || keys["arrowup"]){
+        direction.z -= 1;
+    }
+
+    if(keys["s"] || keys["arrowdown"]){
+        direction.z += 1;
+    }
+
+    if(keys["a"] || keys["arrowleft"]){
+        direction.x -= 1;
+    }
+
+    if(keys["d"] || keys["arrowright"]){
+        direction.x += 1;
+    }
+
+
+    if(direction.length()>0){
+
+        direction.normalize();
+
+
+        let movement =
+        direction.multiplyScalar(
+            moveSpeed
+        );
+
+
+        let newPosition =
+        player.position.clone()
+        .add(movement);
+
+
+
+        // AABB Kollisionsprüfung
+
+        if(!checkCollision(newPosition)){
+
+            player.position.copy(
+                newPosition
+            );
+
+        }
+
+
+        // Spieler dreht in Laufrichtung
+
+        player.rotation.y =
+        Math.atan2(
+            direction.x,
+            direction.z
+        );
+
+    }
+
+}
+
+
+
+// =======================================
+// 9. THIRD PERSON KAMERA
+// =======================================
+
+
+const cameraOffset =
+new THREE.Vector3(
+    0,
+    15,
+    25
+);
+
+
+function updateCamera(){
+
+
+    let wantedPosition =
+    player.position.clone()
+    .add(cameraOffset);
+
+
+
+    // weiches Folgen
+
+    camera.position.lerp(
+        wantedPosition,
+        0.08
+    );
+
+
+    camera.lookAt(
+        player.position
+    );
+
+}
+
+
+
+// =======================================
+// 10. GAME LOOP
+// =======================================
+
+
+let lastTime = 0;
+
+
+function gameLoop(time){
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+
+    let delta =
+    (time-lastTime)/1000;
+
+
+    lastTime=time;
+
+
+
+    // Spieler aktualisieren
+
+    updatePlayer();
+
+
+    // Kamera folgen lassen
+
+    updateCamera();
+
+
+
+    // Szene rendern
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+
+// =======================================
+// 11. STARTPOSITION KAMERA
+// =======================================
+
+
+camera.position.set(
+    0,
+    15,
+    25
+);
+
+
+camera.lookAt(
+    player.position
+);
+
+
+
+// =======================================
+// 12. FENSTERGRÖSSE
+// =======================================
+
+
+window.addEventListener(
+"resize",
+()=>{
+
+
+    camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+});
+
+
+
+// =======================================
+// ENGINE START
+// =======================================
+
+
+requestAnimationFrame(
+    gameLoop
+);
+
+
+</script>
 
 </body>
 </html>
