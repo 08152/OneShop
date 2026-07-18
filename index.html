@@ -1,628 +1,3044 @@
 <!DOCTYPE html>
-<html lang="de">
+<html>
 <head>
+
 <meta charset="UTF-8">
-<title>Offline 3D Game Engine</title>
+<title>Unity Style 3D Game Engine</title>
 
 <style>
+
 html,body{
     margin:0;
+    width:100%;
+    height:100%;
     overflow:hidden;
-    background:#000;
+    background:#202020;
+    color:white;
+    font-family:Arial;
 }
+
+
+#editor{
+    display:grid;
+    grid-template-columns:260px 1fr 320px;
+    height:100vh;
+}
+
+
+.panel{
+    background:#171717;
+    border:1px solid #444;
+    overflow:auto;
+}
+
+
+.header{
+    background:#333;
+    padding:10px;
+    font-weight:bold;
+}
+
+
+#sceneView{
+    position:relative;
+}
+
 
 canvas{
     display:block;
 }
 
-#info{
-    position:absolute;
-    top:10px;
-    left:10px;
-    color:white;
-    font-family:Arial;
-    background:rgba(0,0,0,.5);
-    padding:10px;
-}
-</style>
 
-<!-- Three.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+button{
+    background:#333;
+    color:white;
+    border:1px solid #777;
+    padding:6px;
+    margin:3px;
+}
+
+
+.object{
+    padding:8px;
+    cursor:pointer;
+}
+
+
+.object:hover{
+    background:#444;
+}
+
+
+.selected{
+    background:#225588;
+}
+
+
+input{
+    width:70px;
+    background:#111;
+    color:white;
+    border:1px solid #777;
+}
+
+
+.field{
+    margin:8px;
+}
+
+
+</style>
 
 </head>
 
+
 <body>
 
-<div id="info">
-WASD / Pfeiltasten = Bewegen<br>
-Third Person Kamera<br>
-Offline-Prozedurale Texturen
+
+<div id="editor">
+
+
+<div class="panel">
+
+<div class="header">
+HIERARCHY
 </div>
+
+
+<button onclick="createCube()">
+Cube
+</button>
+
+<button onclick="createSphere()">
+Sphere
+</button>
+
+<button onclick="createPlane()">
+Plane
+</button>
+
+<button onclick="createLight()">
+Light
+</button>
+
+
+<hr>
+
+
+<div id="hierarchy"></div>
+
+
+</div>
+
+
+
+
+
+<div id="sceneView"></div>
+
+
+
+
+
+<div class="panel">
+
+<div class="header">
+INSPECTOR
+</div>
+
+
+<div id="inspector">
+Kein Objekt ausgewählt
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+
 
 
 <script>
 
-// =======================================
-// 1. ENGINE GRUNDSETUP
-// =======================================
 
-const scene = new THREE.Scene();
+/*
+==========================
+TIME SYSTEM
+==========================
+*/
 
-scene.background = new THREE.Color(0x87ceeb);
+
+const Time={
+
+deltaTime:0,
+
+time:0,
+
+last:performance.now()
+
+};
 
 
-// Nebel für Atmosphäre
-scene.fog = new THREE.FogExp2(
-    0x88aacc,
-    0.0025
+
+
+
+
+/*
+==========================
+COMPONENT SYSTEM
+==========================
+*/
+
+
+class Component{
+
+
+constructor(gameObject){
+
+this.gameObject=gameObject;
+
+this.enabled=true;
+
+}
+
+
+
+update(){
+
+}
+
+
+}
+
+
+
+
+
+
+
+class Transform extends Component{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+
+this.position=
+new THREE.Vector3(
+0,0,0
 );
 
 
-// Kamera
-const camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth/window.innerHeight,
-    0.1,
-    2000
+
+this.rotation=
+new THREE.Euler(
+0,0,0
 );
 
 
-// Renderer
-const renderer = new THREE.WebGLRenderer({
-    antialias:true
+
+this.scale=
+new THREE.Vector3(
+1,1,1
+);
+
+
+
+}
+
+
+
+apply(){
+
+
+let object=
+this.gameObject.mesh;
+
+
+
+if(object){
+
+
+object.position.copy(
+this.position
+);
+
+
+object.rotation.copy(
+this.rotation
+);
+
+
+object.scale.copy(
+this.scale
+);
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+class GameObject{
+
+
+constructor(name,mesh=null){
+
+
+this.name=name;
+
+
+this.mesh=mesh;
+
+
+this.components=[];
+
+
+this.transform=
+new Transform(this);
+
+
+this.components.push(
+this.transform
+);
+
+
+this.id=
+crypto.randomUUID();
+
+
+}
+
+
+
+addComponent(component){
+
+
+this.components.push(
+component
+);
+
+
+return component;
+
+
+}
+
+
+
+getComponent(type){
+
+
+return this.components.find(
+c=>c instanceof type
+);
+
+
+}
+
+
+
+
+update(){
+
+
+for(let component of this.components){
+
+
+if(component.enabled){
+
+component.update();
+
+}
+
+
+}
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+ENGINE DATA
+==========================
+*/
+
+
+const Engine={
+
+
+objects:[],
+
+
+selected:null
+
+
+};
+
+
+
+
+
+
+
+
+
+/*
+==========================
+THREE ENGINE
+==========================
+*/
+
+
+const scene=
+new THREE.Scene();
+
+
+
+scene.background=
+new THREE.Color(
+0x77aaff
+);
+
+
+
+
+const camera=
+new THREE.PerspectiveCamera(
+
+70,
+
+window.innerWidth /
+window.innerHeight,
+
+0.1,
+
+5000
+
+);
+
+
+
+camera.position.set(
+5,
+5,
+8
+);
+
+
+
+
+
+const renderer=
+new THREE.WebGLRenderer({
+
+antialias:true
+
 });
 
+
+
 renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
+
+window.innerWidth-580,
+
+window.innerHeight
+
 );
 
 
-// Schatten aktivieren
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type =
-THREE.PCFSoftShadowMap;
 
-
-document.body.appendChild(
-    renderer.domElement
+document
+.getElementById("sceneView")
+.appendChild(
+renderer.domElement
 );
 
 
-// =======================================
-// 2. PROZEDURALE TEXTUREN
-// =======================================
-
-
-// Boden-Schachbrett
-function createGroundTexture(){
-
-    let canvas=document.createElement("canvas");
-
-    canvas.width=256;
-    canvas.height=256;
-
-    let ctx=canvas.getContext("2d");
-
-
-    let size=32;
-
-
-    for(let y=0;y<8;y++){
-
-        for(let x=0;x<8;x++){
-
-            if((x+y)%2===0)
-                ctx.fillStyle="#4b8f3b";
-            else
-                ctx.fillStyle="#3c7630";
-
-
-            ctx.fillRect(
-                x*size,
-                y*size,
-                size,
-                size
-            );
-        }
-    }
-
-
-    let texture =
-    new THREE.CanvasTexture(canvas);
-
-
-    texture.wrapS =
-    THREE.RepeatWrapping;
-
-    texture.wrapT =
-    THREE.RepeatWrapping;
-
-
-    texture.repeat.set(20,20);
-
-
-    return texture;
-}
 
 
 
-// Kisten-Rausch-Textur
-
-function createBoxTexture(){
-
-    let canvas=document.createElement("canvas");
-
-    canvas.width=128;
-    canvas.height=128;
 
 
-    let ctx=canvas.getContext("2d");
+scene.add(
 
-
-    for(let y=0;y<128;y+=8){
-
-        for(let x=0;x<128;x+=8){
-
-            let r=
-            100+
-            Math.random()*80;
-
-
-            ctx.fillStyle=
-            `rgb(${r},${r/2},20)`;
-
-
-            ctx.fillRect(
-                x,
-                y,
-                8,
-                8
-            );
-
-        }
-    }
-
-
-    return new THREE.CanvasTexture(canvas);
-}
-
-
-
-const groundTexture =
-createGroundTexture();
-
-
-const boxTexture =
-createBoxTexture();
-
-
-// =======================================
-// 3. LICHTSYSTEM
-// =======================================
-
-
-const ambient =
 new THREE.AmbientLight(
-    0xffffff,
-    0.5
+0xffffff,
+0.5
+)
+
 );
 
-scene.add(ambient);
 
 
 
-const sun =
+
+let sun=
 new THREE.DirectionalLight(
-    0xffffff,
-    1
+0xffffff,
+1
 );
 
 
 sun.position.set(
-    50,
-   100,
-   50
+10,
+20,
+10
 );
-
-
-sun.castShadow=true;
-
-
-sun.shadow.mapSize.width=2048;
-sun.shadow.mapSize.height=2048;
 
 
 scene.add(sun);
 
 
 
-// =======================================
-// 4. BODENPLATTE
-// =======================================
 
 
-const groundGeometry =
-new THREE.PlaneGeometry(
-    500,
-    500
-);
+/*
+==========================
+TEIL 1 ENDE
+TEIL 2 FOLGT
+==========================
+*/
+/*
+==========================
+TEIL 2
+OBJECT CREATION + HIERARCHY + INSPECTOR
+==========================
+*/
 
 
-const groundMaterial =
+/*
+==========================
+OBJECT FACTORY
+==========================
+*/
+
+
+function addObject(object){
+
+
+Engine.objects.push(object);
+
+
+refreshHierarchy();
+
+
+selectObject(object);
+
+
+return object;
+
+
+}
+
+
+
+
+
+function createCube(){
+
+
+let mesh =
+new THREE.Mesh(
+
+new THREE.BoxGeometry(
+1,1,1
+),
+
 new THREE.MeshStandardMaterial({
 
-    map:groundTexture
+color:0x00ff00
 
-});
+})
 
-
-const ground =
-new THREE.Mesh(
-    groundGeometry,
-    groundMaterial
 );
 
 
-ground.rotation.x=
+
+scene.add(mesh);
+
+
+
+let obj =
+new GameObject(
+"Cube",
+mesh
+);
+
+
+
+return addObject(obj);
+
+
+
+}
+
+
+
+
+
+
+
+function createSphere(){
+
+
+
+let mesh =
+new THREE.Mesh(
+
+new THREE.SphereGeometry(
+0.7,
+32,
+32
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0xff0000
+
+})
+
+);
+
+
+
+scene.add(mesh);
+
+
+
+let obj =
+new GameObject(
+"Sphere",
+mesh
+);
+
+
+
+return addObject(obj);
+
+
+}
+
+
+
+
+
+
+
+
+
+function createPlane(){
+
+
+
+let mesh =
+new THREE.Mesh(
+
+new THREE.PlaneGeometry(
+10,
+10
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0x555555,
+side:THREE.DoubleSide
+
+})
+
+);
+
+
+
+mesh.rotation.x =
 -Math.PI/2;
 
 
-ground.receiveShadow=true;
 
-
-scene.add(ground);
+scene.add(mesh);
 
 
 
-// =======================================
-// 5. MAP OBJEKTE
-// =======================================
-
-
-const obstacles=[];
-
-
-const boxGeometry =
-new THREE.BoxGeometry(
-    8,
-    8,
-    8
+let obj =
+new GameObject(
+"Ground",
+mesh
 );
 
 
-const boxMaterial =
-new THREE.MeshStandardMaterial({
 
-    map:boxTexture
-
-});
+return addObject(obj);
 
 
-
-// mindestens 30 Objekte
-
-for(let i=0;i<50;i++){
-
-    let box =
-    new THREE.Mesh(
-        boxGeometry,
-        boxMaterial
-    );
-
-
-    box.position.x =
-    Math.random()*400-200;
-
-
-    box.position.z =
-    Math.random()*400-200;
-
-
-    box.position.y=4;
-
-
-    box.castShadow=true;
-    box.receiveShadow=true;
-
-
-    scene.add(box);
-
-
-    obstacles.push(box);
 
 }
 
 
 
-// =======================================
-// 6. SPIELER
-// =======================================
 
 
-const playerGeometry =
-new THREE.SphereGeometry(
-    2,
-    32,
-    32
+
+
+
+
+
+function createLight(){
+
+
+
+let light =
+new THREE.PointLight(
+0xffffff,
+2,
+100
 );
 
 
-const playerMaterial =
-new THREE.MeshStandardMaterial({
 
-    color:0xff3333
+light.position.set(
+0,
+3,
+0
+);
+
+
+
+scene.add(light);
+
+
+
+let obj =
+new GameObject(
+"Light",
+light
+);
+
+
+
+return addObject(obj);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+/*
+==========================
+HIERARCHY UPDATE
+==========================
+*/
+
+
+function refreshHierarchy(){
+
+
+let list =
+document.getElementById(
+"hierarchy"
+);
+
+
+
+list.innerHTML="";
+
+
+
+
+Engine.objects.forEach(object=>{
+
+
+let item =
+document.createElement(
+"div"
+);
+
+
+
+item.className="object";
+
+
+
+if(
+Engine.selected===object
+){
+
+item.classList.add(
+"selected"
+);
+
+}
+
+
+
+item.innerHTML =
+"📦 "+object.name;
+
+
+
+item.onclick=function(){
+
+
+selectObject(object);
+
+
+};
+
+
+
+list.appendChild(item);
+
+
 
 });
 
 
-const player =
-new THREE.Mesh(
-    playerGeometry,
-    playerMaterial
-);
 
-
-player.position.set(
-    0,
-    2,
-    0
-);
-
-
-player.castShadow=true;
-
-
-scene.add(player);
+}
 
 
 
-// Spieler Geschwindigkeit
 
-const velocity =
+
+
+
+
+
+/*
+==========================
+INSPECTOR
+==========================
+*/
+
+
+function selectObject(object){
+
+
+Engine.selected=object;
+
+
+refreshHierarchy();
+
+
+
+let t =
+object.transform;
+
+
+
+document.getElementById(
+"inspector"
+)
+.innerHTML=`
+
+<h3>${object.name}</h3>
+
+
+<h4>Transform</h4>
+
+
+
+<div class="field">
+
+Position<br>
+
+X:
+<input id="px" value="${t.position.x}">
+
+Y:
+<input id="py" value="${t.position.y}">
+
+Z:
+<input id="pz" value="${t.position.z}">
+
+</div>
+
+
+
+
+
+<div class="field">
+
+Rotation<br>
+
+X:
+<input id="rx" value="${t.rotation.x}">
+
+Y:
+<input id="ry" value="${t.rotation.y}">
+
+Z:
+<input id="rz" value="${t.rotation.z}">
+
+</div>
+
+
+
+
+
+
+<div class="field">
+
+Scale<br>
+
+X:
+<input id="sx" value="${t.scale.x}">
+
+Y:
+<input id="sy" value="${t.scale.y}">
+
+Z:
+<input id="sz" value="${t.scale.z}">
+
+</div>
+
+
+`;
+
+
+
+
+
+let ids=[
+
+"px","py","pz",
+"rx","ry","rz",
+"sx","sy","sz"
+
+];
+
+
+
+ids.forEach(id=>{
+
+
+document
+.getElementById(id)
+.oninput=function(){
+
+
+t.position.x =
+Number(px.value);
+
+
+t.position.y =
+Number(py.value);
+
+
+t.position.z =
+Number(pz.value);
+
+
+
+
+t.rotation.x =
+Number(rx.value);
+
+
+t.rotation.y =
+Number(ry.value);
+
+
+t.rotation.z =
+Number(rz.value);
+
+
+
+
+
+t.scale.x =
+Number(sx.value);
+
+
+t.scale.y =
+Number(sy.value);
+
+
+t.scale.z =
+Number(sz.value);
+
+
+
+
+
+t.apply();
+
+
+
+};
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+DEFAULT SCENE
+==========================
+*/
+
+
+let ground =
+createPlane();
+
+
+ground.name =
+"World Ground";
+
+
+
+let player =
+createCube();
+
+
+player.name =
+"Player";
+
+
+player.transform.position.y=1;
+
+
+player.transform.apply();
+
+
+
+
+/*
+==========================
+TEIL 2 ENDE
+TEIL 3 FOLGT
+==========================
+*/
+/*
+==========================
+TEIL 3
+COMPONENTS + PHYSICS + SCRIPTS
+==========================
+*/
+
+
+
+/*
+==========================
+RIGIDBODY
+==========================
+*/
+
+
+class Rigidbody extends Component{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+
+this.velocity =
 new THREE.Vector3();
 
 
-const keys={};
+this.gravity =
+-9.81;
 
 
-document.addEventListener(
+this.useGravity=true;
+
+
+}
+
+
+
+
+update(){
+
+
+if(!this.useGravity)
+return;
+
+
+
+this.velocity.y +=
+this.gravity *
+Time.deltaTime;
+
+
+
+this.gameObject.transform.position.y +=
+this.velocity.y *
+Time.deltaTime;
+
+
+
+
+/*
+Boden-Kollision
+*/
+
+
+if(
+this.gameObject.transform.position.y < 0
+){
+
+
+this.gameObject.transform.position.y=0;
+
+
+this.velocity.y=0;
+
+
+}
+
+
+
+this.gameObject.transform.apply();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+BOX COLLIDER
+==========================
+*/
+
+
+class BoxCollider extends Component{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+this.size =
+new THREE.Vector3(
+1,1,1
+);
+
+
+}
+
+
+
+
+}
+
+
+
+ 
+
+
+
+
+
+/*
+==========================
+SCRIPT BASE
+==========================
+*/
+
+
+class Script extends Component{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+ROTATOR SCRIPT
+==========================
+*/
+
+
+class Rotator extends Script{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+
+this.speed=2;
+
+
+}
+
+
+
+
+update(){
+
+
+this.gameObject.transform.rotation.y +=
+this.speed *
+Time.deltaTime;
+
+
+
+this.gameObject.transform.apply();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+PLAYER CONTROLLER
+==========================
+*/
+
+
+class PlayerController extends Script{
+
+
+constructor(gameObject){
+
+
+super(gameObject);
+
+
+
+this.speed=5;
+
+
+this.keys={};
+
+
+window.addEventListener(
 "keydown",
 e=>{
 
-    keys[e.key.toLowerCase()]=true;
+this.keys[e.key.toLowerCase()]=true;
 
-});
+}
+);
 
 
-document.addEventListener(
+
+window.addEventListener(
 "keyup",
 e=>{
 
-    keys[e.key.toLowerCase()]=false;
+this.keys[e.key.toLowerCase()]=false;
+
+}
+);
+
+
+
+}
+
+
+
+
+update(){
+
+
+
+let move =
+new THREE.Vector3();
+
+
+
+if(this.keys["w"])
+move.z-=1;
+
+
+if(this.keys["s"])
+move.z+=1;
+
+
+if(this.keys["a"])
+move.x-=1;
+
+
+if(this.keys["d"])
+move.x+=1;
+
+
+
+
+if(move.length()>0){
+
+
+move.normalize();
+
+
+
+this.gameObject.transform.position.x +=
+move.x *
+this.speed *
+Time.deltaTime;
+
+
+
+this.gameObject.transform.position.z +=
+move.z *
+this.speed *
+Time.deltaTime;
+
+
+
+this.gameObject.transform.apply();
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+SCRIPT ADD FUNCTIONS
+==========================
+*/
+
+
+function addRotator(){
+
+
+
+if(!Engine.selected)
+return;
+
+
+
+let obj =
+Engine.selected;
+
+
+
+if(
+!obj.getComponent(Rotator)
+){
+
+
+obj.addComponent(
+new Rotator(obj)
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+function addPlayerController(){
+
+
+
+if(!Engine.selected)
+return;
+
+
+
+let obj =
+Engine.selected;
+
+
+
+if(
+!obj.getComponent(PlayerController)
+){
+
+
+obj.addComponent(
+new PlayerController(obj)
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+INSPECTOR SCRIPT BUTTONS
+==========================
+*/
+
+
+const oldSelectObject =
+selectObject;
+
+
+
+selectObject=function(object){
+
+
+oldSelectObject(object);
+
+
+
+let inspector =
+document.getElementById(
+"inspector"
+);
+
+
+
+inspector.innerHTML += `
+
+
+<hr>
+
+<h4>Scripts</h4>
+
+
+<button onclick="addRotator()">
+
+Add Rotator
+
+</button>
+
+
+
+<button onclick="addPlayerController()">
+
+Add PlayerController
+
+</button>
+
+
+`;
+
+
+
+};
+
+
+
+
+
+
+
+
+
+/*
+==========================
+GAME LOOP UPDATE PATCH
+==========================
+*/
+
+
+function updateEngine(){
+
+
+for(
+let object of Engine.objects
+){
+
+
+object.update();
+
+
+}
+
+
+}
+
+
+
+
+
+
+/*
+==========================
+TEIL 3 ENDE
+TEIL 4 FOLGT
+==========================
+*/
+/*
+==========================
+TEIL 4
+OFFLINE ASSET SYSTEM
+TEXTURE + MODEL IMPORT
+==========================
+*/
+
+
+
+/*
+==========================
+ASSET STORAGE
+==========================
+*/
+
+
+const Assets={
+
+textures:{},
+
+models:{}
+
+};
+
+
+
+
+
+
+
+/*
+==========================
+TEXTURE IMPORT UI
+==========================
+*/
+
+
+let textureInput =
+document.createElement("input");
+
+
+textureInput.type="file";
+
+textureInput.accept=
+"image/png,image/jpeg";
+
+
+textureInput.style.display="none";
+
+
+document.body.appendChild(
+textureInput
+);
+
+
+
+
+
+let textureButton =
+document.createElement("button");
+
+
+textureButton.innerHTML=
+"Import Texture";
+
+
+textureButton.onclick=()=>{
+
+
+textureInput.click();
+
+
+};
+
+
+document
+.getElementById("createMenu")
+.appendChild(
+textureButton
+);
+
+
+
+
+
+
+textureInput.onchange=function(e){
+
+
+
+let file=e.target.files[0];
+
+
+
+if(!file || !Engine.selected)
+return;
+
+
+
+
+let reader=
+new FileReader();
+
+
+
+
+reader.onload=function(ev){
+
+
+
+let data=
+ev.target.result;
+
+
+
+Assets.textures[file.name]=data;
+
+
+
+let loader=
+new THREE.TextureLoader();
+
+
+
+loader.load(
+data,
+texture=>{
+
+
+if(
+Engine.selected.mesh &&
+Engine.selected.mesh.material
+){
+
+
+Engine.selected.mesh.material.map=
+texture;
+
+
+Engine.selected.mesh.material.needsUpdate=true;
+
+
+}
+
+
+
+}
+
+
+);
+
+
+
+};
+
+
+
+reader.readAsDataURL(file);
+
+
+
+};
+
+
+
+
+
+
+
+
+
+/*
+==========================
+MODEL IMPORT
+==========================
+*/
+
+
+let modelInput =
+document.createElement("input");
+
+
+
+modelInput.type="file";
+
+
+modelInput.accept=
+".obj,.gltf,.glb";
+
+
+
+modelInput.style.display="none";
+
+
+document.body.appendChild(
+modelInput
+);
+
+
+
+
+
+let modelButton =
+document.createElement("button");
+
+
+
+modelButton.innerHTML=
+"Import 3D Model";
+
+
+
+modelButton.onclick=()=>{
+
+modelInput.click();
+
+};
+
+
+
+document
+.getElementById("createMenu")
+.appendChild(
+modelButton
+);
+
+
+
+
+
+
+
+
+
+modelInput.onchange=function(e){
+
+
+
+let file =
+e.target.files[0];
+
+
+
+if(!file)
+return;
+
+
+
+
+
+let reader =
+new FileReader();
+
+
+
+
+
+if(
+file.name.endsWith(".obj")
+){
+
+
+reader.onload=function(ev){
+
+
+let geometry =
+new THREE.BufferGeometry();
+
+
+
+/*
+einfacher OBJ Parser
+Vertices werden gelesen
+*/
+
+
+let lines =
+ev.target.result.split("\n");
+
+
+let vertices=[];
+
+
+
+for(
+let line of lines
+){
+
+
+if(
+line.startsWith("v ")
+){
+
+
+let p =
+line.split(" ");
+
+
+vertices.push(
+
+Number(p[1]),
+
+Number(p[2]),
+
+Number(p[3])
+
+);
+
+
+}
+
+
+
+}
+
+
+
+geometry.setAttribute(
+
+"position",
+
+new THREE.Float32BufferAttribute(
+vertices,
+3
+)
+
+);
+
+
+
+geometry.computeVertexNormals();
+
+
+
+
+let mesh =
+new THREE.Mesh(
+
+geometry,
+
+new THREE.MeshStandardMaterial({
+
+color:0xffffff
+
+})
+
+);
+
+
+
+scene.add(mesh);
+
+
+
+let obj =
+new GameObject(
+
+file.name,
+
+mesh
+
+);
+
+
+
+addObject(obj);
+
+
+
+};
+
+
+
+reader.readAsText(file);
+
+
+
+}
+
+
+
+
+
+
+
+else{
+
+
+reader.onload=function(){
+
+
+
+alert(
+"GLTF/GLB Loader wird vorbereitet"
+);
+
+
+
+};
+
+
+
+reader.readAsArrayBuffer(file);
+
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+
+/*
+==========================
+DRAG & DROP TEXTURE
+==========================
+*/
+
+
+document.body.addEventListener(
+
+"dragover",
+
+e=>{
+
+e.preventDefault();
+
+}
+
+);
+
+
+
+
+
+document.body.addEventListener(
+
+"drop",
+
+e=>{
+
+
+e.preventDefault();
+
+
+
+let file =
+e.dataTransfer.files[0];
+
+
+
+if(
+file &&
+file.type.startsWith("image")
+&&
+Engine.selected
+){
+
+
+
+let reader =
+new FileReader();
+
+
+
+reader.onload=function(ev){
+
+
+
+let loader =
+new THREE.TextureLoader();
+
+
+
+loader.load(
+
+ev.target.result,
+
+tex=>{
+
+
+Engine.selected.mesh.material.map=
+tex;
+
+
+Engine.selected.mesh.material.needsUpdate=true;
+
+
+}
+
+
+);
+
+
+
+};
+
+
+
+reader.readAsDataURL(file);
+
+
+
+}
+
+
+
+}
+
+);
+
+
+
+
+
+
+
+
+/*
+==========================
+TEIL 4 ENDE
+TEIL 5 FOLGT
+==========================
+*/
+/*
+==========================
+TEIL 5
+SCENE SERIALIZER
+PROJECT EXPORTER
+==========================
+*/
+
+
+
+
+
+/*
+==========================
+SCENE TO JSON
+==========================
+*/
+
+
+function saveSceneJSON(){
+
+
+let data={
+
+
+engine:
+"Unity Style HTML Engine",
+
+
+version:
+"1.0",
+
+
+objects:[]
+
+
+
+};
+
+
+
+
+
+for(let obj of Engine.objects){
+
+
+
+let item={
+
+
+
+name:obj.name,
+
+
+
+transform:{
+
+
+position:{
+
+
+x:obj.transform.position.x,
+
+y:obj.transform.position.y,
+
+z:obj.transform.position.z
+
+
+},
+
+
+
+rotation:{
+
+
+x:obj.transform.rotation.x,
+
+y:obj.transform.rotation.y,
+
+z:obj.transform.rotation.z
+
+
+},
+
+
+
+scale:{
+
+
+x:obj.transform.scale.x,
+
+y:obj.transform.scale.y,
+
+z:obj.transform.scale.z
+
+
+}
+
+
+
+},
+
+
+
+components:[]
+
+
+
+};
+
+
+
+
+
+for(let c of obj.components){
+
+
+
+if(c instanceof Rotator){
+
+
+item.components.push(
+"Rotator"
+);
+
+
+}
+
+
+
+if(c instanceof PlayerController){
+
+
+item.components.push(
+"PlayerController"
+);
+
+
+}
+
+
+
+if(c instanceof Rigidbody){
+
+
+item.components.push(
+"Rigidbody"
+);
+
+
+}
+
+
+
+if(c instanceof BoxCollider){
+
+
+item.components.push(
+"BoxCollider"
+);
+
+
+}
+
+
+
+}
+
+
+
+
+data.objects.push(item);
+
+
+
+}
+
+
+
+
+
+return data;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+EXPORT BUTTON
+==========================
+*/
+
+
+
+let exportButton =
+document.createElement(
+"button"
+);
+
+
+
+exportButton.innerHTML=
+"Export Project";
+
+
+
+exportButton.onclick=
+exportProject;
+
+
+
+document
+.getElementById(
+"createMenu"
+)
+.appendChild(
+exportButton
+);
+
+
+
+
+
+
+
+
+
+/*
+==========================
+HTML RUNTIME EXPORT
+==========================
+*/
+
+
+
+function exportProject(){
+
+
+
+let json =
+JSON.stringify(
+saveSceneJSON(),
+null,
+2
+);
+
+
+
+
+
+
+let runtimeHTML=`
+
+
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Exported Game
+</title>
+
+
+
+<style>
+
+body{
+
+margin:0;
+overflow:hidden;
+
+}
+
+
+canvas{
+
+display:block;
+
+}
+
+</style>
+
+
+
+</head>
+
+
+<body>
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+
+
+
+<script>
+
+
+
+const SAVE_DATA =
+${JSON.stringify(json)};
+
+
+
+
+const DATA =
+JSON.parse(SAVE_DATA);
+
+
+
+
+
+const scene =
+new THREE.Scene();
+
+
+
+scene.background =
+new THREE.Color(
+0x77aaff
+);
+
+
+
+
+
+const camera =
+new THREE.PerspectiveCamera(
+70,
+innerWidth/innerHeight,
+0.1,
+1000
+);
+
+
+
+camera.position.set(
+5,5,8
+);
+
+
+
+
+
+
+const renderer =
+new THREE.WebGLRenderer();
+
+
+
+renderer.setSize(
+innerWidth,
+innerHeight
+);
+
+
+
+document.body.appendChild(
+renderer.domElement
+);
+
+
+
+
+
+
+scene.add(
+new THREE.AmbientLight(
+0xffffff,
+0.5
+)
+);
+
+
+
+
+let light =
+new THREE.DirectionalLight(
+0xffffff,
+1
+);
+
+
+
+light.position.set(
+10,20,10
+);
+
+
+
+scene.add(light);
+
+
+
+
+
+
+
+
+DATA.objects.forEach(o=>{
+
+
+
+let mesh;
+
+
+
+if(o.name.includes("Cube") ||
+o.name=="Player"){
+
+
+mesh =
+new THREE.Mesh(
+
+new THREE.BoxGeometry(
+1,1,1
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0x00ff00
+
+})
+
+);
+
+
+}
+
+
+
+
+
+else if(
+o.name.includes("Sphere")
+){
+
+
+
+mesh =
+new THREE.Mesh(
+
+new THREE.SphereGeometry(
+0.7,
+32,
+32
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0xff0000
+
+})
+
+);
+
+
+
+}
+
+
+
+
+
+
+else if(
+o.name.includes("Ground")
+){
+
+
+
+mesh =
+new THREE.Mesh(
+
+new THREE.PlaneGeometry(
+10,
+10
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0x555555,
+side:THREE.DoubleSide
+
+})
+
+);
+
+
+
+mesh.rotation.x=
+-Math.PI/2;
+
+
+}
+
+
+
+
+
+
+
+else{
+
+
+return;
+
+
+}
+
+
+
+
+
+
+mesh.position.set(
+
+o.transform.position.x,
+
+o.transform.position.y,
+
+o.transform.position.z
+
+);
+
+
+
+
+mesh.rotation.set(
+
+o.transform.rotation.x,
+
+o.transform.rotation.y,
+
+o.transform.rotation.z
+
+);
+
+
+
+
+
+mesh.scale.set(
+
+o.transform.scale.x,
+
+o.transform.scale.y,
+
+o.transform.scale.z
+
+);
+
+
+
+
+scene.add(mesh);
+
+
 
 });
 
 
-// =======================================
-// 7. KOLLISION AABB
-// =======================================
-
-
-function checkCollision(newPos){
-
-
-    let playerBox =
-    new THREE.Box3()
-    .setFromCenterAndSize(
-
-        newPos,
-
-        new THREE.Vector3(
-            4,
-            4,
-            4
-        )
-
-    );
-
-
-    for(let obj of obstacles){
-
-        let box =
-        new THREE.Box3()
-        .setFromObject(obj);
-
-
-        if(playerBox.intersectsBox(box)){
-            return true;
-        }
-
-    }
-
-
-    return false;
-
-}
-// =======================================
-// 8. SPIELER BEWEGUNG
-// =======================================
-
-const moveSpeed = 0.35;
-
-
-function updatePlayer(){
-
-    let direction =
-    new THREE.Vector3();
-
-
-    // WASD + Pfeiltasten
-
-    if(keys["w"] || keys["arrowup"]){
-        direction.z -= 1;
-    }
-
-    if(keys["s"] || keys["arrowdown"]){
-        direction.z += 1;
-    }
-
-    if(keys["a"] || keys["arrowleft"]){
-        direction.x -= 1;
-    }
-
-    if(keys["d"] || keys["arrowright"]){
-        direction.x += 1;
-    }
-
-
-    if(direction.length()>0){
-
-        direction.normalize();
-
-
-        let movement =
-        direction.multiplyScalar(
-            moveSpeed
-        );
-
-
-        let newPosition =
-        player.position.clone()
-        .add(movement);
 
 
 
-        // AABB Kollisionsprüfung
-
-        if(!checkCollision(newPosition)){
-
-            player.position.copy(
-                newPosition
-            );
-
-        }
-
-
-        // Spieler dreht in Laufrichtung
-
-        player.rotation.y =
-        Math.atan2(
-            direction.x,
-            direction.z
-        );
-
-    }
-
-}
 
 
 
-// =======================================
-// 9. THIRD PERSON KAMERA
-// =======================================
 
 
-const cameraOffset =
-new THREE.Vector3(
-    0,
-    15,
-    25
+function loop(){
+
+
+
+requestAnimationFrame(loop);
+
+
+
+renderer.render(
+scene,
+camera
 );
 
 
-function updateCamera(){
-
-
-    let wantedPosition =
-    player.position.clone()
-    .add(cameraOffset);
-
-
-
-    // weiches Folgen
-
-    camera.position.lerp(
-        wantedPosition,
-        0.08
-    );
-
-
-    camera.lookAt(
-        player.position
-    );
-
 }
 
 
 
-// =======================================
-// 10. GAME LOOP
-// =======================================
-
-
-let lastTime = 0;
-
-
-function gameLoop(time){
-
-
-    requestAnimationFrame(
-        gameLoop
-    );
-
-
-    let delta =
-    (time-lastTime)/1000;
-
-
-    lastTime=time;
+loop();
 
 
 
-    // Spieler aktualisieren
 
-    updatePlayer();
-
-
-    // Kamera folgen lassen
-
-    updateCamera();
+</script>
 
 
+</body>
 
-    // Szene rendern
+</html>
 
-    renderer.render(
-        scene,
-        camera
-    );
 
+
+`;
+
+
+
+
+
+
+
+
+let blob =
+new Blob(
+
+[
+runtimeHTML
+],
+
+{
+type:"text/html"
 }
 
-
-
-// =======================================
-// 11. STARTPOSITION KAMERA
-// =======================================
-
-
-camera.position.set(
-    0,
-    15,
-    25
-);
-
-
-camera.lookAt(
-    player.position
 );
 
 
 
-// =======================================
-// 12. FENSTERGRÖSSE
-// =======================================
+
+
+let url =
+URL.createObjectURL(
+blob
+);
+
+
+
+let a =
+document.createElement(
+"a"
+);
+
+
+
+a.href=url;
+
+
+
+a.download=
+"ExportedGame.html";
+
+
+
+a.click();
+
+
+
+}
+
+
+
+
+
+
+
+/*
+==========================
+TEIL 5 ENDE
+TEIL 6 FOLGT
+==========================
+*/
+/*
+==========================
+TEIL 6
+FINAL ENGINE LOOP
+RUNTIME SYSTEM
+CAMERA CONTROL
+FINISH
+==========================
+*/
+
+
+
+
+
+/*
+==========================
+PLAYER CAMERA
+==========================
+*/
+
+
+let editorSpeed=0.15;
+
+
+let cameraKeys={};
+
+
+
+window.addEventListener(
+"keydown",
+e=>{
+
+cameraKeys[e.key.toLowerCase()]=true;
+
+});
+
+
+
+window.addEventListener(
+"keyup",
+e=>{
+
+cameraKeys[e.key.toLowerCase()]=false;
+
+});
+
+
+
+
+
+
+
+function moveEditorCamera(){
+
+
+
+let dir=
+new THREE.Vector3();
+
+
+
+if(cameraKeys["w"])
+dir.z-=1;
+
+
+if(cameraKeys["s"])
+dir.z+=1;
+
+
+if(cameraKeys["a"])
+dir.x-=1;
+
+
+if(cameraKeys["d"])
+dir.x+=1;
+
+
+if(cameraKeys["q"])
+dir.y-=1;
+
+
+if(cameraKeys["e"])
+dir.y+=1;
+
+
+
+
+
+if(dir.length()>0){
+
+
+dir.normalize();
+
+
+
+camera.position.add(
+dir.multiplyScalar(
+editorSpeed
+)
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+==========================
+MAIN ENGINE LOOP
+==========================
+*/
+
+
+function EngineLoop(){
+
+
+
+requestAnimationFrame(
+EngineLoop
+);
+
+
+
+
+
+let now =
+performance.now();
+
+
+
+Time.deltaTime =
+(now-Time.last)
+/1000;
+
+
+
+Time.last =
+now;
+
+
+
+Time.time +=
+Time.deltaTime;
+
+
+
+
+
+
+
+/*
+UPDATE ALL OBJECTS
+*/
+
+
+for(
+let object of Engine.objects
+){
+
+
+object.update();
+
+
+}
+
+
+
+
+
+
+moveEditorCamera();
+
+
+
+
+
+
+renderer.render(
+scene,
+camera
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+/*
+==========================
+FINAL STARTUP
+==========================
+*/
+
+
+
+if(
+Engine.objects.length===0
+){
+
+
+createPlane();
+
+
+createCube();
+
+
+}
+
+
+
+
+
+
+EngineLoop();
+
+
+
+
+
+
+
+/*
+==========================
+WINDOW RESIZE
+==========================
+*/
+
 
 
 window.addEventListener(
@@ -630,34 +3046,60 @@ window.addEventListener(
 ()=>{
 
 
-    camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
+camera.aspect =
+(window.innerWidth-580)
+/window.innerHeight;
 
 
-    camera.updateProjectionMatrix();
+
+camera.updateProjectionMatrix();
 
 
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
+
+renderer.setSize(
+
+window.innerWidth-580,
+
+window.innerHeight
+
+);
+
+
 
 });
 
 
 
-// =======================================
-// ENGINE START
-// =======================================
 
 
-requestAnimationFrame(
-    gameLoop
-);
 
 
-</script>
 
-</body>
-</html>
+/*
+==========================
+END OF ENGINE
+==========================
+
+UNITY STYLE HTML 3D ENGINE
+
+FEATURES:
+
+- Three.js Renderer
+- Scene Editor
+- Hierarchy
+- Inspector
+- Transform System
+- Components
+- Rigidbody
+- Collider
+- Scripts
+- Player Controller
+- Rotator
+- Texture Import
+- OBJ Import
+- Drag & Drop Assets
+- JSON Export
+- HTML Runtime Export
+
+==========================
+*/
