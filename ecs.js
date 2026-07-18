@@ -1,219 +1,188 @@
-// ecs.js
-// Minimalistisches, performantes Entity Component System
-// Keine externen Abhängigkeiten
-
 "use strict";
 
 /**
- * Entity IDs sind einfache Zahlen
+ * ecs.js
+ * Minimalistisches, performantes Entity Component System (ECS)
+ * Keine externen Abhängigkeiten.
  */
-let nextEntityId = 1;
 
+/* ============================
+   EntityManager
+============================ */
 
-/**
- * ECS World
- * Verwaltet Entities, Komponenten und Systeme
- */
-class World {
-
+class EntityManager {
     constructor() {
-        // Entity -> Map(ComponentType -> ComponentInstance)
-        this.components = new Map();
+        this._nextEntityId = 1;
 
-        // Alle Systeme
-        this.systems = [];
+        // Map<ComponentClass, Map<EntityId, Component>>
+        this._components = new Map();
     }
 
-
     /**
-     * Erstellt eine neue Entity
-     * @returns {number} Entity ID
+     * Erstellt eine neue Entity.
+     * @returns {number}
      */
     createEntity() {
-        const id = nextEntityId++;
-
-        this.components.set(id, new Map());
-
-        return id;
+        return this._nextEntityId++;
     }
 
-
     /**
-     * Fügt einer Entity eine Komponente hinzu
+     * Fügt einer Entity eine Komponente hinzu.
      * @param {number} entityId
      * @param {object} componentInstance
      */
     addComponent(entityId, componentInstance) {
-
-        const entityComponents = this.components.get(entityId);
-
-        if (!entityComponents) {
-            throw new Error("Entity existiert nicht: " + entityId);
+        if (typeof entityId !== "number") {
+            throw new TypeError("entityId muss eine Zahl sein.");
         }
 
+        if (componentInstance == null) {
+            throw new TypeError("componentInstance darf nicht null sein.");
+        }
 
         const componentClass = componentInstance.constructor;
 
-        entityComponents.set(componentClass, componentInstance);
+        let storage = this._components.get(componentClass);
+
+        if (!storage) {
+            storage = new Map();
+            this._components.set(componentClass, storage);
+        }
+
+        storage.set(entityId, componentInstance);
     }
 
-
     /**
-     * Holt eine Komponente einer Entity
+     * Gibt eine Komponente zurück.
      * @param {number} entityId
-     * @param {class} componentClass
-     * @returns {object|null}
+     * @param {Function} componentClass
+     * @returns {*|undefined}
      */
     getComponent(entityId, componentClass) {
+        const storage = this._components.get(componentClass);
 
-        const entityComponents = this.components.get(entityId);
-
-        if (!entityComponents) {
-            return null;
+        if (!storage) {
+            return undefined;
         }
 
-
-        return entityComponents.get(componentClass) || null;
+        return storage.get(entityId);
     }
 
-
     /**
-     * Entfernt eine Entity
+     * Entfernt eine Komponente.
+     * @param {number} entityId
+     * @param {Function} componentClass
      */
-    destroyEntity(entityId) {
-        this.components.delete(entityId);
+    removeComponent(entityId, componentClass) {
+        const storage = this._components.get(componentClass);
+
+        if (storage) {
+            storage.delete(entityId);
+
+            if (storage.size === 0) {
+                this._components.delete(componentClass);
+            }
+        }
     }
 
-
     /**
-     * Fügt ein System hinzu
+     * Entfernt alle Komponenten einer Entity.
+     * @param {number} entityId
      */
-    addSystem(system) {
-        this.systems.push(system);
-        system.world = this;
+    removeEntity(entityId) {
+        for (const storage of this._components.values()) {
+            storage.delete(entityId);
+        }
     }
 
+    /**
+     * Prüft, ob eine Entity eine bestimmte Komponente besitzt.
+     * @param {number} entityId
+     * @param {Function} componentClass
+     * @returns {boolean}
+     */
+    hasComponent(entityId, componentClass) {
+        const storage = this._components.get(componentClass);
+        return storage ? storage.has(entityId) : false;
+    }
 
     /**
-     * Aktualisiert alle Systeme
+     * Gibt alle Komponenten eines Typs zurück.
+     * @param {Function} componentClass
+     * @returns {Map<number, object>}
      */
-    update(dt) {
+    getComponentStorage(componentClass) {
+        return this._components.get(componentClass) || new Map();
+    }
 
-        for (let i = 0; i < this.systems.length; i++) {
-            this.systems[i].update(dt);
+    /**
+     * Liefert alle Entities, die alle angegebenen Komponenten besitzen.
+     * @param  {...Function} componentClasses
+     * @returns {number[]}
+     */
+    getEntitiesWith(...componentClasses) {
+        if (componentClasses.length === 0) {
+            return [];
         }
 
-    }
+        const firstStorage = this._components.get(componentClasses[0]);
 
+        if (!firstStorage) {
+            return [];
+        }
 
-    /**
-     * Gibt alle Entities zurück
-     */
-    getEntities() {
-        return this.components.keys();
-    }
-}
+        const result = [];
 
+        outer:
+        for (const entityId of firstStorage.keys()) {
+            for (let i = 1; i < componentClasses.length; i++) {
+                const storage = this._components.get(componentClasses[i]);
 
-/**
- * Basisklasse für Systeme
- */
-class System {
-
-    constructor() {
-        this.world = null;
-    }
-
-
-    /**
-     * Wird jeden Frame aufgerufen
-     * @param {number} dt Zeit seit letztem Frame
-     */
-    update(dt) {
-
-    }
-
-}
-
-
-
-/*
-=================================================
-Beispiel-Komponenten
-=================================================
-*/
-
-
-class Position {
-
-    constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
-    }
-
-}
-
-
-class Velocity {
-
-    constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
-    }
-
-}
-
-
-
-/*
-=================================================
-Beispiel-System
-=================================================
-*/
-
-class MovementSystem extends System {
-
-
-    update(dt) {
-
-        for (const entity of this.world.getEntities()) {
-
-            const position =
-                this.world.getComponent(entity, Position);
-
-            const velocity =
-                this.world.getComponent(entity, Velocity);
-
-
-            if (position && velocity) {
-
-                position.x += velocity.x * dt;
-                position.y += velocity.y * dt;
-
+                if (!storage || !storage.has(entityId)) {
+                    continue outer;
+                }
             }
 
+            result.push(entityId);
         }
 
+        return result;
     }
-
 }
 
+/* ============================
+   Basisklasse für Systeme
+============================ */
 
+class System {
+    /**
+     * @param {EntityManager} ecs
+     */
+    constructor(ecs) {
+        this.ecs = ecs;
+    }
 
-/*
-=================================================
-Export für Browser + Node.js
-=================================================
-*/
+    /**
+     * Wird pro Frame aufgerufen.
+     * @param {number} dt Delta-Time in Sekunden
+     */
+    update(dt) {
+        // Von Unterklassen überschreiben.
+    }
+}
+
+/* ============================
+   Optionaler Export
+============================ */
 
 if (typeof module !== "undefined" && module.exports) {
-
     module.exports = {
-        World,
-        System,
-        Position,
-        Velocity,
-        MovementSystem
+        EntityManager,
+        System
     };
+}
 
+if (typeof window !== "undefined") {
+    window.EntityManager = EntityManager;
+    window.System = System;
 }
