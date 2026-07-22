@@ -5,9 +5,9 @@
 
   "videos": [
     {
-      "title": "Mein erstes Video",
-      "description": "Willkommen auf meinem Kanal!",
-      "file": "videos/video1.mp4"
+      "title": "Projekt Seifenkiste #1",
+      "description": "Hi, das ist Teil 1, von diesem projekt.",
+      "file": "#1.mp4"
     }
   ]
 }
