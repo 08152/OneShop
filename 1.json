@@ -1,0 +1,13 @@
+{
+  "channel": "RiskyLife",
+  "description": "Willkommen auf dem offiziellen RiskyLife-Kanal!",
+  "channelImage": "1.png",
+
+  "videos": [
+    {
+      "title": "Mein erstes Video",
+      "description": "Willkommen auf meinem Kanal!",
+      "file": "videos/video1.mp4"
+    }
+  ]
+}
