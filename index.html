@@ -2,216 +2,448 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Video Kompressor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RiskyTube</title>
+
 <style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
 body{
-    font-family:Arial;
-    background:#111;
-    color:white;
-    text-align:center;
-    padding:30px;
+background:#0f0f0f;
+color:white;
+overflow-x:hidden;
 }
-.box{
-    background:#222;
-    padding:25px;
-    border-radius:15px;
-    max-width:500px;
-    margin:auto;
+
+header{
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:60px;
+background:#202020;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 20px;
+z-index:100;
+border-bottom:1px solid #303030;
 }
-button{
-    padding:12px 20px;
-    margin:10px;
-    border:0;
-    border-radius:8px;
-    cursor:pointer;
+
+.logo{
+font-size:28px;
+font-weight:bold;
+color:#ff3333;
 }
-input{
-    padding:10px;
-    margin:10px;
+
+.search{
+display:flex;
+width:40%;
 }
-#status{
-    margin-top:20px;
+
+.search input{
+width:100%;
+padding:10px;
+background:#111;
+color:white;
+border:1px solid #333;
+border-radius:20px 0 0 20px;
+outline:none;
+}
+
+.search button{
+padding:10px 20px;
+border:none;
+background:#333;
+color:white;
+border-radius:0 20px 20px 0;
+cursor:pointer;
+}
+
+main{
+padding-top:90px;
+}
+
+#home{
+display:flex;
+justify-content:center;
+align-items:center;
+height:calc(100vh - 90px);
+}
+
+.channel{
+background:#1b1b1b;
+width:320px;
+border-radius:20px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+box-shadow:0 0 20px rgba(0,0,0,.5);
+}
+
+.channel:hover{
+transform:scale(1.03);
+}
+
+.channel img{
+width:100%;
+height:320px;
+object-fit:cover;
+}
+
+.channelInfo{
+padding:20px;
+text-align:center;
+}
+
+.channelInfo h2{
+margin-bottom:10px;
+}
+
+.channelInfo p{
+color:#bbb;
+}
+
+#videos{
+display:none;
+padding:25px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+gap:20px;
+}
+
+.card{
+background:#1d1d1d;
+border-radius:15px;
+overflow:hidden;
+cursor:pointer;
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.thumb{
+width:100%;
+height:190px;
+background:#000;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.thumb video{
+width:100%;
+height:100%;
+object-fit:cover;
+pointer-events:none;
+}
+
+.info{
+padding:15px;
+}
+
+.info h3{
+margin-bottom:10px;
+font-size:18px;
+}
+
+.info p{
+font-size:14px;
+color:#bdbdbd;
+line-height:20px;
+}
+
+#player{
+display:none;
+padding:30px;
+}
+
+#player video{
+width:100%;
+max-height:70vh;
+background:black;
+border-radius:15px;
+}
+
+#title{
+font-size:28px;
+margin-top:20px;
+}
+
+#description{
+margin-top:15px;
+color:#cfcfcf;
+line-height:25px;
+white-space:pre-wrap;
+}
+
+.back{
+margin-bottom:20px;
+padding:10px 18px;
+background:#ff3333;
+color:white;
+border:none;
+border-radius:10px;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<header>
 
-<h1>🎬 Video Kompressor</h1>
+<div class="logo">
+RiskyTube
+</div>
 
-<input type="file" id="video" accept="video/*">
+<div class="search">
+<input id="searchBox" placeholder="Suchen...">
+<button>Suchen</button>
+</div>
 
-<br>
+</header>
 
-<label>
-Zielgröße MB:
-</label>
+<main>
 
-<input id="size" value="24.5" type="number">
+<div id="home">
 
-<br>
+<div class="channel" onclick="openChannel()">
 
-<button onclick="compress()">
-Komprimieren
-</button>
+<img src="1.png">
 
-<p id="status">
-Bereit
+<div class="channelInfo">
+
+<h2 id="channelName">
+RiskyLife
+</h2>
+
+<p id="channelDesc">
+Videos werden geladen...
 </p>
-
-<a id="download" style="display:none;color:#4af">
-Download
-</a>
 
 </div>
 
+</div>
 
-<script type="module">
+</div>
 
-import {FFmpeg} 
-from "https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/esm/index.js";
+<div id="videos">
 
-import {fetchFile}
-from "https://unpkg.com/@ffmpeg/util@0.12.1/dist/esm/index.js";
+<button class="back" onclick="backHome()">
+← Zurück
+</button>
 
+<div class="grid" id="videoGrid">
+</div>
 
-const ffmpeg = new FFmpeg();
+</div>
 
+<div id="player">
 
-const status =
-document.getElementById("status");
+<button class="back" onclick="closePlayer()">
+← Zurück
+</button>
 
+<video id="videoPlayer" controls></video>
 
-async function loadFFmpeg(){
+<h1 id="title"></h1>
 
-if(!ffmpeg.loaded){
+<p id="description"></p>
 
-status.innerHTML="FFmpeg wird geladen...";
+</div>
 
-await ffmpeg.load({
-coreURL:
-"https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js"
+</main>
+
+<script>
+
+let channelData = null;
+
+async function loadChannel(){
+
+    const res = await fetch("1.json");
+    channelData = await res.json();
+
+    document.getElementById("channelName").textContent =
+        channelData.channel;
+
+    document.getElementById("channelDesc").textContent =
+        channelData.description;
+}
+
+loadChannel();
+
+function openChannel(){
+
+    document.getElementById("home").style.display="none";
+    document.getElementById("videos").style.display="block";
+
+    createVideos();
+}
+
+function backHome(){
+
+    document.getElementById("videos").style.display="none";
+    document.getElementById("player").style.display="none";
+    document.getElementById("home").style.display="flex";
+
+}
+
+function createVideos(){
+
+    const grid=document.getElementById("videoGrid");
+
+    grid.innerHTML="";
+
+    channelData.videos.forEach((video,index)=>{
+
+        const card=document.createElement("div");
+
+        card.className="card";
+
+        card.innerHTML=`
+
+<div class="thumb">
+
+<video src="${video.file}" muted></video>
+
+</div>
+
+<div class="info">
+
+<h3>${video.title}</h3>
+
+<p>${video.description}</p>
+
+</div>
+
+`;
+
+        card.onclick=()=>playVideo(index);
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+function playVideo(index){
+
+    const video=channelData.videos[index];
+
+    document.getElementById("videos").style.display="none";
+
+    document.getElementById("player").style.display="block";
+
+    const player=document.getElementById("videoPlayer");
+
+    player.src=video.file;
+    player.load();
+    player.play();
+
+    document.getElementById("title").textContent =
+        video.title;
+
+    document.getElementById("description").textContent =
+        video.description;
+
+}
+
+function closePlayer(){
+
+    const player=document.getElementById("videoPlayer");
+
+    player.pause();
+
+    player.currentTime=0;
+
+    document.getElementById("player").style.display="none";
+
+    document.getElementById("videos").style.display="block";
+
+}
+
+const search=document.getElementById("searchBox");
+
+search.addEventListener("input",()=>{
+
+    if(!channelData) return;
+
+    const text=search.value.toLowerCase();
+
+    const cards=document.querySelectorAll(".card");
+
+    channelData.videos.forEach((video,index)=>{
+
+        const match=
+            video.title.toLowerCase().includes(text) ||
+            video.description.toLowerCase().includes(text);
+
+        cards[index].style.display=
+            match ? "block" : "none";
+
+    });
+
 });
 
-status.innerHTML="FFmpeg bereit";
+document.addEventListener("keydown",(e)=>{
 
-}
+    if(e.key==="Escape"){
 
-}
+        if(document.getElementById("player").style.display==="block"){
 
+            closePlayer();
 
+        }
 
-window.compress = async function(){
+    }
 
+});
 
-const file =
-document.getElementById("video").files[0];
+window.addEventListener("load", () => {
 
+    const player = document.getElementById("videoPlayer");
 
-if(!file){
-alert("Bitte Video auswählen");
-return;
-}
+    player.volume = 1;
 
+});
 
-await loadFFmpeg();
+document.addEventListener("mouseover", (e) => {
 
+    if (e.target.tagName === "VIDEO" && e.target.parentElement.classList.contains("thumb")) {
 
-let target =
-Number(document.getElementById("size").value);
+        e.target.play();
 
+    }
 
+});
 
-status.innerHTML=
-"Video wird analysiert...";
+document.addEventListener("mouseout", (e) => {
 
+    if (e.target.tagName === "VIDEO" && e.target.parentElement.classList.contains("thumb")) {
 
-const input="input.mp4";
-const output="compressed.mp4";
+        e.target.pause();
 
+        e.target.currentTime = 0;
 
-await ffmpeg.writeFile(
-input,
-await fetchFile(file)
-);
+    }
 
+});
 
+window.addEventListener("error", (e) => {
 
-let durationGuess =
-file.size / (1024*1024);
+    console.log("Fehler:", e.message);
 
-
-
-let bitrate =
-(target*8*1024*1024)/60;
-
-
-
-status.innerHTML=
-"Komprimierung läuft...";
-
-
-
-await ffmpeg.exec([
-
-"-i",
-input,
-
-"-c:v",
-"libx264",
-
-"-b:v",
-Math.floor(bitrate).toString(),
-
-"-preset",
-"medium",
-
-"-c:a",
-"aac",
-
-output
-
-]);
-
-
-
-const data =
-await ffmpeg.readFile(output);
-
-
-
-const blob =
-new Blob(
-[data.buffer],
-{type:"video/mp4"}
-);
-
-
-const url =
-URL.createObjectURL(blob);
-
-
-
-const link =
-document.getElementById("download");
-
-
-link.href=url;
-link.download="komprimiert.mp4";
-link.style.display="block";
-link.innerHTML=
-"⬇️ Video herunterladen";
-
-
-status.innerHTML=
-"Fertig!";
-
-
-}
-
-
+});
 
 </script>
 
