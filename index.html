@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RiskyTube</title>
+<style>
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff}
+header{position:fixed;top:0;left:0;right:0;height:60px;background:#202020;display:flex;align-items:center;padding:0 20px}
+.logo{color:#f33;font-size:28px;font-weight:bold}
+main{padding-top:80px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:20px}
+.card{background:#1d1d1d;border-radius:12px;overflow:hidden;cursor:pointer}
+.card video{width:100%;height:180px;object-fit:cover}
+.info{padding:12px}
+#player{display:none;padding:20px}
+iframe{width:100%;height:70vh;border:none}
+button{padding:8px 12px}
+</style>
+</head>
+<body>
+<header><div class="logo">RiskyTube</div></header>
+<main>
+<div id="videos" class="grid"></div>
+<div id="player">
+<button onclick="back()">← Zurück</button>
+<iframe id="frame" allowfullscreen></iframe>
+<h2 id="t"></h2><p id="d"></p>
+</div>
+</main>
+<script>
+let data;
+fetch("1.json").then(r=>r.json()).then(j=>{data=j;load();});
+function load(){
+ const g=document.getElementById("videos"); g.innerHTML="";
+ data.videos.forEach((v,i)=>{
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerHTML=`<video muted src="${v.file}"></video><div class="info"><h3>${v.title}</h3><p>${v.description}</p></div>`;
+  c.onclick=()=>play(i);
+  c.onmouseover=()=>c.querySelector("video").play();
+  c.onmouseout=()=>{let vd=c.querySelector("video");vd.pause();vd.currentTime=0;}
+  g.appendChild(c);
+ });
+}
+function play(i){
+ let v=data.videos[i],u=v.file;
+ if(u.includes("uc?export=download&id=")){u="https://drive.google.com/file/d/"+u.split("id=")[1]+"/preview";}
+ if(u.includes("youtube.com/watch?v="))u=u.replace("watch?v=","embed/");
+ document.getElementById("videos").style.display="none";
+ document.getElementById("player").style.display="block";
+ frame.src=u;t.textContent=v.title;d.textContent=v.description;
+}
+function back(){frame.src="";player.style.display="none";videos.style.display="grid";}
+</script>
+</body></html>
