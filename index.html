@@ -1,28 +1,287 @@
-<!DOCTYPE html><html lang='de'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>RiskyTube Pro</title><style>
-body{margin:0;background:#0b1220;color:#fff;font:15px Arial}header{display:flex;gap:12px;align-items:center;padding:16px;background:#111827;position:sticky;top:0}
-.logo{font-size:28px;font-weight:bold;color:#ef4444}.search{flex:1}.search input{width:100%;padding:10px;border-radius:20px;border:0}
-.banner{padding:32px;background:linear-gradient(90deg,#1f2937,#111827)}.chips button{margin:4px;padding:8px 12px;border-radius:999px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:20px}.card{background:#1f2937;border-radius:12px;overflow:hidden;cursor:pointer}.card video{width:100%;height:170px;object-fit:cover}.p{display:none;padding:20px}
-iframe{width:100%;height:70vh;border:0}.side button{margin-right:8px}
-</style></head><body><header><div class=logo>RiskyTube</div><div class=search><input id=q placeholder='Suchen'></div><button onclick='toggleTheme()'>🌙</button></header>
-<div class=banner><h1 id=cn>Kanal</h1><p id=cd></p><div class=chips><button>Gaming</button><button>Musik</button><button>Neu</button></div></div>
-<div id=g class=grid></div><div id=player class=p><button onclick='back()'>← Zurück</button><iframe id=f allowfullscreen></iframe><h2 id=t></h2><p id=desc></p><div class=side><button onclick='like()'>👍 <span id=l>0</span></button><button onclick='dislike()'>👎 <span id=dl>0</span></button><button onclick='fav()'>⭐ Favorit</button><button onclick='wl()'>⏰ Watch later</button><button onclick='sub()'>🔔 Abonnieren</button></div><h3>Kommentare</h3><textarea id=c></textarea><br><button onclick='saveComment()'>Speichern</button><div id=comments></div></div>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>RiskyTube Pro</title>
+
+<style>
+body{
+    margin:0;
+    background:#0b1220;
+    color:white;
+    font-family:Arial;
+}
+
+header{
+    padding:20px;
+    background:#111827;
+    font-size:28px;
+    font-weight:bold;
+    color:#ef4444;
+}
+
+.account{
+    margin:40px auto;
+    width:300px;
+    background:#1f2937;
+    border-radius:20px;
+    padding:25px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.account img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.account:hover{
+    background:#374151;
+}
+
+.banner{
+    padding:30px;
+    background:#111827;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+.card{
+    background:#1f2937;
+    border-radius:15px;
+    overflow:hidden;
+    cursor:pointer;
+}
+
+.card video{
+    width:100%;
+    height:170px;
+    object-fit:cover;
+}
+
+.text{
+    padding:15px;
+}
+
+.player{
+    display:none;
+    padding:20px;
+}
+
+iframe{
+    width:100%;
+    height:70vh;
+    border:0;
+}
+
+button{
+    padding:10px 20px;
+    border:0;
+    border-radius:20px;
+    cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+RiskyTube
+</header>
+
+
+<!-- ACCOUNT AUSWAHL -->
+
+<div id="accounts">
+
+<div class="account" onclick="openChannel()">
+
+<img src="1.png">
+
+<h2>RiskyLife</h2>
+
+<p>Gaming • Musik • Videos</p>
+
+</div>
+
+</div>
+
+
+
+<!-- KANAL -->
+
+<div id="channel" style="display:none">
+
+<div class="banner">
+
+<h1>RiskyLife</h1>
+
+<p>
+Willkommen auf meinem Kanal!
+</p>
+
+</div>
+
+
+<div id="videos" class="grid"></div>
+
+</div>
+
+
+
+<!-- VIDEO PLAYER -->
+
+<div id="player" class="player">
+
+<button onclick="back()">
+← Zurück
+</button>
+
+<br><br>
+
+<iframe id="video" allowfullscreen></iframe>
+
+<h2 id="title"></h2>
+
+<p id="description"></p>
+
+</div>
+
+
+
 <script>
-let data,current=-1;
-fetch('1.json').then(r=>r.json()).then(j=>{data=j;cn.textContent=j.channel;cd.textContent=j.description;render(j.videos)});
-function render(vs){g.innerHTML='';vs.forEach((v,i)=>{let d=document.createElement('div');d.className='card';d.innerHTML=`<video muted src="${v.file}"></video><div style="padding:10px"><b>${v.title}</b><p>${v.description}</p></div>`;d.onclick=()=>play(i);d.onmouseover=()=>d.querySelector('video').play();d.onmouseout=()=>{let x=d.querySelector('video');x.pause();x.currentTime=0};g.appendChild(d)})}
-q.oninput=()=>render(data.videos.filter(v=>v.title.toLowerCase().includes(q.value.toLowerCase())||v.description.toLowerCase().includes(q.value.toLowerCase())));
-function play(i){current=i;let u=data.videos[i].file;if(u.includes('watch?v='))u=u.replace('watch?v=','embed/');if(u.includes('uc?export=download&id='))u='https://drive.google.com/file/d/'+u.split('id=')[1]+'/preview';f.src=u;g.style.display='none';player.style.display='block';t.textContent=data.videos[i].title;desc.textContent=data.videos[i].description;loadComments()}
-function back(){f.src='';player.style.display='none';g.style.display='grid'}
-function key(n){return n+'_'+current}
-function like(){localStorage.setItem(key('l'),1+(+localStorage.getItem(key('l'))||0));l.textContent=localStorage.getItem(key('l'))}
-function dislike(){localStorage.setItem(key('d'),1+(+localStorage.getItem(key('d'))||0));dl.textContent=localStorage.getItem(key('d'))}
-function fav(){localStorage.setItem(key('fav'),'1');alert('Favorit gespeichert')}
-function wl(){localStorage.setItem(key('wl'),'1');alert('Watch Later gespeichert')}
-function sub(){localStorage.setItem('sub','1');alert('Abonniert')}
-function saveComment(){let a=JSON.parse(localStorage.getItem(key('c'))||'[]');a.push(c.value);localStorage.setItem(key('c'),JSON.stringify(a));c.value='';loadComments()}
-function loadComments(){comments.innerHTML='';l.textContent=localStorage.getItem(key('l'))||0;dl.textContent=localStorage.getItem(key('d'))||0;(JSON.parse(localStorage.getItem(key('c'))||'[]')).forEach(x=>comments.innerHTML+='<p>'+x+'</p>')}
-function toggleTheme(){document.body.style.background=document.body.style.background?'':'#fff';document.body.style.color=document.body.style.color?'':'#000'}
-document.onkeydown=e=>{if(e.key==='Escape')back()}
-</script></body></html>
+
+let data;
+
+
+fetch("1.json")
+.then(r=>r.json())
+.then(j=>{
+    data=j;
+});
+
+
+
+function openChannel(){
+
+document.getElementById("accounts").style.display="none";
+
+document.getElementById("channel").style.display="block";
+
+
+let box=document.getElementById("videos");
+
+box.innerHTML="";
+
+
+data.videos.forEach((v,i)=>{
+
+
+let card=document.createElement("div");
+
+card.className="card";
+
+
+card.innerHTML=`
+
+<video muted src="${v.file}"></video>
+
+<div class="text">
+
+<b>${v.title}</b>
+
+<p>${v.description}</p>
+
+</div>
+
+`;
+
+
+card.onclick=()=>play(i);
+
+
+box.appendChild(card);
+
+
+});
+
+
+}
+
+
+
+function play(i){
+
+let v=data.videos[i];
+
+let url=v.file;
+
+
+// YouTube Unterstützung
+
+if(url.includes("watch?v=")){
+
+url=url.replace(
+"watch?v=",
+"embed/"
+);
+
+}
+
+
+// Google Drive Unterstützung
+
+if(url.includes("uc?export=download&id=")){
+
+let id=url.split("id=")[1];
+
+url=
+"https://drive.google.com/file/d/"
++id+
+"/preview";
+
+}
+
+
+
+document.getElementById("channel").style.display="none";
+
+document.getElementById("player").style.display="block";
+
+
+document.getElementById("video").src=url;
+
+document.getElementById("title").innerHTML=v.title;
+
+document.getElementById("description").innerHTML=v.description;
+
+
+}
+
+
+
+function back(){
+
+document.getElementById("video").src="";
+
+document.getElementById("player").style.display="none";
+
+document.getElementById("channel").style.display="block";
+
+}
+
+
+</script>
+
+</body>
+</html>
