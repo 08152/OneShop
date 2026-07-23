@@ -2,12 +2,11 @@
   "channel": "RiskyLife",
   "description": "Willkommen auf dem offiziellen RiskyLife-Kanal!",
   "channelImage": "1.png",
-
   "videos": [
     {
       "title": "Projekt Seifenkiste #1",
-      "description": "Hi, das ist Teil 1, von diesem projekt.",
-      "file": "https://drive.google.com/file/d/1CxUfQUu1KMbaSMwoTP9OCZLrycLTfrF_/view?usp=drive_link"
+      "description": "Hi, das ist Teil 1 von diesem Projekt.",
+      "file": "https://drive.google.com/uc?export=download&id=1CxUfQUu1KMbaSMwoTP9OCZLrycLTfrF_"
     }
   ]
 }
