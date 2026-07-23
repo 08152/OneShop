@@ -351,9 +351,15 @@ function playVideo(index){
 
     const player=document.getElementById("videoPlayer");
 
-    player.src=video.file;
-    player.load();
-    player.play();
+  player.src = video.file
+.replace(
+"uc?export=download&id=",
+"file/d/"
+)
+.replace(
+"",
+"/preview"
+);
 
     document.getElementById("title").textContent =
         video.title;
