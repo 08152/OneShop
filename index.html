@@ -343,23 +343,36 @@ function createVideos(){
 
 function playVideo(index){
 
-    const video=channelData.videos[index];
+    const video = channelData.videos[index];
 
-    document.getElementById("videos").style.display="none";
+    document.getElementById("videos").style.display = "none";
 
-    document.getElementById("player").style.display="block";
+    document.getElementById("player").style.display = "block";
 
-    const player=document.getElementById("videoPlayer");
+    const player = document.getElementById("videoPlayer");
 
-  player.src = video.file
-.replace(
-"uc?export=download&id=",
-"file/d/"
-)
-.replace(
-"",
-"/preview"
-);
+    let videoLink = video.file;
+
+    // Google Drive Download-Link in Embed-Link umwandeln
+    if(videoLink.includes("uc?export=download&id=")){
+
+        let id = videoLink.split("id=")[1];
+
+        videoLink = "https://drive.google.com/file/d/" + id + "/preview";
+
+    }
+
+    player.src = videoLink;
+
+
+    document.getElementById("title").textContent =
+        video.title;
+
+
+    document.getElementById("description").textContent =
+        video.description;
+
+}
 
     document.getElementById("title").textContent =
         video.title;
