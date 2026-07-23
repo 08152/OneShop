@@ -1,287 +1,386 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>RiskyTube Pro</title>
+<meta charset="UTF-8">
+<title>Zeichen Film Maker</title>
 
 <style>
 body{
     margin:0;
-    background:#0b1220;
+    background:#202020;
     color:white;
     font-family:Arial;
-}
-
-header{
-    padding:20px;
-    background:#111827;
-    font-size:28px;
-    font-weight:bold;
-    color:#ef4444;
-}
-
-.account{
-    margin:40px auto;
-    width:300px;
-    background:#1f2937;
-    border-radius:20px;
-    padding:25px;
     text-align:center;
-    cursor:pointer;
 }
 
-.account img{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
-}
-
-.account:hover{
-    background:#374151;
-}
-
-.banner{
-    padding:30px;
-    background:#111827;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:20px;
-    padding:20px;
-}
-
-.card{
-    background:#1f2937;
-    border-radius:15px;
-    overflow:hidden;
-    cursor:pointer;
-}
-
-.card video{
-    width:100%;
-    height:170px;
-    object-fit:cover;
-}
-
-.text{
+h1{
+    background:#111;
     padding:15px;
 }
 
-.player{
-    display:none;
-    padding:20px;
+canvas{
+    background:white;
+    border:3px solid black;
+    cursor:crosshair;
 }
 
-iframe{
-    width:100%;
-    height:70vh;
-    border:0;
+button,input{
+    margin:5px;
+    padding:10px;
+    font-size:16px;
 }
 
-button{
-    padding:10px 20px;
-    border:0;
-    border-radius:20px;
-    cursor:pointer;
+#frames{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.frame{
+    border:2px solid white;
+    margin:5px;
+}
+
+.frame img{
+    width:100px;
 }
 </style>
-
 </head>
 
 <body>
 
-<header>
-RiskyTube
-</header>
+<h1>🎨 Zeichen Film Maker</h1>
 
+<canvas id="canvas" width="800" height="500"></canvas>
 
-<!-- ACCOUNT AUSWAHL -->
+<br>
 
-<div id="accounts">
+Stärke:
+<input id="opacity" type="range" min="1" max="100" value="100">
 
-<div class="account" onclick="openChannel()">
+Dicke:
+<input id="size" type="range" min="1" max="50" value="5">
 
-<img src="1.png">
+<br>
 
-<h2>RiskyLife</h2>
+<button onclick="clearCanvas()">🆕 Neues Bild</button>
+<button onclick="saveFrame()">📸 Bild speichern</button>
+<button onclick="duplicateFrame()">📋 Duplizieren</button>
+<button onclick="playFilm()">▶ Film abspielen</button>
+<button onclick="downloadFilm()">⬇ Film downloaden</button>
 
-<p>Gaming • Musik • Videos</p>
+<h2>Frames</h2>
+<div id="frames"></div>
 
-</div>
+<br>
 
-</div>
-
-
-
-<!-- KANAL -->
-
-<div id="channel" style="display:none">
-
-<div class="banner">
-
-<h1>RiskyLife</h1>
-
-<p>
-Willkommen auf meinem Kanal!
-</p>
-
-</div>
-
-
-<div id="videos" class="grid"></div>
-
-</div>
-
-
-
-<!-- VIDEO PLAYER -->
-
-<div id="player" class="player">
-
-<button onclick="back()">
-← Zurück
-</button>
-
-<br><br>
-
-<iframe id="video" allowfullscreen></iframe>
-
-<h2 id="title"></h2>
-
-<p id="description"></p>
-
-</div>
-
+<video id="video" controls></video>
 
 
 <script>
 
-let data;
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+let drawing=false;
+
+let frames=[];
+
+ctx.fillStyle="white";
+ctx.fillRect(0,0,canvas.width,canvas.height);
 
 
-fetch("1.json")
-.then(r=>r.json())
-.then(j=>{
-    data=j;
-});
+// Zeichnen
+
+canvas.onmousedown=e=>{
+    drawing=true;
+    draw(e);
+};
+
+canvas.onmouseup=()=>{
+    drawing=false;
+};
+
+canvas.onmousemove=e=>{
+    if(drawing) draw(e);
+};
 
 
+function draw(e){
 
-function openChannel(){
+    let rect=canvas.getBoundingClientRect();
 
-document.getElementById("accounts").style.display="none";
-
-document.getElementById("channel").style.display="block";
-
-
-let box=document.getElementById("videos");
-
-box.innerHTML="";
+    let x=e.clientX-rect.left;
+    let y=e.clientY-rect.top;
 
 
-data.videos.forEach((v,i)=>{
+    ctx.beginPath();
 
+    ctx.lineWidth=document.getElementById("size").value;
 
-let card=document.createElement("div");
+    ctx.globalAlpha=
+    document.getElementById("opacity").value/100;
 
-card.className="card";
+    ctx.strokeStyle="black";
 
+    ctx.lineCap="round";
 
-card.innerHTML=`
+    ctx.moveTo(x,y);
+    ctx.lineTo(x,y);
 
-<video muted src="${v.file}"></video>
-
-<div class="text">
-
-<b>${v.title}</b>
-
-<p>${v.description}</p>
-
-</div>
-
-`;
-
-
-card.onclick=()=>play(i);
-
-
-box.appendChild(card);
-
-
-});
-
-
+    ctx.stroke();
 }
 
 
 
-function play(i){
+// neues Bild
 
-let v=data.videos[i];
+function clearCanvas(){
 
-let url=v.file;
+ctx.globalAlpha=1;
 
-
-// YouTube Unterstützung
-
-if(url.includes("watch?v=")){
-
-url=url.replace(
-"watch?v=",
-"embed/"
+ctx.fillStyle="white";
+ctx.fillRect(
+0,
+0,
+canvas.width,
+canvas.height
 );
 
 }
 
 
-// Google Drive Unterstützung
+// Frame speichern
 
-if(url.includes("uc?export=download&id=")){
+function saveFrame(){
 
-let id=url.split("id=")[1];
+let img=canvas.toDataURL();
 
-url=
-"https://drive.google.com/file/d/"
-+id+
-"/preview";
+frames.push(img);
 
-}
-
-
-
-document.getElementById("channel").style.display="none";
-
-document.getElementById("player").style.display="block";
-
-
-document.getElementById("video").src=url;
-
-document.getElementById("title").innerHTML=v.title;
-
-document.getElementById("description").innerHTML=v.description;
-
+showFrames();
 
 }
 
 
 
-function back(){
+// Frames anzeigen
 
-document.getElementById("video").src="";
+function showFrames(){
 
-document.getElementById("player").style.display="none";
+let box=document.getElementById("frames");
 
-document.getElementById("channel").style.display="block";
+box.innerHTML="";
+
+
+frames.forEach((f,i)=>{
+
+let div=document.createElement("div");
+
+div.className="frame";
+
+
+let img=document.createElement("img");
+
+img.src=f;
+
+
+div.appendChild(img);
+
+
+let b=document.createElement("button");
+
+b.innerHTML="Laden";
+
+b.onclick=()=>{
+
+let image=new Image();
+
+image.src=f;
+
+image.onload=()=>{
+
+ctx.drawImage(
+image,
+0,
+0
+);
+
+};
+
+};
+
+
+div.appendChild(b);
+
+
+box.appendChild(div);
+
+});
 
 }
 
+
+
+// duplizieren
+
+function duplicateFrame(){
+
+if(frames.length>0){
+
+frames.push(
+frames[frames.length-1]
+);
+
+showFrames();
+
+}
+
+}
+
+
+
+// Film abspielen
+
+function playFilm(){
+
+let i=0;
+
+
+let interval=setInterval(()=>{
+
+
+let img=new Image();
+
+img.src=frames[i];
+
+
+img.onload=()=>{
+
+ctx.drawImage(
+img,
+0,
+0
+);
+
+};
+
+
+i++;
+
+
+if(i>=frames.length)
+clearInterval(interval);
+
+
+},300);
+
+
+}
+
+
+
+// Film exportieren
+
+async function downloadFilm(){
+
+if(frames.length==0){
+alert("Keine Bilder!");
+return;
+}
+
+
+let stream=
+canvas.captureStream(5);
+
+
+let recorder=
+new MediaRecorder(stream,
+{
+mimeType:"video/webm"
+});
+
+
+let chunks=[];
+
+
+recorder.ondataavailable=e=>{
+chunks.push(e.data);
+};
+
+
+recorder.onstop=()=>{
+
+let blob=
+new Blob(chunks,
+{
+type:"video/webm"
+});
+
+
+let url=
+URL.createObjectURL(blob);
+
+
+let a=document.createElement("a");
+
+a.href=url;
+
+a.download="mein_zeichenfilm.webm";
+
+a.click();
+
+
+};
+
+
+recorder.start();
+
+
+let i=0;
+
+
+let timer=setInterval(()=>{
+
+let img=new Image();
+
+img.src=frames[i];
+
+
+img.onload=()=>{
+
+ctx.drawImage(
+img,
+0,
+0
+);
+
+};
+
+
+i++;
+
+
+if(i>=frames.length){
+
+clearInterval(timer);
+
+setTimeout(()=>{
+
+recorder.stop();
+
+},500);
+
+}
+
+
+},300);
+
+
+}
 
 </script>
+
 
 </body>
 </html>
