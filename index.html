@@ -1,609 +1,240 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NortonMarket</title>
+<title>GhostBay - Marktplatz</title>
 
-<link rel="stylesheet" href="style.css">
+<style>
+body{
+    margin:0;
+    background:#050505;
+    color:white;
+    font-family:Arial;
+}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+header{
+    background:#111;
+    padding:20px;
+    border-bottom:3px solid #ffd400;
+}
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+.logo{
+    font-size:30px;
+    font-weight:bold;
+    color:#ffd400;
+}
 
+.search{
+    margin-top:15px;
+}
+
+input{
+    width:80%;
+    padding:12px;
+    border-radius:8px;
+    border:none;
+    font-size:16px;
+}
+
+button{
+    background:#ffd400;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    padding:20px;
+}
+
+.card{
+    background:#111;
+    border:1px solid #333;
+    border-radius:15px;
+    padding:15px;
+    box-shadow:0 0 15px #000;
+}
+
+.card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.title{
+    color:#ffd400;
+    font-size:22px;
+}
+
+.price{
+    font-size:20px;
+    margin:10px 0;
+}
+
+.copy{
+    width:100%;
+}
+</style>
 </head>
 
-<body>
 
-<div id="app">
+<body>
 
 <header>
 
 <div class="logo">
-
-<div class="shield">
-🛡️
+🛒 GhostBay
 </div>
 
-<div class="title">
-
-<h1>NortonMarket</h1>
-
-<p>Sicher kaufen & verkaufen</p>
-
-</div>
-
-</div>
-
-<div class="searchBar">
-
-<input
-type="text"
-id="searchInput"
-placeholder="Produkte suchen..."
-autocomplete="off">
-
-<button id="searchButton">
-🔍
-</button>
-
-</div>
-
-<div class="account">
-
-<button id="accountButton">
-
-<div class="avatar">
-
-🟡
-
-</div>
-
-</button>
-
+<div class="search">
+<input id="search" placeholder="Artikel suchen..." onkeyup="searchItems()">
 </div>
 
 </header>
 
-<nav>
 
-<button class="navButton active">
-Startseite
-</button>
+<div class="container" id="items"></div>
 
-<button class="navButton">
-Kategorien
-</button>
 
-<button class="navButton">
-Beliebt
-</button>
 
-<button class="navButton">
-Neu
-</button>
+<script>
 
-<button class="navButton">
-Hilfe
-</button>
 
-</nav>
+/*
+=================================================
+NEUE ARTIKEL HINZUFÜGEN:
 
-<main>
+Einfach diese Zeile kopieren:
 
-<section class="hero">
+{
+bild:"BILD_LINK",
+titel:"ARTIKEL NAME",
+preis:"99 €",
+kontakt:"deine@email.de"
+},
 
-<div class="heroText">
+=================================================
+*/
 
-<h2>
 
-Willkommen bei NortonMarket
+let artikel=[
 
-</h2>
 
-<p>
+{
+bild:"https://picsum.photos/400/300",
+titel:"Gaming PC",
+preis:"599 €",
+kontakt:"pc@example.com"
+},
 
-Sicher kaufen und verkaufen.
 
-</p>
+{
+bild:"https://picsum.photos/401/300",
+titel:"Minecraft Buch",
+preis:"15 €",
+kontakt:"buch@example.com"
+},
 
+
+{
+bild:"https://picsum.photos/402/300",
+titel:"Bluetooth Kopfhörer",
+preis:"40 €",
+kontakt:"audio@example.com"
+}
+
+
+];
+
+
+
+function anzeigen(liste=artikel){
+
+let box=document.getElementById("items");
+
+box.innerHTML="";
+
+
+liste.forEach((a)=>{
+
+box.innerHTML+=`
+
+<div class="card">
+
+<img src="${a.bild}">
+
+<div class="title">
+${a.titel}
 </div>
 
-</section>
-
-<section id="itemGrid">
-
-<!-- Artikel -->
-
-</section>
-
-</main>
-
+<div class="price">
+${a.preis}
 </div>
 
-<!-- Login -->
 
-<div id="loginWindow" class="hidden">
+<button class="copy"
+onclick="copyText('${a.kontakt}')">
 
-<div class="dialog">
-
-<h2>
-
-Anmelden
-
-</h2>
-
-<input
-id="email"
-type="email"
-placeholder="E-Mail">
-
-<input
-id="pin"
-type="password"
-maxlength="6"
-placeholder="PIN">
-
-<button id="continueLogin">
-
-Weiter
-
-</button>
-
-<button id="closeLogin">
-
-Schließen
+📋 Kontakt kopieren
 
 </button>
 
-</div>
-
-</div>
-<!-- Profilfenster -->
-
-<div id="profileWindow" class="hidden">
-
-    <div class="dialog large">
-
-        <div class="profileHeader">
-
-            <div class="profileAvatar">
-                🟡
-            </div>
-
-            <div class="profileInfo">
-
-                <h2 id="profileMail">
-                    Nicht eingeloggt
-                </h2>
-
-                <p>
-                    NortonMarket Profil
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="profileButtons">
-
-            <button id="addItemButton">
-                ➕ Artikel hinzufügen
-            </button>
-
-            <button id="logoutButton">
-                🚪 Abmelden
-            </button>
-
-            <button id="closeProfile">
-                Schließen
-            </button>
-
-        </div>
-
-    </div>
 
 </div>
 
-<!-- Artikel hinzufügen -->
+`;
 
-<div id="addItemWindow" class="hidden">
+});
 
-    <div class="dialog extraLarge">
 
-        <h2>
-            Artikel hinzufügen
-        </h2>
+}
 
-        <label>
 
-            Überschrift
 
-            <input
-                id="itemTitle"
-                type="text"
-                maxlength="80"
-                placeholder="Titel">
+function searchItems(){
 
-        </label>
+let text=document
+.getElementById("search")
+.value
+.toLowerCase();
 
-        <label>
 
-            Beschreibung
+let ergebnis=artikel.filter(a=>
 
-            <textarea
-                id="itemDescription"
-                rows="7"
-                placeholder="Beschreibung"></textarea>
+a.titel.toLowerCase()
+.includes(text)
 
-        </label>
+);
 
-        <label>
 
-            Zustand
+anzeigen(ergebnis);
 
-            <select id="itemCondition">
+}
 
-                <option value="Neu">
-                    Neu
-                </option>
 
-                <option value="Gebraucht">
-                    Gebraucht
-                </option>
 
-            </select>
+function copyText(text){
 
-        </label>
+navigator.clipboard.writeText(text);
 
-        <label>
+alert("Kontakt kopiert: "+text);
 
-            Preis (€)
+}
 
-            <input
-                id="itemPrice"
-                type="number"
-                min="0"
-                step="0.01">
 
-        </label>
 
-        <label>
+anzeigen();
 
-            Kontakt
 
-            <input
-                id="itemContact"
-                type="text"
-                placeholder="Telefon oder E-Mail">
+</script>
 
-        </label>
 
-        <label>
-
-            Bild 1
-
-            <input
-                id="image1"
-                type="file"
-                accept="image/*">
-
-        </label>
-
-        <label>
-
-            Bild 2
-
-            <input
-                id="image2"
-                type="file"
-                accept="image/*">
-
-        </label>
-
-        <label>
-
-            Bild 3
-
-            <input
-                id="image3"
-                type="file"
-                accept="image/*">
-
-        </label>
-
-        <div class="imagePreview">
-
-            <img id="preview1">
-
-            <img id="preview2">
-
-            <img id="preview3">
-
-        </div>
-        <div class="dialogButtons">
-
-            <button id="saveItemButton">
-                💾 Artikel veröffentlichen
-            </button>
-
-            <button id="cancelItemButton">
-                Abbrechen
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Artikel-Detailfenster -->
-
-<div id="itemWindow" class="hidden">
-
-    <div class="dialog extraLarge">
-
-        <button id="closeItemWindow" class="closeButton">
-            ✕
-        </button>
-
-        <div class="itemViewer">
-
-            <div class="gallery">
-
-                <img id="viewerImage" src="" alt="Artikelbild">
-
-                <div class="galleryThumbs">
-
-                    <img id="thumb1" class="thumb">
-
-                    <img id="thumb2" class="thumb">
-
-                    <img id="thumb3" class="thumb">
-
-                </div>
-
-            </div>
-
-            <div class="itemInfo">
-
-                <h2 id="viewerTitle">
-                    Artikel
-                </h2>
-
-                <div class="priceBox">
-
-                    <span id="viewerPrice">
-                        0,00 €
-                    </span>
-
-                </div>
-
-                <div class="conditionBox">
-
-                    Zustand:
-                    <strong id="viewerCondition">
-                        Neu
-                    </strong>
-
-                </div>
-
-                <div class="contactBox">
-
-                    Kontakt:
-                    <span id="viewerContact"></span>
-
-                </div>
-
-                <h3>
-                    Beschreibung
-                </h3>
-
-                <p id="viewerDescription"></p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Ladeanzeige -->
-
-<div id="loadingOverlay" class="hidden">
-
-    <div class="loadingBox">
-
-        <div class="spinner"></div>
-
-        <h2>
-            Daten werden synchronisiert...
-        </h2>
-
-    </div>
-
-</div>
-
-<!-- Benachrichtigungen -->
-
-<div id="toastContainer">
-
-</div>
-<!-- Vorlage für Artikelkarten -->
-
-<template id="itemTemplate">
-
-    <article class="itemCard">
-
-        <div class="itemImageContainer">
-
-            <img
-                class="itemImage"
-                src=""
-                alt="Artikelbild">
-
-            <div class="itemConditionBadge">
-                Neu
-            </div>
-
-        </div>
-
-        <div class="itemContent">
-
-            <h3 class="itemTitle">
-                Artikeltitel
-            </h3>
-
-            <p class="itemDescription">
-                Beschreibung...
-            </p>
-
-            <div class="itemFooter">
-
-                <div class="itemPrice">
-                    0,00 €
-                </div>
-
-                <button class="openItemButton">
-                    Ansehen
-                </button>
-
-            </div>
-
-        </div>
-
-    </article>
-
-</template>
-
-<!-- Suchergebnisse -->
-
-<section
-    id="searchResults"
-    class="hidden">
-
-    <div class="resultsHeader">
-
-        <h2>
-
-            Suchergebnisse
-
-        </h2>
-
-        <span id="resultCount">
-
-            0 Treffer
-
-        </span>
-
-    </div>
-
-    <div id="searchGrid">
-
-    </div>
-
-</section>
-
-<!-- Keine Ergebnisse -->
-
-<section
-    id="emptySearch"
-    class="hidden">
-
-    <div class="emptyBox">
-
-        <h2>
-
-            Keine Artikel gefunden
-
-        </h2>
-
-        <p>
-
-            Versuche einen anderen Suchbegriff.
-
-        </p>
-
-    </div>
-
-</section>
-<!-- Footer -->
-
-<footer id="footer">
-
-    <div class="footerContainer">
-
-        <div class="footerColumn">
-
-            <h3>NortonMarket</h3>
-
-            <p>
-                Sicher kaufen und verkaufen.
-            </p>
-
-        </div>
-
-        <div class="footerColumn">
-
-            <h3>Marktplatz</h3>
-
-            <ul>
-
-                <li><a href="#">Startseite</a></li>
-
-                <li><a href="#">Kategorien</a></li>
-
-                <li><a href="#">Beliebte Artikel</a></li>
-
-                <li><a href="#">Neu eingestellt</a></li>
-
-            </ul>
-
-        </div>
-
-        <div class="footerColumn">
-
-            <h3>Hilfe</h3>
-
-            <ul>
-
-                <li><a href="#">Kontakt</a></li>
-
-                <li><a href="#">Impressum</a></li>
-
-                <li><a href="#">Datenschutz</a></li>
-
-                <li><a href="#">AGB</a></li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
-</footer>
-
-<!-- Versteckte Statusfelder -->
-
-<input
-    type="hidden"
-    id="currentUser">
-
-<input
-    type="hidden"
-    id="currentItem">
-
-<div
-    id="backgroundBlur"
-    class="hidden">
-</div>
-
-<!-- JavaScript -->
-
-<script src="script.js"></script>
 </body>
 </html>
