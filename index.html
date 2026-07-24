@@ -1,386 +1,609 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
-<title>Zeichen Film Maker</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<style>
-body{
-    margin:0;
-    background:#202020;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-}
+<title>NortonMarket</title>
 
-h1{
-    background:#111;
-    padding:15px;
-}
+<link rel="stylesheet" href="style.css">
 
-canvas{
-    background:white;
-    border:3px solid black;
-    cursor:crosshair;
-}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-button,input{
-    margin:5px;
-    padding:10px;
-    font-size:16px;
-}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-#frames{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-}
-
-.frame{
-    border:2px solid white;
-    margin:5px;
-}
-
-.frame img{
-    width:100px;
-}
-</style>
 </head>
 
 <body>
 
-<h1>🎨 Zeichen Film Maker</h1>
+<div id="app">
 
-<canvas id="canvas" width="800" height="500"></canvas>
+<header>
 
-<br>
+<div class="logo">
 
-Stärke:
-<input id="opacity" type="range" min="1" max="100" value="100">
+<div class="shield">
+🛡️
+</div>
 
-Dicke:
-<input id="size" type="range" min="1" max="50" value="5">
+<div class="title">
 
-<br>
+<h1>NortonMarket</h1>
 
-<button onclick="clearCanvas()">🆕 Neues Bild</button>
-<button onclick="saveFrame()">📸 Bild speichern</button>
-<button onclick="duplicateFrame()">📋 Duplizieren</button>
-<button onclick="playFilm()">▶ Film abspielen</button>
-<button onclick="downloadFilm()">⬇ Film downloaden</button>
+<p>Sicher kaufen & verkaufen</p>
 
-<h2>Frames</h2>
-<div id="frames"></div>
+</div>
 
-<br>
+</div>
 
-<video id="video" controls></video>
+<div class="searchBar">
 
+<input
+type="text"
+id="searchInput"
+placeholder="Produkte suchen..."
+autocomplete="off">
 
-<script>
+<button id="searchButton">
+🔍
+</button>
 
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+</div>
 
-let drawing=false;
+<div class="account">
 
-let frames=[];
+<button id="accountButton">
 
-ctx.fillStyle="white";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+<div class="avatar">
 
+🟡
 
-// Zeichnen
+</div>
 
-canvas.onmousedown=e=>{
-    drawing=true;
-    draw(e);
-};
+</button>
 
-canvas.onmouseup=()=>{
-    drawing=false;
-};
+</div>
 
-canvas.onmousemove=e=>{
-    if(drawing) draw(e);
-};
+</header>
 
+<nav>
 
-function draw(e){
+<button class="navButton active">
+Startseite
+</button>
 
-    let rect=canvas.getBoundingClientRect();
+<button class="navButton">
+Kategorien
+</button>
 
-    let x=e.clientX-rect.left;
-    let y=e.clientY-rect.top;
+<button class="navButton">
+Beliebt
+</button>
 
+<button class="navButton">
+Neu
+</button>
 
-    ctx.beginPath();
+<button class="navButton">
+Hilfe
+</button>
 
-    ctx.lineWidth=document.getElementById("size").value;
+</nav>
 
-    ctx.globalAlpha=
-    document.getElementById("opacity").value/100;
+<main>
 
-    ctx.strokeStyle="black";
+<section class="hero">
 
-    ctx.lineCap="round";
+<div class="heroText">
 
-    ctx.moveTo(x,y);
-    ctx.lineTo(x,y);
+<h2>
 
-    ctx.stroke();
-}
+Willkommen bei NortonMarket
 
+</h2>
 
+<p>
 
-// neues Bild
+Sicher kaufen und verkaufen.
 
-function clearCanvas(){
+</p>
 
-ctx.globalAlpha=1;
+</div>
 
-ctx.fillStyle="white";
-ctx.fillRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
+</section>
 
-}
+<section id="itemGrid">
 
+<!-- Artikel -->
 
-// Frame speichern
+</section>
 
-function saveFrame(){
+</main>
 
-let img=canvas.toDataURL();
+</div>
 
-frames.push(img);
+<!-- Login -->
 
-showFrames();
+<div id="loginWindow" class="hidden">
 
-}
+<div class="dialog">
 
+<h2>
 
+Anmelden
 
-// Frames anzeigen
+</h2>
 
-function showFrames(){
+<input
+id="email"
+type="email"
+placeholder="E-Mail">
 
-let box=document.getElementById("frames");
+<input
+id="pin"
+type="password"
+maxlength="6"
+placeholder="PIN">
 
-box.innerHTML="";
+<button id="continueLogin">
 
+Weiter
 
-frames.forEach((f,i)=>{
+</button>
 
-let div=document.createElement("div");
+<button id="closeLogin">
 
-div.className="frame";
+Schließen
 
+</button>
 
-let img=document.createElement("img");
+</div>
 
-img.src=f;
+</div>
+<!-- Profilfenster -->
 
+<div id="profileWindow" class="hidden">
 
-div.appendChild(img);
+    <div class="dialog large">
 
+        <div class="profileHeader">
 
-let b=document.createElement("button");
+            <div class="profileAvatar">
+                🟡
+            </div>
 
-b.innerHTML="Laden";
+            <div class="profileInfo">
 
-b.onclick=()=>{
+                <h2 id="profileMail">
+                    Nicht eingeloggt
+                </h2>
 
-let image=new Image();
+                <p>
+                    NortonMarket Profil
+                </p>
 
-image.src=f;
+            </div>
 
-image.onload=()=>{
+        </div>
 
-ctx.drawImage(
-image,
-0,
-0
-);
+        <div class="profileButtons">
 
-};
+            <button id="addItemButton">
+                ➕ Artikel hinzufügen
+            </button>
 
-};
+            <button id="logoutButton">
+                🚪 Abmelden
+            </button>
 
+            <button id="closeProfile">
+                Schließen
+            </button>
 
-div.appendChild(b);
+        </div>
 
+    </div>
 
-box.appendChild(div);
+</div>
 
-});
+<!-- Artikel hinzufügen -->
 
-}
+<div id="addItemWindow" class="hidden">
 
+    <div class="dialog extraLarge">
 
+        <h2>
+            Artikel hinzufügen
+        </h2>
 
-// duplizieren
+        <label>
 
-function duplicateFrame(){
+            Überschrift
 
-if(frames.length>0){
+            <input
+                id="itemTitle"
+                type="text"
+                maxlength="80"
+                placeholder="Titel">
 
-frames.push(
-frames[frames.length-1]
-);
+        </label>
 
-showFrames();
+        <label>
 
-}
+            Beschreibung
 
-}
+            <textarea
+                id="itemDescription"
+                rows="7"
+                placeholder="Beschreibung"></textarea>
 
+        </label>
 
+        <label>
 
-// Film abspielen
+            Zustand
 
-function playFilm(){
+            <select id="itemCondition">
 
-let i=0;
+                <option value="Neu">
+                    Neu
+                </option>
 
+                <option value="Gebraucht">
+                    Gebraucht
+                </option>
 
-let interval=setInterval(()=>{
+            </select>
 
+        </label>
 
-let img=new Image();
+        <label>
 
-img.src=frames[i];
+            Preis (€)
 
+            <input
+                id="itemPrice"
+                type="number"
+                min="0"
+                step="0.01">
 
-img.onload=()=>{
+        </label>
 
-ctx.drawImage(
-img,
-0,
-0
-);
+        <label>
 
-};
+            Kontakt
 
+            <input
+                id="itemContact"
+                type="text"
+                placeholder="Telefon oder E-Mail">
 
-i++;
+        </label>
 
+        <label>
 
-if(i>=frames.length)
-clearInterval(interval);
+            Bild 1
 
+            <input
+                id="image1"
+                type="file"
+                accept="image/*">
 
-},300);
+        </label>
 
+        <label>
 
-}
+            Bild 2
 
+            <input
+                id="image2"
+                type="file"
+                accept="image/*">
 
+        </label>
 
-// Film exportieren
+        <label>
 
-async function downloadFilm(){
+            Bild 3
 
-if(frames.length==0){
-alert("Keine Bilder!");
-return;
-}
+            <input
+                id="image3"
+                type="file"
+                accept="image/*">
 
+        </label>
 
-let stream=
-canvas.captureStream(5);
+        <div class="imagePreview">
 
+            <img id="preview1">
 
-let recorder=
-new MediaRecorder(stream,
-{
-mimeType:"video/webm"
-});
+            <img id="preview2">
 
+            <img id="preview3">
 
-let chunks=[];
+        </div>
+        <div class="dialogButtons">
 
+            <button id="saveItemButton">
+                💾 Artikel veröffentlichen
+            </button>
 
-recorder.ondataavailable=e=>{
-chunks.push(e.data);
-};
+            <button id="cancelItemButton">
+                Abbrechen
+            </button>
 
+        </div>
 
-recorder.onstop=()=>{
+    </div>
 
-let blob=
-new Blob(chunks,
-{
-type:"video/webm"
-});
+</div>
 
+<!-- Artikel-Detailfenster -->
 
-let url=
-URL.createObjectURL(blob);
+<div id="itemWindow" class="hidden">
 
+    <div class="dialog extraLarge">
 
-let a=document.createElement("a");
+        <button id="closeItemWindow" class="closeButton">
+            ✕
+        </button>
 
-a.href=url;
+        <div class="itemViewer">
 
-a.download="mein_zeichenfilm.webm";
+            <div class="gallery">
 
-a.click();
+                <img id="viewerImage" src="" alt="Artikelbild">
 
+                <div class="galleryThumbs">
 
-};
+                    <img id="thumb1" class="thumb">
 
+                    <img id="thumb2" class="thumb">
 
-recorder.start();
+                    <img id="thumb3" class="thumb">
 
+                </div>
 
-let i=0;
+            </div>
 
+            <div class="itemInfo">
 
-let timer=setInterval(()=>{
+                <h2 id="viewerTitle">
+                    Artikel
+                </h2>
 
-let img=new Image();
+                <div class="priceBox">
 
-img.src=frames[i];
+                    <span id="viewerPrice">
+                        0,00 €
+                    </span>
 
+                </div>
 
-img.onload=()=>{
+                <div class="conditionBox">
 
-ctx.drawImage(
-img,
-0,
-0
-);
+                    Zustand:
+                    <strong id="viewerCondition">
+                        Neu
+                    </strong>
 
-};
+                </div>
 
+                <div class="contactBox">
 
-i++;
+                    Kontakt:
+                    <span id="viewerContact"></span>
 
+                </div>
 
-if(i>=frames.length){
+                <h3>
+                    Beschreibung
+                </h3>
 
-clearInterval(timer);
+                <p id="viewerDescription"></p>
 
-setTimeout(()=>{
+            </div>
 
-recorder.stop();
+        </div>
 
-},500);
+    </div>
 
-}
+</div>
 
+<!-- Ladeanzeige -->
 
-},300);
+<div id="loadingOverlay" class="hidden">
 
+    <div class="loadingBox">
 
-}
+        <div class="spinner"></div>
 
-</script>
+        <h2>
+            Daten werden synchronisiert...
+        </h2>
 
+    </div>
 
+</div>
+
+<!-- Benachrichtigungen -->
+
+<div id="toastContainer">
+
+</div>
+<!-- Vorlage für Artikelkarten -->
+
+<template id="itemTemplate">
+
+    <article class="itemCard">
+
+        <div class="itemImageContainer">
+
+            <img
+                class="itemImage"
+                src=""
+                alt="Artikelbild">
+
+            <div class="itemConditionBadge">
+                Neu
+            </div>
+
+        </div>
+
+        <div class="itemContent">
+
+            <h3 class="itemTitle">
+                Artikeltitel
+            </h3>
+
+            <p class="itemDescription">
+                Beschreibung...
+            </p>
+
+            <div class="itemFooter">
+
+                <div class="itemPrice">
+                    0,00 €
+                </div>
+
+                <button class="openItemButton">
+                    Ansehen
+                </button>
+
+            </div>
+
+        </div>
+
+    </article>
+
+</template>
+
+<!-- Suchergebnisse -->
+
+<section
+    id="searchResults"
+    class="hidden">
+
+    <div class="resultsHeader">
+
+        <h2>
+
+            Suchergebnisse
+
+        </h2>
+
+        <span id="resultCount">
+
+            0 Treffer
+
+        </span>
+
+    </div>
+
+    <div id="searchGrid">
+
+    </div>
+
+</section>
+
+<!-- Keine Ergebnisse -->
+
+<section
+    id="emptySearch"
+    class="hidden">
+
+    <div class="emptyBox">
+
+        <h2>
+
+            Keine Artikel gefunden
+
+        </h2>
+
+        <p>
+
+            Versuche einen anderen Suchbegriff.
+
+        </p>
+
+    </div>
+
+</section>
+<!-- Footer -->
+
+<footer id="footer">
+
+    <div class="footerContainer">
+
+        <div class="footerColumn">
+
+            <h3>NortonMarket</h3>
+
+            <p>
+                Sicher kaufen und verkaufen.
+            </p>
+
+        </div>
+
+        <div class="footerColumn">
+
+            <h3>Marktplatz</h3>
+
+            <ul>
+
+                <li><a href="#">Startseite</a></li>
+
+                <li><a href="#">Kategorien</a></li>
+
+                <li><a href="#">Beliebte Artikel</a></li>
+
+                <li><a href="#">Neu eingestellt</a></li>
+
+            </ul>
+
+        </div>
+
+        <div class="footerColumn">
+
+            <h3>Hilfe</h3>
+
+            <ul>
+
+                <li><a href="#">Kontakt</a></li>
+
+                <li><a href="#">Impressum</a></li>
+
+                <li><a href="#">Datenschutz</a></li>
+
+                <li><a href="#">AGB</a></li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- Versteckte Statusfelder -->
+
+<input
+    type="hidden"
+    id="currentUser">
+
+<input
+    type="hidden"
+    id="currentItem">
+
+<div
+    id="backgroundBlur"
+    class="hidden">
+</div>
+
+<!-- JavaScript -->
+
+<script src="script.js"></script>
 </body>
 </html>
