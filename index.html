@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
 
 <meta charset="UTF-8">
@@ -8,18 +7,15 @@
 
 <title>Norton Smart Security</title>
 
-
 <style>
 
 *{
 box-sizing:border-box;
 }
 
-
 body{
 
 margin:0;
-
 height:100vh;
 
 background:#101010;
@@ -33,11 +29,11 @@ display:flex;
 }
 
 
-/* Menü */
+/* Seitenmenü */
 
 .sidebar{
 
-width:250px;
+width:260px;
 
 background:#080808;
 
@@ -102,8 +98,7 @@ font-weight:bold;
 
 
 
-
-/* Inhalt */
+/* Haupt */
 
 .main{
 
@@ -129,9 +124,7 @@ margin-bottom:30px;
 
 
 
-
-
-/* Risiko */
+/* Risiko Kreis */
 
 .circle{
 
@@ -150,6 +143,8 @@ align-items:center;
 justify-content:center;
 
 flex-direction:column;
+
+transition:.4s;
 
 }
 
@@ -193,8 +188,7 @@ color:#ffcc00;
 
 
 
-
-
+/* Karten */
 
 .card{
 
@@ -208,10 +202,9 @@ border-radius:15px;
 
 padding:25px;
 
-max-width:700px;
+max-width:750px;
 
 }
-
 
 
 
@@ -223,12 +216,11 @@ margin-top:20px;
 
 
 
-
-button.action{
+.action{
 
 background:#ffcc00;
 
-color:black;
+color:#000;
 
 border:0;
 
@@ -246,12 +238,11 @@ margin:5px;
 
 
 
-button.action:hover{
+.action:hover{
 
 background:#ffe066;
 
 }
-
 
 
 
@@ -260,7 +251,6 @@ background:#ffe066;
 display:none;
 
 }
-
 
 
 
@@ -280,12 +270,10 @@ border-radius:10px;
 
 </style>
 
-
 </head>
 
 
 <body>
-
 
 
 
@@ -313,12 +301,15 @@ Scan
 </button>
 
 
+<button onclick="page('download',this)">
+Download 1.json
+</button>
+
 
 </div>
 
 
 </div>
-
 
 
 
@@ -330,13 +321,15 @@ Scan
 
 
 
-
+<!-- HOME -->
 
 <div id="home">
 
 
 <div class="title">
+
 Home
+
 </div>
 
 
@@ -350,7 +343,9 @@ RISIKOSTUFE
 
 
 <span id="riskText">
+
 BEREIT
+
 </span>
 
 
@@ -373,12 +368,7 @@ Datei auswählen und prüfen
 </p>
 
 
-
-<input 
-id="homeFile"
-type="file"
->
-
+<input id="homeFile" type="file">
 
 
 <br>
@@ -391,7 +381,6 @@ Scan starten
 </button>
 
 
-
 <div id="homeResult" class="result">
 
 Bereit
@@ -399,7 +388,6 @@ Bereit
 </div>
 
 
-
 </div>
 
 
@@ -412,13 +400,18 @@ Bereit
 
 
 
+
+
+<!-- SCAN -->
 
 
 <div id="scan" class="hidden">
 
 
 <div class="title">
+
 Scan
+
 </div>
 
 
@@ -456,7 +449,6 @@ Update Scan
 
 
 
-
 <div id="scanArea">
 
 </div>
@@ -466,9 +458,60 @@ Update Scan
 </div>
 
 
+</div>
+
+
+
+
+
+
+
+
+<!-- DOWNLOAD -->
+
+
+<div id="download" class="hidden">
+
+
+<div class="title">
+
+Download 1.json
 
 </div>
 
+
+
+
+<div class="card">
+
+
+<h2>
+
+Malware Datenbank
+
+</h2>
+
+
+
+<p>
+
+Neue 1.json Datei herunterladen.
+
+</p>
+
+
+
+<button class="action" onclick="downloadJSON()">
+
+1.json herunterladen
+
+</button>
+
+
+</div>
+
+
+</div>
 
 
 
@@ -487,18 +530,12 @@ Update Scan
 <script>
 
 
-
 function page(id,btn){
 
 
 document
-.getElementById("home")
-.classList.add("hidden");
-
-
-document
-.getElementById("scan")
-.classList.add("hidden");
+.querySelectorAll(".main > div")
+.forEach(x=>x.classList.add("hidden"));
 
 
 
@@ -512,11 +549,12 @@ document
 .querySelectorAll(".menu button")
 .forEach(x=>x.classList.remove("active"));
 
+
+
 btn.classList.add("active");
 
 
 }
-
 
 
 
@@ -534,7 +572,7 @@ document.getElementById(input).files[0];
 
 if(!file){
 
-alert("Datei auswählen");
+alert("Bitte Datei auswählen");
 
 return;
 
@@ -548,11 +586,27 @@ document
 
 
 
-// HIER kommt später deine eigene Server-Schnittstelle hin
+document
+.getElementById("homeResult")
+.innerHTML="Analyse läuft...";
 
+
+
+
+
+// später kommt hier Server-Verbindung rein
 
 
 setTimeout(()=>{
+
+
+
+let safe =
+Math.random()>0.5;
+
+
+
+if(safe){
 
 
 document
@@ -565,18 +619,83 @@ document
 .innerHTML="SICHER";
 
 
+}
+
+else{
+
+
+document
+.getElementById("riskCircle")
+.className="circle danger";
+
+
+document
+.getElementById("riskText")
+.innerHTML="GEFAHR";
+
+
+}
+
+
+
+
 
 document
 .getElementById("homeResult")
 .innerHTML=
 
-"Datei geprüft: "
+"Geprüft: "
 +
 file.name;
 
 
 
+
+askLearning();
+
+
+
 },1500);
+
+
+
+}
+
+
+
+
+
+
+
+function askLearning(){
+
+
+let answer =
+confirm(
+"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
+);
+
+
+
+if(answer){
+
+
+alert(
+"Als schädlich gelernt."
+);
+
+
+}
+
+else{
+
+
+alert(
+"Als sicher gelernt."
+);
+
+
+}
 
 
 
@@ -611,11 +730,7 @@ Datei prüfen
 
 `;
 
-
 }
-
-
-
 
 
 
@@ -629,26 +744,16 @@ document
 
 <h3>OrdnerScan</h3>
 
-<input 
-type="file"
-webkitdirectory
-multiple
->
+<input type="file" webkitdirectory multiple>
 
 
 <p>
-Ordnerscan bereit.
-Server-Schnittstelle später.
+Ordnerscan vorbereitet.
 </p>
 
 `;
 
-
 }
-
-
-
-
 
 
 
@@ -663,7 +768,9 @@ document
 <h3>Update Scan</h3>
 
 <p style="color:#e74c3c">
+
 Nicht verfügbar
+
 </p>
 
 `;
@@ -672,8 +779,74 @@ Nicht verfügbar
 
 
 
-</script>
 
+
+
+
+function downloadJSON(){
+
+
+
+let data={
+
+
+version:"1.0",
+
+
+database:"Norton Smart Scanner",
+
+
+signatures:[]
+
+
+};
+
+
+
+
+let blob =
+new Blob(
+
+[
+JSON.stringify(data,null,2)
+],
+
+{
+type:"application/json"
+}
+
+);
+
+
+
+
+let url =
+URL.createObjectURL(blob);
+
+
+
+let a =
+document.createElement("a");
+
+
+
+a.href=url;
+
+a.download="1.json";
+
+a.click();
+
+
+
+URL.revokeObjectURL(url);
+
+
+
+}
+
+
+
+</script>
 
 
 </body>
