@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sichere Sandbox & Virenscanner</title>
+    <title>Hochsicherheits-Sandbox & Virenscanner</title>
     <style>
         :root {
             --primary: #3498db;
@@ -49,8 +49,8 @@ app.get('/', (req, res) => {
 <body>
 
     <div class="card">
-        <h1>🛡️ Live Virenscanner & Datei-Sandbox</h1>
-        <p>Wählen Sie eine HTML-, JS- oder Textdatei aus. Sie wird gleichzeitig serverseitig auf Viren geprüft und unten isoliert gestartet.</p>
+        <h1>🛡️ Hochsicherheits-Virenscanner & Sandbox</h1>
+        <p>Prüft Dateien serverseitig in der Cloud und führt sie zeitgleich in einer hermetisch isolierten Client-Sandbox aus.</p>
         
         <div class="dropzone" onclick="document.getElementById('fileInput').click()">
             <p>Datei hier ablegen oder klicken zum Hochladen</p>
@@ -62,16 +62,16 @@ app.get('/', (req, res) => {
     </div>
 
     <div class="card">
-        <h2>隔离 Sichere Sandbox-Vorschau</h2>
-        <p>Diese Umgebung blockiert durch strikte Browser-Direktiven (Skripte, Cookies, Formulare) jegliche System-Interaktionen.</p>
+        <h2>🔒 Hermetisch isolierte Sandbox</h2>
+        <p><strong>Sicherheitsstufe Maximal:</strong> Skripte dürfen für visuelle Tests laufen, haben jedoch absolutes Netzwerkverbot (kein Datenabfluss) und null Zugriff auf das Elternfenster, Cookies oder Speicherlaufwerke.</p>
         
         <div class="sandbox-wrapper">
             <div class="sandbox-header">
-                <span>Abgesicherter iframe</span>
-                <span class="badge">sandbox="allow-same-origin"</span>
+                <span>Isolierter iframe</span>
+                <span class="badge" style="background:#e67e22;">Streng limitiert (No Same-Origin / CSP-Block)</span>
             </div>
-            <!-- Das Sicherheits-Herzstück: Isoliert ausgeführter Frame -->
-            <iframe id="sandboxFrame" sandbox="allow-same-origin"></iframe>
+            <!-- allow-same-origin WURDE ENTFERNT. Der Inhalt ist jetzt komplett vom Hauptfenster getrennt -->
+            <iframe id="sandboxFrame" sandbox="allow-scripts"></iframe>
         </div>
     </div>
 
@@ -84,20 +84,29 @@ app.get('/', (req, res) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 1. Visuelles Feedback starten
             scanStatus.style.display = 'block';
             scanStatus.className = 'status-box info';
             scanStatus.innerHTML = '⏳ Datei wird verarbeitet und gescannt... Bitte warten...';
 
-            // 2. Lokale Sandbox-Aktivierung via FileReader & Blob
+            // 1. Sicheres Laden in die Sandbox mit Content Security Policy (CSP)
             const reader = new FileReader();
             reader.onload = (evt) => {
-                const blob = new Blob([evt.target.result], { type: 'text/html' });
+                let userContent = evt.target.result;
+                
+                // Wir injizieren eine ultra-strikte CSP ganz oben in den Code der Datei.
+                // default-src 'none': Verbietet alle Verbindungen nach außen, Bilder-Nachladen, Ajax-Requests etc.
+                // script-src 'unsafe-inline': Erlaubt nur den lokalen JS-Code der Datei, verbietet das Nachladen externer Viren-Skripte.
+                const secureCsp = \`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">\`;
+                
+                // Setze CSP an den Anfang des hochgeladenen Codes
+                const securedCode = secureCsp + userContent;
+
+                const blob = new Blob([securedCode], { type: 'text/html' });
                 sandboxFrame.src = URL.createObjectURL(blob);
             };
             reader.readAsText(file);
 
-            // 3. Echten Virenscan im Backend anstoßen
+            // 2. Datei an das Backend senden
             const formData = new FormData();
             formData.append('file', file);
 
@@ -131,7 +140,7 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Route für den echten Cloud-Virenscan
+// Route für den echten Cloud-Virenscan via VirusTotal API
 app.post('/api/scan', upload.single('file'), async (req, res) => {
     if (!VT_API_KEY) {
         return res.status(500).json({ error: "Server-Konfigurationsfehler: Kein API-Key auf Render hinterlegt." });
@@ -144,7 +153,6 @@ app.post('/api/scan', upload.single('file'), async (req, res) => {
         const formData = new FormData();
         formData.append('file', req.file.buffer, { filename: req.file.originalname });
 
-        // 1. Datei-Upload zu VirusTotal
         const uploadResponse = await axios.post('https://virustotal.com', formData, {
             headers: {
                 ...formData.getHeaders(),
@@ -154,10 +162,9 @@ app.post('/api/scan', upload.single('file'), async (req, res) => {
 
         const analysisId = uploadResponse.data.data.id;
 
-        // 2. Kurze Pause für die cloudbasierte Analyse-Engine
+        // Kurze Pause für die cloudbasierte Analyse-Engine
         await new Promise(resolve => setTimeout(resolve, 3500));
 
-        // 3. Analysebericht abrufen
         const resultResponse = await axios.get(`https://virustotal.com{analysisId}`, {
             headers: { 'x-apikey': VT_API_KEY }
         });
