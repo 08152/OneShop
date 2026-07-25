@@ -1,371 +1,781 @@
-// Route für die Startseite (index) im optimierten Norton 360 Premium-Design
-app.get('/', (req, res) => {
-    res.send(`
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Norton 360 - Smart Scan & Isolation Sandbox</title>
-    <style>
-        :root {
-            --norton-yellow: #ffcc00;
-            --norton-dark: #141414;
-            --norton-gray: #1e1e1e;
-            --norton-light-gray: #2d2d2d;
-            --norton-border: #3a3a3a;
-            --norton-text: #ffffff;
-            --norton-text-muted: #aaaaaa;
-            --success-green: #2ecc71;
-            --danger-red: #e74c3c;
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background-color: var(--norton-dark); 
-            color: var(--norton-text); 
-            margin: 0; 
-            padding: 40px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            -webkit-user-select: none;
-            user-select: none;
-        }
 
-        .norton-window {
-            width: 100%;
-            max-width: 780px;
-            background: var(--norton-gray);
-            border-radius: 4px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-            border: 1px solid var(--norton-border);
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .norton-header {
-            background: #0d0d0d;
-            padding: 14px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--norton-light-gray);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
+<title>Norton Smart Scanner</title>
 
-        .norton-brand {
-            color: var(--norton-yellow);
-            font-weight: 800;
-        }
 
-        .norton-window-controls {
-            display: flex;
-            gap: 12px;
-            color: var(--norton-text-muted);
-            font-size: 12px;
-        }
+<style>
 
-        .norton-body {
-            padding: 50px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+*{
+box-sizing:border-box;
+}
 
-        /* Status-Kreis im Norton Design */
-        .status-circle-container {
-            position: relative;
-            margin-bottom: 40px;
-        }
 
-        .status-circle {
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            border: 5px solid var(--norton-yellow);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: rgba(255, 204, 0, 0.02);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.05);
-            position: relative;
-        }
+body{
 
-        /* Pulsierende Scan-Animation im Kreis */
-        .status-circle.is-scanning::after {
-            content: '';
-            position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border-radius: 50%;
-            border: 5px solid transparent;
-            border-top-color: #ffffff;
-            animation: spin 1s linear infinite;
-        }
+margin:0;
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+min-height:100vh;
 
-        .status-circle.is-safe {
-            border-color: var(--success-green);
-            background: rgba(46, 204, 113, 0.02);
-            box-shadow: 0 0 30px rgba(46, 204, 113, 0.1);
-        }
+background:
+radial-gradient(circle at top,#333,#080808);
 
-        .status-circle.is-danger {
-            border-color: var(--danger-red);
-            background: rgba(231, 76, 60, 0.02);
-            box-shadow: 0 0 30px rgba(231, 76, 60, 0.1);
-        }
+font-family:"Segoe UI",Arial,sans-serif;
 
-        .status-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--norton-text-muted);
-            letter-spacing: 1.5px;
-            font-weight: 700;
-        }
+color:white;
 
-        .status-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-top: 6px;
-            letter-spacing: 0.5px;
-            color: var(--norton-yellow);
-        }
+display:flex;
 
-        /* Drag & Drop Zone */
-        .dropzone { 
-            width: 100%;
-            max-width: 580px;
-            border: 1px dashed #444; 
-            padding: 55px 30px; 
-            text-align: center; 
-            cursor: pointer; 
-            background: #181818; 
-            border-radius: 4px; 
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
-        
-        .dropzone:hover, .dropzone.dragover { 
-            border-color: var(--norton-yellow);
-            background: #1c1c1c;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-        }
+justify-content:center;
 
-        .dropzone p {
-            margin: 0 0 20px 0;
-            font-size: 15px;
-            color: #cccc00;
-            font-weight: 600;
-        }
+align-items:center;
 
-        .dropzone span {
-            display: block;
-            font-size: 13px;
-            color: var(--norton-text-muted);
-            margin-bottom: 20px;
-        }
+padding:30px;
 
-        .btn { 
-            background: #222; 
-            color: #fff; 
-            border: 1px solid #444; 
-            padding: 10px 28px; 
-            font-size: 13px; 
-            font-weight: 600;
-            border-radius: 3px; 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
-        
-        .btn:hover { 
-            background: var(--norton-yellow); 
-            color: #000;
-            border-color: var(--norton-yellow);
-        }
+}
 
-        .findings-list {
-            width: 100%;
-            max-width: 580px;
-            text-align: left;
-            margin-top: 30px;
-            background: #141414;
-            padding: 22px;
-            border-radius: 4px;
-            border-left: 4px solid var(--danger-red);
-            display: none;
-            box-sizing: border-box;
-        }
 
-        .findings-list h4 {
-            margin: 0 0 12px 0;
-            color: var(--danger-red);
-            font-size: 15px;
-            font-weight: 700;
-        }
 
-        .findings-list ul {
-            margin: 0;
-            padding-left: 20px;
-            color: #dddddd;
-            font-size: 13px;
-            line-height: 1.6;
-        }
+.card{
 
-        /* Die Sandbox läuft versteckt im Hintergrund */
-        #hiddenSandbox {
-            display: none;
-        }
-    </style>
+width:100%;
+
+max-width:850px;
+
+background:#171717;
+
+border:1px solid #333;
+
+border-radius:18px;
+
+overflow:hidden;
+
+box-shadow:
+0 20px 60px #000;
+
+}
+
+
+
+.header{
+
+height:70px;
+
+background:#090909;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 25px;
+
+border-bottom:1px solid #333;
+
+}
+
+
+
+.logo{
+
+color:#ffcc00;
+
+font-size:26px;
+
+font-weight:900;
+
+}
+
+
+
+.badge{
+
+color:#aaa;
+
+font-size:14px;
+
+}
+
+
+
+.main{
+
+padding:45px;
+
+text-align:center;
+
+}
+
+
+
+
+.circle{
+
+width:190px;
+
+height:190px;
+
+border-radius:50%;
+
+border:7px solid #ffcc00;
+
+margin:auto;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+flex-direction:column;
+
+transition:.4s;
+
+}
+
+
+
+.circle.scan{
+
+animation:pulse 1s infinite;
+
+}
+
+
+
+.circle.safe{
+
+border-color:#2ecc71;
+
+box-shadow:
+0 0 40px #2ecc71;
+
+}
+
+
+
+.circle.danger{
+
+border-color:#e74c3c;
+
+box-shadow:
+0 0 40px #e74c3c;
+
+}
+
+
+
+@keyframes pulse{
+
+50%{
+
+transform:scale(1.05);
+
+}
+
+}
+
+
+
+.small{
+
+color:#aaa;
+
+font-size:12px;
+
+letter-spacing:2px;
+
+}
+
+
+
+.status{
+
+font-size:26px;
+
+font-weight:bold;
+
+margin-top:10px;
+
+color:#ffcc00;
+
+}
+
+
+
+
+.upload{
+
+margin-top:45px;
+
+padding:50px;
+
+border:2px dashed #444;
+
+border-radius:15px;
+
+background:#111;
+
+transition:.3s;
+
+}
+
+
+
+.upload:hover{
+
+border-color:#ffcc00;
+
+}
+
+
+
+input{
+
+display:none;
+
+}
+
+
+
+button{
+
+margin-top:20px;
+
+background:#ffcc00;
+
+color:#000;
+
+border:0;
+
+padding:14px 35px;
+
+font-size:15px;
+
+font-weight:bold;
+
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+background:#ffe066;
+
+}
+
+
+
+.file{
+
+margin-top:20px;
+
+color:#aaa;
+
+}
+
+
+
+.progress{
+
+height:8px;
+
+background:#333;
+
+border-radius:10px;
+
+margin-top:25px;
+
+overflow:hidden;
+
+display:none;
+
+}
+
+
+
+.bar{
+
+height:100%;
+
+width:0%;
+
+background:#ffcc00;
+
+transition:.3s;
+
+}
+
+
+
+.result{
+
+display:none;
+
+margin-top:30px;
+
+background:#111;
+
+border-radius:12px;
+
+padding:25px;
+
+text-align:left;
+
+}
+
+
+
+.result h3{
+
+color:#ffcc00;
+
+}
+
+
+
+.result li{
+
+margin:10px 0;
+
+}
+
+
+
+.footer{
+
+padding:15px;
+
+text-align:center;
+
+color:#666;
+
+font-size:12px;
+
+border-top:1px solid #333;
+
+}
+
+
+</style>
+
+
 </head>
+
+
+
 <body>
 
-    <div class="norton-window">
-        <div class="norton-header">
-            <div><span class="norton-brand">✓ norton</span> 360 Premium</div>
-            <div class="norton-window-controls">
-                <span>—</span> <span>❑</span> <span>✕</span>
-            </div>
-        </div>
-        
-        <div class="norton-body">
-            <!-- Risiko-Stufe im gelben Norton-Kreis -->
-            <div class="status-circle-container">
-                <div id="statusCircle" class="status-circle">
-                    <span class="status-title">Risiko-Stufe</span>
-                    <span id="statusValue" class="status-value">BEREIT</span>
-                </div>
-            </div>
-            
-            <!-- Drag & Drop / Upload Bereich -->
-            <div id="dropzone" class="dropzone">
-                <p>Smart Scan & Datei-Isolation</p>
-                <span>Ziehe eine HTML- oder JS-Datei hierher oder nutze die Schaltfläche</span>
-                <input type="file" id="fileInput" style="display:none">
-                <button class="btn" onclick="document.getElementById('fileInput').click(); event.stopPropagation();">Datei prüfen</button>
-            </div>
 
-            <!-- Detaillierte Befunde bei Funden -->
-            <div id="findingsCard" class="findings-list">
-                <h4>Sicherheitsrisiko identifiziert:</h4>
-                <ul id="findingsUl"></ul>
-            </div>
-        </div>
-    </div>
 
-    <!-- UNSICHTBARE SANDBOX: Führt Code isoliert im Hintergrund aus -->
-    <iframe id="hiddenSandbox" sandbox="allow-scripts"></iframe>
+<div class="card">
 
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const dropzone = document.getElementById('dropzone');
-        const statusCircle = document.getElementById('statusCircle');
-        const statusValue = document.getElementById('statusValue');
-        const findingsCard = document.getElementById('findingsCard');
-        const findingsUl = document.getElementById('findingsUl');
-        const hiddenSandbox = document.getElementById('hiddenSandbox');
 
-        // Drag & Drop Event-Handler
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropzone.classList.add('dragover');
-            }, false);
-        });
+<div class="header">
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('dragover');
-            }, false);
-        });
 
-        dropzone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length) {
-                fileInput.files = files;
-                processAndScanFile(files);
-            }
-        });
+<div class="logo">
+✓ Norton Smart Scanner
+</div>
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length) {
-                processAndScanFile(e.target.files);
-            }
-        });
 
-        // Verarbeitungs- und Scan-Logik
-        async function processAndScanFile(file) {
-            // Kreis-Status auf Analyse setzen + Scan-Animation starten
-            statusCircle.className = 'status-circle is-scanning';
-            statusValue.innerHTML = 'SCANNT...';
-            statusValue.style.color = 'var(--norton-yellow)';
-            findingsCard.style.display = 'none';
+<div class="badge">
+150 MB Upload
+</div>
 
-            // 1. Verstecktes Laden in die Hintergrund-Sandbox mit CSP (Volle Isolation)
-const reader = new FileReader();
-reader.onload = (evt) => {
-const userContent = evt.target.result;
-const secureCsp = ``;
-const securedCode = secureCsp + userContent;
 
-const blob = new Blob([securedCode], { type: 'text/html' });
-hiddenSandbox.src = URL.createObjectURL(blob);
+</div>
+
+
+
+
+<div class="main">
+
+
+<div id="circle" class="circle">
+
+
+<div class="small">
+RISIKO
+</div>
+
+
+<div id="status" class="status">
+BEREIT
+</div>
+
+
+</div>
+
+
+
+
+
+<div id="upload" class="upload">
+
+
+<h2>
+Datei Analyse
+</h2>
+
+
+<p>
+Datei hier hineinziehen oder auswählen
+</p>
+
+
+<input 
+id="file"
+type="file"
+>
+
+
+<button onclick="selectFile()">
+Datei auswählen
+</button>
+
+
+<br>
+
+
+<button onclick="scan()">
+Jetzt prüfen
+</button>
+
+
+
+<div id="filename" class="file">
+
+Keine Datei gewählt
+
+</div>
+
+
+
+<div id="progress" class="progress">
+
+<div id="bar" class="bar"></div>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div id="result" class="result">
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+<div class="footer">
+
+Smart Heuristic Scanner
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+let file=null;
+
+
+
+function selectFile(){
+
+document
+.getElementById("file")
+.click();
+
+}
+
+
+
+
+document
+.getElementById("file")
+.onchange=function(e){
+
+file=e.target.files[0];
+
+showFile();
+
 };
-reader.readAsText(file);
 
-// 2. Datei an das Heuristik-Backend senden
-const formData = new FormData();
-formData.append('file', file);
 
-try {
-const response = await fetch('/api/scan', {
-method: 'POST',
-body: formData
-});
-const data = await response.json();
 
-// Animation stoppen
-statusCircle.classList.remove('is-scanning');
 
-if (data.success) {
-if (data.verdict === 'GEFÄHRLICH') {
-// Norton-Kreis wird ROT bei Bedrohung
-statusCircle.classList.add('is-danger');
-statusValue.innerHTML = 'GEFAHR';
-statusValue.style.color = 'var(--danger-red)';
 
-// Befunde auflisten
-findingsUl.innerHTML = data.findings.map(f => `${f}`).join('');
-findingsCard.style.display = 'block';
-} else {
-// Norton-Kreis wird GRÜN, wenn sauber
-statusCircle.classList.add('is-safe');
-statusValue.innerHTML = 'SICHER';
-statusValue.style.color = 'var(--success-green)';
-}
-} else {
-statusValue.innerHTML = 'FEHLER';
-alert('Fehler bei der Analyse: ' + data.error);
-}
-} catch (err) {
-statusCircle.classList.remove('is-scanning');
-statusValue.innerHTML = 'OFFLINE';
-alert('Verbindung zum Server fehlgeschlagen.');
-}
+const upload=
+document.getElementById("upload");
+
+
+
+upload.ondragover=function(e){
+
+e.preventDefault();
+
+upload.style.borderColor="#ffcc00";
+
 }
 
 
 
-`);
-});
+upload.ondragleave=function(){
 
+upload.style.borderColor="#444";
+
+}
+
+
+
+upload.ondrop=function(e){
+
+e.preventDefault();
+
+file=e.dataTransfer.files[0];
+
+showFile();
+
+}
+
+
+
+
+
+function showFile(){
+
+if(file){
+
+document
+.getElementById("filename")
+.innerHTML=
+
+file.name+
+"<br>"+
+Math.round(file.size/1024/1024)
++" MB";
+
+}
+
+}
+
+
+
+
+
+
+async function scan(){
+
+
+
+if(!file){
+
+alert("Bitte Datei auswählen");
+
+return;
+
+}
+
+
+
+const circle=
+document.getElementById("circle");
+
+
+const status=
+document.getElementById("status");
+
+
+const result=
+document.getElementById("result");
+
+
+const progress=
+document.getElementById("progress");
+
+
+const bar=
+document.getElementById("bar");
+
+
+
+circle.className="circle scan";
+
+status.innerHTML="SCANNT...";
+
+
+progress.style.display="block";
+
+
+let p=0;
+
+let timer=setInterval(()=>{
+
+p+=10;
+
+bar.style.width=p+"%";
+
+
+if(p>=90){
+
+clearInterval(timer);
+
+}
+
+
+},100);
+
+
+
+
+
+
+let form=new FormData();
+
+form.append(
+"file",
+file
+);
+
+
+
+try{
+
+
+let response=
+await fetch(
+"/api/scan",
+{
+
+method:"POST",
+
+body:form
+
+}
+
+);
+
+
+
+let data=
+await response.json();
+
+
+
+clearInterval(timer);
+
+bar.style.width="100%";
+
+
+
+circle.className="circle";
+
+
+
+
+if(data.verdict==="GEFÄHRLICH"){
+
+
+circle.classList.add("danger");
+
+status.innerHTML="GEFAHR";
+
+
+result.style.display="block";
+
+
+result.innerHTML=
+
+"<h3>⚠ Bedrohungen gefunden</h3><ul>"+
+
+data.findings
+.map(
+x=>"<li>"+x+"</li>"
+)
+.join("")
+
++
+"</ul>";
+
+
+}
+
+else{
+
+
+circle.classList.add("safe");
+
+status.innerHTML="SICHER";
+
+
+result.style.display="block";
+
+
+result.innerHTML=
+
+"<h3>✓ Keine Gefahr</h3>"+
+"Die Datei wurde geprüft.";
+
+}
+
+
+}
+
+
+
+catch(error){
+
+
+circle.className="circle danger";
+
+status.innerHTML="FEHLER";
+
+
+result.style.display="block";
+
+
+result.innerHTML=
+"Server nicht erreichbar.";
+
+
+}
+
+
+
+}
+
+
+
+</script>
+
+
+
+</body>
+</html>
