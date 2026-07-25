@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Norton Smart Scanner</title>
+<title>Norton Smart Security</title>
 
 
 <style>
@@ -19,63 +20,30 @@ body{
 
 margin:0;
 
-min-height:100vh;
+height:100vh;
 
-background:
-radial-gradient(circle at top,#333,#080808);
+background:#101010;
 
-font-family:"Segoe UI",Arial,sans-serif;
+font-family:"Segoe UI",Arial;
 
 color:white;
 
 display:flex;
 
-justify-content:center;
-
-align-items:center;
-
-padding:30px;
-
 }
 
 
+/* Menü */
 
-.card{
+.sidebar{
 
-width:100%;
+width:250px;
 
-max-width:850px;
+background:#080808;
 
-background:#171717;
+border-right:1px solid #333;
 
-border:1px solid #333;
-
-border-radius:18px;
-
-overflow:hidden;
-
-box-shadow:
-0 20px 60px #000;
-
-}
-
-
-
-.header{
-
-height:70px;
-
-background:#090909;
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-between;
-
-padding:0 25px;
-
-border-bottom:1px solid #333;
+padding:25px;
 
 }
 
@@ -83,48 +51,97 @@ border-bottom:1px solid #333;
 
 .logo{
 
-color:#ffcc00;
-
 font-size:26px;
 
-font-weight:900;
+font-weight:bold;
+
+color:#ffcc00;
+
+margin-bottom:40px;
 
 }
 
 
 
-.badge{
+.menu button{
 
-color:#aaa;
+width:100%;
 
-font-size:14px;
+padding:15px;
+
+margin-bottom:12px;
+
+border:0;
+
+border-radius:8px;
+
+background:#1b1b1b;
+
+color:white;
+
+text-align:left;
+
+font-size:16px;
+
+cursor:pointer;
 
 }
 
 
+
+.menu button:hover,
+.menu button.active{
+
+background:#ffcc00;
+
+color:black;
+
+font-weight:bold;
+
+}
+
+
+
+
+/* Inhalt */
 
 .main{
 
-padding:45px;
+flex:1;
 
-text-align:center;
+padding:40px;
+
+overflow:auto;
+
+}
+
+
+
+.title{
+
+font-size:32px;
+
+font-weight:bold;
+
+margin-bottom:30px;
 
 }
 
 
 
 
+
+/* Risiko */
+
 .circle{
 
-width:190px;
+width:220px;
 
-height:190px;
+height:220px;
 
 border-radius:50%;
 
-border:7px solid #ffcc00;
-
-margin:auto;
+border:8px solid #ffcc00;
 
 display:flex;
 
@@ -134,16 +151,6 @@ justify-content:center;
 
 flex-direction:column;
 
-transition:.4s;
-
-}
-
-
-
-.circle.scan{
-
-animation:pulse 1s infinite;
-
 }
 
 
@@ -151,9 +158,6 @@ animation:pulse 1s infinite;
 .circle.safe{
 
 border-color:#2ecc71;
-
-box-shadow:
-0 0 40px #2ecc71;
 
 }
 
@@ -163,44 +167,25 @@ box-shadow:
 
 border-color:#e74c3c;
 
-box-shadow:
-0 0 40px #e74c3c;
-
 }
 
 
 
-@keyframes pulse{
-
-50%{
-
-transform:scale(1.05);
-
-}
-
-}
-
-
-
-.small{
+.circle span:first-child{
 
 color:#aaa;
 
-font-size:12px;
-
-letter-spacing:2px;
+font-size:13px;
 
 }
 
 
 
-.status{
+.circle span:last-child{
 
-font-size:26px;
+font-size:30px;
 
 font-weight:bold;
-
-margin-top:10px;
 
 color:#ffcc00;
 
@@ -209,65 +194,59 @@ color:#ffcc00;
 
 
 
-.upload{
 
-margin-top:45px;
 
-padding:50px;
+.card{
 
-border:2px dashed #444;
+margin-top:35px;
+
+background:#1c1c1c;
+
+border:1px solid #333;
 
 border-radius:15px;
 
-background:#111;
+padding:25px;
 
-transition:.3s;
-
-}
-
-
-
-.upload:hover{
-
-border-color:#ffcc00;
+max-width:700px;
 
 }
+
 
 
 
 input{
 
-display:none;
+margin-top:20px;
 
 }
 
 
 
-button{
 
-margin-top:20px;
+button.action{
 
 background:#ffcc00;
 
-color:#000;
+color:black;
 
 border:0;
 
-padding:14px 35px;
-
-font-size:15px;
-
-font-weight:bold;
+padding:14px 25px;
 
 border-radius:8px;
 
+font-weight:bold;
+
 cursor:pointer;
+
+margin:5px;
 
 }
 
 
 
-button:hover{
+button.action:hover{
 
 background:#ffe066;
 
@@ -275,95 +254,28 @@ background:#ffe066;
 
 
 
-.file{
 
-margin-top:20px;
-
-color:#aaa;
-
-}
-
-
-
-.progress{
-
-height:8px;
-
-background:#333;
-
-border-radius:10px;
-
-margin-top:25px;
-
-overflow:hidden;
+.hidden{
 
 display:none;
 
 }
 
-
-
-.bar{
-
-height:100%;
-
-width:0%;
-
-background:#ffcc00;
-
-transition:.3s;
-
-}
 
 
 
 .result{
 
-display:none;
-
-margin-top:30px;
-
-background:#111;
-
-border-radius:12px;
-
-padding:25px;
-
-text-align:left;
-
-}
-
-
-
-.result h3{
-
-color:#ffcc00;
-
-}
-
-
-
-.result li{
-
-margin:10px 0;
-
-}
-
-
-
-.footer{
+margin-top:20px;
 
 padding:15px;
 
-text-align:center;
+background:#111;
 
-color:#666;
-
-font-size:12px;
-
-border-top:1px solid #333;
+border-radius:10px;
 
 }
+
 
 
 </style>
@@ -372,28 +284,44 @@ border-top:1px solid #333;
 </head>
 
 
-
 <body>
 
 
 
-<div class="card">
 
-
-<div class="header">
+<div class="sidebar">
 
 
 <div class="logo">
-✓ Norton Smart Scanner
+
+✓ Norton 360
+
+</div>
+
+
+
+<div class="menu">
+
+
+<button class="active" onclick="page('home',this)">
+Home
+</button>
+
+
+<button onclick="page('scan',this)">
+Scan
+</button>
+
+
+
 </div>
 
 
-<div class="badge">
-150 MB Upload
 </div>
 
 
-</div>
+
+
 
 
 
@@ -401,17 +329,29 @@ border-top:1px solid #333;
 <div class="main">
 
 
-<div id="circle" class="circle">
 
 
-<div class="small">
-RISIKO
+
+<div id="home">
+
+
+<div class="title">
+Home
 </div>
 
 
-<div id="status" class="status">
+
+<div id="riskCircle" class="circle">
+
+
+<span>
+RISIKOSTUFE
+</span>
+
+
+<span id="riskText">
 BEREIT
-</div>
+</span>
 
 
 </div>
@@ -420,61 +360,44 @@ BEREIT
 
 
 
-<div id="upload" class="upload">
+<div class="card">
 
 
 <h2>
-Datei Analyse
+Schnellscan
 </h2>
 
 
 <p>
-Datei hier hineinziehen oder auswählen
+Datei auswählen und prüfen
 </p>
 
 
+
 <input 
-id="file"
+id="homeFile"
 type="file"
 >
 
-
-<button onclick="selectFile()">
-Datei auswählen
-</button>
 
 
 <br>
 
 
-<button onclick="scan()">
-Jetzt prüfen
+<button class="action" onclick="startScan('homeFile')">
+
+Scan starten
+
 </button>
 
 
 
-<div id="filename" class="file">
+<div id="homeResult" class="result">
 
-Keine Datei gewählt
-
-</div>
-
-
-
-<div id="progress" class="progress">
-
-<div id="bar" class="bar"></div>
+Bereit
 
 </div>
 
-
-</div>
-
-
-
-
-
-<div id="result" class="result">
 
 
 </div>
@@ -486,14 +409,75 @@ Keine Datei gewählt
 
 
 
-<div class="footer">
 
-Smart Heuristic Scanner
+
+
+
+
+<div id="scan" class="hidden">
+
+
+<div class="title">
+Scan
+</div>
+
+
+
+<div class="card">
+
+
+<h2>
+Scan auswählen
+</h2>
+
+
+
+<button class="action" onclick="singleScan()">
+
+Einzelscan
+
+</button>
+
+
+
+<button class="action" onclick="folderScan()">
+
+OrdnerScan
+
+</button>
+
+
+
+<button class="action" onclick="updateScan()">
+
+Update Scan
+
+</button>
+
+
+
+
+<div id="scanArea">
 
 </div>
 
 
+
 </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+</div>
+
 
 
 
@@ -503,101 +487,54 @@ Smart Heuristic Scanner
 <script>
 
 
-let file=null;
 
-
-
-function selectFile(){
-
-document
-.getElementById("file")
-.click();
-
-}
-
-
+function page(id,btn){
 
 
 document
-.getElementById("file")
-.onchange=function(e){
+.getElementById("home")
+.classList.add("hidden");
 
-file=e.target.files[0];
-
-showFile();
-
-};
-
-
-
-
-
-const upload=
-document.getElementById("upload");
-
-
-
-upload.ondragover=function(e){
-
-e.preventDefault();
-
-upload.style.borderColor="#ffcc00";
-
-}
-
-
-
-upload.ondragleave=function(){
-
-upload.style.borderColor="#444";
-
-}
-
-
-
-upload.ondrop=function(e){
-
-e.preventDefault();
-
-file=e.dataTransfer.files[0];
-
-showFile();
-
-}
-
-
-
-
-
-function showFile(){
-
-if(file){
 
 document
-.getElementById("filename")
-.innerHTML=
+.getElementById("scan")
+.classList.add("hidden");
 
-file.name+
-"<br>"+
-Math.round(file.size/1024/1024)
-+" MB";
+
+
+document
+.getElementById(id)
+.classList.remove("hidden");
+
+
+
+document
+.querySelectorAll(".menu button")
+.forEach(x=>x.classList.remove("active"));
+
+btn.classList.add("active");
+
 
 }
 
-}
 
 
 
 
 
 
-async function scan(){
+
+async function startScan(input){
+
+
+let file =
+document.getElementById(input).files[0];
 
 
 
 if(!file){
 
-alert("Bitte Datei auswählen");
+alert("Datei auswählen");
 
 return;
 
@@ -605,169 +542,131 @@ return;
 
 
 
-const circle=
-document.getElementById("circle");
+document
+.getElementById("riskText")
+.innerHTML="SCANNT...";
 
 
-const status=
-document.getElementById("status");
 
+// HIER kommt später deine eigene Server-Schnittstelle hin
 
-const result=
-document.getElementById("result");
 
 
-const progress=
-document.getElementById("progress");
+setTimeout(()=>{
 
 
-const bar=
-document.getElementById("bar");
+document
+.getElementById("riskCircle")
+.className="circle safe";
 
 
+document
+.getElementById("riskText")
+.innerHTML="SICHER";
 
-circle.className="circle scan";
 
-status.innerHTML="SCANNT...";
 
+document
+.getElementById("homeResult")
+.innerHTML=
 
-progress.style.display="block";
-
-
-let p=0;
-
-let timer=setInterval(()=>{
-
-p+=10;
-
-bar.style.width=p+"%";
-
-
-if(p>=90){
-
-clearInterval(timer);
-
-}
-
-
-},100);
-
-
-
-
-
-
-let form=new FormData();
-
-form.append(
-"file",
-file
-);
-
-
-
-try{
-
-
-let response=
-await fetch(
-"/api/scan",
-{
-
-method:"POST",
-
-body:form
-
-}
-
-);
-
-
-
-let data=
-await response.json();
-
-
-
-clearInterval(timer);
-
-bar.style.width="100%";
-
-
-
-circle.className="circle";
-
-
-
-
-if(data.verdict==="GEFÄHRLICH"){
-
-
-circle.classList.add("danger");
-
-status.innerHTML="GEFAHR";
-
-
-result.style.display="block";
-
-
-result.innerHTML=
-
-"<h3>⚠ Bedrohungen gefunden</h3><ul>"+
-
-data.findings
-.map(
-x=>"<li>"+x+"</li>"
-)
-.join("")
-
+"Datei geprüft: "
 +
-"</ul>";
+file.name;
 
 
-}
 
-else{
+},1500);
 
-
-circle.classList.add("safe");
-
-status.innerHTML="SICHER";
-
-
-result.style.display="block";
-
-
-result.innerHTML=
-
-"<h3>✓ Keine Gefahr</h3>"+
-"Die Datei wurde geprüft.";
-
-}
 
 
 }
 
 
 
-catch(error){
 
 
-circle.className="circle danger";
-
-status.innerHTML="FEHLER";
 
 
-result.style.display="block";
+
+function singleScan(){
 
 
-result.innerHTML=
-"Server nicht erreichbar.";
+document
+.getElementById("scanArea")
+.innerHTML=`
+
+<h3>Einzelscan</h3>
+
+<input type="file" id="singleFile">
+
+<br>
+
+<button class="action"
+onclick="startScan('singleFile')">
+
+Datei prüfen
+
+</button>
+
+`;
 
 
 }
 
 
+
+
+
+
+
+function folderScan(){
+
+
+document
+.getElementById("scanArea")
+.innerHTML=`
+
+<h3>OrdnerScan</h3>
+
+<input 
+type="file"
+webkitdirectory
+multiple
+>
+
+
+<p>
+Ordnerscan bereit.
+Server-Schnittstelle später.
+</p>
+
+`;
+
+
+}
+
+
+
+
+
+
+
+
+function updateScan(){
+
+
+document
+.getElementById("scanArea")
+.innerHTML=`
+
+<h3>Update Scan</h3>
+
+<p style="color:#e74c3c">
+Nicht verfügbar
+</p>
+
+`;
 
 }
 
@@ -778,4 +677,5 @@ result.innerHTML=
 
 
 </body>
+
 </html>
