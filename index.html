@@ -9,37 +9,28 @@
 
 <style>
 
-*{
-box-sizing:border-box;
-}
-
 body{
-
 margin:0;
-height:100vh;
 background:#101010;
-font-family:"Segoe UI",Arial;
 color:white;
+font-family:Arial;
 display:flex;
-
+height:100vh;
 }
-
-
-/* Menü */
 
 .sidebar{
 
-width:260px;
+width:250px;
 background:#080808;
+padding:20px;
 border-right:1px solid #333;
-padding:25px;
 
 }
 
 
 .logo{
 
-font-size:26px;
+font-size:25px;
 font-weight:bold;
 color:#ffcc00;
 margin-bottom:40px;
@@ -47,185 +38,36 @@ margin-bottom:40px;
 }
 
 
-.menu button{
+button{
 
 width:100%;
 padding:15px;
-margin-bottom:12px;
-
-background:#1b1b1b;
+margin:8px 0;
+background:#222;
 color:white;
-
 border:0;
 border-radius:8px;
-
-text-align:left;
 cursor:pointer;
-
-font-size:16px;
 
 }
 
 
-.menu button:hover,
-.menu button.active{
+button:hover,
+.active{
 
 background:#ffcc00;
 color:black;
-font-weight:bold;
 
 }
 
-
-
-/* Haupt */
 
 .main{
 
 flex:1;
-padding:40px;
+padding:30px;
 overflow:auto;
 
 }
-
-
-
-.title{
-
-font-size:32px;
-font-weight:bold;
-margin-bottom:30px;
-
-}
-
-
-
-
-/* Kreis */
-
-
-.circle{
-
-width:220px;
-height:220px;
-
-border-radius:50%;
-
-border:8px solid #ffcc00;
-
-display:flex;
-
-align-items:center;
-justify-content:center;
-
-flex-direction:column;
-
-transition:.4s;
-
-}
-
-
-.circle.safe{
-
-border-color:#2ecc71;
-
-}
-
-
-.circle.danger{
-
-border-color:#e74c3c;
-
-}
-
-
-.circle.scan{
-
-animation:pulse 1s infinite;
-
-}
-
-
-@keyframes pulse{
-
-50%{
-
-transform:scale(1.05);
-
-}
-
-}
-
-
-
-.circle span:first-child{
-
-font-size:13px;
-color:#aaa;
-
-}
-
-
-
-.circle span:last-child{
-
-font-size:30px;
-font-weight:bold;
-
-color:#ffcc00;
-
-}
-
-
-
-
-
-.card{
-
-margin-top:35px;
-
-background:#1c1c1c;
-
-border:1px solid #333;
-
-border-radius:15px;
-
-padding:25px;
-
-max-width:800px;
-
-}
-
-
-
-
-.action{
-
-background:#ffcc00;
-
-color:#000;
-
-border:0;
-
-padding:14px 25px;
-
-border-radius:8px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-margin:5px;
-
-}
-
-
-.action:hover{
-
-background:#ffe066;
-
-}
-
 
 
 .hidden{
@@ -235,18 +77,62 @@ display:none;
 }
 
 
+.circle{
+
+width:200px;
+height:200px;
+border-radius:50%;
+border:8px solid #ffcc00;
+
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+
+}
+
+
+.safe{
+
+border-color:#2ecc71;
+
+}
+
+
+.danger{
+
+border-color:#e74c3c;
+
+}
+
+
+
+.card{
+
+background:#1c1c1c;
+padding:25px;
+margin-top:25px;
+border-radius:15px;
+
+}
+
+
+iframe{
+
+width:100%;
+height:300px;
+background:white;
+border:2px solid #444;
+margin-top:20px;
+
+}
 
 
 .progress{
 
-margin-top:20px;
-
-background:#333;
-
 height:20px;
-
+background:#333;
 border-radius:10px;
-
 overflow:hidden;
 
 }
@@ -255,49 +141,8 @@ overflow:hidden;
 .bar{
 
 height:100%;
-
 width:0%;
-
 background:#ffcc00;
-
-transition:.3s;
-
-}
-
-
-
-.result{
-
-margin-top:20px;
-
-background:#111;
-
-padding:20px;
-
-border-radius:10px;
-
-}
-
-
-.filelist{
-
-max-height:250px;
-
-overflow:auto;
-
-text-align:left;
-
-margin-top:20px;
-
-}
-
-
-
-.file{
-
-padding:8px;
-
-border-bottom:1px solid #333;
 
 }
 
@@ -319,31 +164,22 @@ border-bottom:1px solid #333;
 </div>
 
 
-
-<div class="menu">
-
-
-<button class="active" onclick="page('home',this)">
+<button class="active" onclick="openPage('home',this)">
 Home
 </button>
 
 
-<button onclick="page('scan',this)">
+<button onclick="openPage('scan',this)">
 Scan
 </button>
 
 
-<button onclick="page('download',this)">
+<button onclick="openPage('download',this)">
 Download 1.json
 </button>
 
 
 </div>
-
-
-</div>
-
-
 
 
 
@@ -353,60 +189,50 @@ Download 1.json
 
 
 
-<!-- HOME -->
-
-
 <div id="home">
 
 
-<div class="title">
-Home
-</div>
-
+<h1>Home</h1>
 
 
 <div id="circle" class="circle">
 
+<span>RISIKO</span>
 
-<span>
-RISIKOSTUFE
-</span>
-
-
-<span id="status">
+<h2 id="status">
 BEREIT
-</span>
-
+</h2>
 
 </div>
-
 
 
 
 <div class="card">
 
 
-<h2>
-Schnellscan
-</h2>
+<h2>Datei Scan</h2>
 
 
-<input id="homeFile" type="file">
+<input type="file" id="homeFile">
 
 
-<br>
-
-
-<button class="action" onclick="scanSingle('homeFile')">
-
-Scan starten
-
+<button onclick="startSandbox('homeFile')">
+Starten
 </button>
 
 
-<div id="homeResult" class="result">
-
+<p id="info">
 Bereit
+</p>
+
+
+
+<iframe
+id="sandbox"
+sandbox="allow-scripts">
+</iframe>
+
+
 
 </div>
 
@@ -414,52 +240,41 @@ Bereit
 </div>
 
 
-</div>
 
 
 
 
 
-
-
-<!-- SCAN -->
 
 
 <div id="scan" class="hidden">
 
 
-<div class="title">
-Scan
-</div>
-
+<h1>Scan</h1>
 
 
 <div class="card">
 
 
-<button class="action" onclick="singleScan()">
-
+<button onclick="single()">
 Einzelscan
-
 </button>
 
 
-<button class="action" onclick="folderScan()">
-
+<button onclick="folder()">
 OrdnerScan
-
 </button>
 
 
-<button class="action" onclick="updateScan()">
-
+<button onclick="update()">
 Update Scan
-
 </button>
 
 
 
-<div id="scanArea"></div>
+<div id="scanArea">
+
+</div>
 
 
 </div>
@@ -471,32 +286,19 @@ Update Scan
 
 
 
-
-
-
-<!-- DOWNLOAD -->
 
 
 <div id="download" class="hidden">
 
 
-<div class="title">
-Download 1.json
-</div>
+<h1>Download 1.json</h1>
 
 
 <div class="card">
 
 
-<p>
-Neue Malware-Datenbank herunterladen
-</p>
-
-
-<button class="action" onclick="downloadJSON()">
-
+<button onclick="downloadJSON()">
 1.json herunterladen
-
 </button>
 
 
@@ -508,10 +310,7 @@ Neue Malware-Datenbank herunterladen
 
 
 
-
-
 </div>
-
 
 
 
@@ -521,11 +320,10 @@ Neue Malware-Datenbank herunterladen
 <script>
 
 
-function page(id,btn){
-
+function openPage(id,btn){
 
 document
-.querySelectorAll(".main > div")
+.querySelectorAll(".main>div")
 .forEach(x=>x.classList.add("hidden"));
 
 
@@ -535,13 +333,12 @@ document
 
 
 document
-.querySelectorAll(".menu button")
+.querySelectorAll(".sidebar button")
 .forEach(x=>x.classList.remove("active"));
 
 
 btn.classList.add("active");
 
-
 }
 
 
@@ -549,30 +346,17 @@ btn.classList.add("active");
 
 
 
-function setScan(text){
+
+function startSandbox(id){
 
 
-document
-.getElementById("status")
-.innerHTML=text;
-
-
-}
-
-
-
-
-
-async function scanSingle(id){
-
-
-let file =
+let file=
 document.getElementById(id).files[0];
 
 
 if(!file){
 
-alert("Datei auswählen");
+alert("Datei wählen");
 
 return;
 
@@ -580,52 +364,85 @@ return;
 
 
 
-let circle=
-document.getElementById("circle");
+let status=
+document.getElementById("status");
 
 
-circle.className="circle scan";
-
-
-setScan("START");
-
-
-
-await wait(500);
-
-
-setScan("LESEN");
-
-
-await wait(700);
-
-
-setScan("PRÜFEN");
-
-
-await wait(1000);
-
-
-let danger=false;
+let info=
+document.getElementById("info");
 
 
 
-circle.className="circle safe";
+status.innerHTML="START";
 
-setScan("SICHER");
+info.innerHTML="Datei wird geladen...";
 
+
+
+let reader=new FileReader();
+
+
+
+reader.onload=function(e){
+
+
+let iframe=
+document.getElementById("sandbox");
+
+
+let blob=
+new Blob(
+[
+e.target.result
+],
+{
+type:file.type || "text/html"
+}
+);
+
+
+
+iframe.src=
+URL.createObjectURL(blob);
+
+
+
+info.innerHTML=
+"Testumgebung gestartet: "+file.name;
+
+
+
+status.innerHTML="PRÜFEN";
+
+
+
+setTimeout(()=>{
 
 
 document
-.getElementById("homeResult")
-.innerHTML=
-
-"Fertig geprüft:<br>"+file.name;
+.getElementById("circle")
+.className="circle safe";
 
 
+status.innerHTML="SICHER";
 
-askLearning();
 
+info.innerHTML=
+"Scan beendet";
+
+
+ask();
+
+
+},2000);
+
+
+
+};
+
+
+
+reader.readAsText(file);
 
 
 }
@@ -635,9 +452,35 @@ askLearning();
 
 
 
+function ask(){
 
-function singleScan(){
+let a=
+confirm(
+"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
+);
 
+
+if(a){
+
+alert("Als schädlich gespeichert");
+
+}
+
+else{
+
+alert("Als sicher gespeichert");
+
+}
+
+}
+
+
+
+
+
+
+
+function single(){
 
 document
 .getElementById("scanArea")
@@ -645,27 +488,11 @@ document
 
 <h3>Einzelscan</h3>
 
+<input id="singleFile" type="file">
 
-<input id="singleScanFile" type="file">
-
-
-<br>
-
-
-<button class="action"
-onclick="scanSingle('singleScanFile')">
-
+<button onclick="startSandbox('singleFile')">
 Start
-
 </button>
-
-
-<div class="result" id="scanResult">
-
-Bereit
-
-</div>
-
 
 `;
 
@@ -676,7 +503,8 @@ Bereit
 
 
 
-function folderScan(){
+
+function folder(){
 
 
 document
@@ -685,33 +513,17 @@ document
 
 <h3>OrdnerScan</h3>
 
-
-<input 
-id="folder"
+<input id="folderFile"
 type="file"
 webkitdirectory
 multiple>
 
 
-<br>
-
-
-<button class="action" onclick="scanFolderFiles()">
-
+<button onclick="folderStart()">
 Ordner starten
-
 </button>
 
-
-<div class="progress">
-
-<div id="bar" class="bar"></div>
-
-</div>
-
-
-<div id="files" class="filelist"></div>
-
+<p id="folderStatus"></p>
 
 `;
 
@@ -721,74 +533,32 @@ Ordner starten
 
 
 
-
-
-async function scanFolderFiles(){
+async function folderStart(){
 
 
 let files=
-document.getElementById("folder").files;
+document.getElementById("folderFile").files;
 
 
-
-if(files.length===0){
-
-alert("Ordner auswählen");
-
-return;
-
-}
-
-
-
-let list=
-document.getElementById("files");
-
-
-let bar=
-document.getElementById("bar");
-
-
-
-list.innerHTML="";
+let out=
+document.getElementById("folderStatus");
 
 
 for(let i=0;i<files.length;i++){
 
 
-
-list.innerHTML+=
-
-`
-<div class="file">
-🔍 Starte: ${files[i].name}
-</div>
-`;
+out.innerHTML=
+"Starte: "+files[i].name;
 
 
-
-bar.style.width=
-
-((i+1)/files.length*100)
-+"%";
-
-
-
-await wait(300);
-
+await new Promise(r=>setTimeout(r,500));
 
 
 }
 
 
-
-document
-.getElementById("status")
-.innerHTML="SICHER";
-
-
-askLearning();
-
+out.innerHTML=
+"Ordner fertig geprüft";
 
 
 }
@@ -798,55 +568,19 @@ askLearning();
 
 
 
-function updateScan(){
 
+function update(){
 
 document
 .getElementById("scanArea")
 .innerHTML=
-
 `
-
 <h3>Update Scan</h3>
 
-<p style="color:#e74c3c">
+<p style="color:red">
 Nicht verfügbar
 </p>
-
 `;
-
-}
-
-
-
-
-
-
-function askLearning(){
-
-
-let answer=
-confirm(
-"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
-);
-
-
-
-if(answer){
-
-alert(
-"Als Malware gelernt"
-);
-
-}
-else{
-
-alert(
-"Als sicher gelernt"
-);
-
-}
-
 
 }
 
@@ -859,7 +593,7 @@ alert(
 function downloadJSON(){
 
 
-let json={
+let data={
 
 version:"1.0",
 
@@ -872,7 +606,7 @@ signatures:[]
 let blob=
 new Blob(
 [
-JSON.stringify(json,null,2)
+JSON.stringify(data,null,2)
 ],
 {
 type:"application/json"
@@ -880,30 +614,18 @@ type:"application/json"
 );
 
 
+let a=document.createElement("a");
 
-let url=
+
+a.href=
 URL.createObjectURL(blob);
 
 
-
-let a=document.createElement("a");
-
-a.href=url;
-
 a.download="1.json";
+
 
 a.click();
 
-
-}
-
-
-
-function wait(ms){
-
-return new Promise(
-r=>setTimeout(r,ms)
-);
 
 }
 
