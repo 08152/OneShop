@@ -1,261 +1,184 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AVI zu MP4 Konverter</title>
-
-<style>
-body{
-    margin:0;
-    background:#111827;
-    color:white;
-    font-family:Arial, sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-}
-
-.container{
-    width:90%;
-    max-width:500px;
-    background:#1f2937;
-    padding:30px;
-    border-radius:15px;
-    text-align:center;
-    box-shadow:0 0 20px #000;
-}
-
-h1{
-    color:#facc15;
-}
-
-input{
-    width:100%;
-    margin:20px 0;
-    padding:12px;
-    background:#374151;
-    color:white;
-    border-radius:8px;
-}
-
-button{
-    width:100%;
-    padding:15px;
-    background:#facc15;
-    color:#111;
-    border:0;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#eab308;
-}
-
-button:disabled{
-    background:#666;
-}
-
-progress{
-    width:100%;
-    height:25px;
-    margin-top:20px;
-}
-
-#status{
-    margin-top:20px;
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sichere Sandbox & Virenscanner</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+        }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #eef2f7; 
+            color: var(--dark); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .card { 
+            width: 100%; 
+            max-width: 900px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05); 
+            margin-bottom: 25px; 
+            box-sizing: border-box; 
+        }
+        h1, h2 { 
+            margin-top: 0; 
+            color: #1a252f; 
+        }
+        .dropzone { 
+            border: 3px dashed var(--primary); 
+            padding: 40px 20px; 
+            text-align: center; 
+            cursor: pointer; 
+            background: #f4f9fd; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            transition: 0.2s; 
+        }
+        .dropzone:hover { 
+            background: #e6f2fc; 
+        }
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            font-size: 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin-top: 15px; 
+        }
+        .status-box { 
+            margin-top: 20px; 
+            padding: 15px; 
+            border-radius: 6px; 
+            font-weight: bold; 
+            display: none; 
+        }
+        .danger { background: #fadbd8; color: var(--danger); border: 1px solid var(--danger); }
+        .success { background: #d4efdf; color: var(--success); border: 1px solid var(--success); }
+        .info { background: #d6eaf8; color: var(--primary); border: 1px solid var(--primary); }
+        
+        .sandbox-wrapper { 
+            border: 2px solid #bdc3c7; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-top: 15px; 
+            background: white; 
+        }
+        .sandbox-header { 
+            background: var(--dark); 
+            color: white; 
+            padding: 10px 15px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            display: flex; 
+            justify-content: space-between; 
+        }
+        .badge { 
+            background: var(--danger); 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 11px; 
+        }
+        iframe { 
+            width: 100%; 
+            height: 450px; 
+            border: none; 
+            background: #fff; 
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<h1>🎬 AVI → MP4</h1>
-
-<p>AVI-Datei auswählen und auf dem Render-Server umwandeln.</p>
-
-<input 
-type="file" 
-id="video"
-accept=".avi">
-
-<button id="btn" onclick="upload()">
-Konvertieren
-</button>
-
-<progress id="progress" value="0" max="100"></progress>
-
-<div id="status">
-Bereit
-</div>
-
-</div>
-
-
-<script>
-
-const SERVER =
-"https://oneshop-1.onrender.com";
-
-
-async function upload(){
-
-const file =
-document.getElementById("video").files[0];
-
-const btn =
-document.getElementById("btn");
-
-const status =
-document.getElementById("status");
-
-const progress =
-document.getElementById("progress");
-
-
-if(!file){
-
-alert("Bitte AVI-Datei auswählen");
-
-return;
-
-}
-
-
-btn.disabled=true;
-
-status.innerHTML =
-"Upload wird gestartet...";
-
-
-let form =
-new FormData();
-
-form.append("video",file);
-
-
-
-let xhr =
-new XMLHttpRequest();
-
-
-xhr.open(
-"POST",
-SERVER + "/convert",
-true
-);
-
-
-xhr.responseType="blob";
-
-
-
-xhr.upload.onprogress=function(e){
-
-if(e.lengthComputable){
-
-let percent =
-(e.loaded/e.total)*100;
-
-progress.value=percent;
-
-status.innerHTML =
-"Upload: "+
-Math.round(percent)+"%";
-
-}
-
-};
-
-
-
-xhr.onload=function(){
-
-
-if(xhr.status===200){
-
-
-status.innerHTML =
-"MP4 wird heruntergeladen...";
-
-
-let blob =
-xhr.response;
-
-
-let url =
-URL.createObjectURL(blob);
-
-
-let a =
-document.createElement("a");
-
-
-a.href=url;
-
-a.download =
-file.name.replace(".avi","")+".mp4";
-
-
-document.body.appendChild(a);
-
-a.click();
-
-document.body.removeChild(a);
-
-
-URL.revokeObjectURL(url);
-
-
-status.innerHTML =
-"✅ Fertig!";
-
-
-}else{
-
-
-status.innerHTML =
-"❌ Server-Fehler: "+xhr.status;
-
-
-}
-
-
-btn.disabled=false;
-
-
-};
-
-
-
-xhr.onerror=function(){
-
-
-status.innerHTML =
-"❌ Verbindung zum Server fehlgeschlagen";
-
-
-btn.disabled=false;
-
-
-};
-
-
-
-xhr.send(form);
-
-
-}
-
-</script>
-
+    <div class="card">
+        <h1>🛡️ Live Virenscanner & Datei-Sandbox</h1>
+        <p>Wählen Sie eine HTML-, JS- oder Textdatei aus. Sie wird gleichzeitig serverseitig auf Viren geprüft und unten isoliert gestartet.</p>
+        
+        <div class="dropzone" onclick="document.getElementById('fileInput').click()">
+            <p>Datei hier ablegen oder klicken zum Hochladen</p>
+            <input type="file" id="fileInput" style="display:none">
+            <button class="btn">Datei auswählen</button>
+        </div>
+
+        <div id="scanStatus" class="status-box"></div>
+    </div>
+
+    <div class="card">
+        <h2>Sichere Sandbox-Vorschau</h2>
+        <p>Diese Umgebung blockiert durch strikte Browser-Direktiven jegliche gefährliche System-Interaktionen.</p>
+        
+        <div class="sandbox-wrapper">
+            <div class="sandbox-header">
+                <span>Abgesicherter iframe</span>
+                <span class="badge">sandbox="allow-same-origin"</span>
+            </div>
+            <!-- Isoliert ausgeführter Frame ohne allow-scripts -->
+            <iframe id="sandboxFrame" sandbox="allow-same-origin"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const scanStatus = document.getElementById('scanStatus');
+        const sandboxFrame = document.getElementById('sandboxFrame');
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 1. Status auf "Laden" setzen
+            scanStatus.style.display = 'block';
+            scanStatus.className = 'status-box info';
+            scanStatus.innerHTML = '⏳ Datei wird verarbeitet und gescannt... Bitte warten...';
+
+            // 2. Lokale Sandbox-Aktivierung via FileReader
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const blob = new Blob([evt.target.result], { type: 'text/html' });
+                sandboxFrame.src = URL.createObjectURL(blob);
+            };
+            reader.readAsText(file);
+
+            // 3. Datei an das Backend (/api/scan) senden
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.verdict === 'GEFÄHRLICH') {
+                        scanStatus.className = 'status-box danger';
+                        scanStatus.innerHTML = '⚠️ BEDROHUNG GEFUNDEN! Erkennungen: ' + data.malicious + ' Antiviren-Engines schlagen Alarm.';
+                    } else {
+                        scanStatus.className = 'status-box success';
+                        scanStatus.innerHTML = '✅ DATEI SAUBER! Der Echtzeit-Cloud-Scan meldet keine bekannten Bedrohungen.';
+                    }
+                } else {
+                    scanStatus.className = 'status-box danger';
+                    scanStatus.innerHTML = 'Fehler beim Scannen: ' + data.error;
+                }
+            } catch (err) {
+                scanStatus.className = 'status-box danger';
+                scanStatus.innerHTML = '⚠️ Verbindung zum Scan-Server fehlgeschlagen.';
+            }
+        });
+    </script>
 </body>
 </html>
