@@ -1,184 +1,371 @@
+// Route für die Startseite (index) im optimierten Norton 360 Premium-Design
+app.get('/', (req, res) => {
+    res.send(`
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sichere Sandbox & Virenscanner</title>
+    <title>Norton 360 - Smart Scan & Isolation Sandbox</title>
     <style>
         :root {
-            --primary: #3498db;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --dark: #2c3e50;
-            --light: #f8f9fa;
+            --norton-yellow: #ffcc00;
+            --norton-dark: #141414;
+            --norton-gray: #1e1e1e;
+            --norton-light-gray: #2d2d2d;
+            --norton-border: #3a3a3a;
+            --norton-text: #ffffff;
+            --norton-text-muted: #aaaaaa;
+            --success-green: #2ecc71;
+            --danger-red: #e74c3c;
         }
+        
         body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: #eef2f7; 
-            color: var(--dark); 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: var(--norton-dark); 
+            color: var(--norton-text); 
             margin: 0; 
-            padding: 20px; 
+            padding: 40px 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
+            -webkit-user-select: none;
+            user-select: none;
         }
-        .card { 
-            width: 100%; 
-            max-width: 900px; 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.05); 
-            margin-bottom: 25px; 
-            box-sizing: border-box; 
+
+        .norton-window {
+            width: 100%;
+            max-width: 780px;
+            background: var(--norton-gray);
+            border-radius: 4px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            border: 1px solid var(--norton-border);
+            overflow: hidden;
         }
-        h1, h2 { 
-            margin-top: 0; 
-            color: #1a252f; 
+
+        .norton-header {
+            background: #0d0d0d;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--norton-light-gray);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
         }
+
+        .norton-brand {
+            color: var(--norton-yellow);
+            font-weight: 800;
+        }
+
+        .norton-window-controls {
+            display: flex;
+            gap: 12px;
+            color: var(--norton-text-muted);
+            font-size: 12px;
+        }
+
+        .norton-body {
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Status-Kreis im Norton Design */
+        .status-circle-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .status-circle {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            border: 5px solid var(--norton-yellow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 204, 0, 0.02);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.05);
+            position: relative;
+        }
+
+        /* Pulsierende Scan-Animation im Kreis */
+        .status-circle.is-scanning::after {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top-color: #ffffff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-circle.is-safe {
+            border-color: var(--success-green);
+            background: rgba(46, 204, 113, 0.02);
+            box-shadow: 0 0 30px rgba(46, 204, 113, 0.1);
+        }
+
+        .status-circle.is-danger {
+            border-color: var(--danger-red);
+            background: rgba(231, 76, 60, 0.02);
+            box-shadow: 0 0 30px rgba(231, 76, 60, 0.1);
+        }
+
+        .status-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--norton-text-muted);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+            color: var(--norton-yellow);
+        }
+
+        /* Drag & Drop Zone */
         .dropzone { 
-            border: 3px dashed var(--primary); 
-            padding: 40px 20px; 
+            width: 100%;
+            max-width: 580px;
+            border: 1px dashed #444; 
+            padding: 55px 30px; 
             text-align: center; 
             cursor: pointer; 
-            background: #f4f9fd; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            transition: 0.2s; 
-        }
-        .dropzone:hover { 
-            background: #e6f2fc; 
-        }
-        .btn { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            font-size: 16px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            margin-top: 15px; 
-        }
-        .status-box { 
-            margin-top: 20px; 
-            padding: 15px; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            display: none; 
-        }
-        .danger { background: #fadbd8; color: var(--danger); border: 1px solid var(--danger); }
-        .success { background: #d4efdf; color: var(--success); border: 1px solid var(--success); }
-        .info { background: #d6eaf8; color: var(--primary); border: 1px solid var(--primary); }
-        
-        .sandbox-wrapper { 
-            border: 2px solid #bdc3c7; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            margin-top: 15px; 
-            background: white; 
-        }
-        .sandbox-header { 
-            background: var(--dark); 
-            color: white; 
-            padding: 10px 15px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            display: flex; 
-            justify-content: space-between; 
-        }
-        .badge { 
-            background: var(--danger); 
-            padding: 2px 8px; 
+            background: #181818; 
             border-radius: 4px; 
-            font-size: 11px; 
+            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
-        iframe { 
-            width: 100%; 
-            height: 450px; 
-            border: none; 
-            background: #fff; 
+        
+        .dropzone:hover, .dropzone.dragover { 
+            border-color: var(--norton-yellow);
+            background: #1c1c1c;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .dropzone p {
+            margin: 0 0 20px 0;
+            font-size: 15px;
+            color: #cccc00;
+            font-weight: 600;
+        }
+
+        .dropzone span {
+            display: block;
+            font-size: 13px;
+            color: var(--norton-text-muted);
+            margin-bottom: 20px;
+        }
+
+        .btn { 
+            background: #222; 
+            color: #fff; 
+            border: 1px solid #444; 
+            padding: 10px 28px; 
+            font-size: 13px; 
+            font-weight: 600;
+            border-radius: 3px; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        
+        .btn:hover { 
+            background: var(--norton-yellow); 
+            color: #000;
+            border-color: var(--norton-yellow);
+        }
+
+        .findings-list {
+            width: 100%;
+            max-width: 580px;
+            text-align: left;
+            margin-top: 30px;
+            background: #141414;
+            padding: 22px;
+            border-radius: 4px;
+            border-left: 4px solid var(--danger-red);
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .findings-list h4 {
+            margin: 0 0 12px 0;
+            color: var(--danger-red);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .findings-list ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #dddddd;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Die Sandbox läuft versteckt im Hintergrund */
+        #hiddenSandbox {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>🛡️ Live Virenscanner & Datei-Sandbox</h1>
-        <p>Wählen Sie eine HTML-, JS- oder Textdatei aus. Sie wird gleichzeitig serverseitig auf Viren geprüft und unten isoliert gestartet.</p>
-        
-        <div class="dropzone" onclick="document.getElementById('fileInput').click()">
-            <p>Datei hier ablegen oder klicken zum Hochladen</p>
-            <input type="file" id="fileInput" style="display:none">
-            <button class="btn">Datei auswählen</button>
-        </div>
-
-        <div id="scanStatus" class="status-box"></div>
-    </div>
-
-    <div class="card">
-        <h2>Sichere Sandbox-Vorschau</h2>
-        <p>Diese Umgebung blockiert durch strikte Browser-Direktiven jegliche gefährliche System-Interaktionen.</p>
-        
-        <div class="sandbox-wrapper">
-            <div class="sandbox-header">
-                <span>Abgesicherter iframe</span>
-                <span class="badge">sandbox="allow-same-origin"</span>
+    <div class="norton-window">
+        <div class="norton-header">
+            <div><span class="norton-brand">✓ norton</span> 360 Premium</div>
+            <div class="norton-window-controls">
+                <span>—</span> <span>❑</span> <span>✕</span>
             </div>
-            <!-- Isoliert ausgeführter Frame ohne allow-scripts -->
-            <iframe id="sandboxFrame" sandbox="allow-same-origin"></iframe>
+        </div>
+        
+        <div class="norton-body">
+            <!-- Risiko-Stufe im gelben Norton-Kreis -->
+            <div class="status-circle-container">
+                <div id="statusCircle" class="status-circle">
+                    <span class="status-title">Risiko-Stufe</span>
+                    <span id="statusValue" class="status-value">BEREIT</span>
+                </div>
+            </div>
+            
+            <!-- Drag & Drop / Upload Bereich -->
+            <div id="dropzone" class="dropzone">
+                <p>Smart Scan & Datei-Isolation</p>
+                <span>Ziehe eine HTML- oder JS-Datei hierher oder nutze die Schaltfläche</span>
+                <input type="file" id="fileInput" style="display:none">
+                <button class="btn" onclick="document.getElementById('fileInput').click(); event.stopPropagation();">Datei prüfen</button>
+            </div>
+
+            <!-- Detaillierte Befunde bei Funden -->
+            <div id="findingsCard" class="findings-list">
+                <h4>Sicherheitsrisiko identifiziert:</h4>
+                <ul id="findingsUl"></ul>
+            </div>
         </div>
     </div>
+
+    <!-- UNSICHTBARE SANDBOX: Führt Code isoliert im Hintergrund aus -->
+    <iframe id="hiddenSandbox" sandbox="allow-scripts"></iframe>
 
     <script>
         const fileInput = document.getElementById('fileInput');
-        const scanStatus = document.getElementById('scanStatus');
-        const sandboxFrame = document.getElementById('sandboxFrame');
+        const dropzone = document.getElementById('dropzone');
+        const statusCircle = document.getElementById('statusCircle');
+        const statusValue = document.getElementById('statusValue');
+        const findingsCard = document.getElementById('findingsCard');
+        const findingsUl = document.getElementById('findingsUl');
+        const hiddenSandbox = document.getElementById('hiddenSandbox');
 
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+        // Drag & Drop Event-Handler
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            }, false);
+        });
 
-            // 1. Status auf "Laden" setzen
-            scanStatus.style.display = 'block';
-            scanStatus.className = 'status-box info';
-            scanStatus.innerHTML = '⏳ Datei wird verarbeitet und gescannt... Bitte warten...';
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+            }, false);
+        });
 
-            // 2. Lokale Sandbox-Aktivierung via FileReader
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const blob = new Blob([evt.target.result], { type: 'text/html' });
-                sandboxFrame.src = URL.createObjectURL(blob);
-            };
-            reader.readAsText(file);
-
-            // 3. Datei an das Backend (/api/scan) senden
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetch('/api/scan', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    if (data.verdict === 'GEFÄHRLICH') {
-                        scanStatus.className = 'status-box danger';
-                        scanStatus.innerHTML = '⚠️ BEDROHUNG GEFUNDEN! Erkennungen: ' + data.malicious + ' Antiviren-Engines schlagen Alarm.';
-                    } else {
-                        scanStatus.className = 'status-box success';
-                        scanStatus.innerHTML = '✅ DATEI SAUBER! Der Echtzeit-Cloud-Scan meldet keine bekannten Bedrohungen.';
-                    }
-                } else {
-                    scanStatus.className = 'status-box danger';
-                    scanStatus.innerHTML = 'Fehler beim Scannen: ' + data.error;
-                }
-            } catch (err) {
-                scanStatus.className = 'status-box danger';
-                scanStatus.innerHTML = '⚠️ Verbindung zum Scan-Server fehlgeschlagen.';
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                fileInput.files = files;
+                processAndScanFile(files);
             }
         });
-    </script>
-</body>
-</html>
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                processAndScanFile(e.target.files);
+            }
+        });
+
+        // Verarbeitungs- und Scan-Logik
+        async function processAndScanFile(file) {
+            // Kreis-Status auf Analyse setzen + Scan-Animation starten
+            statusCircle.className = 'status-circle is-scanning';
+            statusValue.innerHTML = 'SCANNT...';
+            statusValue.style.color = 'var(--norton-yellow)';
+            findingsCard.style.display = 'none';
+
+            // 1. Verstecktes Laden in die Hintergrund-Sandbox mit CSP (Volle Isolation)
+const reader = new FileReader();
+reader.onload = (evt) => {
+const userContent = evt.target.result;
+const secureCsp = ``;
+const securedCode = secureCsp + userContent;
+
+const blob = new Blob([securedCode], { type: 'text/html' });
+hiddenSandbox.src = URL.createObjectURL(blob);
+};
+reader.readAsText(file);
+
+// 2. Datei an das Heuristik-Backend senden
+const formData = new FormData();
+formData.append('file', file);
+
+try {
+const response = await fetch('/api/scan', {
+method: 'POST',
+body: formData
+});
+const data = await response.json();
+
+// Animation stoppen
+statusCircle.classList.remove('is-scanning');
+
+if (data.success) {
+if (data.verdict === 'GEFÄHRLICH') {
+// Norton-Kreis wird ROT bei Bedrohung
+statusCircle.classList.add('is-danger');
+statusValue.innerHTML = 'GEFAHR';
+statusValue.style.color = 'var(--danger-red)';
+
+// Befunde auflisten
+findingsUl.innerHTML = data.findings.map(f => `${f}`).join('');
+findingsCard.style.display = 'block';
+} else {
+// Norton-Kreis wird GRÜN, wenn sauber
+statusCircle.classList.add('is-safe');
+statusValue.innerHTML = 'SICHER';
+statusValue.style.color = 'var(--success-green)';
+}
+} else {
+statusValue.innerHTML = 'FEHLER';
+alert('Fehler bei der Analyse: ' + data.error);
+}
+} catch (err) {
+statusCircle.classList.remove('is-scanning');
+statusValue.innerHTML = 'OFFLINE';
+alert('Verbindung zum Server fehlgeschlagen.');
+}
+}
+
+
+
+`);
+});
+
