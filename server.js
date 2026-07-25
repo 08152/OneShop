@@ -1,19 +1,14 @@
 const express = require('express');
 const multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
 const cors = require('cors');
 
 const app = express();
-const upload = multer({ limits: { fileSize: 32 * 1024 * 1024 } }); // Max 32MB
+const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // Limit: 10MB
 
 app.use(cors());
 app.use(express.json());
 
-// Holt den API-Key aus den Render-Umgebungsvariablen
-const VT_API_KEY = process.env.VIRUSTOTAL_API_KEY;
-
-// Route für die Startseite (index)
+// Startseite mit integriertem Frontend
 app.get('/', (req, res) => {
     res.send(`
 <!DOCTYPE html>
@@ -21,7 +16,7 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hochsicherheits-Sandbox & Virenscanner</title>
+    <title>Kostenlose Lokale Sandbox & Heuristik-Scanner</title>
     <style>
         :root {
             --primary: #3498db;
@@ -42,15 +37,16 @@ app.get('/', (req, res) => {
         .info { background: #d6eaf8; color: var(--primary); border: 1px solid var(--primary); }
         .sandbox-wrapper { border: 2px solid #bdc3c7; border-radius: 8px; overflow: hidden; margin-top: 15px; background: white; }
         .sandbox-header { background: var(--dark); color: white; padding: 10px 15px; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; }
-        .badge { background: var(--danger); padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+        .badge { background: #e67e22; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: white; }
         iframe { width: 100%; height: 450px; border: none; background: #fff; }
+        ul { margin: 5px 0 0 20px; padding: 0; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>🛡️ Hochsicherheits-Virenscanner & Sandbox</h1>
-        <p>Prüft Dateien serverseitig in der Cloud und führt sie zeitgleich in einer hermetisch isolierten Client-Sandbox aus.</p>
+        <h1>🛡️ Lokaler Heuristik-Scanner & Sandbox</h1>
+        <p><strong>100% Kostenlos:</strong> Analysiert Dateien direkt auf dem Server nach schädlichen Mustern und führt sie isoliert aus. Keine Registrierung oder API erforderlich.</p>
         
         <div class="dropzone" onclick="document.getElementById('fileInput').click()">
             <p>Datei hier ablegen oder klicken zum Hochladen</p>
@@ -63,14 +59,13 @@ app.get('/', (req, res) => {
 
     <div class="card">
         <h2>🔒 Hermetisch isolierte Sandbox</h2>
-        <p><strong>Sicherheitsstufe Maximal:</strong> Skripte dürfen für visuelle Tests laufen, haben jedoch absolutes Netzwerkverbot (kein Datenabfluss) und null Zugriff auf das Elternfenster, Cookies oder Speicherlaufwerke.</p>
+        <p>Skripte dürfen visuell ausgeführt werden, jegliche Netzwerkverbindungen nach außen oder Zugriffe auf Browser-Cookies sind jedoch unmöglich.</p>
         
         <div class="sandbox-wrapper">
             <div class="sandbox-header">
                 <span>Isolierter iframe</span>
-                <span class="badge" style="background:#e67e22;">Streng limitiert (No Same-Origin / CSP-Block)</span>
+                <span class="badge">Netzwerk & Origin Blockiert</span>
             </div>
-            <!-- allow-same-origin WURDE ENTFERNT. Der Inhalt ist jetzt komplett vom Hauptfenster getrennt -->
             <iframe id="sandboxFrame" sandbox="allow-scripts"></iframe>
         </div>
     </div>
@@ -86,19 +81,13 @@ app.get('/', (req, res) => {
 
             scanStatus.style.display = 'block';
             scanStatus.className = 'status-box info';
-            scanStatus.innerHTML = '⏳ Datei wird verarbeitet und gescannt... Bitte warten...';
+            scanStatus.innerHTML = '⏳ Lokale Heuristik-Analyse läuft...';
 
-            // 1. Sicheres Laden in die Sandbox mit Content Security Policy (CSP)
+            // 1. Sicheres Laden in die Sandbox mit Content Security Policy (Sperrt Netzwerkabfluss)
             const reader = new FileReader();
             reader.onload = (evt) => {
-                let userContent = evt.target.result;
-                
-                // Wir injizieren eine ultra-strikte CSP ganz oben in den Code der Datei.
-                // default-src 'none': Verbietet alle Verbindungen nach außen, Bilder-Nachladen, Ajax-Requests etc.
-                // script-src 'unsafe-inline': Erlaubt nur den lokalen JS-Code der Datei, verbietet das Nachladen externer Viren-Skripte.
-                const secureCsp = \`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">\`;
-                
-                // Setze CSP an den Anfang des hochgeladenen Codes
+                const userContent = evt.target.result;
+                const secureCsp = \`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:;">\`;
                 const securedCode = secureCsp + userContent;
 
                 const blob = new Blob([securedCode], { type: 'text/html' });
@@ -106,7 +95,7 @@ app.get('/', (req, res) => {
             };
             reader.readAsText(file);
 
-            // 2. Datei an das Backend senden
+            // 2. Datei an das kostenlose lokale Backend senden
             const formData = new FormData();
             formData.append('file', file);
 
@@ -120,18 +109,20 @@ app.get('/', (req, res) => {
                 if (data.success) {
                     if (data.verdict === 'GEFÄHRLICH') {
                         scanStatus.className = 'status-box danger';
-                        scanStatus.innerHTML = '⚠️ BEDROHUNG GEFUNDEN! Erkennungen: ' + data.malicious + ' Antiviren-Engines schlagen Alarm.';
+                        let html = '⚠️ <strong>BEDROHUNG GEFUNDEN!</strong> Folgende verdächtige Muster wurden entdeckt:';
+                        html += '<ul>' + data.findings.map(f => '<li>' + f + '</li>').join('') + '</ul>';
+                        scanStatus.innerHTML = html;
                     } else {
                         scanStatus.className = 'status-box success';
-                        scanStatus.innerHTML = '✅ DATEI SAUBER! Der Echtzeit-Cloud-Scan meldet keine bekannten Bedrohungen.';
+                        scanStatus.innerHTML = '✅ DATEI SAUBER! Keine bekannten schädlichen Heuristik-Muster im Code gefunden.';
                     }
                 } else {
                     scanStatus.className = 'status-box danger';
-                    scanStatus.innerHTML = 'Fehler beim Scannen: ' + data.error;
+                    scanStatus.innerHTML = 'Fehler bei der lokalen Analyse: ' + data.error;
                 }
             } catch (err) {
                 scanStatus.className = 'status-box danger';
-                scanStatus.innerHTML = '⚠️ Verbindung zum Scan-Server fehlgeschlagen.';
+                scanStatus.innerHTML = '⚠️ Verbindung zum lokalen Analyse-Server fehlgeschlagen.';
             }
         });
     </script>
@@ -140,48 +131,45 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Route für den echten Cloud-Virenscan via VirusTotal API
-app.post('/api/scan', upload.single('file'), async (req, res) => {
-    if (!VT_API_KEY) {
-        return res.status(500).json({ error: "Server-Konfigurationsfehler: Kein API-Key auf Render hinterlegt." });
-    }
+// Route für die kostenlose, lokale Signatur- und Heuristik-Prüfung
+app.post('/api/scan', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ error: "Keine Datei übertragen." });
     }
 
     try {
-        const formData = new FormData();
-        formData.append('file', req.file.buffer, { filename: req.file.originalname });
+        const fileContent = req.file.buffer.toString('utf-8');
+        const findings = [];
 
-        const uploadResponse = await axios.post('https://virustotal.com', formData, {
-            headers: {
-                ...formData.getHeaders(),
-                'x-apikey': VT_API_KEY
+        // Lokale Heuristik-Regeln (Erkennt bösartige Absichten in Skripten/HTML)
+        const rules = [
+            { pattern: /eval\s*\(/i, desc: "Dynamische Code-Ausführung (eval) – Häufig genutzt zur Code-Verschleierung." },
+            { pattern: /document\.write\s*\(/i, desc: "Potenzielle DOM-Injection (document.write)." },
+            { pattern: /<script[\s\S]*?src=["']http:\/\/.*?["']/i, desc: "Laden von unverschlüsseltem, externen Code via HTTP." },
+            { pattern: /unescape\s*\(\s*["']%u/i, desc: "Verschleierungsmuster (Shellcode/Unescape) entdeckt." },
+            { pattern: /crypto-miner|coinhive|monero/i, desc: "Unerlaubtes Krypto-Mining Skript im Code vorhanden." },
+            { pattern: /atob\s*\(\s*["'][A-Za-z0-9+/={}]/i, desc: "Base64-kodierter, versteckter Programmcode (atob)." },
+            { pattern: /String\.fromCharCode/i, desc: "Verdächtige Zeichenketten-Generierung zur AV-Umgehung." },
+            { pattern: /location\.replace\s*\(|window\.location\s*=/i, desc: "Automatisierte Weiterleitung (Phishing-Gefahr)." }
+        ];
+
+        // Code gegen alle Regeln prüfen
+        rules.forEach(rule => {
+            if (rule.pattern.test(fileContent)) {
+                findings.push(rule.desc);
             }
         });
 
-        const analysisId = uploadResponse.data.data.id;
-
-        // Kurze Pause für die cloudbasierte Analyse-Engine
-        await new Promise(resolve => setTimeout(resolve, 3500));
-
-        const resultResponse = await axios.get(`https://virustotal.com{analysisId}`, {
-            headers: { 'x-apikey': VT_API_KEY }
-        });
-
-        const stats = resultResponse.data.data.attributes.stats;
-
         res.json({
             success: true,
-            malicious: stats.malicious,
-            verdict: stats.malicious > 0 ? "GEFÄHRLICH" : "SAUBER"
+            findings: findings,
+            verdict: findings.length > 0 ? "GEFÄHRLICH" : "SAUBER"
         });
 
     } catch (error) {
-        console.error("Scan-Error:", error.message);
-        res.status(500).json({ error: "Die Scan-Schnittstelle meldet ein Problem." });
+        res.status(500).json({ error: "Fehler beim Lesen der Datei auf dem Server." });
     }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server gestartet auf Port ${PORT}`));
+app.listen(PORT, () => console.log(`Kostenloser Server gestartet auf Port ${PORT}`));
