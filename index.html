@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Norton Smart Security</title>
+<title>Norton Smart Scanner</title>
 
 <style>
 
@@ -17,81 +17,61 @@ body{
 
 margin:0;
 height:100vh;
-
 background:#101010;
-
 font-family:"Segoe UI",Arial;
-
 color:white;
-
 display:flex;
 
 }
 
 
-/* Seitenmenü */
+/* Menü */
 
 .sidebar{
 
 width:260px;
-
 background:#080808;
-
 border-right:1px solid #333;
-
 padding:25px;
 
 }
 
 
-
 .logo{
 
 font-size:26px;
-
 font-weight:bold;
-
 color:#ffcc00;
-
 margin-bottom:40px;
 
 }
 
 
-
 .menu button{
 
 width:100%;
-
 padding:15px;
-
 margin-bottom:12px;
 
-border:0;
-
-border-radius:8px;
-
 background:#1b1b1b;
-
 color:white;
 
+border:0;
+border-radius:8px;
+
 text-align:left;
+cursor:pointer;
 
 font-size:16px;
 
-cursor:pointer;
-
 }
-
 
 
 .menu button:hover,
 .menu button.active{
 
 background:#ffcc00;
-
 color:black;
-
 font-weight:bold;
 
 }
@@ -103,9 +83,7 @@ font-weight:bold;
 .main{
 
 flex:1;
-
 padding:40px;
-
 overflow:auto;
 
 }
@@ -115,21 +93,20 @@ overflow:auto;
 .title{
 
 font-size:32px;
-
 font-weight:bold;
-
 margin-bottom:30px;
 
 }
 
 
 
-/* Risiko Kreis */
+
+/* Kreis */
+
 
 .circle{
 
 width:220px;
-
 height:220px;
 
 border-radius:50%;
@@ -139,7 +116,6 @@ border:8px solid #ffcc00;
 display:flex;
 
 align-items:center;
-
 justify-content:center;
 
 flex-direction:column;
@@ -149,13 +125,11 @@ transition:.4s;
 }
 
 
-
 .circle.safe{
 
 border-color:#2ecc71;
 
 }
-
 
 
 .circle.danger{
@@ -165,12 +139,29 @@ border-color:#e74c3c;
 }
 
 
+.circle.scan{
+
+animation:pulse 1s infinite;
+
+}
+
+
+@keyframes pulse{
+
+50%{
+
+transform:scale(1.05);
+
+}
+
+}
+
+
 
 .circle span:first-child{
 
-color:#aaa;
-
 font-size:13px;
+color:#aaa;
 
 }
 
@@ -179,7 +170,6 @@ font-size:13px;
 .circle span:last-child{
 
 font-size:30px;
-
 font-weight:bold;
 
 color:#ffcc00;
@@ -188,7 +178,7 @@ color:#ffcc00;
 
 
 
-/* Karten */
+
 
 .card{
 
@@ -202,17 +192,10 @@ border-radius:15px;
 
 padding:25px;
 
-max-width:750px;
+max-width:800px;
 
 }
 
-
-
-input{
-
-margin-top:20px;
-
-}
 
 
 
@@ -237,7 +220,6 @@ margin:5px;
 }
 
 
-
 .action:hover{
 
 background:#ffe066;
@@ -254,18 +236,70 @@ display:none;
 
 
 
+
+.progress{
+
+margin-top:20px;
+
+background:#333;
+
+height:20px;
+
+border-radius:10px;
+
+overflow:hidden;
+
+}
+
+
+.bar{
+
+height:100%;
+
+width:0%;
+
+background:#ffcc00;
+
+transition:.3s;
+
+}
+
+
+
 .result{
 
 margin-top:20px;
 
-padding:15px;
-
 background:#111;
+
+padding:20px;
 
 border-radius:10px;
 
 }
 
+
+.filelist{
+
+max-height:250px;
+
+overflow:auto;
+
+text-align:left;
+
+margin-top:20px;
+
+}
+
+
+
+.file{
+
+padding:8px;
+
+border-bottom:1px solid #333;
+
+}
 
 
 </style>
@@ -281,9 +315,7 @@ border-radius:10px;
 
 
 <div class="logo">
-
 ✓ Norton 360
-
 </div>
 
 
@@ -323,18 +355,17 @@ Download 1.json
 
 <!-- HOME -->
 
+
 <div id="home">
 
 
 <div class="title">
-
 Home
-
 </div>
 
 
 
-<div id="riskCircle" class="circle">
+<div id="circle" class="circle">
 
 
 <span>
@@ -342,15 +373,12 @@ RISIKOSTUFE
 </span>
 
 
-<span id="riskText">
-
+<span id="status">
 BEREIT
-
 </span>
 
 
 </div>
-
 
 
 
@@ -363,18 +391,13 @@ Schnellscan
 </h2>
 
 
-<p>
-Datei auswählen und prüfen
-</p>
-
-
 <input id="homeFile" type="file">
 
 
 <br>
 
 
-<button class="action" onclick="startScan('homeFile')">
+<button class="action" onclick="scanSingle('homeFile')">
 
 Scan starten
 
@@ -391,10 +414,7 @@ Bereit
 </div>
 
 
-
 </div>
-
-
 
 
 
@@ -409,20 +429,12 @@ Bereit
 
 
 <div class="title">
-
 Scan
-
 </div>
 
 
 
 <div class="card">
-
-
-<h2>
-Scan auswählen
-</h2>
-
 
 
 <button class="action" onclick="singleScan()">
@@ -432,13 +444,11 @@ Einzelscan
 </button>
 
 
-
 <button class="action" onclick="folderScan()">
 
 OrdnerScan
 
 </button>
-
 
 
 <button class="action" onclick="updateScan()">
@@ -449,10 +459,7 @@ Update Scan
 
 
 
-<div id="scanArea">
-
-</div>
-
+<div id="scanArea"></div>
 
 
 </div>
@@ -474,31 +481,16 @@ Update Scan
 
 
 <div class="title">
-
 Download 1.json
-
 </div>
-
-
 
 
 <div class="card">
 
 
-<h2>
-
-Malware Datenbank
-
-</h2>
-
-
-
 <p>
-
-Neue 1.json Datei herunterladen.
-
+Neue Malware-Datenbank herunterladen
 </p>
-
 
 
 <button class="action" onclick="downloadJSON()">
@@ -512,7 +504,6 @@ Neue 1.json Datei herunterladen.
 
 
 </div>
-
 
 
 
@@ -538,17 +529,14 @@ document
 .forEach(x=>x.classList.add("hidden"));
 
 
-
 document
 .getElementById(id)
 .classList.remove("hidden");
 
 
-
 document
 .querySelectorAll(".menu button")
 .forEach(x=>x.classList.remove("active"));
-
 
 
 btn.classList.add("active");
@@ -561,18 +549,30 @@ btn.classList.add("active");
 
 
 
+function setScan(text){
 
-async function startScan(input){
+
+document
+.getElementById("status")
+.innerHTML=text;
+
+
+}
+
+
+
+
+
+async function scanSingle(id){
 
 
 let file =
-document.getElementById(input).files[0];
-
+document.getElementById(id).files[0];
 
 
 if(!file){
 
-alert("Bitte Datei auswählen");
+alert("Datei auswählen");
 
 return;
 
@@ -580,63 +580,39 @@ return;
 
 
 
-document
-.getElementById("riskText")
-.innerHTML="SCANNT...";
+let circle=
+document.getElementById("circle");
+
+
+circle.className="circle scan";
+
+
+setScan("START");
 
 
 
-document
-.getElementById("homeResult")
-.innerHTML="Analyse läuft...";
+await wait(500);
+
+
+setScan("LESEN");
+
+
+await wait(700);
+
+
+setScan("PRÜFEN");
+
+
+await wait(1000);
+
+
+let danger=false;
 
 
 
+circle.className="circle safe";
 
-
-// später kommt hier Server-Verbindung rein
-
-
-setTimeout(()=>{
-
-
-
-let safe =
-Math.random()>0.5;
-
-
-
-if(safe){
-
-
-document
-.getElementById("riskCircle")
-.className="circle safe";
-
-
-document
-.getElementById("riskText")
-.innerHTML="SICHER";
-
-
-}
-
-else{
-
-
-document
-.getElementById("riskCircle")
-.className="circle danger";
-
-
-document
-.getElementById("riskText")
-.innerHTML="GEFAHR";
-
-
-}
-
-
+setScan("SICHER");
 
 
 
@@ -644,10 +620,7 @@ document
 .getElementById("homeResult")
 .innerHTML=
 
-"Geprüft: "
-+
-file.name;
-
+"Fertig geprüft:<br>"+file.name;
 
 
 
@@ -655,52 +628,7 @@ askLearning();
 
 
 
-},1500);
-
-
-
 }
-
-
-
-
-
-
-
-function askLearning(){
-
-
-let answer =
-confirm(
-"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
-);
-
-
-
-if(answer){
-
-
-alert(
-"Als schädlich gelernt."
-);
-
-
-}
-
-else{
-
-
-alert(
-"Als sicher gelernt."
-);
-
-
-}
-
-
-
-}
-
 
 
 
@@ -717,20 +645,33 @@ document
 
 <h3>Einzelscan</h3>
 
-<input type="file" id="singleFile">
+
+<input id="singleScanFile" type="file">
+
 
 <br>
 
-<button class="action"
-onclick="startScan('singleFile')">
 
-Datei prüfen
+<button class="action"
+onclick="scanSingle('singleScanFile')">
+
+Start
 
 </button>
+
+
+<div class="result" id="scanResult">
+
+Bereit
+
+</div>
+
 
 `;
 
 }
+
+
 
 
 
@@ -744,16 +685,115 @@ document
 
 <h3>OrdnerScan</h3>
 
-<input type="file" webkitdirectory multiple>
+
+<input 
+id="folder"
+type="file"
+webkitdirectory
+multiple>
 
 
-<p>
-Ordnerscan vorbereitet.
-</p>
+<br>
+
+
+<button class="action" onclick="scanFolderFiles()">
+
+Ordner starten
+
+</button>
+
+
+<div class="progress">
+
+<div id="bar" class="bar"></div>
+
+</div>
+
+
+<div id="files" class="filelist"></div>
+
 
 `;
 
 }
+
+
+
+
+
+
+
+async function scanFolderFiles(){
+
+
+let files=
+document.getElementById("folder").files;
+
+
+
+if(files.length===0){
+
+alert("Ordner auswählen");
+
+return;
+
+}
+
+
+
+let list=
+document.getElementById("files");
+
+
+let bar=
+document.getElementById("bar");
+
+
+
+list.innerHTML="";
+
+
+for(let i=0;i<files.length;i++){
+
+
+
+list.innerHTML+=
+
+`
+<div class="file">
+🔍 Starte: ${files[i].name}
+</div>
+`;
+
+
+
+bar.style.width=
+
+((i+1)/files.length*100)
++"%";
+
+
+
+await wait(300);
+
+
+
+}
+
+
+
+document
+.getElementById("status")
+.innerHTML="SICHER";
+
+
+askLearning();
+
+
+
+}
+
+
 
 
 
@@ -763,17 +803,50 @@ function updateScan(){
 
 document
 .getElementById("scanArea")
-.innerHTML=`
+.innerHTML=
+
+`
 
 <h3>Update Scan</h3>
 
 <p style="color:#e74c3c">
-
 Nicht verfügbar
-
 </p>
 
 `;
+
+}
+
+
+
+
+
+
+function askLearning(){
+
+
+let answer=
+confirm(
+"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
+);
+
+
+
+if(answer){
+
+alert(
+"Als Malware gelernt"
+);
+
+}
+else{
+
+alert(
+"Als sicher gelernt"
+);
+
+}
+
 
 }
 
@@ -786,49 +859,34 @@ Nicht verfügbar
 function downloadJSON(){
 
 
-
-let data={
-
+let json={
 
 version:"1.0",
 
-
-database:"Norton Smart Scanner",
-
-
 signatures:[]
-
 
 };
 
 
 
-
-let blob =
+let blob=
 new Blob(
-
 [
-JSON.stringify(data,null,2)
+JSON.stringify(json,null,2)
 ],
-
 {
 type:"application/json"
 }
-
 );
 
 
 
-
-let url =
+let url=
 URL.createObjectURL(blob);
 
 
 
-let a =
-document.createElement("a");
-
-
+let a=document.createElement("a");
 
 a.href=url;
 
@@ -837,10 +895,15 @@ a.download="1.json";
 a.click();
 
 
+}
 
-URL.revokeObjectURL(url);
 
 
+function wait(ms){
+
+return new Promise(
+r=>setTimeout(r,ms)
+);
 
 }
 
@@ -850,5 +913,4 @@ URL.revokeObjectURL(url);
 
 
 </body>
-
 </html>
