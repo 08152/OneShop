@@ -1,12 +1,41 @@
 {
-  "channel": "RiskyLife",
-  "description": "Willkommen auf dem offiziellen RiskyLife-Kanal!",
-  "channelImage": "1.png",
-  "videos": [
+  "version": "1.0",
+  "database": "Norton Style Malware Database",
+
+  "signatures": [
+
     {
-  "title": "Projekt Seifenkiste #1",
-  "description": "Hi, das ist Teil 1 von diesem Projekt.",
-  "file": "https://drive.google.com/file/d/1CxUfQUu1KMbaSMwoTP9OCZLrycLTfrF_/preview"
-}
+      "name": "Test Malware Pattern",
+      "type": "script",
+      "pattern": "malware_test",
+      "risk": "hoch",
+      "description": "Testsignatur erkannt"
+    },
+
+    {
+      "name": "Crypto Miner",
+      "type": "javascript",
+      "pattern": "coinhive",
+      "risk": "hoch",
+      "description": "Mögliches Krypto-Mining erkannt"
+    },
+
+    {
+      "name": "Suspicious Eval",
+      "type": "javascript",
+      "pattern": "eval(",
+      "risk": "mittel",
+      "description": "Dynamische Code-Ausführung"
+    },
+
+    {
+      "name": "Hidden Redirect",
+      "type": "javascript",
+      "pattern": "window.location",
+      "risk": "mittel",
+      "description": "Automatische Weiterleitung erkannt"
+    }
+
   ]
+
 }
