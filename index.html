@@ -2,106 +2,155 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AVI zu MP4</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AVI → MP4 Konverter</title>
 
 <style>
 body{
-    background:#111;
+    margin:0;
+    background:#111827;
     color:#fff;
-    font-family:Arial;
+    font-family:Arial,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+.box{
+    width:90%;
+    max-width:500px;
+    background:#1f2937;
+    padding:30px;
+    border-radius:15px;
     text-align:center;
-    padding:40px;
+}
+input[type=file]{
+    width:100%;
+    padding:15px;
+    background:#374151;
+    color:white;
+    border-radius:8px;
+    margin:20px 0;
 }
 button{
-    padding:15px 30px;
+    width:100%;
+    padding:15px;
+    background:#facc15;
+    border:none;
+    border-radius:8px;
     font-size:18px;
+    font-weight:bold;
     cursor:pointer;
+}
+button:hover{
+    background:#eab308;
 }
 progress{
     width:100%;
     height:25px;
+    margin-top:20px;
+}
+#status{
+    margin-top:20px;
 }
 </style>
 
 </head>
 <body>
 
-<h1>AVI ➜ MP4</h1>
+<div class="box">
 
-<input type="file" id="file" accept=".avi">
+<h1>AVI → MP4</h1>
 
-<br><br>
+<p>Datei auswählen und konvertieren.</p>
 
-<button onclick="convert()">Konvertieren</button>
+<input id="video" type="file" accept=".avi">
 
-<br><br>
+<button onclick="upload()">Konvertieren</button>
 
 <progress id="progress" value="0" max="100"></progress>
 
-<p id="status">Bereit</p>
+<div id="status">Bereit.</div>
+
+</div>
 
 <script>
 
-const { createFFmpeg, fetchFile } = FFmpeg;
+async function upload(){
 
-const ffmpeg=createFFmpeg({
-    log:true
-});
-
-async function convert(){
-
-const file=document.getElementById("file").files[0];
+const file=document.getElementById("video").files[0];
 
 if(!file){
-alert("Bitte AVI auswählen.");
+alert("Bitte eine AVI-Datei auswählen.");
 return;
 }
 
 const status=document.getElementById("status");
 const progress=document.getElementById("progress");
 
-status.innerHTML="FFmpeg wird geladen...";
+const form=new FormData();
 
-if(!ffmpeg.isLoaded())
-await ffmpeg.load();
+form.append("video",file);
 
-ffmpeg.setProgress(({ratio})=>{
-progress.value=Math.round(ratio*100);
-});
+status.innerHTML="Datei wird hochgeladen...";
 
-status.innerHTML="Datei wird geladen...";
+const xhr=new XMLHttpRequest();
 
-ffmpeg.FS("writeFile","video.avi",await fetchFile(file));
+xhr.open("POST","/convert",true);
 
-status.innerHTML="Konvertiere...";
+xhr.upload.onprogress=function(e){
 
-await ffmpeg.run(
-"-i","video.avi",
-"-c:v","libx264",
-"-pix_fmt","yuv420p",
-"-preset","ultrafast",
-"video.mp4"
-);
+if(e.lengthComputable){
 
-status.innerHTML="Erstelle Download...";
+progress.value=(e.loaded/e.total)*100;
 
-const data=ffmpeg.FS("readFile","video.mp4");
+}
 
-const blob=new Blob([data.buffer],{type:"video/mp4"});
+};
+
+xhr.responseType="blob";
+
+xhr.onload=function(){
+
+if(xhr.status===200){
+
+const blob=xhr.response;
 
 const url=URL.createObjectURL(blob);
 
 const a=document.createElement("a");
+
 a.href=url;
-a.download="video.mp4";
+
+a.download=file.name.replace(/\.[^/.]+$/,"")+".mp4";
+
+document.body.appendChild(a);
+
 a.click();
+
+document.body.removeChild(a);
 
 URL.revokeObjectURL(url);
 
-status.innerHTML="Fertig!";
+status.innerHTML="✅ Fertig!";
+
+progress.value=100;
+
+}else{
+
+status.innerHTML="❌ Fehler bei der Konvertierung.";
+
+}
+
+};
+
+xhr.onerror=function(){
+
+status.innerHTML="❌ Server nicht erreichbar.";
+
+};
+
+xhr.send(form);
 
 }
 
