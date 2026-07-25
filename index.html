@@ -2,127 +2,208 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AVI → MP4 Konverter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AVI zu MP4 Konverter</title>
 
 <style>
 body{
     margin:0;
     background:#111827;
-    color:#fff;
-    font-family:Arial,sans-serif;
+    color:white;
+    font-family:Arial, sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
     min-height:100vh;
 }
-.box{
+
+.container{
     width:90%;
     max-width:500px;
     background:#1f2937;
     padding:30px;
     border-radius:15px;
     text-align:center;
+    box-shadow:0 0 20px #000;
 }
-input[type=file]{
+
+h1{
+    color:#facc15;
+}
+
+input{
     width:100%;
-    padding:15px;
+    margin:20px 0;
+    padding:12px;
     background:#374151;
     color:white;
     border-radius:8px;
-    margin:20px 0;
 }
+
 button{
     width:100%;
     padding:15px;
     background:#facc15;
-    border:none;
-    border-radius:8px;
+    color:#111;
+    border:0;
+    border-radius:10px;
     font-size:18px;
     font-weight:bold;
     cursor:pointer;
 }
+
 button:hover{
     background:#eab308;
 }
+
+button:disabled{
+    background:#666;
+}
+
 progress{
     width:100%;
     height:25px;
     margin-top:20px;
 }
+
 #status{
     margin-top:20px;
 }
 </style>
 
 </head>
+
 <body>
 
-<div class="box">
+<div class="container">
 
-<h1>AVI → MP4</h1>
+<h1>🎬 AVI → MP4</h1>
 
-<p>Datei auswählen und konvertieren.</p>
+<p>AVI-Datei auswählen und auf dem Render-Server umwandeln.</p>
 
-<input id="video" type="file" accept=".avi">
+<input 
+type="file" 
+id="video"
+accept=".avi">
 
-<button onclick="upload()">Konvertieren</button>
+<button id="btn" onclick="upload()">
+Konvertieren
+</button>
 
 <progress id="progress" value="0" max="100"></progress>
 
-<div id="status">Bereit.</div>
+<div id="status">
+Bereit
+</div>
 
 </div>
 
+
 <script>
+
+const SERVER =
+"https://oneshop-1.onrender.com";
+
 
 async function upload(){
 
-const file=document.getElementById("video").files[0];
+const file =
+document.getElementById("video").files[0];
+
+const btn =
+document.getElementById("btn");
+
+const status =
+document.getElementById("status");
+
+const progress =
+document.getElementById("progress");
+
 
 if(!file){
-alert("Bitte eine AVI-Datei auswählen.");
+
+alert("Bitte AVI-Datei auswählen");
+
 return;
+
 }
 
-const status=document.getElementById("status");
-const progress=document.getElementById("progress");
 
-const form=new FormData();
+btn.disabled=true;
+
+status.innerHTML =
+"Upload wird gestartet...";
+
+
+let form =
+new FormData();
 
 form.append("video",file);
 
-status.innerHTML="Datei wird hochgeladen...";
 
-const xhr=new XMLHttpRequest();
 
-xhr.open("POST","/convert",true);
+let xhr =
+new XMLHttpRequest();
+
+
+xhr.open(
+"POST",
+SERVER + "/convert",
+true
+);
+
+
+xhr.responseType="blob";
+
+
 
 xhr.upload.onprogress=function(e){
 
 if(e.lengthComputable){
 
-progress.value=(e.loaded/e.total)*100;
+let percent =
+(e.loaded/e.total)*100;
+
+progress.value=percent;
+
+status.innerHTML =
+"Upload: "+
+Math.round(percent)+"%";
 
 }
 
 };
 
-xhr.responseType="blob";
+
 
 xhr.onload=function(){
 
+
 if(xhr.status===200){
 
-const blob=xhr.response;
 
-const url=URL.createObjectURL(blob);
+status.innerHTML =
+"MP4 wird heruntergeladen...";
 
-const a=document.createElement("a");
+
+let blob =
+xhr.response;
+
+
+let url =
+URL.createObjectURL(blob);
+
+
+let a =
+document.createElement("a");
+
 
 a.href=url;
 
-a.download=file.name.replace(/\.[^/.]+$/,"")+".mp4";
+a.download =
+file.name.replace(".avi","")+".mp4";
+
 
 document.body.appendChild(a);
 
@@ -130,27 +211,47 @@ a.click();
 
 document.body.removeChild(a);
 
+
 URL.revokeObjectURL(url);
 
-status.innerHTML="✅ Fertig!";
 
-progress.value=100;
+status.innerHTML =
+"✅ Fertig!";
+
 
 }else{
 
-status.innerHTML="❌ Fehler bei der Konvertierung.";
+
+status.innerHTML =
+"❌ Server-Fehler: "+xhr.status;
+
 
 }
 
+
+btn.disabled=false;
+
+
 };
+
+
 
 xhr.onerror=function(){
 
-status.innerHTML="❌ Server nicht erreichbar.";
+
+status.innerHTML =
+"❌ Verbindung zum Server fehlgeschlagen";
+
+
+btn.disabled=false;
+
 
 };
 
+
+
 xhr.send(form);
+
 
 }
 
