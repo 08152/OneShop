@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lokaler AVI zu MP4 Konverter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f4f4f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 { color: #333; }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px dashed #ccc;
+            margin-bottom: 20px;
+        }
+        input[type="file"] { display: none; }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .btn:hover { background-color: #0056b3; }
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #666;
+        }
+    </style>
+    <!-- FFmpeg.wasm Bibliotheken laden -->
+    <script src="https://unpkg.com"></script>
+</head>
+<body>
+
+    <h2>AVI zu MP4 Konverter</h2>
+    <p>Die Konvertierung findet direkt in deinem Browser statt. Es werden keine Daten hochgeladen.</p>
+
+    <div class="box">
+        <label for="video-input" class="btn">AVI Datei auswählen</label>
+        <input type="file" id="video-input" accept=".avi">
+        <div id="file-name" style="margin-top: 10px; font-style: italic;">Keine Datei ausgewählt</div>
+    </div>
+
+    <button id="convert-btn" class="btn" disabled>In MP4 umwandeln</button>
+    
+    <div id="status">Warte auf Dateiauswahl...</div>
+
+    <script>
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        // Log aktiviert, um den Fortschritt in der Browser-Konsole zu sehen
+        const ffmpeg = createFFmpeg({ log: true });
+
+        const input = document.getElementById('video-input');
+        const fileNameDiv = document.getElementById('file-name');
+        const convertBtn = document.getElementById('convert-btn');
+        const status = document.getElementById('status');
+
+        // Datei-Auswahl überwachen
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileNameDiv.textContent = file.name;
+                convertBtn.disabled = false;
+                status.textContent = "Bereit zum Konvertieren.";
+            }
+        });
+
+        // Konvertierungsprozess
+        convertBtn.addEventListener('click', async () => {
+            const file = input.files[0];
+            if (!file) return;
+
+            convertBtn.disabled = true;
+            input.disabled = true;
+
+            try {
+                status.textContent = "Lade FFmpeg-Core (beim ersten Mal kurz warten)...";
+                if (!ffmpeg.isLoaded()) {
+                    await ffmpeg.load();
+                }
+
+                status.textContent = "Video wird verarbeitet (Bitte warten)...";
+                
+                // Datei in das virtuelle FFmpeg Dateisystem schreiben
+                ffmpeg.FS('writeFile', 'input.avi', await fetchFile(file));
+
+                // FFmpeg Befehl ausführen: AVI zu MP4 konvertieren
+                // -c:v libx264 sorgt für maximale MP4-Kompatibilität
+                await ffmpeg.run('-i', 'input.avi', '-c:v', 'libx264', '-preset', 'ultrafast', 'output.mp4');
+
+                status.textContent = "Konvertierung fertig! Download startet...";
+
+                // Ergebnis aus dem virtuellen Dateisystem lesen
+                const data = ffmpeg.FS('readFile', 'output.mp4');
+
+                // Download-Link für den Benutzer erstellen
+                const blob = new Blob([data.buffer], { type: 'video/mp4' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name.replace(/\.[^/.]+$/, "") + ".mp4";
+                document.body.appendChild(a);
+                a.click();
+                
+                // Aufräumen
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                status.textContent = "Erfolgreich heruntergeladen!";
+
+            } catch (error) {
+                console.error(error);
+                status.textContent = "Fehler bei der Konvertierung. Details in der Browser-Konsole (F12).";
+            } finally {
+                convertBtn.disabled = false;
+                input.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
