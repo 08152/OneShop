@@ -10,79 +10,194 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+
+// Dateien aus dem gleichen Ordner laden
 app.use(express.static(__dirname));
 
+
+// Upload Ordner
 if (!fs.existsSync("uploads")) {
     fs.mkdirSync("uploads");
 }
 
+
+// Upload Einstellungen
 const upload = multer({
     dest: "uploads/",
     limits: {
-        fileSize: 500 * 1024 * 1024
+        fileSize: 500 * 1024 * 1024 // 500 MB
     }
 });
 
 
-app.post("/convert", upload.single("video"), (req,res)=>{
+
+// AVI zu MP4
+app.post("/convert", upload.single("video"), (req, res) => {
 
     console.log("Upload gestartet");
 
-    if(!req.file){
-        return res.status(400).send("Keine Datei");
+
+    if (!req.file) {
+
+        return res.status(400)
+        .send("Keine Datei erhalten.");
+
     }
 
-    console.log("Datei erhalten:", req.file.originalname);
+
+    console.log(
+        "Datei:",
+        req.file.originalname
+    );
 
 
-    const input = req.file.path;
-    const output = input + ".mp4";
+    const input =
+    req.file.path;
+
+
+    const output =
+    path.join(
+        "uploads",
+        req.file.filename + ".mp4"
+    );
+
+
+
+    console.log("Starte FFmpeg...");
+
 
 
     ffmpeg(input)
+
+    .output(output)
+
     .videoCodec("libx264")
+
     .audioCodec("aac")
+
     .outputOptions([
-        "-preset",
-        "ultrafast",
-        "-pix_fmt",
-        "yuv420p"
+        "-preset ultrafast",
+        "-pix_fmt yuv420p",
+        "-movflags +faststart"
     ])
-    .on("start",cmd=>{
-        console.log("FFmpeg:",cmd);
-    })
-    .on("progress",p=>{
-        console.log("Fortschritt:",p.percent);
-    })
-    .on("end",()=>{
 
-        console.log("Fertig");
 
-        res.download(output,"video.mp4",()=>{
+    .on("start", (cmd) => {
 
-            fs.unlink(input,()=>{});
-            fs.unlink(output,()=>{});
+        console.log(
+            "FFmpeg Befehl:"
+        );
 
-        });
+        console.log(cmd);
 
     })
-    .on("error",err=>{
 
-        console.log("FFmpeg Fehler:",err);
 
-        res.status(500).send("FFmpeg Fehler");
+    .on("progress", (progress) => {
+
+        console.log(
+            "Fortschritt:",
+            progress.percent || 0,
+            "%"
+        );
 
     })
-    .save(output);
+
+
+    .on("end", () => {
+
+
+        console.log(
+            "Konvertierung fertig!"
+        );
+
+
+        res.download(
+            output,
+            "video.mp4",
+            () => {
+
+
+                fs.unlink(
+                    input,
+                    () => {}
+                );
+
+
+                fs.unlink(
+                    output,
+                    () => {}
+                );
+
+
+            }
+        );
+
+
+    })
+
+
+    .on("error", (err) => {
+
+
+        console.log(
+            "FFmpeg Fehler:"
+        );
+
+
+        console.log(err);
+
+
+
+        if(fs.existsSync(input)){
+            fs.unlinkSync(input);
+        }
+
+
+        if(fs.existsSync(output)){
+            fs.unlinkSync(output);
+        }
+
+
+        res.status(500)
+        .send(
+            "FFmpeg Fehler: "
+            + err.message
+        );
+
+
+    })
+
+
+    .run();
+
 
 });
 
 
-app.get("/",(req,res)=>{
-    res.sendFile(path.join(__dirname,"index.html"));
+
+
+// Startseite
+app.get("/", (req,res)=>{
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            "index.html"
+        )
+    );
+
 });
 
 
-app.listen(PORT,()=>{
-    console.log("Server läuft auf Port "+PORT);
+
+
+// Server starten
+app.listen(PORT, ()=>{
+
+    console.log(
+        "Server läuft auf Port "
+        + PORT
+    );
+
 });
