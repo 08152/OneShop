@@ -1,171 +1,111 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browser AVI zu MP4 Konverter via GitHub</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            text-align: center;
-            background-color: #f8f9fa;
-            color: #333;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .box {
-            border: 2px dashed #007bff;
-            padding: 30px;
-            border-radius: 8px;
-            background-color: #f0f7ff;
-            margin: 20px 0;
-            cursor: pointer;
-        }
-        input[type="file"] { display: none; }
-        .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        .btn:hover { background-color: #0056b3; }
-        .btn:disabled { background-color: #6c757d; cursor: not-allowed; }
-        #status {
-            margin-top: 20px;
-            font-size: 15px;
-            color: #555;
-            line-height: 1.5;
-        }
-        .progress-bar {
-            width: 0%;
-            height: 8px;
-            background-color: #28a745;
-            margin-top: 10px;
-            border-radius: 4px;
-            transition: width 0.3s;
-        }
-    </style>
-    <!-- Verwendet die stabilere Single-Thread-Version für maximale Browser-Kompatibilität ohne komplexe Header -->
-    <script src="https://unpkg.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVI zu MP4</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+
+<style>
+body{
+    background:#111;
+    color:#fff;
+    font-family:Arial;
+    text-align:center;
+    padding:40px;
+}
+button{
+    padding:15px 30px;
+    font-size:18px;
+    cursor:pointer;
+}
+progress{
+    width:100%;
+    height:25px;
+}
+</style>
+
 </head>
 <body>
 
-    <div class="container">
-        <h2>AVI zu MP4 Konverter</h2>
-        <p style="font-size: 14px; color: #666;">
-            Gehostet auf GitHub, aber <strong>100% lokal in deinem Browser</strong>. Keine Videodaten verlassen deinen PC.
-        </p>
+<h1>AVI ➜ MP4</h1>
 
-        <div class="box" onclick="document.getElementById('video-input').click()">
-            <span id="file-name" style="font-weight: 500;">Klicke hier, um eine AVI-Datei auszuwählen</span>
-            <input type="file" id="video-input" accept=".avi">
-        </div>
+<input type="file" id="file" accept=".avi">
 
-        <button id="convert-btn" class="btn" disabled>Konvertierung starten</button>
-        
-        <div id="status">Warte auf Datei...</div>
-        <div style="width: 100%; background: #e9ecef; border-radius: 4px; display: none;" id="progress-container">
-            <div id="progress" class="progress-bar"></div>
-        </div>
-    </div>
+<br><br>
 
-    <script>
-        const { createFFmpeg, fetchFile } = FFmpeg;
-        // Erstellt FFmpeg-Instanz. Wichtig: corePath zwingt die Single-Thread-Version, 
-        // die KEINE blockierenden SharedArrayBuffer-Sicherheitsheader benötigt!
-        const ffmpeg = createFFmpeg({ 
-            log: true,
-            corePath: 'https://unpkg.com'
-        });
+<button onclick="convert()">Konvertieren</button>
 
-        const input = document.getElementById('video-input');
-        const fileNameDiv = document.getElementById('file-name');
-        const convertBtn = document.getElementById('convert-btn');
-        const status = document.getElementById('status');
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress');
+<br><br>
 
-        // Fortschritt anzeigen
-        ffmpeg.setProgress(({ ratio }) => {
-            const percentage = Math.round(ratio * 100);
-            progressBar.style.width = `${percentage}%`;
-            status.textContent = `Konvertiere... ${percentage}% abgeschlossen.`;
-        });
+<progress id="progress" value="0" max="100"></progress>
 
-        input.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                fileNameDiv.textContent = `Ausgewählt: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                convertBtn.disabled = false;
-                status.textContent = "Bereit zum Konvertieren.";
-            }
-        });
+<p id="status">Bereit</p>
 
-        convertBtn.addEventListener('click', async () => {
-            const file = input.files[0];
-            if (!file) return;
+<script>
 
-            convertBtn.disabled = true;
-            input.disabled = true;
-            progressContainer.style.display = 'block';
-            progressBar.style.width = '0%';
+const { createFFmpeg, fetchFile } = FFmpeg;
 
-            try {
-                status.textContent = "Lade Konverter-Engine (beim ersten Mal ca. 10-20 Sekunden)...";
-                if (!ffmpeg.isLoaded()) {
-                    await ffmpeg.load();
-                }
+const ffmpeg=createFFmpeg({
+    log:true
+});
 
-                status.textContent = "Lese Videodatei in den Browser-Speicher...";
-                ffmpeg.FS('writeFile', 'input.avi', await fetchFile(file));
+async function convert(){
 
-                status.textContent = "Konvertierung gestartet. Bitte Tab nicht schließen...";
-                // Konvertiert zu H.264 MP4 mit schnellen Einstellungen
-                await ffmpeg.run('-i', 'input.avi', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', 'output.mp4');
+const file=document.getElementById("file").files[0];
 
-                status.textContent = "Erstelle Download-Link...";
-                const data = ffmpeg.FS('readFile', 'output.mp4');
+if(!file){
+alert("Bitte AVI auswählen.");
+return;
+}
 
-                const blob = new Blob([data.buffer], { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = file.name.replace(/\.[^/.]+$/, "") + ".mp4";
-                document.body.appendChild(a);
-                a.click();
-                
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                status.innerHTML = "<span style='color: green; font-weight: bold;'>Fertig! Die MP4-Datei wurde heruntergeladen.</span>";
-                progressBar.style.width = '100%';
+const status=document.getElementById("status");
+const progress=document.getElementById("progress");
 
-                // Speicher im virtuellen Dateisystem freigeben
-                ffmpeg.FS('unlink', 'input.avi');
-                ffmpeg.FS('unlink', 'output.mp4');
+status.innerHTML="FFmpeg wird geladen...";
 
-            } catch (error) {
-                console.error(error);
-                status.innerHTML = `<span style="color: red; font-weight: bold;">Fehler: ${error.message}. Öffne F12 für Details.</span>`;
-            } finally {
-                convertBtn.disabled = false;
-                input.disabled = false;
-            }
-        });
-    </script>
+if(!ffmpeg.isLoaded())
+await ffmpeg.load();
+
+ffmpeg.setProgress(({ratio})=>{
+progress.value=Math.round(ratio*100);
+});
+
+status.innerHTML="Datei wird geladen...";
+
+ffmpeg.FS("writeFile","video.avi",await fetchFile(file));
+
+status.innerHTML="Konvertiere...";
+
+await ffmpeg.run(
+"-i","video.avi",
+"-c:v","libx264",
+"-pix_fmt","yuv420p",
+"-preset","ultrafast",
+"video.mp4"
+);
+
+status.innerHTML="Erstelle Download...";
+
+const data=ffmpeg.FS("readFile","video.mp4");
+
+const blob=new Blob([data.buffer],{type:"video/mp4"});
+
+const url=URL.createObjectURL(blob);
+
+const a=document.createElement("a");
+a.href=url;
+a.download="video.mp4";
+a.click();
+
+URL.revokeObjectURL(url);
+
+status.innerHTML="Fertig!";
+
+}
+
+</script>
 
 </body>
 </html>
