@@ -10,66 +10,79 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Upload-Ordner erstellen
+app.use(express.static(__dirname));
+
 if (!fs.existsSync("uploads")) {
     fs.mkdirSync("uploads");
 }
 
-// HTML-Datei aus demselben Ordner ausliefern
-app.use(express.static(__dirname));
-
 const upload = multer({
-    dest: "uploads/"
+    dest: "uploads/",
+    limits: {
+        fileSize: 500 * 1024 * 1024
+    }
 });
 
-// Konvertierung
-app.post("/convert", upload.single("video"), (req, res) => {
 
-    if (!req.file) {
-        return res.status(400).send("Keine Datei hochgeladen.");
+app.post("/convert", upload.single("video"), (req,res)=>{
+
+    console.log("Upload gestartet");
+
+    if(!req.file){
+        return res.status(400).send("Keine Datei");
     }
 
-    const inputFile = req.file.path;
-    const outputFile = path.join("uploads", req.file.filename + ".mp4");
+    console.log("Datei erhalten:", req.file.originalname);
 
-    ffmpeg(inputFile)
-        .outputOptions([
-            "-c:v libx264",
-            "-preset ultrafast",
-            "-pix_fmt yuv420p",
-            "-c:a aac"
-        ])
-        .toFormat("mp4")
-        .save(outputFile)
 
-        .on("end", () => {
+    const input = req.file.path;
+    const output = input + ".mp4";
 
-            res.download(outputFile, "video.mp4", () => {
-                fs.unlink(inputFile, () => {});
-                fs.unlink(outputFile, () => {});
-            });
 
-        })
+    ffmpeg(input)
+    .videoCodec("libx264")
+    .audioCodec("aac")
+    .outputOptions([
+        "-preset",
+        "ultrafast",
+        "-pix_fmt",
+        "yuv420p"
+    ])
+    .on("start",cmd=>{
+        console.log("FFmpeg:",cmd);
+    })
+    .on("progress",p=>{
+        console.log("Fortschritt:",p.percent);
+    })
+    .on("end",()=>{
 
-        .on("error", (err) => {
+        console.log("Fertig");
 
-            console.error(err);
+        res.download(output,"video.mp4",()=>{
 
-            fs.unlink(inputFile, () => {});
+            fs.unlink(input,()=>{});
+            fs.unlink(output,()=>{});
 
-            if (fs.existsSync(outputFile))
-                fs.unlinkSync(outputFile);
-
-            res.status(500).send("Konvertierung fehlgeschlagen.");
         });
 
+    })
+    .on("error",err=>{
+
+        console.log("FFmpeg Fehler:",err);
+
+        res.status(500).send("FFmpeg Fehler");
+
+    })
+    .save(output);
+
 });
 
-// Startseite
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
+
+app.get("/",(req,res)=>{
+    res.sendFile(path.join(__dirname,"index.html"));
 });
 
-app.listen(PORT, () => {
-    console.log("Server läuft auf Port " + PORT);
+
+app.listen(PORT,()=>{
+    console.log("Server läuft auf Port "+PORT);
 });
