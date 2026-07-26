@@ -27,6 +27,426 @@
       "name": "Webshell.PHP.Backdoor",
       "risk": "HOCH",
       "description": "Typischer Schadcode, der Angreifern Zugriff auf den Webserver erlaubt."
-    }
+    },
+{
+  "pattern": "cmd.exe /c powershell",
+  "type": "text",
+  "name": "PowerShell.Command.Execution",
+  "risk": "HOCH",
+  "description": "Verdächtiger Aufruf von PowerShell über die Windows-Konsole."
+},
+{
+  "pattern": "powershell -enc",
+  "type": "text",
+  "name": "PowerShell.Obfuscated.Script",
+  "risk": "HOCH",
+  "description": "Verschleiertes PowerShell-Skript kann auf Schadcode hindeuten."
+},
+{
+  "pattern": "CreateRemoteThread",
+  "type": "text",
+  "name": "Process.Injection.Technique",
+  "risk": "HOCH",
+  "description": "Methode, die häufig bei Prozess-Injection verwendet wird."
+},
+{
+  "pattern": "VirtualAlloc",
+  "type": "text",
+  "name": "Memory.Execution.Pattern",
+  "risk": "MITTEL",
+  "description": "API-Nutzung zur Speicherreservierung, häufig in Exploits genutzt."
+},
+{
+  "pattern": "rundll32.exe",
+  "type": "text",
+  "name": "Suspicious.Rundll32.Execution",
+  "risk": "MITTEL",
+  "description": "Systemprogramm-Aufruf, der missbraucht werden kann."
+},
+{
+  "pattern": "regsvr32.exe",
+  "type": "text",
+  "name": "Regsvr32.Abuse",
+  "risk": "MITTEL",
+  "description": "Windows-Tool, das für versteckte Codeausführung missbraucht werden kann."
+},
+{
+  "pattern": "schtasks /create",
+  "type": "text",
+  "name": "Scheduled.Task.Persistence",
+  "risk": "HOCH",
+  "description": "Erstellung geplanter Aufgaben kann für automatische Starts genutzt werden."
+},
+{
+  "pattern": "Startup\\",
+  "type": "text",
+  "name": "Startup.Folder.Persistence",
+  "risk": "MITTEL",
+  "description": "Dateipfad für automatische Programmstarts unter Windows."
+},
+{
+  "pattern": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+  "type": "text",
+  "name": "Registry.Run.Persistence",
+  "risk": "HOCH",
+  "description": "Registry-Autostart wird häufig von Malware verwendet."
+},
+{
+  "pattern": "wmic process call create",
+  "type": "text",
+  "name": "WMIC.Remote.Execution",
+  "risk": "HOCH",
+  "description": "WMIC-Befehl kann zur Prozessausführung verwendet werden."
+},
+{
+  "pattern": "curl http",
+  "type": "text",
+  "name": "Suspicious.Download.Command",
+  "risk": "MITTEL",
+  "description": "Kommando zum Herunterladen von Dateien aus dem Internet."
+},
+{
+  "pattern": "wget http",
+  "type": "text",
+  "name": "Linux.Download.Command",
+  "risk": "MITTEL",
+  "description": "Download-Befehl, der auch für Schadsoftware genutzt werden kann."
+},
+{
+  "pattern": "chmod +x",
+  "type": "text",
+  "name": "Linux.Executable.Permission",
+  "risk": "NIEDRIG",
+  "description": "Ändert Dateirechte zur Ausführung unter Linux."
+},
+{
+  "pattern": "bitcoin",
+  "type": "text",
+  "name": "Crypto.Mining.Indicator",
+  "risk": "MITTEL",
+  "description": "Kryptowährungsbezogener Text kann auf Mining oder Betrug hindeuten."
+},
+{
+  "pattern": "stratum+tcp",
+  "type": "text",
+  "name": "CryptoMiner.Stratum.Protocol",
+  "risk": "HOCH",
+  "description": "Mining-Protokoll, das von Kryptominern verwendet wird."
+},
+{
+  "pattern": "BEGIN RSA PRIVATE KEY",
+  "type": "text",
+  "name": "Private.Key.Exposure",
+  "risk": "HOCH",
+  "description": "Gefundener privater Schlüssel kann ein Sicherheitsrisiko darstellen."
+},
+{
+  "pattern": "document.write(unescape",
+  "type": "text",
+  "name": "Javascript.Obfuscation.Pattern",
+  "risk": "MITTEL",
+  "description": "Verschleiertes JavaScript-Muster."
+},
+{
+  "pattern": "iframe src=\"http",
+  "type": "text",
+  "name": "Hidden.Web.Content",
+  "risk": "MITTEL",
+  "description": "Eingebetteter externer Inhalt kann für Angriffe genutzt werden."
+},
+{
+  "pattern": "MZ",
+  "type": "text",
+  "name": "Windows.Binary.Marker",
+  "risk": "NIEDRIG",
+  "description": "Kennzeichnung für Windows-PE-Dateien."
+},
+{
+  "pattern": "0x90909090",
+  "type": "hex",
+  "name": "NOP.Sled.Pattern",
+  "risk": "HOCH",
+  "description": "Typisches Muster, das bei Exploit-Techniken vorkommen kann."
+},
+{
+  "pattern": "powershell.exe",
+  "type": "text",
+  "name": "PowerShell.Execution",
+  "risk": "MITTEL",
+  "description": "PowerShell-Aufruf erkannt. Kann für legitime Administration oder Schadcode verwendet werden."
+},
+{
+  "pattern": "mshta.exe",
+  "type": "text",
+  "name": "MSHTA.Script.Execution",
+  "risk": "HOCH",
+  "description": "Windows-Komponente, die zum Starten von Skripten missbraucht werden kann."
+},
+{
+  "pattern": "certutil.exe -decode",
+  "type": "text",
+  "name": "Certutil.Payload.Decode",
+  "risk": "HOCH",
+  "description": "Certutil kann zum Entschlüsseln und Laden versteckter Daten missbraucht werden."
+},
+{
+  "pattern": "bitsadmin",
+  "type": "text",
+  "name": "BITS.Download.Abuse",
+  "risk": "HOCH",
+  "description": "Windows-Dienst kann für versteckte Downloads verwendet werden."
+},
+{
+  "pattern": "base64_decode(",
+  "type": "text",
+  "name": "PHP.Base64.Obfuscation",
+  "risk": "MITTEL",
+  "description": "Base64-Verschleierung in PHP-Code erkannt."
+},
+{
+  "pattern": "shell_exec(",
+  "type": "text",
+  "name": "PHP.Command.Execution",
+  "risk": "HOCH",
+  "description": "PHP-Funktion kann Systembefehle ausführen."
+},
+{
+  "pattern": "exec(",
+  "type": "text",
+  "name": "Command.Execution.Function",
+  "risk": "MITTEL",
+  "description": "Ausführung externer Befehle erkannt."
+},
+{
+  "pattern": "curl_exec(",
+  "type": "text",
+  "name": "PHP.Remote.Request",
+  "risk": "MITTEL",
+  "description": "PHP-Funktion für externe Netzwerk-Anfragen."
+},
+{
+  "pattern": "LD_PRELOAD",
+  "type": "text",
+  "name": "Linux.Library.Injection",
+  "risk": "HOCH",
+  "description": "Umgebungsvariable kann zum Laden fremder Bibliotheken missbraucht werden."
+},
+{
+  "pattern": "/dev/tcp/",
+  "type": "text",
+  "name": "Linux.Network.Shell.Pattern",
+  "risk": "HOCH",
+  "description": "Muster für Netzwerkverbindungen über Shell erkannt."
+},
+{
+  "pattern": "nc -e",
+  "type": "text",
+  "name": "Netcat.Remote.Shell",
+  "risk": "HOCH",
+  "description": "Netcat kann für Fernzugriffe missbraucht werden."
+},
+{
+  "pattern": "telnet ",
+  "type": "text",
+  "name": "Telnet.Connection",
+  "risk": "NIEDRIG",
+  "description": "Altes Netzwerkprotokoll erkannt."
+},
+{
+  "pattern": "ftp://",
+  "type": "text",
+  "name": "FTP.Resource.Reference",
+  "risk": "NIEDRIG",
+  "description": "FTP-Verbindung in Datei gefunden."
+},
+{
+  "pattern": "keylogger",
+  "type": "text",
+  "name": "Keylogger.Indicator",
+  "risk": "HOCH",
+  "description": "Hinweis auf Tastatureingabe-Überwachung."
+},
+{
+  "pattern": "stealer",
+  "type": "text",
+  "name": "Information.Stealer.Keyword",
+  "risk": "HOCH",
+  "description": "Begriff deutet auf Datendiebstahl-Software hin."
+},
+{
+  "pattern": "credential",
+  "type": "text",
+  "name": "Credential.Access.Keyword",
+  "risk": "MITTEL",
+  "description": "Bezug zu Zugangsdaten erkannt."
+},
+{
+  "pattern": "cookie.sqlite",
+  "type": "text",
+  "name": "Browser.Cookie.Database",
+  "risk": "MITTEL",
+  "description": "Browser-Cookie-Datenbank erkannt."
+},
+{
+  "pattern": "wallet.dat",
+  "type": "text",
+  "name": "Crypto.Wallet.File",
+  "risk": "HOCH",
+  "description": "Datei kann eine Kryptowährungs-Wallet enthalten."
+},
+{
+  "pattern": "autorun.inf",
+  "type": "text",
+  "name": "Autorun.Configuration",
+  "risk": "MITTEL",
+  "description": "Automatische Startkonfiguration erkannt."
+},
+{
+  "pattern": "DLL_PROCESS_ATTACH",
+  "type": "text",
+  "name": "DLL.Load.Event",
+  "risk": "NIEDRIG",
+  "description": "Standard-DLL-Einstiegspunkt erkannt."
+},
+{
+  "pattern": "GetProcAddress",
+  "type": "text",
+  "name": "Dynamic.API.Resolution",
+  "risk": "MITTEL",
+  "description": "Dynamisches Laden von Windows-Funktionen erkannt."
+},
+{
+  "pattern": "WinExec",
+  "type": "text",
+  "name": "Windows.Command.Execution",
+  "risk": "MITTEL",
+  "description": "Windows-Funktion zum Starten von Programmen erkannt."
+},
+{
+  "pattern": "IsDebuggerPresent",
+  "type": "text",
+  "name": "Anti.Debugging.Technique",
+  "risk": "MITTEL",
+  "description": "Programm prüft möglicherweise auf Debugger."
+},
+{
+  "pattern": "CheckRemoteDebuggerPresent",
+  "type": "text",
+  "name": "Debugger.Detection",
+  "risk": "MITTEL",
+  "description": "Erkennung von Analyseumgebungen."
+},
+{
+  "pattern": "NtCreateThreadEx",
+  "type": "text",
+  "name": "Thread.Injection.Pattern",
+  "risk": "HOCH",
+  "description": "Kann für Code-Injection verwendet werden."
+},
+{
+  "pattern": "WriteProcessMemory",
+  "type": "text",
+  "name": "Remote.Memory.Write",
+  "risk": "HOCH",
+  "description": "Schreiben in fremden Prozessspeicher erkannt."
+},
+{
+  "pattern": "OpenProcess",
+  "type": "text",
+  "name": "Process.Access.Request",
+  "risk": "MITTEL",
+  "description": "Zugriff auf andere Prozesse erkannt."
+},
+{
+  "pattern": "VirtualProtect",
+  "type": "text",
+  "name": "Memory.Permission.Change",
+  "risk": "MITTEL",
+  "description": "Ändern von Speicherberechtigungen erkannt."
+},
+{
+  "pattern": "LoadLibraryA",
+  "type": "text",
+  "name": "DLL.Loading.Pattern",
+  "risk": "NIEDRIG",
+  "description": "Dynamisches Laden von DLL-Dateien."
+},
+{
+  "pattern": "WSAStartup",
+  "type": "text",
+  "name": "Network.Socket.Initialization",
+  "risk": "NIEDRIG",
+  "description": "Netzwerkfunktion wurde erkannt."
+},
+{
+  "pattern": "InternetOpenA",
+  "type": "text",
+  "name": "Windows.Internet.API",
+  "risk": "MITTEL",
+  "description": "Programm kann Internetverbindungen öffnen."
+},
+{
+  "pattern": "URLDownloadToFile",
+  "type": "text",
+  "name": "Remote.File.Download",
+  "risk": "HOCH",
+  "description": "Funktion zum Herunterladen von Dateien erkannt."
+},
+{
+  "pattern": "WinHttpOpen",
+  "type": "text",
+  "name": "HTTP.Client.API",
+  "risk": "NIEDRIG",
+  "description": "Windows HTTP-Kommunikation erkannt."
+},
+{
+  "pattern": "CryptEncrypt",
+  "type": "text",
+  "name": "Encryption.API.Usage",
+  "risk": "NIEDRIG",
+  "description": "Verschlüsselungsfunktion erkannt."
+},
+{
+  "pattern": "AES",
+  "type": "text",
+  "name": "AES.Encryption.Keyword",
+  "risk": "NIEDRIG",
+  "description": "Hinweis auf AES-Verschlüsselung."
+},
+{
+  "pattern": "ransom",
+  "type": "text",
+  "name": "Ransomware.Keyword",
+  "risk": "HOCH",
+  "description": "Hinweis auf Erpressungssoftware."
+},
+{
+  "pattern": "decrypt_files",
+  "type": "text",
+  "name": "Ransomware.Decryption.Marker",
+  "risk": "HOCH",
+  "description": "Typischer Begriff aus Ransomware-Skripten."
+},
+{
+  "pattern": "YOUR_FILES_ARE_ENCRYPTED",
+  "type": "text",
+  "name": "Ransomware.Note.Pattern",
+  "risk": "KRITISCH",
+  "description": "Typischer Hinweistext von Erpressungssoftware."
+},
+{
+  "pattern": "miner.exe",
+  "type": "text",
+  "name": "CryptoMiner.Executable",
+  "risk": "HOCH",
+  "description": "Dateiname kann auf Kryptomining-Software hindeuten."
+},
+{
+  "pattern": "xmrig",
+  "type": "text",
+  "name": "CryptoMiner.XMRig",
+  "risk": "HOCH",
+  "description": "Bekannter Name einer Mining-Software."
+}
   ]
 }
