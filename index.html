@@ -9,195 +9,358 @@
 
 <style>
 
-body{
+*{
 margin:0;
-background:#101010;
-color:white;
-font-family:Arial;
-display:flex;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#ffffff;
+color:#111;
 height:100vh;
+overflow:hidden;
+display:flex;
 }
 
-.sidebar{
-
-width:250px;
-background:#080808;
-padding:20px;
-border-right:1px solid #333;
-
+aside{
+width:260px;
+background:#111111;
+color:white;
+display:flex;
+flex-direction:column;
+padding:30px;
+box-shadow:5px 0 20px rgba(0,0,0,.25);
 }
-
 
 .logo{
-
-font-size:25px;
+font-size:34px;
 font-weight:bold;
-color:#ffcc00;
-margin-bottom:40px;
-
+color:#FFD400;
+margin-bottom:60px;
 }
 
+.logo span{
+color:white;
+}
 
-button{
+.menu button{
 
 width:100%;
-padding:15px;
-margin:8px 0;
-background:#222;
-color:white;
+padding:18px;
+font-size:18px;
+font-weight:bold;
 border:0;
-border-radius:8px;
+border-radius:12px;
 cursor:pointer;
+background:#FFD400;
+color:#000;
+transition:.25s;
 
 }
 
+.menu button:hover{
 
-button:hover,
-.active{
-
-background:#ffcc00;
-color:black;
+transform:scale(1.03);
 
 }
 
-
-.main{
+main{
 
 flex:1;
-padding:30px;
+padding:45px;
 overflow:auto;
+background:white;
 
 }
 
+.card{
 
-.hidden{
-
-display:none;
+background:white;
+border-radius:18px;
+padding:35px;
+box-shadow:0 15px 40px rgba(0,0,0,.12);
+margin-bottom:30px;
 
 }
 
+h1{
 
-.circle{
+font-size:42px;
+margin-bottom:30px;
 
-width:200px;
-height:200px;
-border-radius:50%;
-border:8px solid #ffcc00;
+}
+
+.center{
 
 display:flex;
-align-items:center;
 justify-content:center;
+align-items:center;
 flex-direction:column;
 
 }
 
+.circle{
 
-.safe{
-
-border-color:#2ecc71;
+width:260px;
+height:260px;
+border-radius:50%;
+border:12px solid #FFD400;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+transition:.4s;
 
 }
 
+.circle.safe{
 
-.danger{
-
-border-color:#e74c3c;
+border-color:#28c840;
 
 }
 
+.circle.danger{
 
+border-color:#ff3030;
 
-.card{
+}
 
-background:#1c1c1c;
-padding:25px;
+.circle h2{
+
+font-size:42px;
+margin-top:15px;
+
+}
+
+.circle p{
+
+font-size:22px;
+font-weight:bold;
+
+}
+
+.security{
+
+font-size:28px;
 margin-top:25px;
-border-radius:15px;
+font-weight:bold;
 
 }
 
+.scanButton{
 
-iframe{
+margin-top:40px;
+background:#FFD400;
+color:black;
+padding:18px 40px;
+border:0;
+border-radius:14px;
+font-size:22px;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+.scanButton:hover{
+
+background:#f4c400;
+
+}
+
+#scanBox{
+
+display:none;
+margin-top:40px;
+
+}
+
+input[type=file]{
 
 width:100%;
-height:300px;
-background:white;
-border:2px solid #444;
-margin-top:20px;
+padding:20px;
+font-size:18px;
+border:2px dashed #FFD400;
+border-radius:15px;
+background:#fafafa;
 
 }
 
+.upload{
+
+margin-top:25px;
+background:#111;
+color:white;
+padding:16px;
+border-radius:12px;
+border:0;
+font-size:20px;
+cursor:pointer;
+
+}
+
+.upload:hover{
+
+background:#000;
+
+}
 
 .progress{
 
-height:20px;
-background:#333;
-border-radius:10px;
+margin-top:35px;
+height:28px;
+background:#ddd;
+border-radius:20px;
 overflow:hidden;
+display:none;
 
 }
-
 
 .bar{
 
 height:100%;
 width:0%;
-background:#ffcc00;
+background:#FFD400;
+transition:.2s;
 
 }
 
+#percent{
+
+margin-top:15px;
+font-size:24px;
+font-weight:bold;
+display:none;
+
+}
+iframe{
+
+width:100%;
+height:520px;
+border:3px solid #FFD400;
+border-radius:16px;
+background:white;
+margin-top:35px;
+display:none;
+
+}
+
+#riskBox{
+
+display:none;
+margin-top:35px;
+padding:25px;
+border-radius:16px;
+background:#f7f7f7;
+border-left:10px solid #FFD400;
+
+}
+
+#riskTitle{
+
+font-size:34px;
+font-weight:bold;
+margin-bottom:15px;
+
+}
+
+#riskText{
+
+font-size:22px;
+line-height:1.6;
+
+}
+
+.info{
+
+margin-top:25px;
+padding:18px;
+background:#fffbe8;
+border:2px solid #FFD400;
+border-radius:14px;
+font-size:18px;
+
+}
+
+footer{
+
+margin-top:40px;
+text-align:center;
+color:#666;
+font-size:15px;
+
+}
+
+.hidden{
+display:none;
+}
+
+@keyframes pulse{
+
+0%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.05);
+}
+
+100%{
+transform:scale(1);
+}
+
+}
+
+.scanning{
+
+animation:pulse 1s infinite;
+
+}
+
+.success{
+
+color:#28c840;
+
+}
+
+.dangerText{
+
+color:#ff3030;
+
+}
 
 </style>
 
 </head>
 
-
 <body>
 
-
-
-<div class="sidebar">
-
+<aside>
 
 <div class="logo">
-✓ Norton 360
+✓ <span>Norton 360</span>
 </div>
 
+<div class="menu">
 
-<button class="active" onclick="openPage('home',this)">
-Home
+<button onclick="showScanner()">
+🏠 Home
 </button>
-
-
-<button onclick="openPage('scan',this)">
-Scan
-</button>
-
-
-<button onclick="openPage('download',this)">
-Download 1.json
-</button>
-
 
 </div>
 
+</aside>
 
+<main>
 
+<div class="card">
 
-
-<div class="main">
-
-
-
-<div id="home">
-
-
-<h1>Home</h1>
-
+<div class="center">
 
 <div id="circle" class="circle">
 
-<span>RISIKO</span>
+<p>RISIKO</p>
 
 <h2 id="status">
 BEREIT
@@ -205,158 +368,481 @@ BEREIT
 
 </div>
 
+<div class="security">
+Sicherheit
+</div>
 
+<button class="scanButton"
+onclick="openScan()">
 
-<div class="card">
+Scan
 
-
-<h2>Datei Scan</h2>
-
-
-<input type="file" id="homeFile">
-
-
-<button onclick="startSandbox('homeFile')">
-Starten
 </button>
+<div id="scanBox">
 
+<h2>Ordner auswählen</h2>
 
-<p id="info">
-Bereit
+<p class="info">
+Wähle einen Ordner aus. Nach dem Hochladen wird der Scan gestartet und die Dateien werden in einer Sandbox geprüft.
 </p>
 
+<br>
 
+<input
+id="folder"
+type="file"
+webkitdirectory
+multiple>
+
+<button
+class="upload"
+onclick="startUpload()">
+
+Hochladen
+
+</button>
+
+<div
+id="progress"
+class="progress">
+
+<div
+id="bar"
+class="bar"></div>
+
+</div>
+
+<div id="percent">
+0 %
+</div>
+
+<div id="riskBox">
+
+<h2 id="riskTitle">
+Risikoanalyse
+</h2>
+
+<p id="riskText">
+Es wurden noch keine Dateien geprüft.
+</p>
+
+</div>
 
 <iframe
 id="sandbox"
-sandbox="allow-scripts">
+sandbox="allow-scripts allow-same-origin">
 </iframe>
 
-
+</div>
 
 </div>
 
-
 </div>
 
+<footer>
 
+Norton Smart Scanner – Demo
 
+</footer>
 
-
-
-
-
-
-<div id="scan" class="hidden">
-
-
-<h1>Scan</h1>
-
-
-<div class="card">
-
-
-<button onclick="single()">
-Einzelscan
-</button>
-
-
-<button onclick="folder()">
-OrdnerScan
-</button>
-
-
-<button onclick="update()">
-Update Scan
-</button>
-
-
-
-<div id="scanArea">
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-<div id="download" class="hidden">
-
-
-<h1>Download 1.json</h1>
-
-
-<div class="card">
-
-
-<button onclick="downloadJSON()">
-1.json herunterladen
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
+</main>
 
 <script>
 
+const circle =
+document.getElementById("circle");
 
-function openPage(id,btn){
+const statusText =
+document.getElementById("status");
 
-document
-.querySelectorAll(".main>div")
-.forEach(x=>x.classList.add("hidden"));
+const progress =
+document.getElementById("progress");
+
+const bar =
+document.getElementById("bar");
+
+const percent =
+document.getElementById("percent");
+
+const riskBox =
+document.getElementById("riskBox");
+
+const riskText =
+document.getElementById("riskText");
+
+const sandbox =
+document.getElementById("sandbox");
+
+function showScanner(){
+
+document.getElementById("scanBox")
+.style.display="block";
+
+window.scrollTo({
+top:1000,
+behavior:"smooth"
+});
+
+}
+
+function openScan(){
+
+showScanner();
+
+}
+function startUpload(){
+
+const files =
+document.getElementById("folder").files;
+
+if(files.length===0){
+
+alert("Bitte zuerst einen Ordner auswählen.");
+
+return;
+
+}
+
+circle.className="circle scanning";
+statusText.innerHTML="UPLOAD";
+
+progress.style.display="block";
+percent.style.display="block";
+
+riskBox.style.display="none";
+sandbox.style.display="none";
+
+bar.style.width="0%";
+percent.innerHTML="0 %";
+
+let p=0;
+
+let timer=setInterval(function(){
+
+p++;
+
+bar.style.width=p+"%";
+percent.innerHTML=p+" %";
+
+if(p>=100){
+
+clearInterval(timer);
+
+progress.style.display="none";
+percent.style.display="none";
+
+startScan(files);
+
+}
+
+},40);
+
+}
+
+function startScan(files){
+
+statusText.innerHTML="SCAN";
+
+let htmlDatei=null;
+
+for(let i=0;i<files.length;i++){
+
+let name=files[i].name.toLowerCase();
+
+if(name.endsWith(".html") ||
+name.endsWith(".htm")){
+
+htmlDatei=files[i];
+break;
+
+}
+
+}
+
+if(htmlDatei){
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+const blob=new Blob(
+[e.target.result],
+{type:"text/html"}
+);
+
+sandbox.src=
+URL.createObjectURL(blob);
+
+sandbox.style.display="block";
+
+finishScan(htmlDatei);
+
+};
+
+reader.readAsText(htmlDatei);
+
+}else{
+
+finishScan(null);
+
+}
+
+}
+function finishScan(file){
+
+setTimeout(function(){
+
+circle.className="circle safe";
+
+statusText.innerHTML="SICHER";
+
+riskBox.style.display="block";
+
+if(file){
+
+riskText.innerHTML=
+"<b>Datei:</b> "+file.name+
+"<br><br>"+
+"✔ Keine bekannten Risiken gefunden."+
+"<br>"+
+"✔ Sandbox-Test erfolgreich abgeschlossen."+
+"<br>"+
+"✔ Datei konnte geladen werden.";
+
+}else{
+
+riskText.innerHTML=
+"Es wurde keine HTML-Datei im ausgewählten Ordner gefunden."+
+"<br><br>"+
+"Die übrigen Dateien wurden nur überprüft.";
+
+}
+
+},2500);
+
+}
+
+function showDanger(name){
+
+circle.className="circle danger";
+
+statusText.innerHTML="RISIKO";
+
+riskBox.style.display="block";
+
+riskText.innerHTML=
+"<span style='color:#ff3030;font-weight:bold;'>"+
+"⚠ Verdächtige Datei erkannt"+
+"</span><br><br>"+
+"Datei: "+name+
+"<br><br>"+
+"Empfehlung: Datei nicht ausführen.";
+
+}
+
+function resetScanner(){
+
+circle.className="circle";
+
+statusText.innerHTML="BEREIT";
+
+bar.style.width="0%";
+
+percent.innerHTML="0 %";
+
+progress.style.display="none";
+
+percent.style.display="none";
+
+riskBox.style.display="none";
+
+sandbox.style.display="none";
+
+sandbox.src="";
+
+}
+function analyseFile(file){
+
+const reader = new FileReader();
+
+reader.onload = function(e){
+
+const text = e.target.result.toLowerCase();
+
+const verdächtig = [
+"eval(",
+"document.write(",
+"atob(",
+"fromcharcode",
+"websocket",
+"xmlhttprequest",
+"fetch(",
+"localstorage",
+"sessionstorage",
+"indexeddb",
+"navigator.",
+"crypto.subtle",
+"new function",
+"setinterval(",
+"settimeout(",
+"iframe",
+"<script"
+];
+
+let treffer=[];
+
+verdächtig.forEach(function(code){
+
+if(text.includes(code)){
+
+treffer.push(code);
+
+}
+
+});
+
+if(treffer.length>0){
+
+showDanger(file.name);
+
+riskText.innerHTML +=
+"<br><br><b>Gefundene Muster:</b><br>" +
+treffer.join("<br>");
+
+}else{
+
+finishScan(file);
+
+}
+
+};
+
+reader.readAsText(file);
+
+}
+
+function loadSandbox(file){
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+const blob=new Blob(
+[e.target.result],
+{type:"text/html"}
+);
+
+sandbox.src=
+URL.createObjectURL(blob);
+
+sandbox.style.display="block";
+
+analyseFile(file);
+
+};
+
+reader.readAsText(file);
+
+}
+async function scanFolder(files){
+
+if(!files || files.length===0){
+
+alert("Kein Ordner ausgewählt.");
+
+return;
+
+}
 
 
-document
-.getElementById(id)
-.classList.remove("hidden");
+circle.className="circle scanning";
+
+statusText.innerHTML="PRÜFE";
 
 
-document
-.querySelectorAll(".sidebar button")
-.forEach(x=>x.classList.remove("active"));
+let htmlFiles=[];
+
+for(let i=0;i<files.length;i++){
+
+let file=files[i];
+
+let name=file.name.toLowerCase();
 
 
-btn.classList.add("active");
+if(
+name.endsWith(".html") ||
+name.endsWith(".htm")
+){
+
+htmlFiles.push(file);
+
+}
 
 }
 
 
 
+let geprüft=0;
+
+
+for(let i=0;i<files.length;i++){
+
+
+let aktuelleDatei=files[i];
+
+
+riskText.innerHTML=
+"Prüfe Datei:<br><b>"+
+aktuelleDatei.name+
+"</b><br><br>"+
+"Fortschritt: "+
+(i+1)+" / "+files.length;
+
+
+await new Promise(resolve=>{
+
+setTimeout(resolve,300);
+
+});
+
+
+geprüft++;
+
+
+}
 
 
 
-
-function startSandbox(id){
-
-
-let file=
-document.getElementById(id).files[0];
+if(htmlFiles.length>0){
 
 
-if(!file){
+loadSandbox(htmlFiles[0]);
 
-alert("Datei wählen");
+
+}else{
+
+
+finishScan(null);
+
+
+}
+
+
+
+}
+
+
+
+function startUpload(){
+
+
+const files=
+document.getElementById("folder").files;
+
+
+if(files.length===0){
+
+alert("Bitte Ordner auswählen.");
 
 return;
 
@@ -364,30 +850,174 @@ return;
 
 
 
-let status=
-document.getElementById("status");
+progress.style.display="block";
+
+percent.style.display="block";
+
+bar.style.width="0%";
 
 
-let info=
-document.getElementById("info");
+let wert=0;
+
+
+let uploadTimer=setInterval(()=>{
+
+
+wert++;
+
+
+bar.style.width=
+wert+"%";
+
+
+percent.innerHTML=
+wert+" %";
+
+
+if(wert>=100){
+
+
+clearInterval(uploadTimer);
+
+
+progress.style.display="none";
+
+percent.style.display="none";
+
+
+scanFolder(files);
+
+
+}
+
+
+},35);
 
 
 
-status.innerHTML="START";
+}
+function setScanning(){
 
-info.innerHTML="Datei wird geladen...";
+circle.className=
+"circle scanning";
+
+statusText.innerHTML=
+"SCAN";
+
+riskText.innerHTML=
+"Dateien werden analysiert...";
+
+}
+
+
+function setSafe(){
+
+circle.className=
+"circle safe";
+
+statusText.innerHTML=
+"SICHER";
+
+}
+
+
+function setRisk(){
+
+circle.className=
+"circle danger";
+
+statusText.innerHTML=
+"RISIKO";
+
+}
 
 
 
-let reader=new FileReader();
+function updateRisk(files){
+
+
+let gefährlich=false;
+
+
+for(let i=0;i<files.length;i++){
+
+
+let name=
+files[i].name.toLowerCase();
+
+
+
+if(
+name.includes("virus") ||
+name.includes("malware") ||
+name.includes("trojan")
+){
+
+gefährlich=true;
+
+break;
+
+}
+
+
+}
+
+
+
+if(gefährlich){
+
+
+setRisk();
+
+
+riskBox.style.display=
+"block";
+
+
+riskText.innerHTML=
+"⚠ Verdächtiger Dateiname gefunden.<br><br>"+
+"Bitte diese Datei nicht öffnen.";
+
+
+}else{
+
+
+setSafe();
+
+
+riskBox.style.display=
+"block";
+
+
+riskText.innerHTML=
+"✔ Alle Dateien wurden geprüft.<br><br>"+
+"Keine bekannten Gefahren gefunden.";
+
+
+}
+
+
+}
+
+
+
+function showPreview(file){
+
+
+if(!file){
+
+return;
+
+}
+
+
+
+let reader=
+new FileReader();
 
 
 
 reader.onload=function(e){
-
-
-let iframe=
-document.getElementById("sandbox");
 
 
 let blob=
@@ -396,46 +1026,18 @@ new Blob(
 e.target.result
 ],
 {
-type:file.type || "text/html"
+type:"text/html"
 }
 );
 
 
 
-iframe.src=
+sandbox.src=
 URL.createObjectURL(blob);
 
 
-
-info.innerHTML=
-"Testumgebung gestartet: "+file.name;
-
-
-
-status.innerHTML="PRÜFEN";
-
-
-
-setTimeout(()=>{
-
-
-document
-.getElementById("circle")
-.className="circle safe";
-
-
-status.innerHTML="SICHER";
-
-
-info.innerHTML=
-"Scan beendet";
-
-
-ask();
-
-
-},2000);
-
+sandbox.style.display=
+"block";
 
 
 };
@@ -449,190 +1051,156 @@ reader.readAsText(file);
 
 
 
-
-
-
-function ask(){
-
-let a=
-confirm(
-"War diese Datei schädlich?\n\nOK = Ja\nAbbrechen = Nein"
-);
-
-
-if(a){
-
-alert("Als schädlich gespeichert");
-
-}
-
-else{
-
-alert("Als sicher gespeichert");
-
-}
-
-}
-
-
-
-
-
-
-
-function single(){
-
 document
-.getElementById("scanArea")
-.innerHTML=`
-
-<h3>Einzelscan</h3>
-
-<input id="singleFile" type="file">
-
-<button onclick="startSandbox('singleFile')">
-Start
-</button>
-
-`;
-
-}
+.getElementById("folder")
+.addEventListener(
+"change",
+function(){
 
 
+if(this.files.length>0){
 
 
-
-
-
-function folder(){
-
-
-document
-.getElementById("scanArea")
-.innerHTML=`
-
-<h3>OrdnerScan</h3>
-
-<input id="folderFile"
-type="file"
-webkitdirectory
-multiple>
-
-
-<button onclick="folderStart()">
-Ordner starten
-</button>
-
-<p id="folderStatus"></p>
-
-`;
-
-}
-
-
-
-
-
-async function folderStart(){
-
-
-let files=
-document.getElementById("folderFile").files;
-
-
-let out=
-document.getElementById("folderStatus");
-
-
-for(let i=0;i<files.length;i++){
-
-
-out.innerHTML=
-"Starte: "+files[i].name;
-
-
-await new Promise(r=>setTimeout(r,500));
+riskText.innerHTML=
+"Ordner ausgewählt:<br><b>"+
+this.files.length+
+" Dateien</b>";
 
 
 }
 
 
-out.innerHTML=
-"Ordner fertig geprüft";
+});
+window.onload=function(){
 
+circle.className="circle";
 
-}
+statusText.innerHTML="BEREIT";
 
+riskBox.style.display="none";
 
+sandbox.style.display="none";
 
+progress.style.display="none";
 
-
-
-
-function update(){
-
-document
-.getElementById("scanArea")
-.innerHTML=
-`
-<h3>Update Scan</h3>
-
-<p style="color:red">
-Nicht verfügbar
-</p>
-`;
-
-}
-
-
-
-
-
-
-
-function downloadJSON(){
-
-
-let data={
-
-version:"1.0",
-
-signatures:[]
+percent.style.display="none";
 
 };
 
 
 
-let blob=
-new Blob(
-[
-JSON.stringify(data,null,2)
-],
-{
-type:"application/json"
+function showMessage(text){
+
+riskBox.style.display="block";
+
+riskText.innerHTML=text;
+
 }
+
+
+
+function checkSize(files){
+
+
+let total=0;
+
+
+for(let i=0;i<files.length;i++){
+
+total+=files[i].size;
+
+}
+
+
+let mb=
+(total/1024/1024).toFixed(2);
+
+
+
+showMessage(
+"Ordnergröße: <b>"+
+mb+
+" MB</b><br><br>"+
+"Bereit für Sicherheitsprüfung."
 );
 
 
-let a=document.createElement("a");
+}
 
 
-a.href=
-URL.createObjectURL(blob);
+
+function prepareScan(){
 
 
-a.download="1.json";
+const files=
+document.getElementById("folder").files;
 
 
-a.click();
+if(files.length===0){
+
+alert("Bitte Ordner auswählen");
+
+return;
+
+}
+
+
+checkSize(files);
+
+
+circle.className=
+"circle scanning";
+
+
+statusText.innerHTML=
+"START";
 
 
 }
 
 
 
-</script>
+function fakeProtection(){
 
+
+let checks=[
+
+"Dateistruktur wird geprüft",
+
+"HTML-Inhalte werden analysiert",
+
+"Sandbox wird vorbereitet",
+
+"Sicherheitsregeln werden geladen"
+
+];
+
+
+let i=0;
+
+
+let t=setInterval(()=>{
+
+
+riskText.innerHTML=
+checks[i];
+
+
+i++;
+
+
+if(i>=checks.length){
+
+clearInterval(t);
+
+}
+
+
+},700);
+
+
+}
+</script>
 
 </body>
 </html>
