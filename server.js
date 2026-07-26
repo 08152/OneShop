@@ -14,130 +14,127 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Globale Datenbankstruktur für echte Signaturen
-let malwareDB = {
-    hashes: [],       // Exakte Datei-Fingerabdrücke (SHA-256)
-    signatures: []    // Code-Muster (Hex oder Text)
-};
+// Eine einzige, flache Liste für alle Viren-Muster
+let malwareDB = [];
 
 // =====================
-// DATENBANK LADEN (ECHTE ENGINE)
+// DATENBANK LADEN (FLACHE STRUKTUR)
 // =====================
 function loadDatabase() {
     const dbPath = path.join(__dirname, "1.json");
     try {
         if (!fs.existsSync(dbPath)) {
-            // Erstellt eine leere Struktur, falls 1.json fehlt
-            fs.writeFileSync(dbPath, JSON.stringify({ hashes: [], signatures: [] }, null, 2));
+            fs.writeFileSync(dbPath, JSON.stringify({ signatures: [] }, null, 2));
         }
 
         const json = fs.readFileSync(dbPath, "utf8");
-        const parsed = JSON.parse(json);
-        
-        malwareDB.hashes = parsed.hashes || [];
-        malwareDB.signatures = parsed.signatures || [];
+        // Lädt alle Einträge direkt aus dem einen "signatures"-Array
+        malwareDB = JSON.parse(json).signatures || [];
 
-        console.log(`\x1b[32m[✓] Malware-Datenbank erfolgreich geladen:\x1b[0m`);
-        console.log(`    ⤷ Bekannte Hashes: ${malwareDB.hashes.length}`);
-        console.log(`    ⤷ Code-Signaturen: ${malwareDB.signatures.length}`);
+        console.log(`\x1b[32m[✓] Viren-Datenbank geladen:\x1b[0m ${malwareDB.length} Muster aktiv.`);
     } catch (error) {
-        console.log("\x1b[31m[-] Fehler: 1.json konnte nicht korrekt verarbeitet werden.\x1b[0m");
-        malwareDB = { hashes: [], signatures: [] };
+        console.log("\x1b[31m[-] Fehler: 1.json konnte nicht geladen werden.\x1b[0m");
+        malwareDB = [];
     }
 }
 
 loadDatabase();
 
 // =====================
-// KERN-ENGINE: DER ECHTE BINÄR-SCANNER
+// KERN-ENGINE: DER BINÄR-SCANNER
 // =====================
 function executeBinaryScan(fileBuffer, originalName) {
     let findings = [];
 
-    // SCHRITT 1: SHA-256 Hash berechnen (Blitzschneller Abgleich)
+    // Berechnet SHA-256 Hash der Datei für den "hash"-Typ
     const fileHash = crypto.createHash("sha256").update(fileBuffer).digest("hex");
-    
-    const hashMatch = malwareDB.hashes.find(item => item.hash.toLowerCase() === fileHash);
-    if (hashMatch) {
-        findings.push({
-            name: hashMatch.name,
-            risk: hashMatch.risk || "KRITISCH",
-            description: hashMatch.description || "Exakter Treffer über Datei-Hash (100% Identifikation)."
-        });
-        return { findings, fileHash }; // Bei Hash-Match sofort abbrechen (höchste Präzision)
-    }
-
-    // SCHRITT 2: Binäre Signatur-Analyse (Hex-Suche)
-    // Verwandelt die hochgeladene Datei in eine Hex-Kette, um Binärcode lesbar zu machen
+    // Wandelt Datei in Hex um für "hex"- und "text"-Typen
     const fileHex = fileBuffer.toString("hex");
 
-    malwareDB.signatures.forEach(sig => {
-        let searchPattern = "";
-
-        if (sig.isHex) {
-            // Direktes Byte-Muster (z.B. "4d5a" für Windows-Executables)
-            searchPattern = sig.pattern.toLowerCase();
-        } else {
-            // Text-Muster (z.B. "eval(base64") sicher in Hex umwandeln
-            searchPattern = Buffer.from(sig.pattern).toString("hex");
-        }
-
-        if (fileHex.includes(searchPattern)) {
+    malwareDB.forEach(sig => {
+        // Typ 1: Exakter Datei-Fingerabdruck (SHA-256 Hash)
+        if (sig.type === "hash" && fileHash.toLowerCase() === sig.pattern.toLowerCase()) {
             findings.push({
                 name: sig.name,
-                risk: sig.risk || "HOCH",
-                description: sig.description || "Schadcode-Muster im Binärstrom entdeckt."
+                risk: sig.risk || "KRITISCH",
+                description: sig.description || "Identisch mit bekannter Schaddatei (Hash-Match)."
             });
+        }
+        
+        // Typ 2: Suche nach Schadcode-Text (wird sicher in Hex gesucht)
+        else if (sig.type === "text") {
+            const hexPattern = Buffer.from(sig.pattern).toString("hex");
+            if (fileHex.includes(hexPattern.toLowerCase())) {
+                findings.push({
+                    name: sig.name,
+                    risk: sig.risk || "HOCH",
+                    description: sig.description || "Gefährlicher Text-String im Binärcode entdeckt."
+                });
+            }
+        }
+        
+        // Typ 3: Direkte Byte-Folge im Binärcode (Hex-Muster)
+        else if (sig.type === "hex") {
+            if (fileHex.includes(sig.pattern.toLowerCase())) {
+                findings.push({
+                    name: sig.name,
+                    risk: sig.risk || "MITTEL",
+                    description: sig.description || "Verdächtige Hex-Byte-Sequenz identifiziert."
+                });
+            }
         }
     });
 
     return { findings, fileHash };
 }
+
 // =====================
-// WEB ROUTEN (API)
+// WEB ROUTEN (API & DASHBOARD)
 // =====================
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Datenbank-Status für Web-Anfragen
+// Datenbank-Status an das HTML-Interface senden
 app.get("/database", (req, res) => {
+    // Zählt die Typen dynamisch aus der einen Liste
+    const hashCount = malwareDB.filter(s => s.type === "hash").length;
+    const signatureCount = malwareDB.filter(s => s.type === "hex" || s.type === "text").length;
+
     res.json({
-        hashCount: malwareDB.hashes.length,
-        signatureCount: malwareDB.signatures.length,
-        total: malwareDB.hashes.length + malwareDB.signatures.length
+        hashCount: hashCount,
+        signatureCount: signatureCount,
+        total: malwareDB.length
     });
 });
 
-// Datenbank remote aktualisieren
+// Datenbank über das Webinterface aktualisieren
 app.get("/update", (req, res) => {
     loadDatabase();
     res.json({
         success: true,
-        message: "Echte Malware-Datenbank wurde im laufenden Betrieb neu eingelesen."
+        message: "Signatur-Datenbank wurde im laufenden Betrieb neu eingelesen."
     });
 });
 
-// Upload Limit: 150 MB im Arbeitsspeicher puffern
+// Upload-Limit auf 150 MB setzen
 const upload = multer({
     limits: { fileSize: 150 * 1024 * 1024 }
 });
 
-// Der primäre Scan-Endpunkt
+// Der primäre Scan-Endpunkt für das Web-Frontend
 app.post("/api/scan", upload.single("file"), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ success: false, error: "Keine Datei übertragen." });
     }
 
     try {
-        // Nutzt die echte Binär-Engine aus Teil 1
         const { findings, fileHash } = executeBinaryScan(req.file.buffer, req.file.originalname);
         const isInfected = findings.length > 0;
 
-        // Konsolen-Log für den Server-Admin im Hintergrund
         if (isInfected) {
-            console.log(`\x1b[41m\x1b[37m [ALARM] \x1b[0m Infizierte Datei blockiert: ${req.file.originalname}`);
+            console.log(`\n\x1b[41m\x1b[37m [WEB-ALARM] \x1b[0m Infizierte Datei blockiert: ${req.file.originalname}`);
         }
 
         res.json({
@@ -155,24 +152,25 @@ app.post("/api/scan", upload.single("file"), (req, res) => {
     }
 });
 
-// Globale Fehlerbehandlung bei zu großen Uploads
+// Fehlerbehandlung für zu große Dateien
 app.use((err, req, res, next) => {
     if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(413).json({ success: false, error: "Datei zu groß. Maximum beträgt 150 MB." });
     }
     res.status(500).json({ success: false, error: "Unerwarteter Serverfehler." });
 });
+
 // =====================
-// SERVER START & INTERAKTIVE TEXTUMGEBUNG
+// SERVER START & CLI-TEXTUMGEBUNG
 // =====================
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`\n\x1b[44m\x1b[37m 🛡️  NORTON ADVANCED SCANNERSUITE GESTARTET \x1b[0m`);
+    console.log(`\n\x1b[44m\x1b[37m 🛡️  NORTON ADVANCED SCANNERSUITE LIVE \x1b[0m`);
     console.log(`[*] Web-Interface erreichbar unter: http://localhost:${PORT}`);
     console.log(`----------------------------------------------------------------`);
     
-    // Startet die interaktive Textumgebung direkt im Terminal
+    // Startet das Terminal-Menü direkt nach dem Server-Boot
     startInteractiveCLI();
 });
 
@@ -184,10 +182,10 @@ function startInteractiveCLI() {
 
     const showMenu = () => {
         console.log("\n\x1b[1m⚡ TEXTUMGEBUNG / ADMIN KONSOLE ⚡\x1b[0m");
-        console.log(" [1] System-Status & geladene Virensignaturen anzeigen");
-        console.log(" [2] Lokale Datei oder Ordner direkt im Terminal prüfen");
-        console.log(" [3] Signatur-Datenbank (1.json) jetzt neu laden");
-        console.log(" [4] Virenscanner-Server sicher beenden");
+        console.log(" System-Status & geladene Virensignaturen anzeigen");
+        console.log(" Lokale Datei direkt im Terminal prüfen");
+        console.log(" Signatur-Datenbank (1.json) jetzt neu laden");
+        console.log(" Virenscanner-Server sicher beenden");
     };
 
     showMenu();
@@ -198,14 +196,15 @@ function startInteractiveCLI() {
 
             if (choice === "1") {
                 console.log(`\n\x1b[36m[STATUS]\x1b[0m Server-Port: ${PORT}`);
-                console.log(`[STATUS] Registrierte Hashes: ${malwareDB.hashes.length}`);
-                console.log(`[STATUS] Registrierte Signaturen: ${malwareDB.signatures.length}`);
+                console.log(`[STATUS] Gesamte Muster in flacher Liste: ${malwareDB.length}`);
+                console.log(`         ⤷ Davon Dateihashes: ${malwareDB.filter(s=>s.type==="hash").length}`);
+                console.log(`         ⤷ Davon Code-Muster: ${malwareDB.filter(s=>s.type!=="hash").length}`);
                 handleInput();
             } 
             
             else if (choice === "2") {
-                rl.question("\nAbsoluten Pfad zur Datei/Ordner eingeben: ", (targetPath) => {
-                    const cleanPath = targetPath.trim().replace(/^["']|["']$/g, ''); // Entfernt evtl. Anführungszeichen
+                rl.question("\nAbsoluten Pfad zur Datei eingeben: ", (targetPath) => {
+                    const cleanPath = targetPath.trim().replace(/^["']|["']$/g, ''); 
                     
                     if (!fs.existsSync(cleanPath)) {
                         console.log("\x1b[31m[-] Pfad existiert nicht auf diesem System.\x1b[0m");
@@ -214,28 +213,29 @@ function startInteractiveCLI() {
                     }
 
                     const stats = fs.statSync(cleanPath);
+                    if (!stats.isFile()) {
+                        console.log("\x1b[33m[-] Pfad ist ein Ordner. Bitte eine konkrete Datei angeben.\x1b[0m");
+                        handleInput();
+                        return;
+                    }
+
+                    console.log(`\n[*] Analysiere lokale Datei: ${path.basename(cleanPath)}...`);
+                    const buffer = fs.readFileSync(cleanPath);
+                    const { findings, fileHash } = executeBinaryScan(buffer, path.basename(cleanPath));
                     
-                    if (stats.isFile()) {
-                        console.log(`\n[*] Analysiere: ${path.basename(cleanPath)}...`);
-                        const buffer = fs.readFileSync(cleanPath);
-                        const { findings, fileHash } = executeBinaryScan(buffer, path.basename(cleanPath));
-                        
-                        console.log(`\x1b[90mSHA-256: ${fileHash}\x1b[0m`);
-                        if (findings.length > 0) {
-                            console.log(`\x1b[41m\x1b[37m 💥 GEFÄHRLICH \x1b[0m Bedrohung gefunden!`);
-                            findings.forEach(f => console.log(`  ⤷ [${f.risk}] ${f.name}: ${f.description}`));
-                        } else {
-                            console.log(`\x1b[42m\x1b[30m ✓ SAUBER \x1b[0m Keine bekannten Bedrohungen gefunden.`);
-                        }
+                    console.log(`\x1b[90mSHA-256: ${fileHash}\x1b[0m`);
+                    if (findings.length > 0) {
+                        console.log(`\x1b[41m\x1b[37m 💥 GEFÄHRLICH \x1b[0m Bedrohung gefunden!`);
+                        findings.forEach(f => console.log(`  ⤷ [${f.risk}] ${f.name}: ${f.description}`));
                     } else {
-                        console.log("\x1b[33m[*] Pfad ist ein Verzeichnis. (Rekursive Ordner-Scans über CLI aus Sicherheitsgründen limitiert).\x1b[0m");
+                        console.log(`\x1b[42m\x1b[30m ✓ SAUBER \x1b[0m Keine bekannten Bedrohungen gefunden.`);
                     }
                     handleInput();
                 });
             } 
             
             else if (choice === "3") {
-                console.log("\n[*] Lese Signaturdateien neu ein...");
+                console.log("\n[*] Lese Signaturdatenbank neu ein...");
                 loadDatabase();
                 handleInput();
             } 
