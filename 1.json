@@ -1,41 +1,32 @@
 {
-  "version": "1.0",
-  "database": "Norton Style Malware Database",
-
   "signatures": [
-
     {
-      "name": "Test Malware Pattern",
-      "type": "script",
-      "pattern": "malware_test",
-      "risk": "hoch",
-      "description": "Testsignatur erkannt"
+      "pattern": "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*",
+      "type": "text",
+      "name": "EICAR.Standard.Testfile",
+      "risk": "TEST",
+      "description": "Internationaler Standard-Test-String für Virenscanner. Absolut harmlos."
     },
-
     {
-      "name": "Crypto Miner",
-      "type": "javascript",
-      "pattern": "coinhive",
-      "risk": "hoch",
-      "description": "Mögliches Krypto-Mining erkannt"
+      "pattern": "275a5b512e9bcf2813587002047ffaa46c4f039316715fbc358509310cd4cb87",
+      "type": "hash",
+      "name": "Trojan.Generic.CryptoStealer",
+      "risk": "KRITISCH",
+      "description": "Schadsoftware versucht Krypto-Wallets und Browser-Passwörter auszulesen."
     },
-
     {
-      "name": "Suspicious Eval",
-      "type": "javascript",
-      "pattern": "eval(",
-      "risk": "mittel",
-      "description": "Dynamische Code-Ausführung"
+      "pattern": "4d5a",
+      "type": "hex",
+      "name": "Suspicious.Executable.Header",
+      "risk": "MITTEL",
+      "description": "Windows-Anwendungs-Header in einer Datei entdeckt."
     },
-
     {
-      "name": "Hidden Redirect",
-      "type": "javascript",
-      "pattern": "window.location",
-      "risk": "mittel",
-      "description": "Automatische Weiterleitung erkannt"
+      "pattern": "eval(base64_decode",
+      "type": "text",
+      "name": "Webshell.PHP.Backdoor",
+      "risk": "HOCH",
+      "description": "Typischer Schadcode, der Angreifern Zugriff auf den Webserver erlaubt."
     }
-
   ]
-
 }
