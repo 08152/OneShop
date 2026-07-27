@@ -1,290 +1,68 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Norton Advanced ScanSuite - Control Center</title>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --panel-bg: #1e293b;
-            --accent-blue: #38bdf8;
-            --accent-green: #4ade80;
-            --accent-red: #f87171;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        header {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 2px solid var(--panel-bg);
-        }
-        header h1 {
-            margin: 0;
-            color: var(--accent-blue);
-            font-size: 2rem;
-            letter-spacing: 1px;
-        }
-        header p {
-            margin: 5px 0 0 0;
-            color: var(--text-muted);
-        }
-        .grid-dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 15px;
-        }
-        .card {
-            background-color: var(--panel-bg);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .drop-zone {
-            border: 2px dashed #475569;
-            background-color: var(--panel-bg);
-            border-radius: 8px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        .drop-zone.dragover {
-            border-color: var(--accent-blue);
-            background-color: #1e293b;
-            transform: scale(1.01);
-        }
-        .drop-zone p {
-            margin: 10px 0 0 0;
-            font-size: 1.1rem;
-        }
-        #file-input { display: none; }
-        .progress-bar-container {
-            width: 100%;
-            background-color: #334155;
-            border-radius: 4px;
-            height: 8px;
-            margin-top: 15px;
-            display: none;
-            overflow: hidden;
-        }
-        .progress-bar {
-            height: 100%;
-            background-color: var(--accent-blue);
-            width: 0%;
-            transition: width 0.1s ease;
-        }
-        .result-panel { display: none; }
-        .verdict-box {
-            padding: 15px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-        .verdict-clean { background-color: rgba(74, 222, 128, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
-        .verdict-danger { background-color: rgba(248, 113, 113, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
-        .meta-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .meta-table td { padding: 8px; border-bottom: 1px solid #334155; font-size: 0.9rem; }
-        .meta-table td:first-child { color: var(--text-muted); width: 30%; }
-        .finding-item {
-            background: #273549;
-            border-left: 4px solid var(--accent-red);
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 0 4px 4px 0;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WinOS</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    <header>
-        <h1>🛡️ NORTON ADVANCED SCANSUITE</h1>
-        <p>Echtzeit-Binäranalyse & Signatur-Abgleich</p>
-    </header>
 
-    <div class="grid-dashboard">
-        <div class="card">
-            <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Engine Status</div>
-            <div id="engine-status" style="font-size: 1.5rem; font-weight: bold; color: var(--accent-green); margin-top: 5px;">🔄 Prüfe...</div>
-        </div>
-        <div class="card">
-            <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Geladene Hashes</div>
-            <div id="stat-hashes" style="font-size: 1.5rem; font-weight: bold; color: var(--accent-blue); margin-top: 5px;">0</div>
-        </div>
-        <div class="card">
-            <div style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">Code-Signaturen</div>
-            <div id="stat-signatures" style="font-size: 1.5rem; font-weight: bold; color: var(--accent-blue); margin-top: 5px;">0</div>
-        </div>
-        <div class="card" style="display: flex; align-items: center; justify-content: center;">
-            <button id="btn-reload" style="background-color: #334155; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s;">🔄 DB Neu Laden</button>
-        </div>
+<div id="desktop">
+
+    <div class="icon" id="syntax">
+        <div class="icon-box"></div>
+        <span>SyntaxVoid.exe</span>
     </div>
 
-    <div class="card">
-        <h3 style="margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 8px; color: var(--accent-blue);">📁 Datei-Testlabor</h3>
-        <div id="drop-zone" class="drop-zone">
-            <span style="font-size: 3rem;">📥</span>
-            <p>Datei hierher ziehen oder <span style="color: var(--accent-blue); text-decoration: underline;">durchsuchen</span></p>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Maximal 150 MB (Binär-, Text- oder Archivdaten)</p>
-            <input type="file" id="file-input">
-        </div>
-        <div id="progress-container" class="progress-bar-container">
-            <div id="progress-bar" class="progress-bar"></div>
-        </div>
-    </div>
-
-    <div id="result-panel" class="card result-panel">
-        <h3 style="margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 8px;">📊 Labor-Analysebericht</h3>
-        <div id="verdict-banner" class="verdict-box">VERDICT</div>
-        <h4>Dateisystem-Metadaten</h4>
-        <table class="meta-table">
-            <tr><td>Dateiname:</td><td id="res-name">-</td></tr>
-            <tr><td>Dateigröße:</td><td id="res-size">-</td></tr>
-            <tr><td>SHA-256 Hash:</td><td id="res-hash" style="font-family: monospace; word-break: break-all;">-</td></tr>
-        </table>
-        <div id="findings-section" style="margin-top: 20px; display: none;">
-            <h4 style="color: var(--accent-red); margin-bottom: 5px;">💥 Detektierte Bedrohungen:</h4>
-            <div id="findings-container"></div>
-        </div>
-    </div>
 </div>
-<script>
-    const API_URL = window.location.origin;
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
 
-    async function updateDashboardStats() {
-        try {
-            const res = await fetch(`${API_URL}/database`);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            document.getElementById('engine-status').innerText = "🟢 LIVE";
-            document.getElementById('engine-status').style.color = "var(--accent-green)";
-            document.getElementById('stat-hashes').innerText = data.hashCount || 0;
-            document.getElementById('stat-signatures').innerText = data.signatureCount || 0;
-        } catch (e) {
-            document.getElementById('engine-status').innerText = "🔴 OFFLINE";
-            document.getElementById('engine-status').style.color = "var(--accent-red)";
-        }
-    }
+<div id="popup" class="hidden">
 
-    document.getElementById('btn-reload').addEventListener('click', async () => {
-        try {
-            const res = await fetch(`${API_URL}/update`);
-            const data = await res.json();
-            alert(data.message);
-            updateDashboardStats();
-        } catch (e) { alert("Fehler beim Aktualisieren der Server-Datenbank."); }
-    });
+    <div class="window">
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.add('dragover'); }, false);
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); }, false);
-    });
+        <div class="titlebar">
+            SYSTEM WARNUNG: Kritischer Prozesszugriff
+        </div>
 
-    dropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        if (dt.files.length > 0) handleFileAnalysis(dt.files[0]);
-    });
-    dropZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) handleFileAnalysis(e.target.files[0]);
-    });
+        <div class="content">
 
-    async function handleFileAnalysis(file) {
-        const progressContainer = document.getElementById('progress-container');
-        const progressBar = document.getElementById('progress-bar');
-        const resultPanel = document.getElementById('result-panel');
-        
-        progressContainer.style.display = 'block';
-        progressBar.style.width = '0%';
-        resultPanel.style.display = 'none';
+            <p>
+            Die Anwendung <b>"SyntaxVoid.exe"</b> versucht,
+            direkten Zugriff auf den Kernel-Treiber von
+            WinOS zuzulassen.
+            </p>
 
-        const formData = new FormData();
-        formData.append('file', file);
+            <p>
+            Möchten Sie der Anwendung
+            erweiterte Systemrechte gewähren?
+            </p>
 
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_URL}/api/scan`, true);
+            <div class="buttons">
 
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-                const percentComplete = (e.loaded / e.total) * 100;
-                progressBar.style.width = percentComplete + '%';
-            }
-        };
+                <button id="allow">
+                    Zulassen
+                </button>
 
-        xhr.onload = function() {
-            progressContainer.style.display = 'none';
-            if (xhr.status !== 200) {
-                alert("Analysefehler: Statuscode " + xhr.status);
-                return;
-            }
+                <button id="cancel">
+                    Abbrechen
+                </button>
 
-            const response = JSON.parse(xhr.responseText);
-            if (!response.success) {
-                alert("Fehler: " + response.error);
-                return;
-            }
+            </div>
 
-            resultPanel.style.display = 'block';
-            document.getElementById('res-name').innerText = response.filename;
-            document.getElementById('res-size').innerText = (response.size / 1024 / 1024).toFixed(2) + " MB (" + response.size + " Bytes)";
-            document.getElementById('res-hash').innerText = response.sha256;
+        </div>
 
-            const banner = document.getElementById('verdict-banner');
-            const findingsSection = document.getElementById('findings-section');
-            const findingsContainer = document.getElementById('findings-container');
-            findingsContainer.innerHTML = "";
+    </div>
 
-            if (response.verdict === "GEFÄHRLICH") {
-                banner.innerText = "💥 ALARM DETECTED: GEFÄHRLICH";
-                banner.className = "verdict-box verdict-danger";
-                findingsSection.style.display = "block";
+</div>
 
-                response.findings.forEach(f => {
-                    const item = document.createElement('div');
-                    item.className = 'finding-item';
-                    item.innerHTML = `<strong>${f.name}</strong> <span style="color:var(--accent-red); font-size:0.8rem;">[${f.risk}]</span><br>
-                                      <span style="font-size:0.85rem; color:var(--text-muted);">${f.description}</span>`;
-                    findingsContainer.appendChild(item);
-                });
-            } else {
-                banner.innerText = "🛡️ SYSTEM VERDICT: SAUBER";
-                banner.className = "verdict-box verdict-clean";
-                findingsSection.style.display = "none";
-            }
-        };
+<div id="terminal" class="hidden">
 
-        xhr.onerror = function() {
-            progressContainer.style.display = 'none';
-            alert("Netzwerkfehler zur Scan-Engine.");
-        };
-        xhr.send(formData);
-    }
-    updateDashboardStats();
-</script>
+<canvas id="matrix"></canvas>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
