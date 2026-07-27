@@ -1,96 +1,108 @@
-const icon=document.getElementById("syntax");
-const popup=document.getElementById("popup");
-const allow=document.getElementById("allow");
-const cancel=document.getElementById("cancel");
-const terminal=document.getElementById("terminal");
+const icon = document.getElementById("syntax");
+const popup = document.getElementById("popup");
+const allowBtn = document.getElementById("allow");
+const cancelBtn = document.getElementById("cancel");
+const terminal = document.getElementById("terminal");
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-let clicks=0;
-let timer;
+let matrixRunning = false;
 
-icon.onclick=function(){
-
-clicks++;
-
-if(clicks===1){
-
-timer=setTimeout(()=>{
-
-clicks=0;
-
-},300);
-
-}else{
-
-clearTimeout(timer);
-
-clicks=0;
-
-popup.classList.remove("hidden");
-
+// Fenstergröße anpassen
+function resizeCanvas() {
+    canvas.width = terminal.clientWidth;
+    canvas.height = terminal.clientHeight;
 }
 
-};
+window.addEventListener("resize", resizeCanvas);
 
-cancel.onclick=function(){
+// Doppelklick auf die Desktop-Datei
+icon.addEventListener("dblclick", () => {
+    popup.classList.remove("hidden");
+});
 
-popup.classList.add("hidden");
+// Popup schließen
+cancelBtn.addEventListener("click", () => {
+    popup.classList.add("hidden");
+});
 
-};
+// Popup bestätigen
+allowBtn.addEventListener("click", () => {
 
-allow.onclick=function(){
+    popup.classList.add("hidden");
 
-popup.classList.add("hidden");
+    terminal.classList.remove("hidden");
 
-terminal.classList.remove("hidden");
+    resizeCanvas();
 
-startMatrix();
+    if (!matrixRunning) {
+        matrixRunning = true;
+        startMatrix();
+    }
 
-};
+});
 
-function startMatrix(){
+// Matrix-Effekt
+function startMatrix() {
 
-const canvas=document.getElementById("matrix");
-const ctx=canvas.getContext("2d");
+    const chars =
+        "アイウエオカキクケコサシスセソタチツテト0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*";
 
-canvas.width=terminal.clientWidth;
-canvas.height=terminal.clientHeight;
+    const fontSize = 16;
 
-const letters="01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
-const size=16;
+    let columns = Math.floor(canvas.width / fontSize);
 
-const columns=Math.floor(canvas.width/size);
+    let drops = [];
 
-const drops=[];
+    function resetDrops() {
+        columns = Math.floor(canvas.width / fontSize);
+        drops = [];
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+        }
+    }
 
-for(let i=0;i<columns;i++)
-drops[i]=1;
+    resetDrops();
 
-function draw(){
+    window.addEventListener("resize", () => {
+        resizeCanvas();
+        resetDrops();
+    });
 
-ctx.fillStyle="rgba(0,0,0,.08)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+    function draw() {
 
-ctx.fillStyle="#00ff55";
-ctx.font=size+"px monospace";
+        ctx.fillStyle = "rgba(0,0,0,0.08)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-for(let i=0;i<drops.length;i++){
+        ctx.fillStyle = "#00ff55";
+        ctx.font = fontSize + "px monospace";
 
-const text=
-letters[Math.floor(Math.random()*letters.length)];
+        for (let i = 0; i < drops.length; i++) {
 
-ctx.fillText(text,i*size,drops[i]*size);
+            const text =
+                chars[Math.floor(Math.random() * chars.length)];
 
-if(drops[i]*size>canvas.height&&Math.random()>0.97)
-drops[i]=0;
+            ctx.fillText(
+                text,
+                i * fontSize,
+                drops[i] * fontSize
+            );
 
-drops[i]++;
+            if (
+                drops[i] * fontSize > canvas.height &&
+                Math.random() > 0.975
+            ) {
+                drops[i] = 0;
+            }
 
-}
+            drops[i]++;
 
-requestAnimationFrame(draw);
+        }
 
-}
+        requestAnimationFrame(draw);
 
-draw();
+    }
+
+    draw();
 
 }
