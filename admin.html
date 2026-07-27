@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finanzen - Admin Panel</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a202c; color: #e2e8f0; margin: 0; padding: 20px; touch-action: manipulation; }
+        .admin-box { max-width: 600px; margin: 10px auto; background: #2d3748; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        h2 { color: #f1c40f; margin-top: 0; }
+        .user-list { list-style: none; padding: 0; margin-bottom: 30px; }
+        /* Große, touch-freundliche Listen-Elemente (60px hoch) */
+        .user-item { background: #4a5568; padding: 18px; border-radius: 8px; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 2px solid transparent; font-size: 16px; }
+        .user-item:active { background: #f1c40f; color: #1a202c; }
+        
+        .management-area { background: #1a202c; padding: 20px; border-radius: 12px; display: none; margin-top: 20px; }
+        .form-group { margin-bottom: 18px; display: flex; flex-direction: column; }
+        label { font-size: 13px; color: #a0aec0; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
+        /* Große Inputs, leicht zu treffen auf Smartphones */
+        input { padding: 14px; border-radius: 8px; border: 1px solid #4a5568; background: #2d3748; color: white; font-size: 16px; width: 100%; }
+        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+        /* Große, dicke Touch-Buttons */
+        button { padding: 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; text-transform: uppercase; }
+        .btn-save { background: #2ecc71; color: white; }
+        .btn-expense { background: #e74c3c; color: white; }
+        .btn-back { background: #718096; color: white; margin-top: 25px; display: block; text-align: center; text-decoration: none; border-radius: 8px; padding: 16px; font-weight: bold; font-size: 16px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="admin-box">
+    <h2>Admin-Panel (Nutzerverwaltung)</h2>
+    
+    <h3>Nutzer auswählen:</h3>
+    <ul class="user-list" id="users-container"></ul>
+
+    <div class="management-area" id="edit-area">
+        <h3>Nutzer: <span id="selected-user-name" style="color: #f1c40f;">-</span></h3>
+        
+        <div class="form-group">
+            <label>Gehalt auszahlen (€)</label>
+            <input type="number" id="salary-amount" placeholder="Betrag eintragen" step="0.01">
+        </div>
+        <div class="form-group">
+            <label>Nächstes Gehaltsdatum</label>
+            <input type="text" id="salary-date" placeholder="z.B. 27. August 2026">
+        </div>
+
+        <div class="form-group">
+            <label>Vertrag Name (schreiben)</label>
+            <input type="text" id="contract-name" placeholder="z.B. Fitnessstudio">
+        </div>
+        <div class="form-group">
+            <label>Vertrag Kosten (€ / Monat)</label>
+            <input type="number" id="contract-price" placeholder="Betrag eintragen" step="0.01">
+        </div>
+
+        <div class="form-group" style="border-top: 1px solid #4a5568; padding-top: 20px;">
+            <label>Neue Ausgabe buchen (Zweck)</label>
+            <input type="text" id="expense-name" placeholder="z.B. Einkauf">
+        </div>
+        <div class="form-group">
+            <label>Ausgaben-Betrag (€)</label>
+            <input type="number" id="expense-amount" placeholder="Betrag eintragen" step="0.01">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-save" onclick="applyAdminChanges()">Speichern (Gehalt & Vertrag)</button>
+            <button class="btn-expense" onclick="applyExpenseOnly()">Nur Ausgabe buchen</button>
+        </div>
+    </div>
+
+    <a href="index.html" class="btn-back">Zurück zur Übersicht</a>
+</div>
+
+<script>
+    let selectedUserId = null;
+
+    async function loadUsers() {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        const container = document.getElementById('users-container');
+        container.innerHTML = "";
+        
+        users.forEach(user => {
+            const li = document.createElement('li');
+            li.className = 'user-item';
+            li.onclick = () => selectUser(user);
+            li.innerHTML = `<span><strong>${user.name}</strong></span> <span>${user.balance.toFixed(2)} €</span>`;
+            container.appendChild(li);
+        });
+    }
+
+    function selectUser(user) {
+        selectedUserId = user.id;
+        document.getElementById('selected-user-name').textContent = user.name;
+        document.getElementById('salary-date').value = user.nextSalary || "";
+        document.getElementById('edit-area').style.display = "block";
+        
+        document.getElementById('salary-amount').value = "";
+        document.getElementById('contract-name').value = "";
+        document.getElementById('contract-price').value = "";
+        document.getElementById('expense-name').value = "";
+        document.getElementById('expense-amount').value = "";
+    }
+
+    async function sendData(data) {
+        await fetch('/api/users/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: selectedUserId, ...data })
+        });
+        loadUsers();
+        document.getElementById('edit-area').style.display = "none";
+        alert("Daten auf dem Server gespeichert!");
+    }
+
+    function applyAdminChanges() {
+        sendData({
+            salary: document.getElementById('salary-amount').value,
+            nextSalary: document.getElementById('salary-date').value,
+            contractName: document.getElementById('contract-name').value,
+            contractPrice: document.getElementById('contract-price').value
+        });
+    }
+
+    function applyExpenseOnly() {
+        sendData({
+            expenseName: document.getElementById('expense-name').value,
+            expenseAmount: document.getElementById('expense-amount').value
+        });
+    }
+
+    loadUsers();
+</script>
+</body>
+</html>
