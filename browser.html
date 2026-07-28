@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* CC0 1.0 Universal - Public Domain Dedication */
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #eee; display: flex; flex-direction: column; height: 100vh; }
+        .nav { display: flex; padding: 5px; background: #ddd; gap: 5px; border-bottom: 1px solid #ccc; }
+        .nav input { flex: 1; padding: 4px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; }
+        .nav button { padding: 4px 10px; background: #00426d; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .web-content { flex: 1; padding: 15px; background: #fff; font-size: 14px; overflow-y: auto; }
+        .darknet { display: none; color: #ff3333; background: #111; height: 100vh; padding: 20px; box-sizing: border-box; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <input type="text" id="url" value="https://google.de">
+        <button onclick="go()">Go</button>
+    </div>
+    <div class="web-content" id="web">
+        <h3>Willkommen im Webbrowser v4.0</h3>
+        <p>Geben Sie eine Webadresse ein, um im Netz zu surfen.</p>
+        <p style="color: #666; margin-top: 20px;"><em>Tipp: Erfahrene Hacker nutzen Adressen wie <strong>onion.net</strong> für versteckte Netzwerke.</em></p>
+    </div>
+    <div class="darknet" id="dark">
+        <h2>⚠️ ANONYMOUS ONION NETWORK</h2>
+        <hr style="border-color: #333;">
+        <p style="color: #0f0;">[+] Proxy-Status: VERSCHLÜSSELT</p>
+        <p>[!] Verfügbare Leaks: Datenbank_Backup_2026.sql</p>
+        <p>[!] Status des Mainframes: Angreifbar über IP 192.168.1.42</p>
+    </div>
+
+    <script>
+        function go() {
+            let url = document.getElementById('url').value.trim().toLowerCase();
+            if(url.includes('onion.net')) {
+                document.getElementById('web').style.display = 'none';
+                document.getElementById('dark').style.display = 'block';
+            } else {
+                document.getElementById('web').style.display = 'block';
+                document.getElementById('dark').style.display = 'none';
+                document.getElementById('web').innerHTML = '<h3>Simulation von: ' + url + '</h3><p>Die Verbindung ist verschlüsselt und sicher. Keine Anomalien gefunden.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
