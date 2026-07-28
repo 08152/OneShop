@@ -2,25 +2,162 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <title>Kalender</title>
     <style>
         /* CC0 1.0 Universal - Public Domain Dedication */
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; background: #fff; color: #333; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            padding: 15px; 
+            margin: 0; 
+            background: #fff; 
+            color: #333; 
+            font-size: 13px;
+            user-select: none;
+        }
         h3 { margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #00426d; padding-bottom: 5px; color: #00426d; }
-        .event { background: #f9f9f9; border-left: 4px solid #ccc; padding: 10px; margin-bottom: 10px; font-size: 13px; border-radius: 0 4px 4px 0; }
-        .critical { background: #ffebeb; border-left-color: #ff5f56; }
-        .info { background: #e3f2fd; border-left-color: #2196f3; }
+        
+        /* Formular zum Hinzufügen */
+        .add-event-form {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+        }
+        .form-row { display: flex; gap: 5px; margin-bottom: 5px; }
+        .form-row input[type="time"] { width: 80px; }
+        .form-row input[type="text"] { flex: 1; }
+        input, button { padding: 5px; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; }
+        button { background: #00426d; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #002d4d; }
+
+        /* Terminliste */
+        .event-list { max-height: 180px; overflow-y: auto; }
+        .event { 
+            background: #f9f9f9; 
+            border-left: 4px solid #2196f3; 
+            padding: 8px; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .event-time { font-weight: bold; color: #00426d; margin-right: 5px; }
+        .delete-btn {
+            background: transparent;
+            color: #ff5f56;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+        .delete-btn:hover { color: #cc0000; }
+        .no-events { color: #888; text-align: center; font-style: italic; padding: 20px 0; }
     </style>
 </head>
 <body>
-    <h3>System-Terminkalender</h3>
-    <div class="event info">
-        <strong>09:00 Uhr - Tägliches IT-Standup</strong><br>Besprechung der neuen Firewall-Regeln.
+
+    <h3>📅 System-Terminkalender</h3>
+
+    <!-- Formular für neue Termine -->
+    <div class="add-event-form">
+        <div class="form-row">
+            <input type="time" id="event-time" required>
+            <input type="text" id="event-text" placeholder="Terminbeschreibung..." required>
+        </div>
+        <button onclick="addEvent()" style="width: 100%;">Termin hinzufügen</button>
     </div>
-    <div class="event critical">
-        <strong>13:00 Uhr - Serverwartung (Mainframe)</strong><br>ACHTUNG: Die Sicherheitsüberprüfung schaltet temporär Ports auf IP 192.168.1.42 frei!
+
+    <!-- Liste der Termine -->
+    <div class="event-list" id="event-container">
+        <!-- Termine werden hier dynamisch eingefügt -->
     </div>
-    <div class="event">
-        <strong>16:30 Uhr - Passwort-Wechsel-Routine</strong><br>Vorgeschriebenes Update aller Admin-Passwörter.
-    </div>
+
+    <script>
+        let events = [];
+
+        // Termine aus dem Speicher laden
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedEvents = localStorage.getItem('hacker_calendar_events');
+            if (savedEvents) {
+                events = JSON.parse(savedEvents);
+            }
+            renderEvents();
+        });
+
+        // Termine auf dem Bildschirm zeichnen
+        function renderEvents() {
+            const container = document.getElementById('event-container');
+            container.innerHTML = '';
+
+            if (events.length === 0) {
+                container.innerHTML = '<div class="no-events">Keine Termine eingetragen.</div>';
+                return;
+            }
+
+            // Nach Uhrzeit sortieren
+            events.sort((a, b) => a.time.localeCompare(b.time));
+
+            events.forEach((event, index) => {
+                const div = document.createElement('div');
+                div.className = 'event';
+                div.innerHTML = `
+                    <div>
+                        <span class="event-time">${event.time} Uhr</span> - 
+                        <span class="event-text">${escapeHtml(event.text)}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteEvent(${index})" title="Löschen">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Neuen Termin hinzufügen
+        function addEvent() {
+            const timeInput = document.getElementById('event-time');
+            const textInput = document.getElementById('event-text');
+
+            if (!timeInput.value || !textInput.value.trim()) {
+                alert('Bitte fülle beide Felder aus!');
+                return;
+            }
+
+            const newEvent = {
+                time: timeInput.value,
+                text: textInput.value.trim()
+            };
+
+            events.push(newEvent);
+            saveAndRefresh();
+
+            // Formular zurücksetzen
+            textInput.value = '';
+            timeInput.value = '';
+        }
+
+        // Termin löschen
+        function deleteEvent(index) {
+            events.splice(index, 1);
+            saveAndRefresh();
+        }
+
+        // Im LocalStorage speichern und Liste neu laden
+        function saveAndRefresh() {
+            localStorage.setItem('hacker_calendar_events', JSON.stringify(events));
+            renderEvents();
+        }
+
+        // Schutz gegen HTML-Eingaben (Sicherheit)
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
 </body>
 </html>
