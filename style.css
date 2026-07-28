@@ -1,213 +1,157 @@
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
+/* Moderne Schriftart von Google Fonts laden */
+@import url('https://googleapis.com');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-body{
-overflow:hidden;
+body {
+    background: linear-gradient(135deg, #f4f7f5 0%, #e9efe9 100%);
+    color: #2c3e50;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
 }
 
-#desktop{
-
-width:100vw;
-height:100vh;
-
-background:
-linear-gradient(135deg,#1f5ea8,#0b2c55);
-
-position:relative;
-
+.container {
+    background-color: #ffffff;
+    max-width: 650px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-.icon{
-
-width:90px;
-
-text-align:center;
-
-color:white;
-
-cursor:pointer;
-
-margin:20px;
-
-user-select:none;
-
+h1 {
+    color: #1b4332;
+    font-size: 32px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
 }
 
-.icon-box{
-
-width:56px;
-height:56px;
-
-margin:auto;
-
-border-radius:12px;
-
-background:
-
-linear-gradient(#77b7ff,#3478d8);
-
-border:2px solid white;
-
+.subtitle {
+    text-align: center;
+    color: #637381;
+    font-size: 16px;
+    margin-bottom: 32px;
 }
 
-.icon span{
-
-display:block;
-
-margin-top:8px;
-
-font-size:13px;
-
+.info-box {
+    background-color: #f2f7f4;
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    border-left: 5px solid #2d6a4f;
 }
 
-.hidden{
-
-display:none;
-
+.info-box p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #40514e;
+    margin-bottom: 16px;
 }
 
-#popup{
-
-position:fixed;
-
-left:0;
-top:0;
-
-width:100%;
-height:100%;
-
-background:rgba(0,0,0,.35);
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
+.services-list {
+    list-style: none;
 }
 
-.window{
-
-width:92%;
-max-width:430px;
-
-background:#f4f4f4;
-
-border-radius:8px;
-
-overflow:hidden;
-
-box-shadow:0 15px 30px rgba(0,0,0,.5);
-
+.services-list li {
+    font-size: 15px;
+    font-weight: 500;
+    color: #2d6a4f;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
 }
 
-.titlebar{
-
-background:#2d5ca8;
-
-color:white;
-
-padding:12px;
-
-font-weight:bold;
-
+/* Kleiner grüner Punkt vor jedem Punkt auf der Liste */
+.services-list li::before {
+    content: "✓";
+    margin-right: 12px;
+    font-weight: 700;
+    color: #52b788;
 }
 
-.content{
-
-padding:18px;
-
-color:#222;
-
-line-height:1.5;
-
+h2 {
+    color: #1b4332;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
 }
 
-.buttons{
-
-display:flex;
-
-justify-content:flex-end;
-
-gap:10px;
-
-margin-top:25px;
-
+.form-group {
+    margin-bottom: 20px;
 }
 
-button{
-
-padding:10px 18px;
-
-border:none;
-
-border-radius:6px;
-
-cursor:pointer;
-
-font-size:15px;
-
+label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #451a03;
+    margin-bottom: 8px;
 }
 
-#allow{
-
-background:#2d8cff;
-
-color:white;
-
+input, textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    background-color: #f8fafc;
+    color: #334155;
+    transition: all 0.2s ease-in-out;
 }
 
-#cancel{
-
-background:#d8d8d8;
-
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #52b788;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(82, 183, 136, 0.15);
 }
 
-#terminal{
-
-position:absolute;
-
-left:50%;
-
-top:50%;
-
-transform:translate(-50%,-50%);
-
-width:90%;
-
-max-width:900px;
-
-height:75%;
-
-background:black;
-
-border-radius:8px;
-
-overflow:hidden;
-
-box-shadow:0 0 30px black;
-
+textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-canvas{
-
-width:100%;
-height:100%;
-
-display:block;
-
+button {
+    width: 100%;
+    background-color: #2d6a4f;
+    color: white;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(45, 106, 79, 0.2);
+    margin-top: 10px;
 }
 
-@media(max-width:600px){
-
-.icon{
-
-margin:15px;
-
+button:hover {
+    background-color: #1b4332;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(45, 106, 79, 0.3);
 }
 
+button:active {
+    transform: translateY(0);
+}
+
+/* Macht das Design fit für Smartphones */
+@media (max-width: 480px) {
+    .container {
+        padding: 24px;
+    }
+    h1 {
+        font-size: 26px;
+    }
 }
