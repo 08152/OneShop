@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* CC0 1.0 Universal - Public Domain Dedication */
+        body { background: #000; color: #0f0; font-family: monospace; padding: 10px; margin: 0; overflow-x: hidden; }
+        #output { white-space: pre-wrap; margin-bottom: 10px; font-size: 13px; line-height: 1.4; }
+        .input-line { display: flex; }
+        .prompt { color: #0f0; margin-right: 5px; font-weight: bold; }
+        input { background: transparent; border: none; color: #0f0; font-family: monospace; outline: none; flex: 1; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div id="output">System Terminal v1.2<br>Tippe 'help' für eine Liste der Befehle.<br><br></div>
+    <div class="input-line">
+        <span class="prompt">C:\Users\Hacker></span>
+        <input type="text" id="cmd" autofocus onkeydown="runCmd(event)">
+    </div>
+
+    <script>
+        const out = document.getElementById('output');
+        function runCmd(e) {
+            if(e.key !== 'Enter') return;
+            const fullCmd = e.target.value.trim();
+            const val = fullCmd.toLowerCase();
+            out.innerHTML += 'C:\\Users\\Hacker&gt; ' + fullCmd + '<br>';
+            
+            if(val === 'help') {
+                out.innerHTML += 'Verfügbare Befehle:<br> - scan : Scannt das lokale Netzwerk nach Zielen<br> - hack [IP] : Startet den Brute-Force Exploit<br> - clear : Leert den Bildschirm<br>';
+            } else if(val === 'scan') {
+                out.innerHTML += 'Scanne Netzwerkknoten...<br>[+] Target gefunden: <span style="color:cyan">192.168.1.42</span> (Mainframe-Server)<br>';
+            } else if(val.startsWith('hack')) {
+                out.innerHTML += 'Verbinde mit Server...<br>';
+                let i = 0;
+                let iv = setInterval(() => {
+                    i += 20;
+                    out.innerHTML += 'Breche Firewall auf... [' + i + '%]<br>';
+                    window.scrollTo(0, document.body.scrollHeight);
+                    if(i >= 100) {
+                        clearInterval(iv);
+                        out.innerHTML += '<span style="color:yellow; font-weight:bold;">[SUCCESS] Zugriff gewährt. Root-Rechte erlangt.</span><br>';
+                    }
+                }, 400);
+            } else if(val === 'clear') {
+                out.innerHTML = '';
+            } else if(val === '') {
+                // Leere Eingabe, tue nichts
+            } else {
+                out.innerHTML += "Unbekannter Befehl. Tippe 'help' für Hilfe.<br>";
+            }
+            e.target.value = '';
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    </script>
+</body>
+</html>
