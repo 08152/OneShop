@@ -11,52 +11,27 @@
 
     <div class="container">
         <h1>Hallo liebe Nachbarn!</h1>
-        <p class="subtitle">Fleißige Hilfe für Garten, Einkauf und Alltag</p>
+        <p class="subtitle">Fleißige Hilfe in der Nachbarschaft</p>
         
         <div class="info-box">
-            <p>Ich bin 12 Jahre alt und möchte mir gerne mein Taschengeld etwas aufbessern. Deshalb biete ich meine Unterstützung in unserer Nachbarschaft an!</p>
+            <p>Ich bin 12 Jahre alt und möchte mir gerne mein Taschengeld etwas aufbessern. Deshalb biete ich meine Unterstützung in unserer Umgebung an!</p>
             <ul class="services-list">
-                <li>Rasenmähen und Laub harken</li>
-                <li>Pflanzen gießen während Ihres Urlaubs</li>
-                <li>Einkäufe nach Hause tragen</li>
-                <li>Briefkasten leeren bei Abwesenheit</li>
+                <li>Rasenmähen</li>
+                <li>Einkaufen helfen (Sachen tragen oder mit dem Rad erledigen)</li>
+                <li>Pflanzen gießen</li>
             </ul>
         </div>
 
-        <h2>Direktkontakt per E-Mail</h2>
-        <p style="font-size: 14px; color: #637381; margin-bottom: 12px;">Sie können meine E-Mail-Adresse hier einfach kopieren:</p>
+        <h2>Kontakt per E-Mail</h2>
+        <p style="font-size: 15px; color: #40514e; margin-bottom: 16px; line-height: 1.5;">
+            Wenn Sie Unterstützung brauchen, schreiben Sie mir gerne eine Nachricht an meine E-Mail-Adresse.
+        </p>
         
         <!-- Die Kopier-Box -->
-        <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
             <input type="text" value="r.schmid.8321@gmail.com" id="mailInput" readonly style="font-family: monospace; font-weight: bold; background-color: #f1f5f9; cursor: default;">
-            <button onclick="copyMail()" style="margin-top: 0; width: auto; white-space: nowrap; padding: 0 20px; background-color: #52b788;">Kopieren</button>
+            <button onclick="copyMail()" style="margin-top: 0; width: auto; white-space: nowrap; padding: 0 24px; background-color: #52b788;">Kopieren</button>
         </div>
-
-        <h2>Nachricht direkt hier senden</h2>
-        <form action="https://formspree.io" method="POST">
-            
-            <div class="form-group">
-                <label for="name">Ihr Name</label>
-                <input type="text" id="name" name="name" required placeholder="Vor- und Nachname">
-            </div>
-
-            <div class="form-group">
-                <label for="adresse">Straße & Hausnummer</label>
-                <input type="text" id="adresse" name="adresse" required placeholder="Damit ich weiß, wo Sie wohnen">
-            </div>
-
-            <div class="form-group">
-                <label for="email">Ihre E-Mail-Adresse</label>
-                <input type="email" id="email" name="_replyto" required placeholder="name@beispiel.de">
-            </div>
-
-            <div class="form-group">
-                <label for="nachricht">Wie kann ich Ihnen helfen?</label>
-                <textarea id="nachricht" name="nachricht" required placeholder="Beschreiben Sie kurz, welche Aufgabe ich übernehmen darf..."></textarea>
-            </div>
-
-            <button type="submit">Nachricht absenden</button>
-        </form>
     </div>
 
     <!-- Kleines Skript für die Kopier-Funktion -->
