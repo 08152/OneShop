@@ -23,9 +23,16 @@
             </ul>
         </div>
 
-        <h2>Nachricht senden</h2>
+        <h2>Direktkontakt per E-Mail</h2>
+        <p style="font-size: 14px; color: #637381; margin-bottom: 12px;">Sie können meine E-Mail-Adresse hier einfach kopieren:</p>
         
-        <!-- Deine E-Mail-Adresse ist jetzt fest für den sicheren Versand hinterlegt -->
+        <!-- Die Kopier-Box -->
+        <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+            <input type="text" value="r.schmid.8321@gmail.com" id="mailInput" readonly style="font-family: monospace; font-weight: bold; background-color: #f1f5f9; cursor: default;">
+            <button onclick="copyMail()" style="margin-top: 0; width: auto; white-space: nowrap; padding: 0 20px; background-color: #52b788;">Kopieren</button>
+        </div>
+
+        <h2>Nachricht direkt hier senden</h2>
         <form action="https://formspree.io" method="POST">
             
             <div class="form-group">
@@ -51,6 +58,17 @@
             <button type="submit">Nachricht absenden</button>
         </form>
     </div>
+
+    <!-- Kleines Skript für die Kopier-Funktion -->
+    <script>
+        function copyMail() {
+            var copyText = document.getElementById("mailInput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Für Smartphones
+            navigator.clipboard.writeText(copyText.value);
+            alert("E-Mail-Adresse kopiert: " + copyText.value);
+        }
+    </script>
 
 </body>
 </html>
