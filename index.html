@@ -3,92 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taschengeld-Hilfe in der Nachbarschaft</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f9f4;
-            color: #333;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #2e7d32;
-            text-align: center;
-        }
-        .info-box {
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-left: 5px solid #2e7d32;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input, textarea {
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            background-color: #2e7d32;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1b5e20;
-        }
-    </style>
+    <title>Nachbarschaftshilfe</title>
+    <!-- Hier wird das schöne Design aus deiner style.css geladen -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Hallo liebe Nachbarn!</h1>
-    
-    <div class="info-box">
-        <p>Ich bin 12 Jahre alt und möchte mir gerne mein Taschengeld etwas aufbessern. Deshalb biete ich meine Hilfe in der Nachbarschaft an!</p>
-        <p><strong>Dabei kann ich Ihnen helfen:</strong></p>
-        <ul>
-            <li>Rasenmähen und Laub harken</li>
-            <li>Blumen gießen (wenn Sie im Urlaub sind)</li>
-            <li>Einkäufe nach Hause tragen</li>
-            <li>Briefkasten leeren</li>
-        </ul>
+    <div class="container">
+        <h1>Hallo liebe Nachbarn!</h1>
+        <p class="subtitle">Fleißige Hilfe für Garten, Einkauf und Alltag</p>
+        
+        <div class="info-box">
+            <p>Ich bin 12 Jahre alt und möchte mir gerne mein Taschengeld etwas aufbessern. Deshalb biete ich meine Unterstützung in unserer Nachbarschaft an!</p>
+            <ul class="services-list">
+                <li>Rasenmähen und Laub harken</li>
+                <li>Pflanzen gießen während Ihres Urlaubs</li>
+                <li>Einkäufe nach Hause tragen</li>
+                <li>Briefkasten leeren bei Abwesenheit</li>
+            </ul>
+        </div>
+
+        <h2>Nachricht senden</h2>
+        
+        <!-- Deine E-Mail-Adresse ist jetzt fest für den sicheren Versand hinterlegt -->
+        <form action="https://formspree.io" method="POST">
+            
+            <div class="form-group">
+                <label for="name">Ihr Name</label>
+                <input type="text" id="name" name="name" required placeholder="Vor- und Nachname">
+            </div>
+
+            <div class="form-group">
+                <label for="adresse">Straße & Hausnummer</label>
+                <input type="text" id="adresse" name="adresse" required placeholder="Damit ich weiß, wo Sie wohnen">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Ihre E-Mail-Adresse</label>
+                <input type="email" id="email" name="_replyto" required placeholder="name@beispiel.de">
+            </div>
+
+            <div class="form-group">
+                <label for="nachricht">Wie kann ich Ihnen helfen?</label>
+                <textarea id="nachricht" name="nachricht" required placeholder="Beschreiben Sie kurz, welche Aufgabe ich übernehmen darf..."></textarea>
+            </div>
+
+            <button type="submit">Nachricht absenden</button>
+        </form>
     </div>
-
-    <h2>Schreiben Sie mir eine Nachricht:</h2>
-    
-    <!-- WICHTIG: Ersetze "DEINE_ELTERN_EMAIL" durch die echte E-Mail-Adresse deiner Eltern -->
-    <form action="https://formspree.io" method="POST">
-        <label for="name">Ihr Name:</label>
-        <input type="text" id="name" name="name" required placeholder="Vor- und Nachname">
-
-        <label for="adresse">Straße / Hausnummer:</label>
-        <input type="text" id="adresse" name="adresse" required placeholder="Damit ich weiß, wo Sie wohnen">
-
-        <label for="email">Ihre E-Mail-Adresse:</label>
-        <input type="email" id="email" name="_replyto" required placeholder="name@beispiel.de">
-
-        <label for="nachricht">Was kann ich für Sie tun?</label>
-        <textarea id="nachricht" name="nachricht" rows="5" required placeholder="z.B. Rasenmähen am Samstag..."></textarea>
-
-        <button type="submit">Nachricht absenden</button>
-    </form>
 
 </body>
 </html>
