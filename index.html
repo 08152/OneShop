@@ -3,47 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nachbarschaftshilfe</title>
-    <!-- Hier wird das schöne Design aus deiner style.css geladen -->
-    <link rel="stylesheet" href="style.css">
+    <title>Windows Hacking Simulator</title>
+    <style>
+        /* CC0 1.0 Universal - Public Domain Dedication */
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #00426d; overflow: hidden; height: 100vh; }
+        
+        /* Desktop */
+        .desktop { width: 100vw; height: calc(100vh - 40px); position: relative; padding: 20px; display: flex; flex-direction: column; gap: 20px; align-content: flex-start; flex-wrap: wrap; }
+        .icon { width: 80px; text-align: center; cursor: pointer; color: white; text-shadow: 1px 1px 3px black; font-size: 12px; }
+        .icon-img { width: 40px; height: 40px; margin: 0 auto 5px; background: rgba(255,255,255,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.3); }
+        .icon:hover .icon-img { background: rgba(255,255,255,0.4); }
+
+        /* Taskbar */
+        .taskbar { height: 40px; background: #1c1c1c; position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; padding: 0 10px; z-index: 9999; }
+        .start-btn { color: white; font-weight: bold; margin-right: 15px; font-size: 14px; cursor: pointer; }
+
+        /* Window System */
+        .window { position: absolute; width: 420px; height: 320px; background: white; border: 1px solid #1c1c1c; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; min-width: 200px; min-height: 150px; }
+        .window-header { background: #f3f3f3; padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #d3d3d3; }
+        .window-title { font-size: 12px; font-weight: bold; color: #333; }
+        .window-close { background: #ff5f56; border: none; width: 15px; height: 15px; border-radius: 50%; cursor: pointer; }
+        .window-content { flex: 1; overflow: auto; position: relative; }
+        .app-iframe { width: 100%; height: 100%; border: none; background: white; }
+    </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Hallo liebe Nachbarn!</h1>
-        <p class="subtitle">Fleißige Hilfe in der Nachbarschaft</p>
-        
-        <div class="info-box">
-            <p>Ich bin 12 Jahre alt und möchte mir gerne mein Taschengeld etwas aufbessern. Deshalb biete ich meine Unterstützung in unserer Umgebung an!</p>
-            <ul class="services-list">
-                <li>Rasenmähen</li>
-                <li>Einkaufen helfen (Sachen tragen oder mit dem Rad erledigen)</li>
-                <li>Pflanzen gießen</li>
-            </ul>
+    <div class="desktop" id="desktop">
+        <div class="icon" onclick="openApp('Terminal', 'terminal.html')">
+            <div class="icon-img">💻</div>
+            <div>Terminal</div>
         </div>
-
-        <h2>Kontakt per E-Mail</h2>
-        <p style="font-size: 15px; color: #40514e; margin-bottom: 16px; line-height: 1.5;">
-            Wenn Sie Unterstützung brauchen, schreiben Sie mir gerne eine Nachricht an meine E-Mail-Adresse.
-        </p>
-        
-        <!-- Die Kopier-Box -->
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <input type="text" value="r.schmid.8321@gmail.com" id="mailInput" readonly style="font-family: monospace; font-weight: bold; background-color: #f1f5f9; cursor: default;">
-            <button onclick="copyMail()" style="margin-top: 0; width: auto; white-space: nowrap; padding: 0 24px; background-color: #52b788;">Kopieren</button>
+        <div class="icon" onclick="openApp('Browser', 'browser.html')">
+            <div class="icon-img">🌐</div>
+            <div>Browser</div>
+        </div>
+        <div class="icon" onclick="openApp('Kalender', 'kalender.html')">
+            <div class="icon-img">📅</div>
+            <div>Kalender</div>
+        </div>
+        <div class="icon" onclick="openApp('Einstellungen', 'einstellungen.html')">
+            <div class="icon-img">⚙️</div>
+            <div>Einstellungen</div>
         </div>
     </div>
 
-    <!-- Kleines Skript für die Kopier-Funktion -->
-    <script>
-        function copyMail() {
-            var copyText = document.getElementById("mailInput");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); // Für Smartphones
-            navigator.clipboard.writeText(copyText.value);
-            alert("E-Mail-Adresse kopiert: " + copyText.value);
-        }
-    </script>
+    <div class="taskbar">
+        <div class="start-btn">⊞ Start</div>
+    </div>
 
+    <script>
+        let zIndexCounter = 10;
+
+        function openApp(title, file) {
+            let appKey = file.replace('.html', '');
+            let existing = document.getElementById('win-' + appKey);
+            if (existing) {
+                existing.style.zIndex = ++zIndexCounter;
+                return;
+            }
+
+            let win = document.createElement('div');
+            win.id = 'win-' + appKey;
+            win.className = 'window';
+            win.style.left = (50 + (zIndexCounter * 5)) + 'px';
+            win.style.top = (50 + (zIndexCounter * 5)) + 'px';
+            win.style.zIndex = ++zIndexCounter;
+            
+            win.innerHTML = `
+                <div class="window-header" onmousedown="dragStart(event, '${win.id}')">
+                    <span class="window-title">${title}</span>
+                    <button class="window-close" onclick="closeApp('${win.id}')"></button>
+                </div>
+                <div class="window-content">
+                    <iframe class="app-iframe" src="${file}"></iframe>
+                </div>
+            `;
+            document.body.appendChild(win);
+        }
+
+        function closeApp(id) {
+            let win = document.getElementById(id);
+            if (win) win.remove();
+        }
+
+        let activeWin = null;
+        let offsetX, offsetY;
+
+        function dragStart(e, id) {
+            if (e.target.className === 'window-close') return;
+            activeWin = document.getElementById(id);
+            activeWin.style.zIndex = ++zIndexCounter;
+            offsetX = e.clientX - activeWin.getBoundingClientRect().left;
+            offsetY = e.clientY - activeWin.getBoundingClientRect().top;
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!activeWin) return;
+            activeWin.style.left = (e.clientX - offsetX) + 'px';
+            activeWin.style.top = (e.clientY - offsetY) + 'px';
+        }
+
+        function dragEnd() {
+            activeWin = null;
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+        }
+
+        // Standardmäßig das Terminal beim Start öffnen
+        openApp('Terminal', 'terminal.html');
+    </script>
 </body>
 </html>
