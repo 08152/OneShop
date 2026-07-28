@@ -2,38 +2,156 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <title>Einstellungen</title>
     <style>
         /* CC0 1.0 Universal - Public Domain Dedication */
-        body { font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; background: #f9f9f9; color: #333; font-size: 13px; }
-        h3 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
-        .setting-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        select, input[type="text"], input[type="number"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .checkbox-group { display: flex; align-items: center; gap: 5px; margin-top: 10px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            padding: 15px; 
+            margin: 0; 
+            background: #f9f9f9; 
+            color: #333; 
+            font-size: 13px; 
+            user-select: none;
+        }
+        h3 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px; color: #00426d; }
+        
+        .section {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section-title { font-weight: bold; margin-bottom: 10px; color: #555; display: flex; align-items: center; gap: 5px; }
+        
+        .control-group { margin-bottom: 10px; }
+        .control-group:last-child { margin-bottom: 0; }
+        
+        label { display: block; margin-bottom: 5px; color: #666; }
+        
+        /* Slider Styles */
+        .slider-container { display: flex; align-items: center; gap: 10px; }
+        .slider-container input[type="range"] { flex: 1; accent-color: #00426d; cursor: pointer; }
+        .value-display { width: 35px; text-align: right; font-family: monospace; color: #777; }
+        
+        /* Theme Grid */
+        .bg-grid { display: flex; gap: 10px; margin-top: 5px; }
+        .bg-btn { 
+            width: 40px; 
+            height: 40px; 
+            border: 2px solid #ccc; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: transform 0.1s, border-color 0.1s;
+        }
+        .bg-btn:hover { transform: scale(1.05); }
+        .bg-btn.active { border-color: #00426d; transform: scale(1.05); }
+        
+        /* Farb-Vorschauen */
+        #bg-blue { background: #00426d; }
+        #bg-dark { background: #1e1e1e; }
+        #bg-green { background: #003d1c; }
+        #bg-purple { background: #3c006d; }
     </style>
 </head>
 <body>
-    <h3>Systemsteuerung</h3>
-    <div class="setting-group">
-        <label>Verschlüsselungs-Protokoll</label>
-        <select>
-            <option>AES-256 (Aktiviert)</option>
-            <option>RSA-4096</option>
-            <option>DES (Unsicher!)</option>
-            <option>Keine Verschlüsselung</option>
-        </select>
+
+    <h3>💻 Systemeinstellungen</h3>
+
+    <!-- HINTERGRUND -->
+    <div class="section">
+        <div class="section-title">🖼️ Desktop-Hintergrund</div>
+        <div class="control-group">
+            <label>Wähle eine Systemfarbe für den Desktop:</label>
+            <div class="bg-grid">
+                <button class="bg-btn" id="bg-blue" onclick="setBg('#00426d', this)" title="Standard Blau"></button>
+                <button class="bg-btn" id="bg-dark" onclick="setBg('#1e1e1e', this)" title="Matrix Schwarz"></button>
+                <button class="bg-btn" id="bg-green" onclick="setBg('#003d1c', this)" title="Terminal Grün"></button>
+                <button class="bg-btn" id="bg-purple" onclick="setBg('#3c006d', this)" title="Cyberpunk Lila"></button>
+            </div>
+        </div>
     </div>
-    <div class="setting-group">
-        <label>Hacker-Proxy IP-Adresse</label>
-        <input type="text" value="127.0.0.1">
+
+    <!-- LICHT / HELLIGKEIT -->
+    <div class="section">
+        <div class="section-title">💡 Bildschirm & Licht</div>
+        <div class="control-group">
+            <label id="label-brightness">Monitor-Helligkeit: 100%</label>
+            <div class="slider-container">
+                <input type="range" id="brightness" min="20" max="100" value="100" oninput="updateBrightness(this.value)">
+                <span class="value-display" id="val-brightness">100%</span>
+            </div>
+        </div>
     </div>
-    <div class="setting-group">
-        <label>Verbindungs-Timeout (Sekunden)</label>
-        <input type="number" value="30">
+
+    <!-- LAUTSTÄRKE -->
+    <div class="section">
+        <div class="section-title">🔊 Audio & Lautstärke</div>
+        <div class="control-group">
+            <label>Hauptlautstärke (System-Sounds):</label>
+            <div class="slider-container">
+                <input type="range" id="volume" min="0" max="100" value="70" oninput="updateVolume(this.value)">
+                <span class="value-display" id="val-volume">70%</span>
+            </div>
+        </div>
     </div>
-    <div class="checkbox-group">
-        <input type="checkbox" id="logs" checked>
-        <label for="logs">Eigene IP-Adresse im Netzwerk verbergen</label>
-    </div>
+
+    <script>
+        // Synchronisiert die Einstellungen direkt mit dem Hauptfenster (index.html)
+        function setBg(color, element) {
+            // Aktiven Button optisch hervorheben
+            document.querySelectorAll('.bg-btn').forEach(btn => btn.classList.remove('active'));
+            if(element) element.classList.add('active');
+            
+            // Speicher im LocalStorage für index.html ab
+            localStorage.setItem('win_desktop_bg', color);
+            
+            // Versuche direkt auf das Eltern-Dokument zuzugreifen, falls im Iframe geladen
+            if (window.parent && window.parent.document) {
+                const desktop = window.parent.document.getElementById('desktop');
+                if (desktop) desktop.style.background = color;
+            }
+        }
+
+        function updateBrightness(value) {
+            document.getElementById('val-brightness').innerText = value + '%';
+            localStorage.setItem('win_desktop_brightness', value);
+            
+            // Wendet einen Helligkeitsfilter auf das gesamte Hauptfenster an
+            if (window.parent && window.parent.document) {
+                window.parent.document.body.style.filter = `brightness(${value}%)`;
+            }
+        }
+
+        function updateVolume(value) {
+            document.getElementById('val-volume').innerText = value + '%';
+            localStorage.setItem('win_desktop_volume', value);
+            // Hier könnte später ein Audio-Player im Simulator die Lautstärke auslesen
+        }
+
+        // Beim Laden der App zuvor gespeicherte Werte wiederherstellen
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedBg = localStorage.getItem('win_desktop_bg') || '#00426d';
+            const savedBtn = Array.from(document.querySelectorAll('.bg-btn')).find(b => b.id.includes(savedBg.replace('#', '')));
+            // Alternativ über Farbabgleich suchen
+            const btns = document.querySelectorAll('.bg-btn');
+            btns.forEach(btn => {
+                if(btn.id === 'bg-blue' && savedBg === '#00426d') btn.classList.add('active');
+                if(btn.id === 'bg-dark' && savedBg === '#1e1e1e') btn.classList.add('active');
+                if(btn.id === 'bg-green' && savedBg === '#003d1c') btn.classList.add('active');
+                if(btn.id === 'bg-purple' && savedBg === '#3c006d') btn.classList.add('active');
+            });
+
+            const savedBrightness = localStorage.getItem('win_desktop_brightness') || '100';
+            document.getElementById('brightness').value = savedBrightness;
+            updateBrightness(savedBrightness);
+
+            const savedVolume = localStorage.getItem('win_desktop_volume') || '70';
+            document.getElementById('volume').value = savedVolume;
+            document.getElementById('val-volume').innerText = savedVolume + '%';
+        });
+    </script>
 </body>
 </html>
