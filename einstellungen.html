@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* CC0 1.0 Universal - Public Domain Dedication */
+        body { font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; background: #f9f9f9; color: #333; font-size: 13px; }
+        h3 { margin-top: 0; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
+        .setting-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .checkbox-group { display: flex; align-items: center; gap: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h3>Systemsteuerung</h3>
+    <div class="setting-group">
+        <label>Verschlüsselungs-Protokoll</label>
+        <select>
+            <option>AES-256 (Aktiviert)</option>
+            <option>RSA-4096</option>
+            <option>DES (Unsicher!)</option>
+            <option>Keine Verschlüsselung</option>
+        </select>
+    </div>
+    <div class="setting-group">
+        <label>Hacker-Proxy IP-Adresse</label>
+        <input type="text" value="127.0.0.1">
+    </div>
+    <div class="setting-group">
+        <label>Verbindungs-Timeout (Sekunden)</label>
+        <input type="number" value="30">
+    </div>
+    <div class="checkbox-group">
+        <input type="checkbox" id="logs" checked>
+        <label for="logs">Eigene IP-Adresse im Netzwerk verbergen</label>
+    </div>
+</body>
+</html>
