@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Spielautomat</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+h1{
+    margin-top:30px;
+}
+
+.slot{
+    display:inline-block;
+    width:100px;
+    height:100px;
+    line-height:100px;
+    font-size:60px;
+    background:white;
+    color:black;
+    margin:10px;
+    border-radius:10px;
+}
+
+button{
+    margin-top:40px;
+    font-size:25px;
+    padding:15px 35px;
+    cursor:pointer;
+}
+
+#info{
+    margin-top:25px;
+    font-size:28px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🎰 Spielautomat</h1>
+
+<div id="a" class="slot">❓</div>
+<div id="b" class="slot">❓</div>
+<div id="c" class="slot">❓</div>
+
+<br>
+
+<button onclick="drehen()">Drehen</button>
+
+<div id="info"></div>
+
+<script>
+
+const emojis=["🍒","🍋","🍇","⭐","7️⃣","🍀"];
+
+function zufall(){
+    return emojis[Math.floor(Math.random()*emojis.length)];
+}
+
+function drehen(){
+
+const felder=[
+document.getElementById("a"),
+document.getElementById("b"),
+document.getElementById("c")
+];
+
+let i=0;
+
+const anim=setInterval(()=>{
+
+felder[0].innerHTML=zufall();
+felder[1].innerHTML=zufall();
+felder[2].innerHTML=zufall();
+
+i++;
+
+if(i>25){
+
+clearInterval(anim);
+
+const r=Math.random();
+
+let e1,e2,e3;
+
+if(r<0.15){
+
+//15% drei gleiche
+
+e1=zufall();
+e2=e1;
+e3=e1;
+
+document.getElementById("info").innerHTML="🎉 Drei gleiche!";
+
+}
+else if(r<0.40){
+
+//25% zwei gleiche
+
+e1=zufall();
+e2=e1;
+
+do{
+e3=zufall();
+}while(e3===e1);
+
+if(Math.random()<0.5){
+[e2,e3]=[e3,e2];
+}
+
+document.getElementById("info").innerHTML="✨ Zwei gleiche!";
+}
+else{
+
+e1=zufall();
+
+do{
+e2=zufall();
+}while(e2===e1);
+
+do{
+e3=zufall();
+}while(e3===e1 || e3===e2);
+
+document.getElementById("info").innerHTML="Leider nichts.";
+}
+
+felder[0].innerHTML=e1;
+felder[1].innerHTML=e2;
+felder[2].innerHTML=e3;
+
+}
+
+},80);
+
+}
+
+</script>
+
+</body>
+</html>
