@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Darknet Seite</title>
+    <title>Meine Darknet Suche</title>
     <style>
-        /* Dunkles Design passend zum Darknet */
         body {
             background-color: #121212;
             color: #e0e0e0;
@@ -13,43 +12,44 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .container {
             text-align: center;
-            padding: 20px;
-            border: 1px solid #333;
-            background-color: #1a1a1a;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
         }
         h1 {
             color: #00ff66;
             font-size: 24px;
+            margin-bottom: 5px;
         }
         p {
             font-size: 14px;
             color: #888;
+            margin-top: 0;
         }
-        /* DuckDuckGo Suchmaske */
         .search-box {
-            margin-top: 25px;
+            margin: 15px 0;
         }
         input[type="text"] {
-            background-color: #222;
-            border: 1px solid #444;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
             color: #fff;
             padding: 10px;
-            width: 250px;
+            width: 60%;
             border-radius: 4px;
         }
         input[type="submit"] {
             background-color: #00ff66;
             border: none;
             color: #121212;
-            padding: 10px 15px;
+            padding: 10px 20px;
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
@@ -57,22 +57,34 @@
         input[type="submit"]:hover {
             background-color: #00cc52;
         }
+        /* Das Ergebnisfenster */
+        iframe {
+            width: 100%;
+            max-width: 900px;
+            height: 70vh;
+            border: 1px solid #333;
+            background-color: #ffffff; /* DDG-HTML liefert weißen Hintergrund */
+            border-radius: 6px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Willkommen auf meiner Onion-Seite</h1>
-        <p>Dies ist eine legale, minimalistische HTML-Webseite.</p>
+        <h1>Onion Suchportal</h1>
+        <p>Ergebnisse werden direkt unten eingeblendet.</p>
 
-        <!-- DuckDuckGo Onion Suchformular -->
+        <!-- Formular sendet die Suchanfrage an das iframe ("results") -->
         <div class="search-box">
-            <form method="get" action="https://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion">
-                <input type="text" name="q" placeholder="Im Darknet suchen..." required>
+            <form method="get" action="https://html.duckduckgo.com/html/" target="results">
+                <input type="text" name="q" placeholder="Suchbegriff eingeben..." required>
                 <input type="submit" value="Suchen">
             </form>
         </div>
     </div>
+
+    <!-- Hier werden die Suchergebnisse geladen -->
+    <iframe name="results" src="about:blank" title="Suchergebnisse"></iframe>
 
 </body>
 </html>
