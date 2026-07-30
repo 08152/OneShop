@@ -1,14 +1,13 @@
 {
-  "name": "one-shop-separated-mailer",
+  "name": "one-shop-unlimited-mailer",
   "version": "1.0.0",
-  "description": "Kostenloser HTML Mailer via Brevo und Render",
+  "description": "Unlimitierter kostenloser HTML Mailer ohne Installation",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "nodemailer": "^6.9.13"
+    "express": "^4.19.2"
   },
   "engines": {
     "node": ">=18.0.0"
