@@ -1,71 +1,54 @@
 const express = require('express');
-const path = require('path');
+const nodemailer = require('nodemailer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Erlaubt das Lesen von JSON-Daten im Body
 app.use(express.json());
 
-// Start-Benutzerliste (jetzt leer, da sich jeder selbst registriert)
-let usersData = [];
-
-// API: Alle Benutzer abrufen
-app.get('/api/users', (req, res) => {
-    res.json(usersData);
+// Einfacher Test-Endpunkt für den Browser
+app.get('/', (req, res) => {
+    res.send('E-Mail Server läuft erfolgreich!');
 });
 
-// NEU - API: Einen neuen Benutzer registrieren
-app.post('/api/users/register', (req, res) => {
-    const { name } = req.body;
-    if (!name || name.trim() === "") {
-        return res.status(400).json({ error: "Name darf nicht leer sein" });
+// API-Endpunkt zum Senden der HTML-E-Mail
+app.post('/send-email', async (req, res) => {
+    const { to, subject, htmlContent } = req.body;
+
+    if (!to || !subject || !htmlContent) {
+        return res.status(400).json({ error: 'Bitte "to", "subject" und "htmlContent" angeben.' });
     }
 
-    // Neue ID generieren
-    const newId = usersData.length > 0 ? usersData[usersData.length - 1].id + 1 : 1;
-    
-    const newUser = {
-        id: newId,
-        name: name.trim(),
-        balance: 0.00, // Startet bei 0€
-        expenses: 0.00,
-        nextSalary: "Noch nicht festgelegt",
-        history: [],
-        contracts: []
-    };
+    try {
+        // Konfiguration des E-Mail-Transporters über Umgebungsvariablen
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,       // z.B. ://gmail.com oder mail.gmx.net
+            port: parseInt(process.env.EMAIL_PORT) || 587, 
+            secure: process.env.EMAIL_SECURE === 'true', // true für Port 465, false für andere
+            auth: {
+                user: process.env.EMAIL_USER,   // Deine E-Mail-Adresse
+                pass: process.env.EMAIL_PASS    // Dein Passwort oder App-Passwort
+            }
+        });
 
-    usersData.push(newUser);
-    res.json({ success: true, user: newUser });
+        // E-Mail Optionen festlegen
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: to,
+            subject: subject,
+            html: htmlContent // Hier wird der HTML-Code gerendert
+        };
+
+        // E-Mail senden
+        const info = await transporter.sendMail(mailOptions);
+        return res.status(200).json({ message: 'E-Mail erfolgreich gesendet!', messageId: info.messageId });
+
+    } catch (error) {
+        console.error('Fehler beim E-Mail-Versand:', error);
+        return res.status(500).json({ error: 'Fehler beim Senden der E-Mail.', details: error.message });
+    }
 });
 
-// API: Änderungen vom Admin-Panel speichern
-app.post('/api/users/update', (req, res) => {
-    const { id, salary, nextSalary, contractName, contractPrice, expenseName, expenseAmount } = req.body;
-    const user = usersData.find(u => u.id === parseInt(id));
-
-    if (!user) return res.status(404).json({ error: "Nutzer nicht gefunden" });
-
-    if (salary && parseFloat(salary) > 0) {
-        user.balance += parseFloat(salary);
-        user.history.push({ type: 'Einnahme', name: 'Gehalt ausgezahlt', amount: parseFloat(salary) });
-    }
-    if (nextSalary) user.nextSalary = nextSalary;
-    if (contractName && parseFloat(contractPrice) > 0) {
-        user.contracts.push({ name: contractName, price: parseFloat(contractPrice) });
-    }
-    if (expenseName && parseFloat(expenseAmount) > 0) {
-        user.balance -= parseFloat(expenseAmount);
-        user.expenses += parseFloat(expenseAmount);
-        user.history.push({ type: 'Ausgabe', name: expenseName, amount: parseFloat(expenseAmount) });
-    }
-
-    res.json({ success: true, user });
+app.listen(PORT, () => {
+    console.log(`Server läuft auf Port ${PORT}`);
 });
-
-// HTML-Seiten ausliefern
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
-app.get('/vermoegen.html', (req, res) => res.sendFile(path.join(__dirname, 'vermoegen.html')));
-app.get('/vertraege.html', (req, res) => res.sendFile(path.join(__dirname, 'vertraege.html')));
-app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
-
-app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
