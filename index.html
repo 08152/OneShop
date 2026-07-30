@@ -17,11 +17,14 @@
     <div class="box">
         <h2>🤖 Pixel-zu-Beschreibung KI</h2>
         <p>Nutze Bilder im selben GitHub-Ordner für die Farb-KI.</p>
+        
+        <!-- Das Formular schickt die Beschreibung an deine app.py -->
         <form method="POST">
             <input type="text" name="prompt" placeholder="kreis, wiese, sonne oder wellen..." value="{{ prompt }}" required>
             <button type="submit">Pixel rendern</button>
         </form>
 
+        <!-- Zeigt das Bild an, sobald es generiert wurde -->
         {% if generated %}
         <div class="output">
             <h3>Generiertes Bild für: "{{ prompt }}"</h3>
