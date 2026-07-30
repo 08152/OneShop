@@ -3,42 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OneShop Mailer - Unbegrenzt</title>
+    <title>Meine Darknet Seite</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; max-width: 500px; }
-        h2 { color: #10b981; margin-top: 0; text-align: center; }
-        label { display: block; margin: 14px 0 6px; font-weight: 600; color: #374151; font-size: 14px; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 14px; background-color: #f9fafb; }
-        input:focus, textarea:focus { outline: none; border-color: #10b981; background-color: #fff; }
-        .domain-hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
-        button { width: 100%; background-color: #10b981; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 24px; cursor: pointer; transition: background 0.2s; }
-        button:hover { background-color: #059669; }
+        /* Dunkles Design passend zum Darknet */
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+        }
+        h1 {
+            color: #00ff66;
+            font-size: 24px;
+        }
+        p {
+            font-size: 14px;
+            color: #888;
+        }
+        /* DuckDuckGo Suchmaske */
+        .search-box {
+            margin-top: 25px;
+        }
+        input[type="text"] {
+            background-color: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            width: 250px;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #00ff66;
+            border: none;
+            color: #121212;
+            padding: 10px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #00cc52;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>E-Mail generieren & schreiben</h2>
-    <p style="color: #6b7280; font-size: 13px; text-align: center; margin-bottom: 20px;">Unlimitierter Versand direkt über das Web-Interface ohne Limits.</p>
-    
-    <form action="/send-email" method="POST">
-        <label for="vonWunschName">Neue Absender-Adresse:</label>
-        <input type="text" id="vonWunschName" name="vonWunschName" placeholder="z.B. info, support, noreply" required>
-        <div class="domain-hint">Daraus wird: <strong>wunschname@://onrender.com</strong></div>
+    <div class="container">
+        <h1>Willkommen auf meiner Onion-Seite</h1>
+        <p>Dies ist eine legale, minimalistische HTML-Webseite.</p>
 
-        <label for="to">Empfänger E-Mail-Adresse:</label>
-        <input type="email" id="to" name="to" placeholder="ziel-adresse@gmail.com" required>
-
-        <label for="subject">E-Mail Betreff:</label>
-        <input type="text" id="subject" name="subject" placeholder="Dein Finanz-Dashboard Übersicht" required>
-
-        <label for="messageText">Nachricht (Inhalt):</label>
-        <textarea id="messageText" name="messageText" rows="4" placeholder="Schreibe hier deinen persönlichen Text..." required></textarea>
-
-        <button type="submit">Jetzt unbegrenzt absenden</button>
-    </form>
-</div>
+        <!-- DuckDuckGo Onion Suchformular -->
+        <div class="search-box">
+            <form method="get" action="https://duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion">
+                <input type="text" name="q" placeholder="Im Darknet suchen..." required>
+                <input type="submit" value="Suchen">
+            </form>
+        </div>
+    </div>
 
 </body>
 </html>
