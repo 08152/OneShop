@@ -1,14 +1,15 @@
 {
-  "name": "html-email-sender",
+  "name": "eigener-mail-server",
   "version": "1.0.0",
-  "description": "HTML Mail Sender via Render and GitHub",
+  "description": "Eigener, unabhängiger SMTP Mail Server",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "nodemailer": "^6.9.13"
+    "nodemailer": "^6.9.13",
+    "smtp-server": "^3.13.0"
   },
   "engines": {
     "node": ">=18.0.0"
