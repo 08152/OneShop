@@ -1,13 +1,14 @@
 {
-  "name": "finanz-guru-demo",
+  "name": "html-email-sender",
   "version": "1.0.0",
-  "description": "Finanz Dashboard mit Admin-Panel",
+  "description": "HTML Mail Sender via Render and GitHub",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13"
   },
   "engines": {
     "node": ">=18.0.0"
