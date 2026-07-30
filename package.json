@@ -1,7 +1,7 @@
 {
-  "name": "one-shop-mail-server",
+  "name": "one-shop-separated-mailer",
   "version": "1.0.0",
-  "description": "Unabhängiger Mail-Versand ohne externe Dienste",
+  "description": "Kostenloser HTML Mailer mit getrennten Dateien",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
