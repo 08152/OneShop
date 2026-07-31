@@ -2,35 +2,94 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Pixel KI Renderer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oneshop Weiterleitung</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f0f1a; color: #fff; text-align: center; padding: 40px; }
-        .box { background: #1a1a2e; padding: 30px; border-radius: 12px; display: inline-block; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        input[type="text"] { padding: 12px; width: 280px; border: 2px solid #3f3f5f; border-radius: 6px; background: #111; color: #fff; font-size: 16px; }
-        button { padding: 12px 24px; background: #e94560; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:hover { background: #ff4f73; }
-        .output { margin-top: 30px; }
-        img { border: 4px solid #fff; border-radius: 4px; width: 256px; height: 256px; image-rendering: pixelated; }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h1 { color: #2c3e50; font-size: 24px; }
+        p { color: #7f8c8d; font-size: 16px; }
+        .success-icon { font-size: 48px; color: #2ecc71; margin-bottom: 15px; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>🤖 Pixel-zu-Beschreibung KI</h2>
-        <p>Nutze Bilder im selben GitHub-Ordner für die Farb-KI.</p>
-        
-        <!-- Das Formular schickt die Beschreibung an deine app.py -->
-        <form method="POST">
-            <input type="text" name="prompt" placeholder="kreis, wiese, sonne oder wellen..." value="{{ prompt }}" required>
-            <button type="submit">Pixel rendern</button>
-        </form>
 
-        <!-- Zeigt das Bild an, sobald es generiert wurde -->
-        {% if generated %}
-        <div class="output">
-            <h3>Generiertes Bild für: "{{ prompt }}"</h3>
-            <img src="/render_image?cb={{ cache_buster }}" alt="KI Bild">
+    <div class="container">
+        <!-- Dieser Bereich ändert sich dynamisch je nach aktueller URL -->
+        <div id="status-content">
+            <div class="spinner"></div>
+            <h1>Verbindung wird aufgebaut...</h1>
+            <p>Bitte warten, du wirst weitergeleitet.</p>
         </div>
-        {% endif %}
     </div>
+
+    <script>
+        // Definition der Weiterleitungskette
+        const chain = [
+            "https://oneshop-1.onrender.com",
+            "https://oneshop-2.onrender.com",
+            "https://oneshop-3.onrender.com"
+        ];
+
+        // Aktuelle URL auslesen (ignoriert eventuelle Parameter am Ende)
+        const currentUrl = window.location.origin;
+
+        // Finde die Position der aktuellen URL in der Kette
+        const currentIndex = chain.indexOf(currentUrl);
+
+        // Wenn wir auf Shop 1 oder Shop 2 sind, leite zum nächsten weiter
+        if (currentIndex !== -1 && currentIndex < chain.length - 1) {
+            const nextUrl = chain[currentIndex + 1];
+            // Optionale minimale Verzögerung von 500ms, damit der Nutzer sieht, was passiert
+            setTimeout(() => {
+                window.location.href = nextUrl;
+            }, 500);
+        } 
+        // Wenn wir das finale Ziel (Shop 3) erreicht haben
+        else if (currentUrl === chain[chain.length - 1]) {
+            document.getElementById('status-content').innerHTML = `
+                <div class="success-icon">✓</div>
+                <h1>Ziel erreicht!</h1>
+                <p>Willkommen auf https://oneshop-3.onrender.com. Die Weiterleitungskette ist abgeschlossen.</p>
+            `;
+        } 
+        // Fallback, falls die Datei lokal oder auf einer anderen URL getestet wird
+        else {
+            document.getElementById('status-content').innerHTML = `
+                <h1>Oneshop Startseite</h1>
+                <p>Klicke unten, um die Kette manuell zu starten:</p>
+                <a href="${chain[0]}" style="display:inline-block; margin-top:15px; padding:10px 20px; background:#3498db; color:white; text-decoration:none; border-radius:5px;">Zu Shop 1 wechseln</a>
+            `;
+        }
+    </script>
+
 </body>
 </html>
