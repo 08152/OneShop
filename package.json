@@ -1,12 +1,4 @@
-{
-  "name": "simple-node-server",
-  "version": "1.0.0",
-  "description": "Ein einfacher Node.js Webserver mit Express",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.19.2"
-  }
+"dependencies": {
+  "express": "^4.19.2",
+  "http-proxy-middleware": "^3.0.3"
 }
