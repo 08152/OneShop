@@ -1,15 +1,12 @@
 {
-  "name": "one-shop-unlimited-mailer",
+  "name": "simple-node-server",
   "version": "1.0.0",
-  "description": "Unlimitierter kostenloser HTML Mailer ohne Installation",
+  "description": "Ein einfacher Node.js Webserver mit Express",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
