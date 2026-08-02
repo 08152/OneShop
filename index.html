@@ -3,133 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lokale Musik-KI</title>
+    <title>Lokaler MP3 Beat-Slicer</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #121212;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0d0e12;
             color: #ffffff;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
         }
         .container {
-            background: #1e1e1e;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #16171e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
             text-align: center;
-            width: 400px;
+            width: 450px;
+            border: 1px solid #252836;
         }
         button {
-            background: #1db954;
+            background: #ff5722;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 15px 30px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
         }
         button:hover {
-            background: #1ed760;
-            transform: scale(1.05);
+            background: #ff7043;
+            transform: translateY(-2px);
         }
-        .playlist {
-            margin-top: 20px;
-            text-align: left;
-            background: #282828;
-            border-radius: 8px;
-            padding: 10px;
+        button.stop {
+            background: #37474f;
+            box-shadow: none;
+            margin-left: 10px;
         }
-        .song-item {
-            padding: 8px;
-            border-bottom: 1px solid #3e3e3e;
+        .status-box {
+            margin-top: 25px;
+            background: #1f222f;
+            padding: 15px;
+            border-radius: 10px;
             font-size: 14px;
+            text-align: left;
+            border-left: 4px solid #ff5722;
         }
-        .song-item.active {
-            color: #1db954;
+        .highlight {
+            color: #ffb74d;
             font-weight: bold;
-        }
-        audio {
-            margin-top: 20px;
-            width: 100%;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Musik-KI</h1>
-    <p>Generiere Playlists aus deinen lokalen MP3s</p>
-    <button onclick="generateAIPlaylist()">KI-Playlist generieren</button>
+    <h1>MP3 Beat-Slicer KI</h1>
+    <p>Zerlegt deine MP3s mathematisch und baut neue Rhythmen</p>
+    <button onclick="loadAndSliceTrack()">Neuen Beat generieren</button>
+    <button class="stop" onclick="stopBeat()">Stop</button>
     
-    <audio id="audioPlayer" controls></audio>
-    
-    <div class="playlist" id="playlistContainer" style="display: none;">
-        <h3>KI Vorhersage-Reihenfolge:</h3>
-        <div id="tracksList"></div>
+    <div class="status-box">
+        <p>Status: <span id="statusTxt">Bereit</span></p>
+        <p>Geladene Quelldatei: <span id="trackTxt" class="highlight">-</span></p>
+        <p>Aktuelles KI-Schnittmuster: <span id="sliceTxt" class="highlight">-</span></p>
     </div>
 </div>
 
 <script>
-    let currentPlaylist = [];
-    let currentTrackIndex = 0;
-    const player = document.getElementById('audioPlayer');
+    let audioCtx = null;
+    let decodedBuffer = null;
+    let isPlaying = false;
+    let beatTimeout = null;
+    
+    // Konfiguration für die Beat-Generierung
+    const bpm = 125; 
+    const stepLength = 60 / bpm / 2; // Achtelnoten-Raster
+    let currentStep = 0;
 
-    async function generateAIPlaylist() {
-        const response = await fetch('/api/generate-playlist');
-        const data = await response.json();
+    async function loadAndSliceTrack() {
+        stopBeat();
+        document.getElementById('statusTxt').innerText = "Suche MP3-Dateien...";
 
-        if (data.error) {
-            alert(data.error);
+        // 1. Liste der verfügbaren MP3s vom Server holen
+        const res = await fetch('/api/available-tracks');
+        const tracks = await res.json();
+
+        if (tracks.length === 0) {
+            document.getElementById('statusTxt').innerText = "Fehler: Keine MP3s im 'musik'-Ordner!";
+            alert("Bitte lege zuerst MP3-Dateien in den Ordner 'musik'!");
             return;
         }
 
-        currentPlaylist = data;
-        currentTrackIndex = 0;
+        // Zufälligen Track als KI-Basis wählen
+        const selectedTrack = tracks[Math.floor(Math.random() * tracks.length)];
+        document.getElementById('trackTxt').innerText = selectedTrack;
+        document.getElementById('statusTxt').innerText = "Lade und decodiere Audiosignale...";
+
+        // 2. Audio-Kontext initialisieren
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 3. MP3 als Binärdaten (ArrayBuffer) herunterladen
+        const trackRes = await fetch(`/tracks/${encodeURIComponent(selectedTrack)}`);
+        const arrayBuffer = await trackRes.arrayBuffer();
+
+        // 4. Die komprimierte MP3 in rohe PCM-Wellenformen decodieren
+        decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
         
-        renderPlaylist();
-        playTrack(currentTrackIndex);
+        document.getElementById('statusTxt').innerText = "Generiere neuen Rhythmus-Loop...";
+        isPlaying = true;
+        currentStep = 0;
+        
+        playSlicedLoop();
     }
 
-    function renderPlaylist() {
-        const container = document.getElementById('playlistContainer');
-        const list = document.getElementById('tracksList');
-        container.style.display = 'block';
-        list.innerHTML = '';
+    function playSlicedLoop() {
+        if (!isPlaying || !decodedBuffer) return;
 
-        currentPlaylist.forEach((track, index) => {
-            const div = document.createElement('div');
-            div.className = `song-item ${index === currentTrackIndex ? 'active' : ''}`;
-            div.innerText = `${index + 1}. ${track.artist} - ${track.title} (${track.genre})`;
-            list.appendChild(div);
-        });
+        // KI-Logik: Berechne zufällige, aber mathematisch saubere Abschnitte aus der MP3
+        // Wir teilen die Datei gedanklich in Schnipsel und wählen pro Schritt ein zufälliges Fragment
+        const totalDuration = decodedBuffer.duration;
+        const sliceDuration = 0.25; // Länge eines Sound-Schnipsels (250ms)
+        
+        // Wähle einen zufälligen Startpunkt innerhalb der ersten 80% des Songs
+        const randomOffset = Math.random() * (totalDuration * 0.8);
+
+        // Slice abspielen
+        playBufferSlice(randomOffset, sliceDuration);
+
+        document.getElementById('sliceTxt').innerText = `Step ${currentStep + 1}/8 - Offset: ${randomOffset.toFixed(2)}s`;
+        document.getElementById('statusTxt').innerText = "Beat-Wiedergabe aktiv";
+
+        currentStep = (currentStep + 1) % 8;
+
+        // Exaktes Timing-Intervall für den nächsten Beat-Schritt
+        beatTimeout = setTimeout(playSlicedLoop, stepLength * 1000);
     }
 
-    function playTrack(index) {
-        if (index >= currentPlaylist.length) return;
-        
-        currentTrackIndex = index;
-        renderPlaylist();
-        
-        player.src = `/tracks/${encodeURIComponent(currentPlaylist[index].filename)}`;
-        player.play();
+    function playBufferSlice(startTime, duration) {
+        // Erzeuge eine neue Audioquelle aus dem decodierten MP3-Speicher
+        const source = audioCtx.createBufferSource();
+        source.buffer = decodedBuffer;
+
+        // Ein kleiner Lautstärken-Filter (Gain), um Knackgeräusche an den Schnittkanten zu verhindern
+        const gainNode = audioCtx.createGain();
+        gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration - 0.02);
+
+        source.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        // Spiele genau den berechneten Ausschnitt der MP3 ab
+        source.start(0, startTime, duration);
     }
 
-    // Automatisch nächsten KI-Song spielen, wenn der aktuelle endet
-    player.onended = () => {
-        if (currentTrackIndex + 1 < currentPlaylist.length) {
-            playTrack(currentTrackIndex + 1);
-        } else {
-            // Wenn Playlist vorbei, neue generieren
-            generateAIPlaylist();
+    function stopBeat() {
+        isPlaying = false;
+        clearTimeout(beatTimeout);
+        if (audioCtx) {
+            audioCtx.close();
+            audioCtx = null;
         }
-    };
+        document.getElementById('statusTxt').innerText = "Gestoppt";
+        document.getElementById('sliceTxt').innerText = "-";
+    }
 </script>
 
 </body>
