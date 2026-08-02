@@ -1,7 +1,7 @@
 {
-  "name": "audio-slicer-ki",
+  "name": "render-mp3-ki-slicer",
   "version": "1.0.0",
-  "description": "Lokale KI für Audio-Resampling und Beat-Slicing",
+  "description": "KI-Audio-Slicer optimiert fuer Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
