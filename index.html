@@ -124,6 +124,10 @@
         if (isPlaying) stopKiRemix();
         document.getElementById('statusTxt').innerText = "Verbinde mit Server...";
 
+        // Dummy-Audio erzeugen, um die Browser-Sicherheitsblockade zu loesen
+        const unlockAudio = new Audio();
+        unlockAudio.play().catch(() => {});
+
         try {
             const res = await fetch('/api/available-tracks');
             trackList = await res.json();
@@ -161,7 +165,9 @@
         }
 
         activeAudio = new Audio(sliceUrl);
-        activeAudio.play().catch(e => console.log("Wiedergabe unterbrochen"));
+        // Lautstaerke explizit setzen
+        activeAudio.volume = 1.0; 
+        activeAudio.play().catch(e => console.log("Wiedergabe blockiert/unterbrochen:", e));
 
         currentStep = (currentStep + 1) % 8;
         nextStepTimeout = setTimeout(playNextSlice, stepDurationMs);
