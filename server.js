@@ -4,22 +4,21 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Sucht die Dateien direkt im selben Ordner wie diese server.js
 const ROOT_DIR = __dirname; 
 
 app.use(express.static(ROOT_DIR));
 
-// Gibt alle MP3s aus dem aktuellen Ordner aus
+// Scannt den aktuellen Hauptordner nach MP3-Dateien
 app.get('/api/available-tracks', (req, res) => {
     try {
-        const files = fs.readdirSync(ROOT_DIR).filter(file => file.endsWith('.mp3'));
+        const files = fs.readdirSync(ROOT_DIR).filter(file => file.toLowerCase().endsWith('.mp3'));
         res.json(files);
     } catch (err) {
         res.status(500).json({ error: "Ordner konnte nicht gelesen werden." });
     }
 });
 
-// Streamt einen Schnipsel direkt aus dem Hauptordner
+// Streamt robuste Audio-Slices für den KI-Remix
 app.get('/api/stream-slice', (req, res) => {
     const { file, offset } = req.query;
     if (!file) return res.status(400).send("Keine Datei angegeben.");
@@ -30,8 +29,12 @@ app.get('/api/stream-slice', (req, res) => {
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
 
-    const startByte = Math.floor((parseFloat(offset) || 0) * 16000); 
-    const endByte = Math.min(startByte + 40000, fileSize - 1); 
+    // Erhöhte Byte-Menge (ca. 192kbps MP3-Standard) für hörbare Slices
+    const bytesPerSecond = 24000; 
+    const startByte = Math.floor((parseFloat(offset) || 0) * bytesPerSecond);
+    
+    // Schneidet ein gut hörbares Fragment von ca. 1.2 Sekunden heraus
+    const endByte = Math.min(startByte + 45000, fileSize - 1); 
 
     if (startByte >= fileSize) {
         return res.status(400).send("Offset außerhalb der Dateigröße.");
@@ -49,5 +52,5 @@ app.get('/api/stream-slice', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server läuft auf Port ${PORT}`);
+    console.log(`Server läuft erfolgreich auf Port ${PORT}`);
 });
