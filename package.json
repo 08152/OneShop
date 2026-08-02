@@ -1,4 +1,13 @@
-"dependencies": {
-  "express": "^4.19.2",
-  "http-proxy-middleware": "^3.0.3"
+{
+  "name": "musik-ki-server",
+  "version": "1.0.0",
+  "description": "Lokale KI-Musik-Musikdatenbank und Playlist-Generator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "music-metadata": "^7.14.0"
+  }
 }
