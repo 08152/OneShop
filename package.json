@@ -1,7 +1,7 @@
 {
-  "name": "render-mp3-ki-slicer",
+  "name": "render-mp3-ki-generator",
   "version": "1.0.0",
-  "description": "KI-Audio-Slicer optimiert fuer Render",
+  "description": "KI-Audio-Slicer der eine neue Datei generiert",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
