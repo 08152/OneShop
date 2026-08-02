@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lokaler MP3 Beat-Slicer</title>
+    <title>Render MP3-Slicer KI</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: #0d0e12;
+            background: #0a0b0e;
             color: #ffffff;
             display: flex;
             justify-content: center;
@@ -16,17 +16,27 @@
             margin: 0;
         }
         .container {
-            background: #16171e;
+            background: #13151c;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
             text-align: center;
-            width: 450px;
-            border: 1px solid #252836;
+            width: 420px;
+            border: 1px solid #222533;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #00e676;
+        }
+        p {
+            color: #b0bec5;
+            font-size: 14px;
+            margin-top: 0;
         }
         button {
-            background: #ff5722;
-            color: white;
+            background: #00e676;
+            color: #000000;
             border: none;
             padding: 15px 30px;
             font-size: 16px;
@@ -34,29 +44,44 @@
             border-radius: 30px;
             cursor: pointer;
             transition: 0.2s;
-            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
         }
         button:hover {
-            background: #ff7043;
+            background: #33f091;
             transform: translateY(-2px);
         }
         button.stop {
             background: #37474f;
+            color: #ffffff;
             box-shadow: none;
             margin-left: 10px;
         }
-        .status-box {
+        button.stop:hover {
+            background: #455a64;
+        }
+        .status-panel {
             margin-top: 25px;
-            background: #1f222f;
-            padding: 15px;
-            border-radius: 10px;
+            background: #1c1f2b;
+            padding: 20px;
+            border-radius: 12px;
             font-size: 14px;
             text-align: left;
-            border-left: 4px solid #ff5722;
+            border-left: 4px solid #00e676;
+        }
+        .info-row {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .label {
+            color: #90a4ae;
+        }
+        .value {
+            color: #ffffff;
+            font-weight: bold;
         }
         .highlight {
-            color: #ffb74d;
-            font-weight: bold;
+            color: #00e676;
         }
     </style>
 </head>
@@ -64,113 +89,94 @@
 
 <div class="container">
     <h1>MP3 Beat-Slicer KI</h1>
-    <p>Zerlegt deine MP3s mathematisch und baut neue Rhythmen</p>
-    <button onclick="loadAndSliceTrack()">Neuen Beat generieren</button>
-    <button class="stop" onclick="stopBeat()">Stop</button>
+    <p>Live-Resampling & Remixing im selben Ordner</p>
     
-    <div class="status-box">
-        <p>Status: <span id="statusTxt">Bereit</span></p>
-        <p>Geladene Quelldatei: <span id="trackTxt" class="highlight">-</span></p>
-        <p>Aktuelles KI-Schnittmuster: <span id="sliceTxt" class="highlight">-</span></p>
+    <button onclick="startKiRemix()">Beat generieren</button>
+    <button class="stop" onclick="stopKiRemix()">Stop</button>
+    
+    <div class="status-panel">
+        <div class="info-row">
+            <span class="label">Status:</span>
+            <span id="statusTxt" class="value">Bereit</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Quelle:</span>
+            <span id="trackTxt" class="value highlight">-</span>
+        </div>
+        <div class="info-row">
+            <span class="label">KI-Muster:</span>
+            <span id="patternTxt" class="value">-</span>
+        </div>
     </div>
 </div>
 
 <script>
-    let audioCtx = null;
-    let decodedBuffer = null;
     let isPlaying = false;
-    let beatTimeout = null;
-    
-    // Konfiguration für die Beat-Generierung
-    const bpm = 125; 
-    const stepLength = 60 / bpm / 2; // Achtelnoten-Raster
+    let nextStepTimeout = null;
+    let trackList = [];
+    let activeAudio = null;
+
+    const bpm = 130;
+    const stepDurationMs = (60 / bpm / 2) * 1000; 
     let currentStep = 0;
 
-    async function loadAndSliceTrack() {
-        stopBeat();
-        document.getElementById('statusTxt').innerText = "Suche MP3-Dateien...";
+    async function startKiRemix() {
+        if (isPlaying) stopKiRemix();
+        document.getElementById('statusTxt').innerText = "Verbinde mit Server...";
 
-        // 1. Liste der verfügbaren MP3s vom Server holen
-        const res = await fetch('/api/available-tracks');
-        const tracks = await res.json();
+        try {
+            const res = await fetch('/api/available-tracks');
+            trackList = await res.json();
 
-        if (tracks.length === 0) {
-            document.getElementById('statusTxt').innerText = "Fehler: Keine MP3s im 'musik'-Ordner!";
-            alert("Bitte lege zuerst MP3-Dateien in den Ordner 'musik'!");
-            return;
+            if (!trackList || trackList.length === 0) {
+                document.getElementById('statusTxt').innerText = "Keine MP3s gefunden!";
+                alert("Bitte lege deine MP3-Dateien direkt neben diese Dateien in den Ordner!");
+                return;
+            }
+
+            isPlaying = true;
+            currentStep = 0;
+            document.getElementById('statusTxt').innerText = "Remix aktiv";
+            playNextSlice();
+
+        } catch (err) {
+            document.getElementById('statusTxt').innerText = "Verbindungsfehler";
+            console.error(err);
         }
-
-        // Zufälligen Track als KI-Basis wählen
-        const selectedTrack = tracks[Math.floor(Math.random() * tracks.length)];
-        document.getElementById('trackTxt').innerText = selectedTrack;
-        document.getElementById('statusTxt').innerText = "Lade und decodiere Audiosignale...";
-
-        // 2. Audio-Kontext initialisieren
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        // 3. MP3 als Binärdaten (ArrayBuffer) herunterladen
-        const trackRes = await fetch(`/tracks/${encodeURIComponent(selectedTrack)}`);
-        const arrayBuffer = await trackRes.arrayBuffer();
-
-        // 4. Die komprimierte MP3 in rohe PCM-Wellenformen decodieren
-        decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-        
-        document.getElementById('statusTxt').innerText = "Generiere neuen Rhythmus-Loop...";
-        isPlaying = true;
-        currentStep = 0;
-        
-        playSlicedLoop();
     }
 
-    function playSlicedLoop() {
-        if (!isPlaying || !decodedBuffer) return;
+    function playNextSlice() {
+        if (!isPlaying) return;
 
-        // KI-Logik: Berechne zufällige, aber mathematisch saubere Abschnitte aus der MP3
-        // Wir teilen die Datei gedanklich in Schnipsel und wählen pro Schritt ein zufälliges Fragment
-        const totalDuration = decodedBuffer.duration;
-        const sliceDuration = 0.25; // Länge eines Sound-Schnipsels (250ms)
+        const randomTrack = trackList[Math.floor(Math.random() * trackList.length)];
+        const randomOffset = (Math.random() * 120).toFixed(2);
+
+        document.getElementById('trackTxt').innerText = randomTrack;
+        document.getElementById('patternTxt').innerText = `Schritt ${currentStep + 1}/8 (Offset: ${randomOffset}s)`;
+
+        const sliceUrl = `/api/stream-slice?file=${encodeURIComponent(randomTrack)}&offset=${randomOffset}`;
         
-        // Wähle einen zufälligen Startpunkt innerhalb der ersten 80% des Songs
-        const randomOffset = Math.random() * (totalDuration * 0.8);
+        if (activeAudio) {
+            activeAudio.pause();
+        }
 
-        // Slice abspielen
-        playBufferSlice(randomOffset, sliceDuration);
-
-        document.getElementById('sliceTxt').innerText = `Step ${currentStep + 1}/8 - Offset: ${randomOffset.toFixed(2)}s`;
-        document.getElementById('statusTxt').innerText = "Beat-Wiedergabe aktiv";
+        activeAudio = new Audio(sliceUrl);
+        activeAudio.play().catch(e => console.log("Wiedergabe unterbrochen"));
 
         currentStep = (currentStep + 1) % 8;
-
-        // Exaktes Timing-Intervall für den nächsten Beat-Schritt
-        beatTimeout = setTimeout(playSlicedLoop, stepLength * 1000);
+        nextStepTimeout = setTimeout(playNextSlice, stepDurationMs);
     }
 
-    function playBufferSlice(startTime, duration) {
-        // Erzeuge eine neue Audioquelle aus dem decodierten MP3-Speicher
-        const source = audioCtx.createBufferSource();
-        source.buffer = decodedBuffer;
-
-        // Ein kleiner Lautstärken-Filter (Gain), um Knackgeräusche an den Schnittkanten zu verhindern
-        const gainNode = audioCtx.createGain();
-        gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration - 0.02);
-
-        source.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        // Spiele genau den berechneten Ausschnitt der MP3 ab
-        source.start(0, startTime, duration);
-    }
-
-    function stopBeat() {
+    function stopKiRemix() {
         isPlaying = false;
-        clearTimeout(beatTimeout);
-        if (audioCtx) {
-            audioCtx.close();
-            audioCtx = null;
+        clearTimeout(nextStepTimeout);
+        if (activeAudio) {
+            activeAudio.pause();
+            activeAudio = null;
         }
         document.getElementById('statusTxt').innerText = "Gestoppt";
-        document.getElementById('sliceTxt').innerText = "-";
+        document.getElementById('trackTxt').innerText = "-";
+        document.getElementById('patternTxt').innerText = "-";
     }
 </script>
 
