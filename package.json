@@ -1,13 +1,12 @@
 {
-  "name": "musik-ki-server",
+  "name": "audio-slicer-ki",
   "version": "1.0.0",
-  "description": "Lokale KI-Musik-Musikdatenbank und Playlist-Generator",
+  "description": "Lokale KI für Audio-Resampling und Beat-Slicing",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "music-metadata": "^7.14.0"
+    "express": "^4.19.2"
   }
 }
