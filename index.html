@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Render MP3-Slicer KI</title>
+    <title>KI Song Generator</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: #0a0b0e;
+            background: #090a0f;
             color: #ffffff;
             display: flex;
             justify-content: center;
@@ -16,173 +16,82 @@
             margin: 0;
         }
         .container {
-            background: #13151c;
+            background: #12141d;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.8);
             text-align: center;
-            width: 420px;
-            border: 1px solid #222533;
+            width: 400px;
+            border: 1px solid #1f2233;
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-            color: #00e676;
-        }
-        p {
-            color: #b0bec5;
-            font-size: 14px;
-            margin-top: 0;
-        }
+        h1 { font-size: 24px; margin-bottom: 5px; color: #ff007f; }
+        p { color: #a0a5c0; font-size: 14px; margin-top: 0; }
         button {
-            background: #00e676;
-            color: #000000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+            background: #ff007f; color: white; border: none; padding: 15px 30px;
+            font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer;
+            transition: 0.2s; box-shadow: 0 4px 15px rgba(255, 0, 127, 0.4);
+            width: 100%; margin-top: 15px;
         }
-        button:hover {
-            background: #33f091;
-            transform: translateY(-2px);
+        button:hover { background: #ff3399; transform: translateY(-2px); }
+        button:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+        .status-box {
+            margin-top: 25px; background: #1a1d29; padding: 20px;
+            border-radius: 12px; font-size: 14px; text-align: left; border-left: 4px solid #ff007f;
         }
-        button.stop {
-            background: #37474f;
-            color: #ffffff;
-            box-shadow: none;
-            margin-left: 10px;
-        }
-        button.stop:hover {
-            background: #455a64;
-        }
-        .status-panel {
-            margin-top: 25px;
-            background: #1c1f2b;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            text-align: left;
-            border-left: 4px solid #00e676;
-        }
-        .info-row {
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-        }
-        .label {
-            color: #90a4ae;
-        }
-        .value {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .highlight {
-            color: #00e676;
-        }
+        audio { width: 100%; margin-top: 20px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>MP3 Beat-Slicer KI</h1>
-    <p>Live-Resampling & Remixing im selben Ordner</p>
+    <h1>KI Song-Generator</h1>
+    <p>Komponiert eine neue MP3 direkt auf dem Server</p>
     
-    <button onclick="startKiRemix()">Beat generieren</button>
-    <button class="stop" onclick="stopKiRemix()">Stop</button>
+    <button id="genBtn" onclick="generateNewSong()">Neuen Song komponieren</button>
     
-    <div class="status-panel">
-        <div class="info-row">
-            <span class="label">Status:</span>
-            <span id="statusTxt" class="value">Bereit</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Quelle:</span>
-            <span id="trackTxt" class="value highlight">-</span>
-        </div>
-        <div class="info-row">
-            <span class="label">KI-Muster:</span>
-            <span id="patternTxt" class="value">-</span>
-        </div>
+    <div class="status-box">
+        <div>Status: <span id="statusTxt" style="font-weight:bold;">Bereit</span></div>
     </div>
+
+    <!-- Nativer Player für die fertige Datei -->
+    <audio id="audioPlayer" controls></audio>
 </div>
 
 <script>
-    let isPlaying = false;
-    let nextStepTimeout = null;
-    let trackList = [];
-    let activeAudio = null;
+    async function generateNewSong() {
+        const btn = document.getElementById('genBtn');
+        const status = document.getElementById('statusTxt');
+        const player = document.getElementById('audioPlayer');
 
-    const bpm = 130;
-    const stepDurationMs = (60 / bpm / 2) * 1000; 
-    let currentStep = 0;
-
-    async function startKiRemix() {
-        if (isPlaying) stopKiRemix();
-        document.getElementById('statusTxt').innerText = "Verbinde mit Server...";
-
-        // Dummy-Audio erzeugen, um die Browser-Sicherheitsblockade zu loesen
-        const unlockAudio = new Audio();
-        unlockAudio.play().catch(() => {});
+        btn.disabled = true;
+        player.style.display = "none";
+        player.pause();
+        status.innerText = "Die KI schneidet und fusioniert Daten...";
 
         try {
-            const res = await fetch('/api/available-tracks');
-            trackList = await res.json();
+            const res = await fetch('/api/generate-new-song', { method: 'POST' });
+            const data = await res.json();
 
-            if (!trackList || trackList.length === 0) {
-                document.getElementById('statusTxt').innerText = "Keine MP3s gefunden!";
-                alert("Bitte lege deine MP3-Dateien direkt neben diese Dateien in den Ordner!");
+            if (data.error) {
+                status.innerText = "Fehler!";
+                alert(data.error);
+                btn.disabled = false;
                 return;
             }
 
-            isPlaying = true;
-            currentStep = 0;
-            document.getElementById('statusTxt').innerText = "Remix aktiv";
-            playNextSlice();
+            status.innerText = "Song erfolgreich erstellt!";
+            btn.disabled = false;
+
+            // Cache-Buster anhängen (?t=...), damit der Browser die Datei wirklich neu lädt
+            player.src = `/${data.filename}?t=${new Date().getTime()}`;
+            player.style.display = "block";
+            player.play();
 
         } catch (err) {
-            document.getElementById('statusTxt').innerText = "Verbindungsfehler";
+            status.innerText = "Verbindungsfehler!";
+            btn.disabled = false;
             console.error(err);
         }
-    }
-
-    function playNextSlice() {
-        if (!isPlaying) return;
-
-        const randomTrack = trackList[Math.floor(Math.random() * trackList.length)];
-        const randomOffset = (Math.random() * 120).toFixed(2);
-
-        document.getElementById('trackTxt').innerText = randomTrack;
-        document.getElementById('patternTxt').innerText = `Schritt ${currentStep + 1}/8 (Offset: ${randomOffset}s)`;
-
-        const sliceUrl = `/api/stream-slice?file=${encodeURIComponent(randomTrack)}&offset=${randomOffset}`;
-        
-        if (activeAudio) {
-            activeAudio.pause();
-        }
-
-        activeAudio = new Audio(sliceUrl);
-        // Lautstaerke explizit setzen
-        activeAudio.volume = 1.0; 
-        activeAudio.play().catch(e => console.log("Wiedergabe blockiert/unterbrochen:", e));
-
-        currentStep = (currentStep + 1) % 8;
-        nextStepTimeout = setTimeout(playNextSlice, stepDurationMs);
-    }
-
-    function stopKiRemix() {
-        isPlaying = false;
-        clearTimeout(nextStepTimeout);
-        if (activeAudio) {
-            activeAudio.pause();
-            activeAudio = null;
-        }
-        document.getElementById('statusTxt').innerText = "Gestoppt";
-        document.getElementById('trackTxt').innerText = "-";
-        document.getElementById('patternTxt').innerText = "-";
     }
 </script>
 
