@@ -6,15 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Erlaubt das Parsen von JSON und Formulardaten
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Statische Dateien (HTML) bereitstellen
 app.use(express.static(path.join(__dirname)));
 
-// Route für das Scraping/Suchen im Internet
-app.post('/api/scrape', async (req, res) => {
+// Endpunkt: Sucht im Netz nach Begriffen und liest die gefundenen Links aus
+app.post('/api/search-and-scrape', async (req, res) => {
     const { searchQuery } = req.body;
     
     if (!searchQuery) {
@@ -22,40 +19,64 @@ app.post('/api/scrape', async (req, res) => {
     }
 
     try {
-        // Beispiel: Wir durchsuchen die Wikipedia-Suche nach dem Begriff
-        const targetUrl = `https://wikipedia.org{encodeURIComponent(searchQuery)}`;
+        // 1. Kostenlose Suche über die Wikipedia-API, um relevante Links zu finden
+        const searchUrl = `https://wikipedia.org{encodeURIComponent(searchQuery)}&limit=3&namespace=0&format=json`;
+        const searchResponse = await axios.get(searchUrl);
         
-        // HTML der Webseite laden
-        const { data } = await axios.get(targetUrl, {
-            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-        });
+        // Die API liefert ein Array zurück. Index 1 sind die Titel, Index 3 die direkten Links
+        const foundTitles = searchResponse.data[1] || [];
+        const foundLinks = searchResponse.data[3] || [];
 
-        // HTML mit Cheerio parsen (wie jQuery für Server)
-        const $ = cheerio.load(data);
-        
-        // Daten extrahieren (Hier: Den ersten Absatz und alle H2-Überschriften)
-        const pageTitle = $('#firstHeading').text().trim();
-        const firstParagraph = $('p').first().text().trim();
-        
-        const subheadings = [];
-        $('h2').each((index, element) => {
-            const text = $(element).text().trim();
-            if (text) subheadings.push(text);
-        });
+        if (foundLinks.length === 0) {
+            return res.status(404).json({ success: false, error: 'Keine passenden Links im Internet gefunden.' });
+        }
 
-        // Daten an das Frontend zurückgeben
+        let combinedTrainingText = "";
+        let sourcesUsed = [];
+
+        // 2. Die gefundenen Links nacheinander durchsuchen und Text extrahieren
+        for (let i = 0; i < foundLinks.length; i++) {
+            try {
+                const pageResponse = await axios.get(foundLinks[i], {
+                    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+                });
+                
+                const $ = cheerio.load(pageResponse.data);
+                // Unwichtige Elemente entfernen
+                $('script, style, nav, footer, header, .mw-jump-link').remove();
+
+                let pageText = "";
+                $('p').each((index, el) => {
+                    pageText += $(el).text().trim() + "\n";
+                });
+
+                if (pageText.trim().length > 100) {
+                    combinedTrainingText += `--- QUELLE: ${foundTitles[i]} ---\n` + pageText + "\n\n";
+                    sourcesUsed.push({ title: foundTitles[i], url: foundLinks[i] });
+                }
+            } catch (e) {
+                // Falls ein einzelner Link blockiert, überspringen wir ihn einfach
+                continue;
+            }
+        }
+
+        if (!combinedTrainingText.trim()) {
+            return res.status(500).json({ success: false, error: 'Inhalte konnten nicht ausgelesen werden.' });
+        }
+
+        // Ergebnis zurückgeben (Der Text darf sehr lang werden)
         res.json({
             success: true,
-            sourceUrl: targetUrl,
-            title: pageTitle,
-            preview: firstParagraph || 'Keine Vorschau verfügbar.',
-            headers: subheadings.slice(0, 5) // Die ersten 5 Unterüberschriften
+            searchTerm: searchQuery,
+            sources: sourcesUsed,
+            preview: combinedTrainingText.substring(0, 400) + "...", 
+            text: combinedTrainingText // Kompletter Trainings-Datensatz
         });
 
     } catch (error) {
         res.status(500).json({ 
             success: false, 
-            error: 'Seite nicht gefunden oder Zugriff verweigert.' 
+            error: 'Fehler bei der Suche im Internet.' 
         });
     }
 });
