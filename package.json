@@ -1,12 +1,14 @@
 {
-  "name": "tonejs-music-generator",
+  "name": "web-search-scraper",
   "version": "1.0.0",
-  "description": "Musik erstellen mit Tone.js und Node.js",
+  "description": "Ein einfacher Web-Scraper für Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "express": "^4.18.2"
   }
 }
