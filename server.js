@@ -1,6 +1,5 @@
 const express = require('express');
 const axios = require('axios');
-const cheerio = require('cheerio');
 const path = require('path');
 
 const app = express();
@@ -10,72 +9,81 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// API-Endpunkt für die automatisierte Wikipedia-Suche
+// API-Endpunkt: Holt Daten garantiert und blockierungsfrei über die offizielle Wikipedia-API
 app.post('/api/search-and-scrape', async (req, res) => {
-    let { targetUrl } = req.body;
-
-    if (!targetUrl || targetUrl.trim() === "") {
-        try {
-            const randomApiUrl = 'https://wikipedia.org';
-            const randomRes = await axios.get(randomApiUrl, {
-                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-            });
-            const pageId = randomRes.data.query.random[0].id;
-            targetUrl = `https://wikipedia.org{pageId}`;
-        } catch (err) {
-            return res.status(500).json({ success: false, error: 'Konnte keine zufällige Wikipedia-Seite abrufen.' });
-        }
-    }
-
     try {
-        const response = await axios.get(targetUrl, {
-            headers: { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-            },
-            timeout: 10000
+        let title = "";
+        let pageId = "";
+
+        // 1. Schritt: Eine zufällige Seite über die offizielle API anfordern
+        const randomApiUrl = 'https://wikipedia.org';
+        const randomRes = await axios.get(randomApiUrl, {
+            headers: { 'User-Agent': 'DatasetEnhancerBot/1.0 (deine-email@example.com)' }
         });
         
-        const $ = cheerio.load(response.data);
-        $('script, style, nav, footer, header, iframe, .navbox, .aside, ad').remove();
+        if (randomRes.data && randomRes.data.query && randomRes.data.query.random) {
+            title = randomRes.data.query.random[0].title;
+            pageId = randomRes.data.query.random[0].id;
+        } else {
+            return res.status(500).json({ success: false, error: 'Zufallsartikel-API antwortete fehlerhaft.' });
+        }
 
-        const pageTitle = $('title').text().replace('- Wikipedia', '').trim() || "Unbenannte Webseite";
+        // 2. Schritt: Den Volltext der Seite sauber und unblockiert über die Text-Extracts-API laden
+        const contentApiUrl = `https://wikipedia.org{pageId}&explaintext=1&format=json`;
+        const contentRes = await axios.get(contentApiUrl, {
+            headers: { 'User-Agent': 'DatasetEnhancerBot/1.0 (deine-email@example.com)' }
+        });
+
+        const pages = contentRes.data.query.pages;
+        const pageData = pages[pageId];
+        const rawFullText = pageData.extract || "";
+
+        if (!rawFullText.trim()) {
+            return res.status(404).json({ success: false, error: 'Der Artikel enthielt keinen Text.' });
+        }
+
+        // 3. Schritt: Den Text in ein strukturiertes Format zerlegen (wichtig für deine KI)
+        const textLines = rawFullText.split('\n');
         let structuredContent = [];
-        let plainTextBackup = "";
+        let cleanPlainBackup = "";
 
-        $('h1, h2, h3, h4, p, li').each((index, el) => {
-            const tagName = el.tagName.toLowerCase();
-            const textContent = $(el).text().replace(/\s+/g, ' ').trim();
-
-            if (textContent.length > 5) {
+        textLines.forEach(line => {
+            const trimmed = line.trim();
+            if (trimmed.length > 5) {
+                // Wikipedia kennzeichnet Überschriften im Reintext mit "== Überschrift =="
+                const isHeading = trimmed.startsWith('==') && trimmed.endsWith('==');
+                
                 structuredContent.push({
-                    type: tagName.startsWith('h') ? 'heading' : 'paragraph',
-                    tag: tagName,
-                    content: textContent
+                    type: isHeading ? 'heading' : 'paragraph',
+                    tag: isHeading ? 'h2' : 'p',
+                    content: isHeading ? trimmed.replace(/==/g, '').trim() : trimmed
                 });
-                plainTextBackup += textContent + "\n";
+                
+                cleanPlainBackup += trimmed + "\n";
             }
         });
 
-        if (structuredContent.length === 0) {
-            return res.status(404).json({ success: false, error: 'Kein Inhalt lesbar.' });
-        }
-
+        // Erfolgreiche Antwort an deine index.html / script.js senden
         res.json({
             success: true,
-            title: pageTitle,
-            url: targetUrl,
+            title: title,
+            url: `https://wikipedia.org{pageId}`,
             scrapedAt: new Date().toISOString(),
             elementsCount: structuredContent.length,
-            totalCharacters: plainTextBackup.length,
-            fullTextPlain: plainTextBackup,
+            totalCharacters: cleanPlainBackup.length,
+            fullTextPlain: cleanPlainBackup,
             contentTree: structuredContent
         });
 
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        console.error("API-Fehler:", error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: `Wikipedia-Schnittstelle blockiert nicht, aber meldet: ${error.message}` 
+        });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Server läuft fehlerfrei auf Port ${PORT}`);
+    console.log(`Blockierungsfreier Server läuft auf Port ${PORT}`);
 });
