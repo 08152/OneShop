@@ -1,169 +1,97 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Trainingsdaten Sammler</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
-        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; margin-top: 0; }
-        h3 { color: #f1f5f9; margin-bottom: 10px; }
-        input[type="text"] { width: 75%; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
-        input[type="text"]:focus { border-color: #38bdf8; outline: none; }
-        button { padding: 14px 24px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #0369a1; }
-        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; margin-top: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-download:hover { background-color: #15803d; }
-        #statusLog { height: 150px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
-        .stats { display: flex; gap: 20px; margin-top: 15px; }
-        .stat-card { background: #334155; padding: 10px 20px; border-radius: 6px; flex: 1; text-align: center; }
-        .stat-card span { display: block; font-size: 24px; font-weight: bold; color: #38bdf8; }
-        .source-list { max-height: 150px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
-    </style>
-</head>
-<body>
+const express = require('express');
+const axios = require('axios');
+const cheerio = require('cheerio');
+const path = require('path');
 
-    <div class="box">
-        <h1>📦 KI-Trainingsdaten Crawler</h1>
-        <p>Diese Oberfläche sammelt strukturierte Rohdaten aus dem Internet, bündelt sie und bereitet sie für den Import in deine andere KI vor.</p>
-        
-        <form id="crawlerForm">
-            <input type="text" id="searchQuery" placeholder="Suchbegriff eingeben (z.B. Quantenphysik, Geschichte Japans...)" required>
-            <button type="submit">Daten sammeln</button>
-        </form>
-    </div>
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    <!-- Live-Statistiken der aktuellen Sammlung -->
-    <div class="box">
-        <h3>📊 Aktueller Sammlungs-Status</h3>
-        <div class="stats">
-            <div class="stat-card">Gesammelte Zeichen <span id="statChars">0</span></div>
-            <div class="stat-card">Durchsuchte Links <span id="statLinks">0</span></div>
-        </div>
-        <h4 style="margin-top: 15px; margin-bottom: 5px;">Durchsuchte Webseiten:</h4>
-        <div id="sourcesUsed" class="source-list">Keine Quellen geladen.</div>
-    </div>
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname)));
 
-    <!-- Live-Log-Protokoll -->
-    <div class="box">
-        <h3>📜 System-Protokoll</h3>
-        <div id="statusLog">> System bereit. Warte auf Suchbegriff...</div>
-    </div>
-
-    <!-- Großer Download-Bereich für die finale JSON -->
-    <div class="box" style="text-align: center;">
-        <h3>💾 Datensatz-Export</h3>
-        <p>Klicke hier, um alle gesammelten Webinhalte als eine einzige, unbegrenzt lange JSON-Datei für deine KI herunterzuladen:</p>
-        <button id="downloadBtn" class="btn-download">📥 JETZT TRAININGSDATEN ALS JSON DOWNLOADEN</button>
-    </div>
-
-<script>
-    // In diesem Array werden alle Suchvorgänge und Texte zusammengeführt
-    let datasetContainer = {
-        erstellungsDatum: new Date().toISOString(),
-        gesamteZeichen: 0,
-        anzahlQuellen: 0,
-        datenSaetze: []
-    };
-
-    const statusLog = document.getElementById('statusLog');
-    const statChars = document.getElementById('statChars');
-    const statLinks = document.getElementById('statLinks');
-    const sourcesUsed = document.getElementById('sourcesUsed');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    // Hilfsfunktion für das Protokoll
-    function logToSystem(message) {
-        statusLog.innerHTML += `<br>> ${message}`;
-        statusLog.scrollTop = statusLog.scrollHeight;
+app.post('/api/search-and-scrape', async (req, res) => {
+    const { searchQuery } = req.body;
+    
+    if (!searchQuery) {
+        return res.status(400).json({ error: 'Bitte einen Suchbegriff eingeben.' });
     }
 
-    document.getElementById('crawlerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const searchQuery = document.getElementById('searchQuery').value;
+    try {
+        // WICHTIG: Die URL wird sauber encodiert. Ein User-Agent simuliert einen echten Browser.
+        const searchUrl = `https://wikipedia.org{encodeURIComponent(searchQuery)}&limit=5&namespace=0&format=json`;
         
-        logToSystem(`Starte Websuche nach: "${searchQuery}"...`);
-        
-        try {
-            // Verbindung zu deiner server.js auf Render
-            const response = await fetch('/api/search-and-scrape', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ searchQuery })
-            });
-            const data = await response.json();
-            
-            if(data.success) {
-                logToSystem(`Erfolgreich! Links gefunden. Starte Text-Extraktion...`);
-                
-                // Neuen Datensatz an die Gesamtliste anhängen
-                datasetContainer.datenSaetze.push({
-                    suchbegriff: data.searchTerm,
-                    zeitstempel: new Date().toISOString(),
-                    quellen: data.sources,
-                    rohText: data.text
-                });
-
-                // Statistiken aktualisieren
-                datasetContainer.anzahlQuellen += data.sources.length;
-                datasetContainer.gesamteZeichen += data.text.length;
-
-                statChars.innerText = datasetContainer.gesamteZeichen.toLocaleString();
-                statLinks.innerText = datasetContainer.anzahlQuellen;
-
-                // Quellen im UI auflisten
-                sourcesUsed.innerHTML = "<ul>";
-                datasetContainer.datenSaetze.forEach(set => {
-                    set.quellen.forEach(s => {
-                        sourcesUsed.innerHTML += `<li><b>[${set.suchbegriff}]</b> <a href="${s.url}" target="_blank" style="color: #38bdf8;">${s.title}</a></li>`;
-                    });
-                });
-                sourcesUsed.innerHTML += "</ul>";
-
-                logToSystem(`✓ Text erfolgreich geladen (${data.text.length} Zeichen extrahiert).`);
-                logToSystem(`Bereit für den JSON-Download oder weitere Suchen.`);
-                
-                // Download-Button einblenden
-                downloadBtn.style.display = "block";
-            } else {
-                logToSystem(`❌ Fehler vom Server: ${data.error}`);
+        const searchResponse = await axios.get(searchUrl, {
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
-        } catch (err) {
-            logToSystem(`❌ Verbindungsfehler zum Render-Backend.`);
+        });
+        
+        // Wikipedia liefert die Links immer im vierten Array-Element (Index 3)
+        const foundTitles = searchResponse.data[1] || [];
+        const foundLinks = searchResponse.data[3] || [];
+
+        if (!foundLinks || foundLinks.length === 0) {
+            return res.status(404).json({ success: false, error: 'Keine passenden Seiten im Internet gefunden.' });
         }
-    });
 
-    // Speicher- und Download-Logik für extrem lange JSON-Dateien
-    downloadBtn.addEventListener('click', () => {
-        if (datasetContainer.datenSaetze.length === 0) return;
+        let combinedTrainingText = "";
+        let sourcesUsed = [];
 
-        logToSystem("Generiere JSON-Datei aus dem Arbeitsspeicher...");
+        // Die gefundenen Links nacheinander abrufen
+        for (let i = 0; i < foundLinks.length; i++) {
+            try {
+                const pageResponse = await axios.get(foundLinks[i], {
+                    headers: { 
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    },
+                    timeout: 5000 // Verhindert, dass der Server unendlich lange wartet
+                });
+                
+                const $ = cheerio.load(pageResponse.data);
+                
+                // Unwichtige Layout-Elemente aggressiv löschen
+                $('script, style, nav, footer, header, iframe, .mw-jump-link, .navbox').remove();
 
-        // Daten in Text umwandeln
-        const jsonString = JSON.stringify(datasetContainer, null, 2);
-        
-        // Blob erstellen, damit auch gigantische Datenmengen im Browser geladen werden können
-        const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        // Virtuellen Link im Hintergrund klicken
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", blobUrl);
-        
-        // Dateiname mit Timestamp generieren
-        const dateStr = new Date().toISOString().substring(0, 10);
-        downloadAnchor.setAttribute("download", `ki_trainingsdaten_${dateStr}.json`);
-        
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        
-        // Aufräumen
-        document.body.removeChild(downloadAnchor);
-        URL.revokeObjectURL(blobUrl);
-        
-        logToSystem("✓ Download gestartet! Datei wurde auf deinem PC gespeichert.");
-    });
-</script>
-</body>
-</html>
+                let pageText = "";
+                $('p').each((index, el) => {
+                    const txt = $(el).text().trim();
+                    if (txt.length > 20) { // Nur sinnvolle Absätze mitnehmen
+                        pageText += txt + "\n";
+                    }
+                });
+
+                if (pageText.trim().length > 100) {
+                    combinedTrainingText += `\n--- QUELLE: ${foundTitles[i]} ---\n` + pageText + "\n";
+                    sourcesUsed.push({ title: foundTitles[i], url: foundLinks[i] });
+                }
+            } catch (e) {
+                // Wenn eine einzelne Unterseite blockiert oder offline ist, ignoriere sie und mache weiter
+                continue;
+            }
+        }
+
+        if (!combinedTrainingText.trim()) {
+            return res.status(500).json({ success: false, error: 'Die gefundenen Seiten verweigerten den Textzugriff.' });
+        }
+
+        // Erfolg: Übergabe an deine Sammel-HTML
+        res.json({
+            success: true,
+            searchTerm: searchQuery,
+            sources: sourcesUsed,
+            text: combinedTrainingText
+        });
+
+    } catch (error) {
+        console.error("Suchfehler:", error.message);
+        res.status(500).json({ 
+            success: false, 
+            error: `Internetsuche fehlgeschlagen: ${error.message}` 
+        });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server läuft fehlerfrei auf Port ${PORT}`);
+});
