@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Trainingsdaten Sammler</title>
+    <title>Gezielter KI-Daten-Crawler</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
         .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         h1 { color: #38bdf8; margin-top: 0; }
         h3 { color: #f1f5f9; margin-bottom: 10px; }
-        input[type="text"] { width: 75%; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
+        .input-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px; }
+        input[type="text"] { width: 100%; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
         input[type="text"]:focus { border-color: #38bdf8; outline: none; }
-        button { padding: 14px 24px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button { padding: 14px 24px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
         button:hover { background-color: #0369a1; }
         .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; margin-top: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
         .btn-download:hover { background-color: #15803d; }
@@ -25,12 +26,15 @@
 <body>
 
     <div class="box">
-        <h1>📦 KI-Trainingsdaten Crawler</h1>
-        <p>Diese Oberfläche sammelt strukturierte Rohdaten aus dem Internet für deine KI.</p>
+        <h1>📦 Gezielter KI-Daten-Crawler</h1>
+        <p>Gib eine Wunsch-Webseite ein und filtere sie nach einem bestimmten Thema, um passgenaue Trainingsdaten abzuspeichern.</p>
         
         <form id="crawlerForm">
-            <input type="text" id="searchQuery" placeholder="Suchbegriff eingeben..." required>
-            <button type="submit">Daten sammeln</button>
+            <div class="input-group">
+                <input type="text" id="targetUrl" placeholder="1. Webseite eingeben (z.B. de.wikipedia.org/wiki/Roboter)" required>
+                <input type="text" id="theme" placeholder="2. Thema/Schlagwort filtern (z.B. Sensor, Ethik, Geschichte)" required>
+            </div>
+            <button type="submit">Seite nach Thema durchsuchen</button>
         </form>
     </div>
 
@@ -38,70 +42,71 @@
         <h3>📊 Sammlungs-Status</h3>
         <div class="stats">
             <div class="stat-card">Gesammelte Zeichen <span id="statChars">0</span></div>
-            <div class="stat-card">Durchsuchte Links <span id="statLinks">0</span></div>
+            <div class="stat-card">Gefundene Treffer <span id="statHits">0</span></div>
         </div>
-        <h4 style="margin-top: 15px; margin-bottom: 5px;">Quellen:</h4>
+        <h4 style="margin-top: 15px; margin-bottom: 5px;">Durchsuchte Links:</h4>
         <div id="sourcesUsed" class="source-list">Keine Quellen geladen.</div>
     </div>
 
     <div class="box">
         <h3>📜 System-Protokoll</h3>
-        <div id="statusLog">> System bereit...</div>
+        <div id="statusLog">> System bereit. Warte auf Eingaben...</div>
     </div>
 
     <div class="box" style="text-align: center;">
-        <button id="downloadBtn" class="btn-download">📥 JETZT TRAININGSDATEN ALS JSON DOWNLOADEN</button>
+        <button id="downloadBtn" class="btn-download">📥 TRAININGSDATEN ALS JSON DOWNLOADEN</button>
     </div>
 
 <script>
-    let datasetContainer = { erstellungsDatum: new Date().toISOString(), gesamteZeichen: 0, anzahlQuellen: 0, datenSaetze: [] };
+    let datasetContainer = { erstellungsDatum: new Date().toISOString(), gesamteZeichen: 0, gesamteTreffer: 0, datenSaetze: [] };
 
     document.getElementById('crawlerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const searchQuery = document.getElementById('searchQuery').value;
+        const targetUrl = document.getElementById('targetUrl').value;
+        const theme = document.getElementById('theme').value;
         const log = document.getElementById('statusLog');
-        log.innerHTML += `<br>> Suche nach: "${searchQuery}"...`;
+        
+        log.innerHTML += `<br>> Rufe "${targetUrl}" auf und suche nach "${theme}"...`;
         log.scrollTop = log.scrollHeight;
 
         try {
             const response = await fetch('/api/search-and-scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ searchQuery })
+                body: JSON.stringify({ targetUrl, theme })
             });
             const data = await response.json();
             
             if(data.success) {
                 datasetContainer.datenSaetze.push({
-                    suchbegriff: data.searchTerm,
+                    seite: data.title,
+                    url: data.url,
+                    gesuchtesThema: data.theme,
                     zeitstempel: new Date().toISOString(),
-                    quellen: data.sources,
                     rohText: data.text
                 });
 
-                datasetContainer.anzahlQuellen += data.sources.length;
+                datasetContainer.gesamteTreffer += data.stats.found;
                 datasetContainer.gesamteZeichen += data.text.length;
 
                 document.getElementById('statChars').innerText = datasetContainer.gesamteZeichen.toLocaleString();
-                document.getElementById('statLinks').innerText = datasetContainer.anzahlQuellen;
+                document.getElementById('statHits').innerText = datasetContainer.gesamteTreffer;
                 
-                // Quellen-Liste aktualisieren
+                // Quellen-Liste im UI erweitern
                 let sourcesDiv = document.getElementById('sourcesUsed');
                 sourcesDiv.innerHTML = "<ul>";
                 datasetContainer.datenSaetze.forEach(set => {
-                    set.quellen.forEach(s => {
-                        sourcesDiv.innerHTML += `<li><b>[${set.suchbegriff}]</b> <a href="${s.url}" target="_blank" style="color: #38bdf8;">${s.title}</a></li>`;
-                    });
+                    sourcesDiv.innerHTML += `<li><b>[Thema: ${set.gesuchtesThema}]</b> <a href="${set.url}" target="_blank" style="color: #38bdf8;">${set.seite}</a></li>`;
                 });
                 sourcesDiv.innerHTML += "</ul>";
 
-                log.innerHTML += `<br>> ✓ ${data.text.length} Zeichen extrahiert.`;
+                log.innerHTML += `<br>> ✓ Erfolg! ${data.stats.found} Abschnitte gefunden (${data.text.length} Zeichen).`;
                 document.getElementById('downloadBtn').style.display = "block";
             } else {
                 log.innerHTML += `<br>> ❌ Fehler: ${data.error}`;
             }
         } catch (err) {
-            log.innerHTML += `<br>> ❌ Keine Verbindung zum Server.`;
+            log.innerHTML += `<br>> ❌ Keine Verbindung zum Render-Server möglich.`;
         }
         log.scrollTop = log.scrollHeight;
     });
@@ -112,7 +117,7 @@
         const blobUrl = URL.createObjectURL(blob);
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", blobUrl);
-        downloadAnchor.setAttribute("download", `ki_trainingsdaten.json`);
+        downloadAnchor.setAttribute("download", `gezielte_ki_trainingsdaten.json`);
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
         document.body.removeChild(downloadAnchor);
