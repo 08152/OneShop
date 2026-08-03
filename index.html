@@ -3,105 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainingsdaten-Extraktor</title>
+    <title>Internet-Suche & KI-Training</title>
+    <!-- Puter.js für komplett kostenlose KI-Funktionen -->
+    <script src="https://puter.com"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; line-height: 1.6; background-color: #f4f7f6; color: #333; }
-        .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input[type="text"] { width: 70%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { padding: 12px 20px; font-size: 16px; cursor: pointer; border: none; border-radius: 4px; background-color: #007bff; color: white; font-weight: bold; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .box { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input[type="text"] { width: 75%; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 12px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         button:hover { background-color: #0056b3; }
-        .download-btn { background-color: #28a745; margin-top: 15px; display: none; width: 100%; text-align: center; }
-        .download-btn:hover { background-color: #218838; }
-        .result-box { margin-top: 25px; padding: 20px; border: 1px solid #e0e0e0; background: #fafafa; border-radius: 4px; display: none; }
-        .error { color: #dc3545; font-weight: bold; }
-        pre { background: #eee; padding: 10px; overflow-x: auto; border-radius: 4px; max-height: 200px; font-size: 13px; }
+        .btn-green { background-color: #28a745; } .btn-green:hover { background-color: #218838; }
+        #chatArea { height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; background: #fafafa; margin-bottom: 10px; border-radius: 4px; }
+        img { max-width: 100%; border-radius: 6px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        audio { width: 100%; margin-top: 10px; }
+        ul { padding-left: 20px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🤖 Trainingsdaten-Generator</h1>
-    <p>Gib einen Begriff ein, um Webinhalte zu extrahieren und als JSON-Datensatz für KI-Training herunterzuladen:</p>
+    <h1>🔍 Internet-Search-Scraper & KI-Creator</h1>
 
-    <form id="searchForm">
-        <input type="text" id="searchQuery" placeholder="Thema für Trainingsdaten..." required>
-        <button type="submit">Daten extrahieren</button>
-    </form>
+    <!-- SCHRITT 1: Internet durchsuchen -->
+    <div class="box">
+        <h3>1. Internet nach Links durchsuchen & Daten extrahieren</h3>
+        <p>Gib ein Thema ein. Der Server sucht automatisch nach passenden Links und liest die Texte aus:</p>
+        <form id="searchForm">
+            <input type="text" id="searchQuery" placeholder="Z.B. Quantencomputer, Altes Ägypten, Klimawandel..." required>
+            <button type="submit">Internet durchsuchen</button>
+        </form>
+        <div id="loadStatus" style="margin-top: 10px;"></div>
+        <button id="downloadBtn" class="btn-green" style="display:none; margin-top: 10px;">📥 Lange JSON-Trainingsdaten herunterladen</button>
+    </div>
 
-    <!-- Download-Button wird erst nach erfolgreichem Scrape sichtbar -->
-    <button id="downloadBtn" class="download-btn">📥 Trainingsdaten als JSON herunterladen</button>
+    <!-- SCHRITT 2: KI-Chat mit den Daten -->
+    <div class="box">
+        <h3>2. Mit der KI über die durchsuchten Webseiten sprechen</h3>
+        <div id="chatArea"><em>Führe zuerst eine Suche durch, damit die KI Daten zum Antworten hat...</em></div>
+        <input type="text" id="chatInput" placeholder="Stelle eine Frage zu den Suchergebnissen...">
+        <button id="sendChatBtn">Sprechen</button>
+    </div>
 
-    <div id="result" class="result-box"></div>
-</div>
+    <!-- SCHRITT 3: Bilder und Sound erstellen -->
+    <div class="box">
+        <h3>3. KI-Medien aus den Suchdaten generieren</h3>
+        <button id="genImageBtn" class="btn-green">🖼️ Passendes KI-Bild erstellen</button>
+        <div id="imageResult"></div>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        <button id="genMusicBtn" class="btn-green">🎵 Passendes Audio/Musik erstellen</button>
+        <div id="musicResult"></div>
+    </div>
 
 <script>
-    // Variable, die die rohen, ungekürzten Daten speichert
-    let currentScrapedData = null;
+    let globalScrapedData = null;
 
+    // 1. Suche ausführen und Links auslesen
     document.getElementById('searchForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const searchQuery = document.getElementById('searchQuery').value;
-        const resultDiv = document.getElementById('result');
-        const downloadBtn = document.getElementById('downloadBtn');
-        
-        // UI zurücksetzen
-        downloadBtn.style.display = 'none';
-        resultDiv.style.display = 'block';
-        resultDiv.innerHTML = '<em>Generiere Trainingsdaten aus dem Web... (Bitte warten)</em>';
+        const status = document.getElementById('loadStatus');
+        status.innerHTML = "<em>Suche im Internet läuft und Links werden analysiert... Bitte warten...</em>";
 
         try {
-            const response = await fetch('/api/scrape', {
+            const response = await fetch('/api/search-and-scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ searchQuery })
             });
-
             const data = await response.json();
+            
+            if(data.success) {
+                globalScrapedData = data;
+                
+                // Quellen auflisten
+                let sourcesHtml = "<ul>";
+                data.sources.forEach(s => {
+                    sourcesHtml += `<li><a href="${s.url}" target="_blank">${s.title}</a></li>`;
+                });
+                sourcesHtml += "</ul>";
 
-            if (!data.success) {
-                resultDiv.innerHTML = `<p class="error">Fehler: ${data.error}</p>`;
-                return;
+                status.innerHTML = `<p style="color:green; font-weight:bold;">✅ Suche erfolgreich! Folgende Links wurden durchsucht und gespeichert:</p>${sourcesHtml}`;
+                document.getElementById('downloadBtn').style.display = "inline-block";
+                document.getElementById('chatArea').innerHTML = `<b>System:</b> Ich habe das Wissen aus den oberen Links gelernt. Frag mich etwas dazu!`;
+            } else {
+                status.innerHTML = `<p style="color:red;">Fehler: ${data.error}</p>`;
             }
-
-            // Gesamtes JSON-Objekt für den späteren Download sichern
-            currentScrapedData = data;
-            downloadBtn.style.display = 'block';
-
-            // Vorschau in der Oberfläche anzeigen
-            resultDiv.innerHTML = `
-                <h3>Erfolg: Daten extrahiert</h3>
-                <p><strong>Ziel-Quelle:</strong> <a href="${data.sourceUrl}" target="_blank">${data.sourceUrl}</a></p>
-                <p><strong>Stichprobe des Texts:</strong> ${data.preview}</p>
-                <h4>Struktur-Vorschau der JSON:</h4>
-                <pre>${JSON.stringify({ title: data.title, headers: data.headers }, null, 2)}</pre>
-            `;
-
         } catch (err) {
-            resultDiv.innerHTML = '<p class="error">Verbindungsfehler zum Backend-Server.</p>';
+            status.innerHTML = "<p style='color:red;'>Verbindungsfehler zum Backend-Server.</p>";
         }
     });
 
-    // Download-Logik für extrem lange JSON-Dateien
+    // JSON Trainingsdaten Download
     document.getElementById('downloadBtn').addEventListener('click', () => {
-        if (!currentScrapedData) return;
+        if(!globalScrapedData) return;
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(globalScrapedData, null, 2));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", `suchdaten_${globalScrapedData.searchTerm.replace(/[^a-z0-9]/gi, '_')}.json`);
+        dlAnchor.click();
+    });
 
-        // Erstellt einen virtuellen Blob aus den JSON-Daten im Speicher
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentScrapedData, null, 2));
+    // 2. Chatten mit Puter.js (Kostenloses LLM)
+    document.getElementById('sendChatBtn').addEventListener('click', async () => {
+        const input = document.getElementById('chatInput');
+        const chatArea = document.getElementById('chatArea');
+        if (!input.value) return;
+
+        const userPrompt = input.value;
+        chatArea.innerHTML += `<p><b>Du:</b> ${userPrompt}</p>`;
+        input.value = "";
+
+        // Gefundene Webseitendaten als Kontext mitsenden
+        const systemContext = globalScrapedData ? `Nutze folgendes durchsuchtes Internet-Wissen für deine Antwort: ${globalScrapedData.text}. ` : "";
         
-        // Erstellt ein unsichtbares Download-Element im HTML
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
+        try {
+            const response = await puter.ai.chat(systemContext + userPrompt); // Gratis GPT via Puter
+            chatArea.innerHTML += `<p><b>KI:</b> ${response}</p>`;
+            chatArea.scrollTop = chatArea.scrollHeight;
+        } catch (err) {
+            chatArea.innerHTML += `<p style="color:red;"><b>Fehler:</b> KI-Dienst antwortet nicht.</p>`;
+        }
+    });
+
+    // 3. Bild generieren mit Puter.js
+    document.getElementById('genImageBtn').addEventListener('click', async () => {
+        const imgResult = document.getElementById('imageResult');
+        imgResult.innerHTML = "⏳ Bild wird aus den Suchdaten kostenlos generiert...";
         
-        // Generiert einen sauberen Dateinamen basierend auf dem Suchbegriff
-        const fileName = `trainingsdaten_${currentScrapedData.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.json`;
-        downloadAnchorNode.setAttribute("download", fileName);
+        const promptKeyword = globalScrapedData ? globalScrapedData.searchTerm : "Future Technology AI";
         
-        // Klickt das Element automatisch an und entfernt es wieder
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+        try {
+            // Generiert ein kostenloses Bild
+            const imageElement = await puter.ai.txt2img(`A cinematic digital artwork about ${promptKeyword}, detailed, 4k resolution`);
+            imgResult.innerHTML = "";
+            imgResult.appendChild(imageElement);
+        } catch (err) {
+            imgResult.innerHTML = "<p style='color:red;'>Fehler bei der Bildgenerierung.</p>";
+        }
+    });
+
+    // 4. Audio/Musik generieren
+    document.getElementById('genMusicBtn').addEventListener('click', async () => {
+        const musicResult = document.getElementById('musicResult');
+        musicResult.innerHTML = "⏳ Audio-Track wird generiert...";
+        
+        const textToVoice = globalScrapedData ? `Hier ist die akustische Zusammenfassung über ${globalScrapedData.searchTerm}: ` + globalScrapedData.preview : "Keine Suchdaten vorhanden.";
+        
+        try {
+            // Wandelt den Text kostenlos in Audio/Sprache um
+            const audioKey = await puter.ai.txt2speech(textToVoice.substring(0, 250));
+            musicResult.innerHTML = `<audio controls src="${audioKey.src}"></audio><p>Audio erfolgreich erstellt!</p>`;
+        } catch (err) {
+            musicResult.innerHTML = "<p style='color:red;'>Fehler bei der Audio-Generierung.</p>";
+        }
     });
 </script>
-
 </body>
 </html>
