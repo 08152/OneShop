@@ -1,215 +1,80 @@
-// 1. Audio Engine initialisieren
-let synth, bass;
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Volltext-Crawler (Modular)</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
+        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        h1 { color: #38bdf8; margin-top: 0; }
+        h3 { color: #f1f5f9; margin-bottom: 10px; }
+        .input-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        input[type="text"] { flex: 4; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: #38bdf8; outline: none; }
+        .btn-action { flex: 1; padding: 14px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-action:hover { background-color: #0369a1; }
+        .upload-area { border: 2px dashed #475569; padding: 20px; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; transition: 0.2s; }
+        .upload-area:hover { border-color: #38bdf8; background: #111e36; }
+        #fileInput { display: none; }
+        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; margin-top: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-download:hover { background-color: #15803d; }
+        #statusLog { height: 150px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
+        .stats { display: flex; gap: 20px; margin-top: 15px; }
+        .stat-card { background: #334155; padding: 15px 20px; border-radius: 6px; flex: 1; text-align: center; }
+        .stat-card span { display: block; font-size: 26px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
+        .source-list { max-height: 180px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
+        .source-list li { margin-bottom: 6px; font-size: 14px; }
+    </style>
+</head>
+<body>
 
-function initAudio() {
-    if (!synth) {
-        synth = new Tone.PolySynth(Tone.Synth).toDestination();
-        bass = new Tone.MonoSynth({
-            oscillator: { type: "sawtooth" },
-            filter: { Q: 1, type: "lowpass", frequency: 200 }
-        }).toDestination();
-    }
-}
+    <!-- JSON hochladen -->
+    <div class="box">
+        <h1>📂 Vorhandenes Dataset hochladen</h1>
+        <p>Wähle eine alte `.json`-Datei aus, die du mit diesem Tool erstellt hast, um neue Webseiten hinzuzufügen:</p>
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <span id="uploadText">📁 Klicke hier, um deine JSON-Datei auszuwählen</span>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+    </div>
 
-let currentSequence = null;
-let generatedSongs = [];
-let activeSong = null;
-let progressInterval = null;
-let elapsedSeconds = 0;
-
-const emojis = ['🎵', '🎹', '🎸', '🌌', '⚡', '🤖', '🎧', '🔥', '🔮'];
-const getRandomEmoji = () => emojis[Math.floor(Math.random() * emojis.length)];
-
-// 2. Klick-Event für die Song-Erstellung absichern
-const generateBtn = document.getElementById('generateBtn');
-if (generateBtn) {
-    generateBtn.addEventListener('click', async () => {
-        try {
-            // Erzwinge den Start der Audio-Engine bei Interaktion
-            await Tone.start();
-            initAudio();
-            console.log("Audio Context erfolgreich gestartet.");
-
-            const prompt = document.getElementById('promptInput').value || "Abstract AI Vibe";
-            const style = document.getElementById('styleInput').value || "Experimental";
-            const title = document.getElementById('titleInput').value || "AI Session #" + (generatedSongs.length + 1);
-
-            let scale = ['C4', 'E4', 'G4', 'B4']; 
-            if(style.toLowerCase().includes('cyber') || style.toLowerCase().includes('dark') || style.toLowerCase().includes('synth')) {
-                scale = ['A3', 'C4', 'D4', 'E4', 'G4'];
-            }
-
-            const melodyPattern = Array.from({length: 16}, () => Math.random() > 0.4 ? scale[Math.floor(Math.random() * scale.length)] : null);
-            const bassPattern = Array.from({length: 16}, (v, i) => i % 4 === 0 ? scale[0].replace('4', '2').replace('3', '2') : null);
-
-            const newSong = {
-                id: Date.now(),
-                title: title,
-                prompt: prompt,
-                style: style,
-                emoji: getRandomEmoji(),
-                melody: melodyPattern,
-                bass: bassPattern
-            };
-
-            generatedSongs.unshift(newSong); 
-            renderSongs();
-            playSong(newSong);
-
-            document.getElementById('titleInput').value = '';
-        } catch (error) {
-            console.error("Fehler beim Erstellen des Songs:", error);
-        }
-    });
-}
-
-// 3. Songs in die Liste rendern
-function renderSongs() {
-    const container = document.getElementById('songsContainer');
-    if (!container) return; // Falls wir auf einer Unterseite ohne Liste sind
-    
-    container.innerHTML = '';
-
-    if (generatedSongs.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted);">Noch keine Songs erstellt.</p>';
-        return;
-    }
-
-    generatedSongs.forEach(song => {
-        const card = document.createElement('div');
-        card.className = `song-card ${activeSong && activeSong.id === song.id ? 'active-card' : ''}`;
+    <!-- Webseiten scrapen -->
+    <div class="box">
+        <h1>📦 KI-Volltext-Crawler (Deep Scrape)</h1>
+        <p>Gib eine URL ein, um die Seite vollständig auszulesen und an das Dataset anzuhängen.</p>
         
-        // CSS Style dynamisch injizieren für aktive Kantenbeleuchtung
-        if(activeSong && activeSong.id === song.id) {
-            card.style.borderColor = "var(--accent)";
-        }
-
-        card.innerHTML = `
-            <div class="song-info">
-                <div class="song-cover">${song.emoji}</div>
-                <div class="song-details">
-                    <div class="title">${song.title}</div>
-                    <div class="prompt-text">${song.prompt}</div>
-                    <div class="song-tags">
-                        <span class="tag">${song.style}</span>
-                        <span class="tag">AI Generated</span>
-                    </div>
-                </div>
+        <form id="crawlerForm">
+            <div class="input-row">
+                <input type="text" id="targetUrl" placeholder="https://wikipedia.org" required>
+                <button type="submit" class="btn-action">Aussaugen</button>
             </div>
-            <button class="play-card-btn">
-                <i class="fa-solid ${activeSong && activeSong.id === song.id && Tone.Transport.state === 'started' ? 'fa-circle-pause' : 'fa-circle-play'}"></i>
-            </button>
-        `;
+        </form>
+    </div>
 
-        card.querySelector('.play-card-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (activeSong && activeSong.id === song.id) {
-                togglePlay();
-            } else {
-                playSong(song);
-            }
-        });
+    <!-- Live-Zähler -->
+    <div class="box">
+        <h3>📊 Zustand deines KI-Datensatzes</h3>
+        <div class="stats">
+            <div class="stat-card">Seiten im Datensatz <span id="statPages">0</span></div>
+            <div class="stat-card">Gesamt-Textelemente <span id="statElements">0</span></div>
+            <div class="stat-card">Gesamt-Zeichenanzahl <span id="statChars">0</span></div>
+        </div>
+        <h4 style="margin-top: 20px; margin-bottom: 5px;">Integrierte Webseiten:</h4>
+        <div id="sourcesUsed" class="source-list">Noch keine Daten im Speicher.</div>
+    </div>
 
-        container.appendChild(card);
-    });
-}
+    <!-- Log -->
+    <div class="box">
+        <h3>📜 System-Log-Protokoll</h3>
+        <div id="statusLog">> System hochgefahren. Bereit...</div>
+    </div>
 
-// 4. Playback Steuerung
-function playSong(song) {
-    initAudio();
-    stopAudio();
-    activeSong = song;
+    <div class="box" style="text-align: center;">
+        <button id="downloadBtn" class="btn-download">📥 GESAMTEN DATENSATZ ALS JSON DOWNLOADEN</button>
+    </div>
 
-    const currentTitle = document.getElementById('currentTitle');
-    const currentStyle = document.getElementById('currentStyle');
-    const currentCover = document.getElementById('currentCover');
-    const globalPlayBtn = document.getElementById('globalPlayBtn');
-
-    if (currentTitle) currentTitle.innerText = song.title;
-    if (currentStyle) currentStyle.innerText = song.style;
-    if (currentCover) currentCover.innerHTML = song.emoji;
-    if (globalPlayBtn) globalPlayBtn.innerHTML = '<i class="fa-solid fa-circle-pause"></i>';
-
-    let index = 0;
-    currentSequence = Tone.Transport.scheduleRepeat((time) => {
-        let step = index % 16;
-        
-        if (song.melody[step] && synth) {
-            synth.triggerAttackRelease(song.melody[step], "16n", time, 0.4);
-        }
-        if (song.bass[step] && bass) {
-            bass.triggerAttackRelease(song.bass[step], "8n", time, 0.6);
-        }
-        index++;
-    }, "16n");
-
-    Tone.Transport.bpm.value = 120;
-    Tone.Transport.start();
-
-    elapsedSeconds = 0;
-    clearInterval(progressInterval);
-    progressInterval = setInterval(() => {
-        elapsedSeconds += 0.5;
-        if(elapsedSeconds > 15) elapsedSeconds = 0; 
-        
-        const progressFill = document.getElementById('progressFill');
-        const currentTime = document.getElementById('currentTime');
-        
-        if (progressFill) progressFill.style.width = ((elapsedSeconds / 15) * 100) + '%';
-        if (currentTime) {
-            let mins = Math.floor(elapsedSeconds / 60);
-            let secs = Math.floor(elapsedSeconds % 60);
-            currentTime.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        }
-    }, 500);
-
-    renderSongs();
-}
-
-function stopAudio() {
-    Tone.Transport.stop();
-    if (currentSequence !== null) {
-        Tone.Transport.clear(currentSequence);
-        currentSequence = null;
-    }
-    clearInterval(progressInterval);
-    
-    const progressFill = document.getElementById('progressFill');
-    const currentTime = document.getElementById('currentTime');
-    const globalPlayBtn = document.getElementById('globalPlayBtn');
-
-    if (progressFill) progressFill.style.width = '0%';
-    if (currentTime) currentTime.innerText = '0:00';
-    if (globalPlayBtn) globalPlayBtn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
-}
-
-function togglePlay() {
-    if (!activeSong) return;
-    const globalPlayBtn = document.getElementById('globalPlayBtn');
-    
-    if (Tone.Transport.state === 'started') {
-        Tone.Transport.pause();
-        clearInterval(progressInterval);
-        if (globalPlayBtn) globalPlayBtn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
-    } else {
-        Tone.Transport.start();
-        progressInterval = setInterval(() => {
-            elapsedSeconds += 0.5;
-            if(elapsedSeconds > 15) elapsedSeconds = 0;
-            const progressFill = document.getElementById('progressFill');
-            if (progressFill) progressFill.style.width = (elapsedSeconds / 15) * 100 + '%';
-        }, 500);
-        if (globalPlayBtn) globalPlayBtn.innerHTML = '<i class="fa-solid fa-circle-pause"></i>';
-    }
-    renderSongs();
-}
-
-const globalPlayBtn = document.getElementById('globalPlayBtn');
-if (globalPlayBtn) {
-    globalPlayBtn.addEventListener('click', togglePlay);
-}
-
-// Initialer Render beim Laden der Seite
-window.addEventListener('DOMContentLoaded', () => {
-    renderSongs();
-});
+    <!-- Verknüpfung der Logik-Datei -->
+    <script src="script.js"></script>
+</body>
+</html>
