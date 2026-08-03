@@ -1,80 +1,123 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Volltext-Crawler (Modular)</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
-        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; margin-top: 0; }
-        h3 { color: #f1f5f9; margin-bottom: 10px; }
-        .input-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        input[type="text"] { flex: 4; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
-        input[type="text"]:focus { border-color: #38bdf8; outline: none; }
-        .btn-action { flex: 1; padding: 14px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-action:hover { background-color: #0369a1; }
-        .upload-area { border: 2px dashed #475569; padding: 20px; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; transition: 0.2s; }
-        .upload-area:hover { border-color: #38bdf8; background: #111e36; }
-        #fileInput { display: none; }
-        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; margin-top: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-download:hover { background-color: #15803d; }
-        #statusLog { height: 150px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
-        .stats { display: flex; gap: 20px; margin-top: 15px; }
-        .stat-card { background: #334155; padding: 15px 20px; border-radius: 6px; flex: 1; text-align: center; }
-        .stat-card span { display: block; font-size: 26px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
-        .source-list { max-height: 180px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
-        .source-list li { margin-bottom: 6px; font-size: 14px; }
-    </style>
-</head>
-<body>
+// Das Hauptobjekt, das das Dataset hält
+let masterTrainingDataset = {
+    crawlerVersion: "2.0-FullScrape",
+    generiertAm: new Date().toISOString(),
+    metriken: { seitenAnzahl: 0, elementeAnzahl: 0, zeichenAnzahl: 0 },
+    erfassteWebseiten: []
+};
 
-    <!-- JSON hochladen -->
-    <div class="box">
-        <h1>📂 Vorhandenes Dataset hochladen</h1>
-        <p>Wähle eine alte `.json`-Datei aus, die du mit diesem Tool erstellt hast, um neue Webseiten hinzuzufügen:</p>
-        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            <span id="uploadText">📁 Klicke hier, um deine JSON-Datei auszuwählen</span>
-            <input type="file" id="fileInput" accept=".json">
-        </div>
-    </div>
+const log = document.getElementById('statusLog');
+const downloadBtn = document.getElementById('downloadBtn');
 
-    <!-- Webseiten scrapen -->
-    <div class="box">
-        <h1>📦 KI-Volltext-Crawler (Deep Scrape)</h1>
-        <p>Gib eine URL ein, um die Seite vollständig auszulesen und an das Dataset anzuhängen.</p>
+// Funktion, um das UI nach Änderungen neu zu zeichnen
+function updateUI() {
+    document.getElementById('statPages').innerText = masterTrainingDataset.metriken.seitenAnzahl;
+    document.getElementById('statElements').innerText = masterTrainingDataset.metriken.elementeAnzahl.toLocaleString();
+    document.getElementById('statChars').innerText = masterTrainingDataset.metriken.zeichenAnzahl.toLocaleString();
+    
+    let sourcesDiv = document.getElementById('sourcesUsed');
+    if(masterTrainingDataset.erfassteWebseiten.length > 0) {
+        sourcesDiv.innerHTML = "<ol>";
+        masterTrainingDataset.erfassteWebseiten.forEach(site => {
+            sourcesDiv.innerHTML += `<li><a href="${site.url}" target="_blank" style="color: #38bdf8; font-weight: bold;">${site.titel}</a> (${site.reinText.length.toLocaleString()} Zeichen)</li>`;
+        });
+        sourcesDiv.innerHTML += "</ol>";
+        downloadBtn.style.display = "block";
+    } else {
+        sourcesDiv.innerHTML = "Noch keine Daten im Speicher.";
+        downloadBtn.style.display = "none";
+    }
+}
+
+// LOGIK FÜR DEN DATEI-UPLOAD
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        try {
+            const parsedJson = JSON.parse(evt.target.result);
+            
+            // Überprüfung der Struktur-Kompatibilität
+            if (parsedJson.metriken && Array.isArray(parsedJson.erfassteWebseiten)) {
+                masterTrainingDataset = parsedJson;
+                updateUI();
+                
+                document.getElementById('uploadText').innerText = `✅ Geladen: ${file.name}`;
+                log.innerHTML += `<br>> [UPLOAD] Dataset erfolgreich importiert! ${masterTrainingDataset.metriken.seitenAnzahl} Seiten geladen.`;
+            } else {
+                alert("Ungültiges JSON-Format. Bitte lade eine kompatible Dataset-Datei hoch.");
+                log.innerHTML += `<br>> ❌ [UPLOAD] Fehler: Falsches JSON-Format.`;
+            }
+        } catch (err) {
+            alert("Datei konnte nicht gelesen werden. Keine gültige JSON.");
+            log.innerHTML += `<br>> ❌ [UPLOAD] Fehler beim Parsen der Datei.`;
+        }
+        log.scrollTop = log.scrollHeight;
+    };
+    reader.readAsText(file);
+});
+
+// SCRAPER AUSFÜHREN
+document.getElementById('crawlerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const targetUrl = document.getElementById('targetUrl').value;
+    
+    log.innerHTML += `<br>> Verbinde mit Zielseite: "${targetUrl}"...`;
+    log.scrollTop = log.scrollHeight;
+
+    try {
+        const response = await fetch('/api/search-and-scrape', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ targetUrl })
+        });
+        const data = await response.json();
         
-        <form id="crawlerForm">
-            <div class="input-row">
-                <input type="text" id="targetUrl" placeholder="https://wikipedia.org" required>
-                <button type="submit" class="btn-action">Aussaugen</button>
-            </div>
-        </form>
-    </div>
+        if(data.success) {
+            // Neue Daten anhängen
+            masterTrainingDataset.erfassteWebseiten.push({
+                titel: data.title,
+                url: data.url,
+                erfassungsZeit: data.scrapedAt,
+                strukturierterInhalt: data.contentTree,
+                reinText: data.fullTextPlain
+            });
 
-    <!-- Live-Zähler -->
-    <div class="box">
-        <h3>📊 Zustand deines KI-Datensatzes</h3>
-        <div class="stats">
-            <div class="stat-card">Seiten im Datensatz <span id="statPages">0</span></div>
-            <div class="stat-card">Gesamt-Textelemente <span id="statElements">0</span></div>
-            <div class="stat-card">Gesamt-Zeichenanzahl <span id="statChars">0</span></div>
-        </div>
-        <h4 style="margin-top: 20px; margin-bottom: 5px;">Integrierte Webseiten:</h4>
-        <div id="sourcesUsed" class="source-list">Noch keine Daten im Speicher.</div>
-    </div>
+            // Metriken erhöhen
+            masterTrainingDataset.metriken.seitenAnzahl += 1;
+            masterTrainingDataset.metriken.elementeAnzahl += data.elementsCount;
+            masterTrainingDataset.metriken.zeichenAnzahl += data.totalCharacters;
 
-    <!-- Log -->
-    <div class="box">
-        <h3>📜 System-Log-Protokoll</h3>
-        <div id="statusLog">> System hochgefahren. Bereit...</div>
-    </div>
+            updateUI();
+            log.innerHTML += `<br>> ✓ VOLLTEXT ERFOLGREICH GEHOLT! "${data.title}" wurde angehängt.`;
+        } else {
+            log.innerHTML += `<br>> ❌ Fehler: ${data.error}`;
+        }
+    } catch (err) {
+        log.innerHTML += `<br>> ❌ Server-Verbindungsfehler.`;
+    }
+    log.scrollTop = log.scrollHeight;
+});
 
-    <div class="box" style="text-align: center;">
-        <button id="downloadBtn" class="btn-download">📥 GESAMTEN DATENSATZ ALS JSON DOWNLOADEN</button>
-    </div>
-
-    <!-- Verknüpfung der Logik-Datei -->
-    <script src="script.js"></script>
-</body>
-</html>
+// DOWNLOAD AUSFÜHREN
+downloadBtn.addEventListener('click', () => {
+    if (masterTrainingDataset.erfassteWebseiten.length === 0) return;
+    
+    const jsonString = JSON.stringify(masterTrainingDataset, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", blobUrl);
+    downloadAnchor.setAttribute("download", `ai_dataset_fortgesetzt_${Date.now()}.json`);
+    
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    document.body.removeChild(downloadAnchor);
+    URL.revokeObjectURL(blobUrl);
+    
+    log.innerHTML += `<br>> ✓ Aktualisiertes Dataset auf deinem PC gesichert!`;
+    log.scrollTop = log.scrollHeight;
+});
