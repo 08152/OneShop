@@ -10,82 +10,78 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// API-Endpunkt für die Internetsuche und das Auslesen (Scraping)
+// API-Endpunkt für das gezielte Durchsuchen einer bestimmten Seite nach einem Thema
 app.post('/api/search-and-scrape', async (req, res) => {
-    const { searchQuery } = req.body;
+    const { targetUrl, theme } = req.body;
     
-    if (!searchQuery) {
-        return res.status(400).json({ error: 'Bitte einen Suchbegriff eingeben.' });
+    if (!targetUrl || !theme) {
+        return res.status(400).json({ error: 'Bitte eine URL und ein Thema eingeben.' });
+    }
+
+    // Sicherstellen, dass die URL mit http:// oder https:// beginnt
+    let cleanUrl = targetUrl.trim();
+    if (!/^https?:\/\//i.test(cleanUrl)) {
+        cleanUrl = 'https://' + cleanUrl;
     }
 
     try {
-        // Suchanfrage an die freie Wikipedia-API senden (inklusive Browser-Kennung)
-        const searchUrl = `https://wikipedia.org{encodeURIComponent(searchQuery)}&limit=5&namespace=0&format=json`;
-        
-        const searchResponse = await axios.get(searchUrl, {
+        // Die vom Nutzer eingegebene Seite abrufen (mit Browser-Kennung)
+        const response = await axios.get(cleanUrl, {
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            }
+            },
+            timeout: 8000
         });
         
-        const foundTitles = searchResponse.data[1] || [];
-        const foundLinks = searchResponse.data[3] || [];
+        const $ = cheerio.load(response.data);
+        
+        // Unwichtige Layout-Elemente entfernen
+        $('script, style, nav, footer, header, iframe, .navbox').remove();
 
-        if (!foundLinks || foundLinks.length === 0) {
-            return res.status(404).json({ success: false, error: 'Keine passenden Seiten im Internet gefunden.' });
-        }
+        const pageTitle = $('title').text().trim() || "Eingegebene Webseite";
+        let filteredText = "";
+        let totalParagraphsChecked = 0;
+        let matchingParagraphsFound = 0;
 
-        let combinedTrainingText = "";
-        let sourcesUsed = [];
-
-        // Die gefundenen Links nacheinander abrufen
-        for (let i = 0; i < foundLinks.length; i++) {
-            try {
-                const pageResponse = await axios.get(foundLinks[i], {
-                    headers: { 
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                    },
-                    timeout: 5000
-                });
+        // Alle Textabsätze durchsuchen
+        $('p, li, h1, h2, h3').each((index, el) => {
+            const txt = $(el).text().trim();
+            if (txt.length > 10) {
+                totalParagraphsChecked++;
                 
-                const $ = cheerio.load(pageResponse.data);
-                
-                // Unwichtige Elemente entfernen
-                $('script, style, nav, footer, header, iframe, .mw-jump-link, .navbox').remove();
-
-                let pageText = "";
-                $('p').each((index, el) => {
-                    const txt = $(el).text().trim();
-                    if (txt.length > 20) {
-                        pageText += txt + "\n";
-                    }
-                });
-
-                if (pageText.trim().length > 100) {
-                    combinedTrainingText += `\n--- QUELLE: ${foundTitles[i]} ---\n` + pageText + "\n";
-                    sourcesUsed.push({ title: foundTitles[i], url: foundLinks[i] });
+                // Prüfen, ob das eingegebene Thema im Textabschnitt vorkommt (Groß-/Kleinschreibung ignorieren)
+                const regex = new RegExp(theme.trim(), 'i');
+                if (regex.test(txt)) {
+                    filteredText += txt + "\n\n";
+                    matchingParagraphsFound++;
                 }
-            } catch (e) {
-                // Ein fehlerhafter Link wird übersprungen
-                continue;
             }
+        });
+
+        if (!filteredText.trim()) {
+            return res.status(404).json({ 
+                success: false, 
+                error: `Das Thema "${theme}" wurde auf dieser Webseite nicht im Text gefunden.` 
+            });
         }
 
-        if (!combinedTrainingText.trim()) {
-            return res.status(500).json({ success: false, error: 'Zugriff auf Textinhalte wurde verweigert.' });
-        }
-
+        // Ergebnis zurückgeben
         res.json({
             success: true,
-            searchTerm: searchQuery,
-            sources: sourcesUsed,
-            text: combinedTrainingText
+            title: pageTitle,
+            url: cleanUrl,
+            theme: theme,
+            text: filteredText,
+            stats: {
+                checked: totalParagraphsChecked,
+                found: matchingParagraphsFound
+            }
         });
 
     } catch (error) {
         res.status(500).json({ 
             success: false, 
-            error: `Internetsuche fehlgeschlagen: ${error.message}` 
+            error: `Die Webseite konnte nicht geladen werden. Details: ${error.message}` 
         });
     }
 });
