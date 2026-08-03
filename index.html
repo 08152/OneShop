@@ -3,125 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gezielter KI-Daten-Crawler</title>
+    <title>KI-Volltext-Crawler (Gesamte Seite)</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
         .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         h1 { color: #38bdf8; margin-top: 0; }
         h3 { color: #f1f5f9; margin-bottom: 10px; }
-        .input-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px; }
-        input[type="text"] { width: 100%; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; }
+        input[type="text"] { width: 78%; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; margin-right: 2%; }
         input[type="text"]:focus { border-color: #38bdf8; outline: none; }
-        button { padding: 14px 24px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
+        button { width: 20%; padding: 14px; font-size: 16px; background-color: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         button:hover { background-color: #0369a1; }
         .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; margin-top: 20px; display: none; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; }
         .btn-download:hover { background-color: #15803d; }
         #statusLog { height: 150px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
         .stats { display: flex; gap: 20px; margin-top: 15px; }
-        .stat-card { background: #334155; padding: 10px 20px; border-radius: 6px; flex: 1; text-align: center; }
-        .stat-card span { display: block; font-size: 24px; font-weight: bold; color: #38bdf8; }
-        .source-list { max-height: 150px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
+        .stat-card { background: #334155; padding: 15px 20px; border-radius: 6px; flex: 1; text-align: center; }
+        .stat-card span { display: block; font-size: 26px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
+        .source-list { max-height: 180px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
+        .source-list li { margin-bottom: 6px; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h1>📦 Gezielter KI-Daten-Crawler</h1>
-        <p>Gib eine Wunsch-Webseite ein und filtere sie nach einem bestimmten Thema, um passgenaue Trainingsdaten abzuspeichern.</p>
+        <h1>📦 KI-Volltext-Crawler (Deep Scrape)</h1>
+        <p>Gibt eine URL ein, um die Seite vollständig auszulesen. Die Struktur wird für maschinelles Lernen optimiert aufbereitet.</p>
         
         <form id="crawlerForm">
-            <div class="input-group">
-                <input type="text" id="targetUrl" placeholder="1. Webseite eingeben (z.B. de.wikipedia.org/wiki/Roboter)" required>
-                <input type="text" id="theme" placeholder="2. Thema/Schlagwort filtern (z.B. Sensor, Ethik, Geschichte)" required>
-            </div>
-            <button type="submit">Seite nach Thema durchsuchen</button>
+            <input type="text" id="targetUrl" placeholder="https://wikipedia.org" required>
+            <button type="submit">Seite aussaugen</button>
         </form>
     </div>
 
+    <!-- Live-Zähler für das Dataset -->
     <div class="box">
-        <h3>📊 Sammlungs-Status</h3>
+        <h3>📊 Zustand deines KI-Datensatzes</h3>
         <div class="stats">
-            <div class="stat-card">Gesammelte Zeichen <span id="statChars">0</span></div>
-            <div class="stat-card">Gefundene Treffer <span id="statHits">0</span></div>
+            <div class="stat-card">Seiten im Datensatz <span id="statPages">0</span></div>
+            <div class="stat-card">Gesamt-Textelemente <span id="statElements">0</span></div>
+            <div class="stat-card">Gesamt-Zeichenanzahl <span id="statChars">0</span></div>
         </div>
-        <h4 style="margin-top: 15px; margin-bottom: 5px;">Durchsuchte Links:</h4>
-        <div id="sourcesUsed" class="source-list">Keine Quellen geladen.</div>
+        <h4 style="margin-top: 20px; margin-bottom: 5px;">Integrierte Webseiten:</h4>
+        <div id="sourcesUsed" class="source-list">Noch keine Daten im Speicher.</div>
     </div>
 
     <div class="box">
-        <h3>📜 System-Protokoll</h3>
-        <div id="statusLog">> System bereit. Warte auf Eingaben...</div>
+        <h3>📜 System-Log-Protokoll</h3>
+        <div id="statusLog">> System hochgefahren. Warte auf Ziel-URL...</div>
     </div>
 
     <div class="box" style="text-align: center;">
-        <button id="downloadBtn" class="btn-download">📥 TRAININGSDATEN ALS JSON DOWNLOADEN</button>
+        <p>Alle gesammelten Seiten werden in einer einzigen, unbegrenzt langen JSON-Datei zusammengeführt:</p>
+        <button id="downloadBtn" class="btn-download">📥 GESAMTEN DATENSATZ ALS JSON DOWNLOADEN</button>
     </div>
 
 <script>
-    let datasetContainer = { erstellungsDatum: new Date().toISOString(), gesamteZeichen: 0, gesamteTreffer: 0, datenSaetze: [] };
+    // Das Hauptobjekt, das beliebig viele Seiten sammelt
+    let masterTrainingDataset = {
+        crawlerVersion: "2.0-FullScrape",
+        generiertAm: new Date().toISOString(),
+        metriken: {
+            seitenAnzahl: 0,
+            elementeAnzahl: 0,
+            zeichenAnzahl: 0
+        },
+        erfassteWebseiten: []
+    };
+
+    const log = document.getElementById('statusLog');
 
     document.getElementById('crawlerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const targetUrl = document.getElementById('targetUrl').value;
-        const theme = document.getElementById('theme').value;
-        const log = document.getElementById('statusLog');
         
-        log.innerHTML += `<br>> Rufe "${targetUrl}" auf und suche nach "${theme}"...`;
+        log.innerHTML += `<br>> Verbinde mit Zielseite: "${targetUrl}"...`;
         log.scrollTop = log.scrollHeight;
 
         try {
             const response = await fetch('/api/search-and-scrape', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ targetUrl, theme })
+                body: JSON.stringify({ targetUrl })
             });
             const data = await response.json();
             
             if(data.success) {
-                datasetContainer.datenSaetze.push({
-                    seite: data.title,
+                // Neue Seite in das Datenset pushen
+                masterTrainingDataset.erfassteWebseiten.push({
+                    titel: data.title,
                     url: data.url,
-                    gesuchtesThema: data.theme,
-                    zeitstempel: new Date().toISOString(),
-                    rohText: data.text
+                    erfassungsZeit: data.scrapedAt,
+                    strukturierterInhalt: data.contentTree,
+                    reinText: data.fullTextPlain
                 });
 
-                datasetContainer.gesamteTreffer += data.stats.found;
-                datasetContainer.gesamteZeichen += data.text.length;
+                // Globale Metriken hochzählen
+                masterTrainingDataset.metriken.seitenAnzahl += 1;
+                masterTrainingDataset.metriken.elementeAnzahl += data.elementsCount;
+                masterTrainingDataset.metriken.zeichenAnzahl += data.totalCharacters;
 
-                document.getElementById('statChars').innerText = datasetContainer.gesamteZeichen.toLocaleString();
-                document.getElementById('statHits').innerText = datasetContainer.gesamteTreffer;
+                // UI aktualisieren
+                document.getElementById('statPages').innerText = masterTrainingDataset.metriken.seitenAnzahl;
+                document.getElementById('statElements').innerText = masterTrainingDataset.metriken.elementeAnzahl.toLocaleString();
+                document.getElementById('statChars').innerText = masterTrainingDataset.metriken.zeichenAnzahl.toLocaleString();
                 
-                // Quellen-Liste im UI erweitern
+                // Liste der URLs rendern
                 let sourcesDiv = document.getElementById('sourcesUsed');
-                sourcesDiv.innerHTML = "<ul>";
-                datasetContainer.datenSaetze.forEach(set => {
-                    sourcesDiv.innerHTML += `<li><b>[Thema: ${set.gesuchtesThema}]</b> <a href="${set.url}" target="_blank" style="color: #38bdf8;">${set.seite}</a></li>`;
+                sourcesDiv.innerHTML = "<ol>";
+                masterTrainingDataset.erfassteWebseiten.forEach(site => {
+                    sourcesDiv.innerHTML += `<li><a href="${site.url}" target="_blank" style="color: #38bdf8; font-weight: bold;">${site.titel}</a> (${site.reinText.length.toLocaleString()} Zeichen gelernt)</li>`;
                 });
-                sourcesDiv.innerHTML += "</ul>";
+                sourcesDiv.innerHTML += "</ol>";
 
-                log.innerHTML += `<br>> ✓ Erfolg! ${data.stats.found} Abschnitte gefunden (${data.text.length} Zeichen).`;
+                log.innerHTML += `<br>> ✓ VOLLTEXT ERFOLGREICH GEKLAUT! "${data.title}" wurde komplett gelernt.`;
                 document.getElementById('downloadBtn').style.display = "block";
             } else {
                 log.innerHTML += `<br>> ❌ Fehler: ${data.error}`;
             }
         } catch (err) {
-            log.innerHTML += `<br>> ❌ Keine Verbindung zum Render-Server möglich.`;
+            log.innerHTML += `<br>> ❌ Server-Verbindungsfehler. Überprüfe die Render-Logs.`;
         }
         log.scrollTop = log.scrollHeight;
     });
 
+    // Speicheroptimierter JSON-Download über Blobs (wichtig bei extrem langen Datensätzen)
     document.getElementById('downloadBtn').addEventListener('click', () => {
-        const jsonString = JSON.stringify(datasetContainer, null, 2);
+        if (masterTrainingDataset.erfassteWebseiten.length === 0) return;
+
+        log.innerHTML += `<br>> Packe JSON-Datenpaket...`;
+        
+        const jsonString = JSON.stringify(masterTrainingDataset, null, 2);
         const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
         const blobUrl = URL.createObjectURL(blob);
+        
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", blobUrl);
-        downloadAnchor.setAttribute("download", `gezielte_ki_trainingsdaten.json`);
+        downloadAnchor.setAttribute("download", `ai_dataset_fullscrape_${Date.now()}.json`);
+        
         document.body.appendChild(downloadAnchor);
         downloadAnchor.click();
+        
         document.body.removeChild(downloadAnchor);
         URL.revokeObjectURL(blobUrl);
+        
+        log.innerHTML += `<br>> ✓ Datei erfolgreich auf deinem PC gesichert!`;
+        log.scrollTop = log.scrollHeight;
     });
 </script>
 </body>
