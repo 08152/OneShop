@@ -3,48 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Trainingsdaten Datensatz-Erweiterer</title>
+    <title>KI-Trainingsdaten Erweiterer</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
-        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; }
         h1 { color: #38bdf8; margin-top: 0; }
-        h3 { color: #f1f5f9; margin-bottom: 10px; }
-        .upload-area { border: 2px dashed #475569; padding: 25px; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
-        .upload-area:hover { border-color: #38bdf8; background: #111e36; }
+        .upload-area { border: 2px dashed #475569; padding: 25px; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; font-weight: bold; }
         #fileInput { display: none; }
-        .btn-control { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: white; }
+        .btn-control { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; color: white; }
         #btnAutopilot { background-color: #2563eb; }
-        #btnAutopilot:hover { background-color: #1id4ed8; }
-        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; display: none; }
-        .btn-download:hover { background-color: #15803d; }
-        #statusLog { height: 180px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
+        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; display: none; margin-top: 15px; }
+        #statusLog { height: 180px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: monospace; color: #34d399; border-radius: 6px; }
         .stats { display: flex; gap: 20px; margin-top: 15px; }
         .stat-card { background: #334155; padding: 15px 20px; border-radius: 6px; flex: 1; text-align: center; }
         .stat-card span { display: block; font-size: 26px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
         .source-list { max-height: 180px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
-        .source-list li { margin-bottom: 6px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <!-- SCHRITT 1: JSON hochladen -->
     <div class="box">
         <h1>📂 1. Vorhandene JSON hochladen</h1>
-        <p>Lade deine alte JSON-Datei hoch, um sie mit neuen Internet-Daten zu verbessern und zu vergrößern:</p>
         <div class="upload-area" onclick="document.getElementById('fileInput').click()">
             <span id="uploadText">📁 Klicke hier, um deine JSON-Datei auszuwählen</span>
             <input type="file" id="fileInput" accept=".json">
         </div>
     </div>
 
-    <!-- SCHRITT 2: Steuerung -->
     <div class="box">
         <h1>🤖 2. Datensatz-Erweiterung steuern</h1>
-        <p>Nach dem Upload kannst du den Autopiloten starten. Er sucht selbstständig nach neuen Wikipedia-Seiten:</p>
         <button id="btnAutopilot" class="btn-control">▶️ Autopilot starten</button>
     </div>
 
-    <!-- LIVE-STATISTIKEN (ALLE 3 WERTE SICHTBAR) -->
     <div class="box">
         <h3>📊 Zustand deines verbesserten KI-Datensatzes</h3>
         <div class="stats">
@@ -56,15 +46,12 @@
         <div id="sourcesUsed" class="source-list">Warte auf JSON-Upload oder Start...</div>
     </div>
 
-    <!-- System Log -->
     <div class="box">
         <h3>📜 System-Log-Protokoll</h3>
-        <div id="statusLog">> System bereit. Bitte lade eine JSON hoch oder drücke direkt auf Start...</div>
+        <div id="statusLog">> System bereit...</div>
     </div>
 
-    <!-- SCHRITT 3: Export -->
     <div class="box" style="text-align: center;">
-        <h3>💾 3. Ergebnis sichern</h3>
         <button id="downloadBtn" class="btn-download">📥 BESSERE JSON DOWNLOADEN</button>
     </div>
 
