@@ -3,144 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suno AI - Music Generator Clone</title>
-    <!-- Tone.js für die Audio-Synthese -->
+    <title>Suno AI - Erstellen</title>
     <script src="https://cloudflare.com"></script>
-    <!-- FontAwesome für moderne Icons -->
     <link rel="stylesheet" href="https://cloudflare.com">
     <style>
         :root {
-            --bg-main: #0a0a0c;
-            --bg-sidebar: #121216;
-            --bg-card: #18181c;
-            --bg-input: #222227;
-            --accent: #e11d48;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
+            --bg-main: #0a0a0c; --bg-sidebar: #121216; --bg-card: #18181c;
+            --bg-input: #222227; --accent: #e11d48; --text-main: #f4f4f5; --text-muted: #a1a1aa;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* Links: Navigationsleiste */
-        .sidebar { width: 240px; background: var(--bg-sidebar); padding: 20px; display: flex; flex-direction: column; gap: 25px; border-right: 1px solid #27272a; }
-        .logo { font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--accent); }
-        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .nav-links li a { color: var(--text-muted); text-decoration: none; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; }
-        .nav-links li a.active, .nav-links li a:hover { background: #27272a; color: var(--text-main); }
+        /* LINKES MENÜ (Aus deinem Screenshot) */
+        .sidebar { width: 260px; background: var(--bg-sidebar); padding: 20px 15px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid #27272a; }
+        .nav-container { display: flex; flex-direction: column; gap: 8px; }
+        .nav-links { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .nav-links li a { color: var(--text-muted); text-decoration: none; padding: 12px 16px; border-radius: 8px; display: flex; align-items: center; gap: 14px; font-size: 15px; font-weight: 500; transition: 0.2s; }
+        .nav-links li a:hover, .nav-links li a.active { background: #1c1c21; color: var(--text-main); }
+        
+        /* User Profil Kapsel unten */
+        .user-profile { background: #1c1c21; padding: 12px 16px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 
-        /* Mitte-Links: Prompt-Panel */
+        /* Layout-Bereiche */
         .create-panel { width: 360px; background: var(--bg-sidebar); padding: 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #27272a; overflow-y: auto; }
-        .panel-title { font-size: 18px; font-weight: 600; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-group label { font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; }
-        textarea, input[type="text"] { background: var(--bg-input); border: 1px solid #3f3f46; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; resize: none; outline: none; transition: 0.2s; }
-        textarea:focus, input[type="text"]:focus { border-color: var(--accent); }
-        .create-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; margin-top: 10px; }
-        .create-btn:hover { opacity: 0.9; transform: scale(0.98); }
-
-        /* Rechts: Dashboard */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; padding-bottom: 120px; }
-        .feed-header { margin-bottom: 25px; font-size: 24px; font-weight: 700; }
-        .song-list { display: flex; flex-direction: column; gap: 12px; }
-        .song-card { background: var(--bg-card); border: 1px solid #27272a; border-radius: 10px; padding: 15px; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; cursor: pointer; }
-        .song-card:hover { background: #222227; border-color: #3f3f46; }
-        .song-info { display: flex; align-items: center; gap: 15px; }
-        .song-cover { width: 55px; height: 55px; border-radius: 6px; background: linear-gradient(135deg, #3b82f6, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; position: relative; }
-        .song-details .title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-        .song-details .prompt-text { font-size: 13px; color: var(--text-muted); max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .song-tags { display: flex; gap: 6px; margin-top: 4px; }
-        .tag { background: #27272a; color: var(--text-muted); font-size: 11px; padding: 2px 8px; border-radius: 4px; }
-        .play-card-btn { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; transition: 0.2s; margin-right: 10px; }
-        .play-card-btn:hover { color: var(--accent); transform: scale(1.1); }
-
-        /* Unten: Player-Leiste */
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .input-group label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+        textarea, input[type="text"] { background: var(--bg-input); border: 1px solid #3f3f46; border-radius: 8px; color: #fff; padding: 12px; font-size: 14px; outline: none; }
+        .create-btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        
+        /* Player Leiste unten */
         .player-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 90px; background: #111115; border-top: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; z-index: 100; }
-        .player-left { display: flex; align-items: center; gap: 15px; width: 30%; }
-        .player-cover { width: 50px; height: 50px; border-radius: 6px; background: #27272a; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-        .player-center { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 40%; }
-        .player-controls { display: flex; align-items: center; gap: 20px; }
-        .control-btn { background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
-        .control-btn:hover { color: #fff; }
-        .control-btn.main-play { font-size: 32px; color: #fff; }
-        .control-btn.main-play:hover { color: var(--accent); }
-        .progress-container { width: 100%; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-muted); }
-        .progress-bar { flex: 1; height: 4px; background: #3f3f46; border-radius: 2px; cursor: pointer; position: relative; }
-        .progress-fill { width: 0%; height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.1s linear; }
-        .player-right { width: 30%; display: flex; justify-content: flex-end; align-items: center; gap: 10px; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
-    <!-- Linker Navigations-Bereich -->
+    <!-- DIE SIDEBAR (Identisch auf allen Seiten) -->
     <div class="sidebar">
-        <div class="logo"><i class="fa-solid fa-wand-magic-sparkles"></i> SUNO<span>.ai</span></div>
-        <ul class="nav-links">
-            <li><a href="#" class="active"><i class="fa-solid fa-compass"></i> Explore</a></li>
-            <li><a href="#"><i class="fa-solid fa-layer-group"></i> Library</a></li>
-            <li><a href="#"><i class="fa-solid fa-heart"></i> Favorites</a></li>
-        </ul>
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="/start"><i class="fa-solid fa-house"></i> Start</a></li>
+                <li><a href="/entdecken"><i class="fa-solid fa-magnifying-glass"></i> Entdecken</a></li>
+                <li><a href="/" class="active"><i class="fa-solid fa-music"></i> Erstellen</a></li>
+                <li><a href="/studio"><i class="fa-solid fa-wand-magic-sparkles"></i> Studio</a></li>
+                <li><a href="/bibliothek"><i class="fa-solid fa-lines-leaning"></i> Bibliothek</a></li>
+                <li><a href="/hooks"><i class="fa-solid fa-box-archive"></i> Hooks</a></li>
+            </ul>
+        </div>
+        
+        <!-- User Bereich unten aus deinem Bild -->
+        <div class="user-profile">
+            <div class="user-info">
+                <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                <span style="font-size: 14px; font-weight: 500;">riskylive</span>
+            </div>
+            <i class="fa-solid fa-ellipsis" style="color: var(--text-muted);"></i>
+        </div>
     </div>
 
-    <!-- Generierungs-Panel -->
+    <!-- SPEZIFISCHER INHALT FÜR "ERSTELLEN" -->
     <div class="create-panel">
-        <div class="panel-title">Create Music</div>
-        
+        <h2 style="font-size: 18px; margin-bottom: 10px;">Create Music</h2>
         <div class="input-group">
             <label>Song Description</label>
-            <textarea id="promptInput" rows="4" placeholder="An upbeat electronic synthwave track with heavy bass and futuristic cyber vibes..."></textarea>
+            <textarea id="promptInput" rows="4" placeholder="An upbeat synthwave track..."></textarea>
         </div>
-
         <div class="input-group">
             <label>Style of Music</label>
-            <input type="text" id="styleInput" placeholder="e.g. Synthwave, Cyberpunk, Lo-Fi">
+            <input type="text" id="styleInput" placeholder="e.g. Cyberpunk">
         </div>
-
-        <div class="input-group">
-            <label>Title</label>
-            <input type="text" id="titleInput" placeholder="Give it a name (optional)">
-        </div>
-
-        <button class="create-btn" id="generateBtn">
-            <i class="fa-solid fa-gears"></i> Create Song
-        </button>
+        <button class="create-btn" id="generateBtn">Create Song</button>
     </div>
 
-    <!-- Dashboard -->
     <div class="main-content">
-        <div class="feed-header">Your Creations</div>
-        <div class="song-list" id="songsContainer"></div>
+        <h2 style="font-size: 24px; margin-bottom: 20px;">Your Creations</h2>
+        <div id="songsContainer"></div>
     </div>
 
-    <!-- Player Leiste -->
-    <div class="player-bar">
-        <div class="player-left">
-            <div class="player-cover" id="currentCover"><i class="fa-solid fa-music"></i></div>
-            <div>
-                <div class="title" id="currentTitle" style="font-weight:600; font-size:14px;">No Song Playing</div>
-                <div id="currentStyle" style="font-size:12px; color:var(--text-muted);">Select or create a track</div>
-            </div>
-        </div>
-        <div class="player-center">
-            <div class="player-controls">
-                <button class="control-btn"><i class="fa-solid fa-backward-step"></i></button>
-                <button class="control-btn main-play" id="globalPlayBtn"><i class="fa-solid fa-circle-play"></i></button>
-                <button class="control-btn"><i class="fa-solid fa-forward-step"></i></button>
-            </div>
-            <div class="progress-container">
-                <span id="currentTime">0:00</span>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                <span id="totalTime">0:15</span>
-            </div>
-        </div>
-        <div class="player-right">
-            <i class="fa-solid fa-volume-high"></i>
-            <div class="progress-bar" style="width:80px; max-width:80px;"><div class="progress-fill" style="width: 80%;"></div></div>
-        </div>
-    </div>
-
-    <!-- Externe Logik laden -->
+    <!-- globaler Player bleibt gleich -->
     <script src="script.js"></script>
 </body>
 </html>
