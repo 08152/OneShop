@@ -24,7 +24,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
         // 1. Ein zufälliges Suchwort auswählen
         const randomWord = randomKeywords[Math.floor(Math.random() * randomKeywords.length)];
         
-        // 2. DuckDuckGo HTML-Version ohne Javascript aufrufen (Wird von Render nicht blockiert)
+        // 2. DuckDuckGo HTML-Version aufrufen (Wird von Render nicht blockiert)
         const ddgUrl = `https://duckduckgo.com{encodeURIComponent(randomWord)}`;
         
         const searchResponse = await fetch(ddgUrl, {
@@ -40,16 +40,17 @@ app.post('/api/search-and-scrape', async (req, res) => {
         const searchHtml = await searchResponse.text();
         const $search = cheerio.load(searchHtml);
         
-        // Die echten Suchergebnisse aus den DuckDuckGo-Klassen herausfiltern
+        // Die echten Suchergebnisse herausfiltern
         let foundLinks = [];
         $search('.result__url').each((i, el) => {
             let link = $search(el).attr('href');
             if (link) {
-                // DuckDuckGo-Weiterleitungs-URLs säubern, falls vorhanden
+                // DuckDuckGo-Weiterleitungs-URLs sauber extrahieren und decodieren
                 if (link.includes('uddg=')) {
                     const parts = link.split('uddg=');
                     if (parts.length > 1) {
-                        link = decodeURIComponent(parts[1].split('&')[0]);
+                        const actualLink = parts[1].split('&');
+                        link = decodeURIComponent(actualLink[0]);
                     }
                 }
                 // Keine Werbelinks oder DuckDuckGo-eigenen Links mitnehmen
@@ -63,15 +64,15 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Keine passenden Links bei DuckDuckGo gefunden.' });
         }
 
-        // Einen zufälligen Link aus den Top-Suchergebnissen auswählen
+        // Einen zufälligen Link aus den Suchergebnissen auswählen
         const targetUrl = foundLinks[Math.floor(Math.random() * foundLinks.length)];
 
-        // 3. Die ausgewählte Webseite blitzschnell aufrufen
+        // 3. Die ausgewählte Webseite im Hintergrund aufrufen
         const pageResponse = await fetch(targetUrl, {
             headers: { 
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
             },
-            signal: AbortSignal.timeout(5000) // Nach 5 Sekunden abbrechen, falls eine externe Seite trödelt
+            signal: AbortSignal.timeout(5000) // Nach 5 Sekunden abbrechen, falls eine Seite trödelt
         });
 
         if (!pageResponse.ok) {
@@ -81,8 +82,8 @@ app.post('/api/search-and-scrape', async (req, res) => {
         const pageHtml = await pageResponse.text();
         const $page = cheerio.load(pageHtml);
         
-        // Skripte, Styles, Iframes und Menüs radikal löschen für sauberen Text
-        $page('script, style, nav, footer, header, iframe, .navbox, .aside, ad, noscript, style, link').remove();
+        // Unwichtige Elemente radikal löschen für sauberen Text
+        $page('script, style, nav, footer, header, iframe, .navbox, .aside, ad, noscript, link, style').remove();
 
         const pageTitle = $page('title').text().trim() || "Zufällige Internetseite";
         let structuredContent = [];
@@ -93,7 +94,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
             const tagName = el.tagName.toLowerCase();
             const textContent = $page(el).text().replace(/\s+/g, ' ').trim();
 
-            if (textContent.length > 20) { // Nur Abschnitte mit echtem Inhalt mitnehmen
+            if (textContent.length > 25) { // Nur Abschnitte mit echtem Inhalt mitnehmen
                 const isHeading = tagName.startsWith('h');
                 structuredContent.push({
                     type: isHeading ? 'heading' : 'paragraph',
@@ -108,7 +109,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Die ausgewählte Seite enthielt keinen lesbaren Text.' });
         }
 
-        // Datenpaket ans Frontend schicken
+        // Datenpaket sauber strukturiert ans Frontend schicken
         return res.json({
             success: true,
             title: pageTitle,
