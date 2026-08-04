@@ -8,6 +8,10 @@
   },
   "dependencies": {
     "brain.js": "^2.0.0-alpha.4",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "gl": "^7.0.2"
+  },
+  "overrides": {
+    "gl": "^7.0.2"
   }
 }
