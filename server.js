@@ -5,7 +5,7 @@ const Parser = require('rss-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const parser = new Parser({ timeout: 4000 });
+const parser = new Parser({ timeout: 5000 }); // Mehr Zeit für den Download einräumen
 
 app.use(express.json({ limit: '50mb' })); 
 
@@ -16,18 +16,18 @@ let verlauf = {
   saetze: []
 };
 
+// Bereinigte, extrem stabile Feed-Quellen (Standard-RSS2 ohne Sonderformate)
 const internetFeeds = [
-  { name: 'Heise Tech', url: 'https://heise.de' },
-  { name: 'Spiegel Netzwelt', url: 'https://spiegel.de' },
-  { name: 'Tagesschau', url: 'https://tagesschau.de' },
-  { name: 'Golem IT', url: 'https://golem.de' }
+  { name: 'Tagesschau News', url: 'https://tagesschau.de' },
+  { name: 'Wikipedia Trends', url: 'https://wikipedia.org' },
+  { name: 'ZDF Heute', url: 'https://zdf.de' }
 ];
 
-// Erlaubt NUR die absolut häufigsten Buchstaben, um das Vokabular klein zu halten
 function saubereText(text) {
+  if (!text) return '';
   return text
     .toLowerCase()
-    .replace(/[^a-z ]/g, '') // Entfernt Umlaute/Sonderzeichen, da diese brain.js crashen lassen
+    .replace(/[^a-z ]/g, '') // Strikt nur Kleinbuchstaben und Leerzeichen
     .replace(/\s+/g, ' ')       
     .trim();
 }
@@ -38,27 +38,31 @@ async function durchsucheUndLerneZufaellig() {
   const zeit = new Date().toLocaleTimeString();
   
   try {
-    console.log(`Scrape läuft auf: ${quelle.name}...`);
+    console.log(`Lese Quelle: ${quelle.name}...`);
     const feed = await parser.parseURL(quelle.url);
     
     let neueSaetze = [];
     
-    feed.items.forEach(item => {
-      let textStueck = item.title || '';
-      const saetze = textStueck.split(/[.!?]+/);
-      
-      saetze.forEach(s => {
-        let sauber = saubereText(s);
-        const wortAnzahl = sauber.split(' ').length;
+    if (feed && feed.items) {
+      feed.items.forEach(item => {
+        let textStueck = item.title || item.contentSnippet || '';
+        // Alle HTML-Tags entfernen, falls welche im Feed stecken
+        textStueck = textStueck.replace(/<\/?[^>]+(>|$)/g, "");
         
-        // STRENGER FILTER: Nur kurze Sätze mit maximal 5 einfachen Wörtern erlauben!
-        if (wortAnzahl >= 2 && wortAnzahl <= 5 && sauber.length > 5 && !neueSaetze.includes(sauber)) {
-          neueSaetze.push(sauber);
-        }
+        const saetze = textStueck.split(/[.!?]+/);
+        
+        saetze.forEach(s => {
+          let sauber = saubereText(s);
+          const wortAnzahl = sauber.split(' ').length;
+          
+          // Nur extrem kurze, mundgerechte Sätze erlauben (2 bis 4 Wörter)
+          if (wortAnzahl >= 2 && wortAnzahl <= 4 && sauber.length > 4 && !neueSaetze.includes(sauber)) {
+            neueSaetze.push(sauber);
+          }
+        });
       });
-    });
+    }
 
-    // Nur maximal 2 Sätze pro Durchgang lernen, um den RAM zu schonen!
     const auswahl = neueSaetze.slice(0, 2);
 
     if (auswahl.length > 0) {
@@ -67,9 +71,9 @@ async function durchsucheUndLerneZufaellig() {
       });
       if (verlauf.saetze.length > 20) verlauf.saetze.pop();
 
-      // KI-Modell sicher trainieren
+      // KI trainieren
       net.train(auswahl, { 
-        iterations: 8, // Sehr wenige Iterationen verhindern den Absturz
+        iterations: 10, 
         errorThresh: 0.1,
         log: false 
       });
@@ -80,15 +84,13 @@ async function durchsucheUndLerneZufaellig() {
       return { erfolg: true, anzahl: auswahl.length, quelle: quelle.name };
     }
     
-    return { erfolg: false, grund: 'Keine mundgerechten Sätze gefunden.' };
+    verlauf.quellen.unshift(`[${zeit}] ${quelle.name}: Keine passenden Kurzsätze gefunden.`);
+    return { erfolg: false, grund: 'Keine Sätze' };
+
   } catch (error) {
-    // Falls das Modell wegen Überlastung crasht, setzen wir es hier automatisch zurück
-    if (error.message.includes('size') || error.message.includes('memory')) {
-      net = new brain.recurrent.LSTM(); 
-      verlauf.quellen.unshift(`[${zeit}] ⚠️ Speicher voll! KI-Modell wurde automatisch bereinigt.`);
-    } else {
-      verlauf.quellen.unshift(`[${zeit}] Fehler bei ${quelle.name}: ${error.message}`);
-    }
+    // Sanft abfangen: Fehler loggen, aber nicht abstürzen
+    verlauf.quellen.unshift(`[${zeit}] Überspringe Quelle (${quelle.name}): Datenformat unleserlich`);
+    if (verlauf.quellen.length > 10) verlauf.quellen.pop();
     return { erfolg: false, grund: error.message };
   }
 }
