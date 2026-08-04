@@ -1,13 +1,9 @@
 {
-  "name": "github-render-video-ki",
+  "name": "mini-ki-textvorhersage",
   "version": "1.0.0",
-  "description": "Video KI gesteuert über HTML, gehostet auf Render",
+  "description": "Eine einfache KI zur Textvorhersage",
   "main": "server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
-    "express": "^4.19.2"
+    "brain.js": "^2.0.0-alpha.4"
   }
 }
