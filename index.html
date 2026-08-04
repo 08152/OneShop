@@ -3,74 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI-Trainingsdaten Datensatz-Erweiterer</title>
+    <title>Lokaler Video KI Controller</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #0f172a; color: #f8fafc; }
-        .box { background: #1e293b; padding: 25px; margin-bottom: 25px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        h1 { color: #38bdf8; margin-top: 0; }
-        h3 { color: #f1f5f9; margin-bottom: 10px; }
-        .upload-area { border: 2px dashed #475569; padding: 25px; text-align: center; border-radius: 6px; background: #0f172a; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .upload-area:hover { border-color: #38bdf8; background: #111e36; }
-        #fileInput { display: none; }
-        textarea { width: 100%; height: 120px; padding: 14px; font-size: 16px; background: #0f172a; border: 1px solid #475569; border-radius: 6px; color: #fff; box-sizing: border-box; resize: vertical; margin-bottom: 15px; font-family: monospace; }
-        textarea:focus { border-color: #38bdf8; outline: none; }
-        .btn-control { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: white; }
-        #btnAutopilot { background-color: #2563eb; }
-        #btnAutopilot:hover { background-color: #1d4ed8; }
-        .btn-download { background-color: #16a34a; width: 100%; font-size: 18px; padding: 16px; text-transform: uppercase; letter-spacing: 1px; color: white; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; display: none; }
-        .btn-download:hover { background-color: #15803d; }
-        #statusLog { height: 180px; overflow-y: auto; background: #0f172a; border: 1px solid #334155; padding: 15px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #34d399; border-radius: 6px; }
-        .stats { display: flex; gap: 20px; margin-top: 15px; }
-        .stat-card { background: #334155; padding: 15px 20px; border-radius: 6px; flex: 1; text-align: center; }
-        .stat-card span { display: block; font-size: 26px; font-weight: bold; color: #38bdf8; margin-top: 5px; }
-        .source-list { max-height: 180px; overflow-y: auto; padding-left: 20px; color: #cbd5e1; }
-        .source-list li { margin-bottom: 6px; font-size: 14px; }
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 0 20px; background-color: #1e1e1e; color: #f5f5f5; }
+        .card { background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 20px; border: 1px solid #3d3d3d; }
+        .flex { display: flex; gap: 10px; margin-bottom: 10px; }
+        input, textarea, select { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 4px; font-size: 14px; background: #1e1e1e; color: white; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; background-color: #007bff; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        button.delete { background-color: #dc3545; }
+        .status-container { background: #252526; padding: 15px; border-radius: 4px; margin-top: 20px; border-left: 4px solid #007bff; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+        .video-box { background: #333; padding: 10px; border-radius: 6px; border: 1px solid #444; text-align: center; }
+        video { width: 100%; border-radius: 4px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- SCHRITT 1: JSON hochladen -->
-    <div class="box">
-        <h1>📂 1. Vorhandene JSON hochladen</h1>
-        <p>Lade deine alte JSON-Datei hoch, um sie mit neuen Internet-Daten zu erweitern:</p>
-        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-            <span id="uploadText">📁 Klicke hier, um deine JSON-Datei auszuwählen</span>
-            <input type="file" id="fileInput" accept=".json">
-        </div>
+    <h1>Lokale Video-KI (Ohne API)</h1>
+    <p style="color: #aaa;">Generiert Videos direkt über deine lokale Grafikkarte.</p>
+    
+    <div class="card">
+        <h3>Szenen-Konfigurator</h3>
+        <div id="linksContainer"></div>
+        <button onclick="addScene()">+ Neue Szene einfügen</button>
     </div>
 
-    <!-- SCHRITT 2: Link-Eingabe & Steuerung -->
-    <div class="box">
-        <h1>🔗 2. Eigene Webseiten eingeben</h1>
-        <p>Füge hier eine oder mehrere URLs ein (einfach einen Link pro Zeile untereinander eintragen):</p>
-        <textarea id="urlList" placeholder="https://wikipedia.org"></textarea>
-        <button id="btnAutopilot" class="btn-control">▶️ Links abarbeiten starten</button>
+    <div class="card">
+        <button onclick="sendToLocalAI()" style="background-color: #28a745; font-size: 16px; padding: 12px 24px; width: 100%;">Lokal auf Grafikkarte berechnen</button>
     </div>
 
-    <!-- Statistiken -->
-    <div class="box">
-        <h3>📊 Zustand deines verbesserten KI-Datensatzes</h3>
-        <div class="stats">
-            <div class="stat-card">Seiten im Datensatz <span id="statPages">0</span></div>
-            <div class="stat-card">Gelernte Wörter <span id="statWords">0</span></div>
-            <div class="stat-card">Gesamt-Zeichenanzahl <span id="statChars">0</span></div>
-        </div>
-        <h4 style="margin-top: 20px; margin-bottom: 5px;">Durchsuchte Webseiten:</h4>
-        <div id="sourcesUsed" class="source-list">Warte auf Eingaben...</div>
+    <div class="card status-container" id="statusSection" style="display:none;">
+        <h3>Lokaler GPU-Status</h3>
+        <p id="globalStatus">Warte auf GPU-Antwort...</p>
+        <div class="video-grid" id="videoGrid"></div>
     </div>
 
-    <!-- System Log -->
-    <div class="box">
-        <h3>📜 System-Log-Protokoll</h3>
-        <div id="statusLog">> System bereit. Bitte lade eine JSON hoch, gib Links ein und drücke auf Start...</div>
-    </div>
+    <script>
+        window.onload = function() { addScene(); };
 
-    <!-- SCHRITT 3: Export -->
-    <div class="box" style="text-align: center;">
-        <h3>💾 3. Ergebnis sichern</h3>
-        <button id="downloadBtn" class="btn-download">📥 BESSERE JSON DOWNLOADEN</button>
-    </div>
+        function addScene() {
+            const container = document.getElementById('linksContainer');
+            const sceneId = Date.now();
+            
+            container.insertAdjacentHTML('beforeend', `
+                <div class="scene-item card" id="scene_${sceneId}" style="background: #252526;">
+                    <div class="flex">
+                        <input type="url" class="scene-url" placeholder="Optional: Lokaler Bildpfad / URL">
+                        <button class="delete" onclick="document.getElementById('scene_${sceneId}').remove()">X</button>
+                    </div>
+                    <div class="flex">
+                        <textarea class="scene-prompt" placeholder="Beschreibe die Bewegung für die lokale KI..." rows="2" required></textarea>
+                    </div>
+                </div>
+            `);
+        }
 
-    <script src="script.js"></script>
+        async function sendToLocalAI() {
+            const scenes = [];
+            const urls = document.querySelectorAll('.scene-url');
+            const prompts = document.querySelectorAll('.scene-prompt');
+
+            prompts.forEach((p, i) => {
+                if(p.value.trim() !== "") {
+                    scenes.push({ scene_number: i+1, source_url: urls[i].value.trim(), ai_prompt: p.value.trim() });
+                }
+            });
+
+            if(scenes.length === 0) return alert("Bitte Prompt ausfüllen.");
+
+            document.getElementById('statusSection').style.display = 'block';
+            document.getElementById('globalStatus').innerText = "Verbinde mit lokaler GPU...";
+            document.getElementById('videoGrid').innerHTML = "";
+
+            try {
+                const res = await fetch('/api/generate-video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timeline: scenes })
+                });
+                const result = await res.json();
+                
+                if(result.error) throw new Error(result.error);
+
+                document.getElementById('globalStatus').innerText = "Grafikkarte rendert... Bitte Fenster nicht schließen.";
+                
+                result.tasks.forEach(task => {
+                    document.getElementById('videoGrid').insertAdjacentHTML('beforeend', `
+                        <div class="video-box" id="task_${task.generation_id}">
+                            <strong>Szene ${task.scene_number}</strong>
+                            <div class="status-lbl" style="color: #ffc107; font-weight:bold; margin-top:5px;">Berechne Frames...</div>
+                        </div>
+                    `);
+                    trackLocalStatus(task.generation_id);
+                });
+            } catch (e) {
+                document.getElementById('globalStatus').innerText = "Fehler: " + e.message;
+            }
+        }
+
+        function trackLocalStatus(id) {
+            const interval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/generation-status/${id}`);
+                    const data = await res.json();
+                    const box = document.getElementById(`task_${id}`);
+                    const label = box.querySelector('.status-lbl');
+
+                    if (data.status === 'completed') {
+                        clearInterval(interval);
+                        label.style.color = '#28a745';
+                        label.innerText = "Fertig!";
+                        box.insertAdjacentHTML('beforeend', `<video src="${data.video_url || 'https://w3schools.com'}" controls autoplay loop></video>`);
+                    }
+                } catch (e) { console.log(e); }
+            }, 4000);
+        }
+    </script>
 </body>
 </html>
