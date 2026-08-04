@@ -41,7 +41,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Keine URL empfangen.' });
         }
 
-        // HIER WURDE ERHÖHT: Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 5 Sekunden (5000ms)
+        // Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 5 Sekunden (5000ms)
         await sleep(5000);
 
         // Extrahiere den Artikelnamen korrekt aus der URL
@@ -50,10 +50,10 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Keine gültige deutsche Wikipedia-URL.' });
         }
         
-        // HIER WAR DER FEHLER: Wir brauchen den Index, um den Artikelnamen hinter dem Slash zu greifen!
+        // HIER WAR DER FEHLER: Holt sauber den Text hinter dem Schrägstrich
         const articleTitle = urlParts[1]; 
 
-        // Setzt die API-Adresse mit der korrekten Variablen-Syntax zusammen
+        // Setzt die API-Adresse mit Backticks und korrekter Syntax zusammen
         const apiUrl = `https://wikipedia.org{articleTitle}&explaintext=1&format=json`;
         
         const apiResponse = await makeApiRequest(apiUrl);
@@ -63,7 +63,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
         const pageId = Object.keys(pages)[0]; // Holt die erste gefundene Seiten-ID aus dem Objekt
         
         if (pageId === "-1") {
-            return res.status(404).json({ success: false, error: `Der Wikipedia-Artikel "${decodeURIComponent(articleTitle)}" wurde nicht gefunden.` });
+            return res.status(404).json({ success: false, error: `Der Wikipedia-Artikel wurde nicht gefunden.` });
         }
 
         const rawFullText = pages[pageId].extract || "";
@@ -111,4 +111,4 @@ app.post('/api/search-and-scrape', async (req, res) => {
 });
 
 app.use((req, res) => { res.status(404).json({ success: false, error: "Route nicht gefunden." }); });
-app.listen(PORT, () => { console.log(`API-Crawler mit sicherer 5s-Bremse läuft auf Port ${PORT}`); });
+app.listen(PORT, () => { console.log(`API-Crawler läuft auf Port ${PORT}`); });
