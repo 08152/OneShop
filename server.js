@@ -8,13 +8,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// API-Endpunkt: Holt Daten garantiert und blockierungsfrei über die offizielle Wikipedia-API
+// API-Endpunkt für die automatisierte Wikipedia-Suche
 app.post('/api/search-and-scrape', async (req, res) => {
     try {
         let title = "";
         let pageId = "";
 
-        // 1. Schritt: Eine zufällige Seite über die offizielle API anfordern (mit echtem User-Agent)
+        // 1. Schritt: Eine zufällige Seite über die offizielle API anfordern
         const randomApiUrl = 'https://wikipedia.org';
         
         const randomRes = await fetch(randomApiUrl, {
@@ -23,16 +23,21 @@ app.post('/api/search-and-scrape', async (req, res) => {
                 'Accept': 'application/json'
             }
         });
+
+        if (!randomRes.ok) {
+            return res.status(500).json({ success: false, error: `Wikipedia Random-API antwortete mit Status ${randomRes.status}` });
+        }
+
         const randomData = await randomRes.json();
         
         if (randomData && randomData.query && randomData.query.random && randomData.query.random[0]) {
             title = randomData.query.random[0].title;
             pageId = randomData.query.random[0].id;
         } else {
-            return res.status(500).json({ success: false, error: 'Zufallsartikel-API blockiert oder Antwort ungültig.' });
+            return res.status(500).json({ success: false, error: 'Zufallsartikel-API lieferte unerwartete Struktur.' });
         }
 
-        // 2. Schritt: Den Volltext der Seite sauber über die Text-Extracts-API laden
+        // 2. Schritt: Den Volltext der Seite über die Text-Extracts-API laden
         const contentApiUrl = `https://wikipedia.org{pageId}&explaintext=1&format=json`;
         
         const contentRes = await fetch(contentApiUrl, {
@@ -41,6 +46,11 @@ app.post('/api/search-and-scrape', async (req, res) => {
                 'Accept': 'application/json'
             }
         });
+
+        if (!contentRes.ok) {
+            return res.status(500).json({ success: false, error: `Wikipedia Content-API antwortete mit Status ${contentRes.status}` });
+        }
+
         const contentData = await contentRes.json();
 
         const pages = contentData.query.pages;
@@ -48,10 +58,10 @@ app.post('/api/search-and-scrape', async (req, res) => {
         const rawFullText = pageData.extract || "";
 
         if (!rawFullText.trim()) {
-            return res.status(404).json({ success: false, error: 'Der Artikel enthielt keinen Text.' });
+            return res.status(404).json({ success: false, error: 'Der Artikel enthielt keinen lesbaren Text.' });
         }
 
-        // 3. Schritt: Den Text in ein strukturiertes Format zerlegen (für deine KI)
+        // 3. Schritt: Den Text in ein strukturiertes Format zerlegen
         const textLines = rawFullText.split('\n');
         let structuredContent = [];
         let cleanPlainBackup = "";
@@ -59,7 +69,6 @@ app.post('/api/search-and-scrape', async (req, res) => {
         textLines.forEach(line => {
             const trimmed = line.trim();
             if (trimmed.length > 5) {
-                // Wikipedia kennzeichnet Überschriften im Reintext mit "== Überschrift =="
                 const isHeading = trimmed.startsWith('==') && trimmed.endsWith('==');
                 
                 structuredContent.push({
@@ -72,8 +81,8 @@ app.post('/api/search-and-scrape', async (req, res) => {
             }
         });
 
-        // Erfolgreiche Antwort an das Frontend senden
-        res.json({
+        // WICHTIG: Sende garantiert sauberes JSON zurück
+        return res.json({
             success: true,
             title: title,
             url: `https://wikipedia.org{pageId}`,
@@ -86,13 +95,19 @@ app.post('/api/search-and-scrape', async (req, res) => {
 
     } catch (error) {
         console.error("API-Fehler:", error.message);
-        res.status(500).json({ 
+        // Fallback: Wenn der Server abstürzt, fangen wir das ab und senden JSON statt HTML-Fehler
+        return res.status(500).json({ 
             success: false, 
-            error: `Verbindung fehlgeschlagen: ${error.message}` 
+            error: `Interner Serverfehler abgefangen: ${error.message}` 
         });
     }
 });
 
+// Fängt falsche Routen ab, damit Render niemals HTML-Fehler sendet
+app.use((req, res) => {
+    res.status(404).json({ success: false, error: "Route nicht gefunden." });
+});
+
 app.listen(PORT, () => {
-    console.log(`Blockierungsfreier Server läuft auf Port ${PORT}`);
+    console.log(`Absturzsicherer Server läuft auf Port ${PORT}`);
 });
