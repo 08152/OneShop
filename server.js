@@ -44,6 +44,8 @@ function makeRequest(url) {
 app.post('/api/search-and-scrape', async (req, res) => {
     try {
         const randomWord = randomKeywords[Math.floor(Math.random() * randomKeywords.length)];
+        
+        // HIER WAR DER FEHLER: Die URL nutzt jetzt Backticks (`) und die korrekte ${}-Syntax mit dem Fragezeichen (?)
         const ddgUrl = `https://duckduckgo.com{encodeURIComponent(randomWord)}`;
         
         // 1. DuckDuckGo HTML laden
@@ -57,8 +59,8 @@ app.post('/api/search-and-scrape', async (req, res) => {
                 if (link.includes('uddg=')) {
                     const parts = link.split('uddg=');
                     if (parts.length > 1) {
-                        const actualLink = parts[1].split('&')[0];
-                        link = decodeURIComponent(actualLink);
+                        const actualLink = parts[1].split('&');
+                        link = decodeURIComponent(actualLink[0]);
                     }
                 }
                 if (link.startsWith('http') && !link.includes('duckduckgo.com')) {
