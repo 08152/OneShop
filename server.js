@@ -5,9 +5,9 @@ const Parser = require('rss-parser');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const parser = new Parser({ timeout: 4000 }); // Etwas mehr Zeit für langsame Leitungen
+const parser = new Parser({ timeout: 4000 });
 
-app.use(express.json({ limit: '100mb' })); 
+app.use(express.json({ limit: '50mb' })); 
 
 let net = new brain.recurrent.LSTM();
 
@@ -20,15 +20,14 @@ const internetFeeds = [
   { name: 'Heise Tech', url: 'https://heise.de' },
   { name: 'Spiegel Netzwelt', url: 'https://spiegel.de' },
   { name: 'Tagesschau', url: 'https://tagesschau.de' },
-  { name: 'Golem IT', url: 'https://golem.de' },
-  { name: 'Wired Tech', url: 'https://wired.com' },
-  { name: 'BBC News', url: 'http://bbci.co.uk' }
+  { name: 'Golem IT', url: 'https://golem.de' }
 ];
 
+// Erlaubt NUR die absolut häufigsten Buchstaben, um das Vokabular klein zu halten
 function saubereText(text) {
   return text
     .toLowerCase()
-    .replace(/[^a-zäöüß ]/g, '') 
+    .replace(/[^a-z ]/g, '') // Entfernt Umlaute/Sonderzeichen, da diese brain.js crashen lassen
     .replace(/\s+/g, ' ')       
     .trim();
 }
@@ -36,56 +35,60 @@ function saubereText(text) {
 async function durchsucheUndLerneZufaellig() {
   const zufallsIndex = Math.floor(Math.random() * internetFeeds.length);
   const quelle = internetFeeds[zufallsIndex];
+  const zeit = new Date().toLocaleTimeString();
   
   try {
     console.log(`Scrape läuft auf: ${quelle.name}...`);
     const feed = await parser.parseURL(quelle.url);
     
     let neueSaetze = [];
-    const zeit = new Date().toLocaleTimeString();
     
     feed.items.forEach(item => {
       let textStueck = item.title || '';
-      if (item.contentSnippet) textStueck += ' ' + item.contentSnippet;
-      
       const saetze = textStueck.split(/[.!?]+/);
+      
       saetze.forEach(s => {
         let sauber = saubereText(s);
         const wortAnzahl = sauber.split(' ').length;
-        // Wichtig: Sätze dürfen nicht zu lang sein, sonst stürzt der RAM ab!
-        if (wortAnzahl >= 3 && wortAnzahl <= 8 && !neueSaetze.includes(sauber)) {
+        
+        // STRENGER FILTER: Nur kurze Sätze mit maximal 5 einfachen Wörtern erlauben!
+        if (wortAnzahl >= 2 && wortAnzahl <= 5 && sauber.length > 5 && !neueSaetze.includes(sauber)) {
           neueSaetze.push(sauber);
         }
       });
     });
 
-    // Nur maximal 5 Sätze auf einmal lernen (schont den kostenlosen Render-Server)
-    const auswahl = neueSaetze.slice(0, 5);
+    // Nur maximal 2 Sätze pro Durchgang lernen, um den RAM zu schonen!
+    const auswahl = neueSaetze.slice(0, 2);
 
     if (auswahl.length > 0) {
       auswahl.forEach(s => {
         verlauf.saetze.unshift(`[Neu Gelernt] "${s}"`);
       });
-      if (verlauf.saetze.length > 30) verlauf.saetze.pop();
+      if (verlauf.saetze.length > 20) verlauf.saetze.pop();
 
-      // KI-Modell trainieren
+      // KI-Modell sicher trainieren
       net.train(auswahl, { 
-        iterations: 10, // Weniger Runden = Viel schneller und materialschonender
-        errorThresh: 0.08,
+        iterations: 8, // Sehr wenige Iterationen verhindern den Absturz
+        errorThresh: 0.1,
         log: false 
       });
       
       verlauf.quellen.unshift(`[${zeit}] ${quelle.name} (${auswahl.length} Sätze gelernt)`);
-      if (verlauf.quellen.length > 15) verlauf.quellen.pop();
+      if (verlauf.quellen.length > 10) verlauf.quellen.pop();
 
       return { erfolg: true, anzahl: auswahl.length, quelle: quelle.name };
     }
     
-    verlauf.quellen.unshift(`[${zeit}] ${quelle.name} (Keine passenden Sätze gefunden)`);
-    return { erfolg: false, grund: 'Keine passenden Sätze im Text gefunden.' };
+    return { erfolg: false, grund: 'Keine mundgerechten Sätze gefunden.' };
   } catch (error) {
-    const zeit = new Date().toLocaleTimeString();
-    verlauf.quellen.unshift(`[${zeit}] Fehler bei ${quelle.name}: ${error.message}`);
+    // Falls das Modell wegen Überlastung crasht, setzen wir es hier automatisch zurück
+    if (error.message.includes('size') || error.message.includes('memory')) {
+      net = new brain.recurrent.LSTM(); 
+      verlauf.quellen.unshift(`[${zeit}] ⚠️ Speicher voll! KI-Modell wurde automatisch bereinigt.`);
+    } else {
+      verlauf.quellen.unshift(`[${zeit}] Fehler bei ${quelle.name}: ${error.message}`);
+    }
     return { erfolg: false, grund: error.message };
   }
 }
@@ -99,10 +102,6 @@ app.post('/api/scrape-step', async (req, res) => {
   res.json({ ergebnis, verlauf });
 });
 
-app.get('/api/status', (req, res) => {
-  res.json(verlauf);
-});
-
 app.get('/api/predict', (req, res) => {
   const input = req.query.text || '';
   try {
@@ -110,7 +109,7 @@ app.get('/api/predict', (req, res) => {
     const output = net.run(gereinigterInput);
     res.json({ eingabe: input, vorhersage: output });
   } catch (error) {
-    res.json({ eingabe: input, vorhersage: 'KI lernt noch oder Gehirn ist leer...' });
+    res.json({ eingabe: input, vorhersage: 'KI startet neu...' });
   }
 });
 
