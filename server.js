@@ -6,27 +6,45 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Erhöhte Payload-Limits, um Fehler beim Upload großer JSON-Datensätze zu vermeiden
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Schlaf-Funktion: Zwingt den Node.js-Server vor jeder Anfrage zum Warten (5 Sekunden Schutz)
+// Schlaf-Funktion: Zwingt den Node.js-Server vor jeder Anfrage zum Warten (JETZT 12 SEKUNDEN SCHUTZ)
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Hilfsfunktion: Führt einen direkten, sicheren HTTPS-Abruf aus
 function makeRequest(url) {
     return new Promise((resolve, reject) => {
+        const parsedUrl = new URL(url);
+        
         const options = {
+            hostname: parsedUrl.hostname,
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: 'GET',
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+                // Ein realistischerer User-Agent verhindert, dass Wikipedia die Anfrage als Bot blockiert
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+                // FIX FÜR FEHLER 426: Signalisiert dem Server die Bereitschaft für moderne Web-Protokolle (HTTP/1.1 oder höher mit TLS)
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
             },
-            timeout: 8000
+            timeout: 10000 // Timeout auf 10 Sekunden erhöht
         };
 
-        https.get(url, options, (res) => {
-            if (res.statusCode < 200 || res.statusCode >= 300) {
-                return reject(new Error(`Status Code: ${res.statusCode}`));
+        https.get(options, (res) => {
+            // Falls Wikipedia ein Redirect schickt (z. B. von http auf https), fangen wir es ab
+            if (res.statusCode === 301 || res.statusCode === 302) {
+                return makeRequest(res.headers.location).then(resolve).catch(reject);
             }
+
+            if (res.statusCode < 200 || res.statusCode >= 300) {
+                return reject(new Error(`Status Code: ${res.statusCode} (${res.statusMessage})`));
+            }
+
             let data = '';
             res.on('data', (chunk) => { data += chunk; });
             res.on('end', () => { resolve(data); });
@@ -43,8 +61,8 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Keine URL vom Frontend empfangen.' });
         }
 
-        // HIER WIRD GEBREMST: Der Server wartet vor jedem Abruf exakt 5 Sekunden, damit Wikipedia uns liebt
-        await sleep(5000);
+        // HIER WIRD GEBREMST: Der Server wartet vor jedem Abruf exakt 12 Sekunden gegen Fehler 426
+        await sleep(12000);
 
         // Die eingegebene Wikipedia-Wunschseite direkt über HTTPS ansteuern
         const pageHtml = await makeRequest(targetUrl.trim());
@@ -102,5 +120,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Direkter Wikipedia-Crawler läuft auf Port ${PORT}`);
+    console.log(`Direkter Wikipedia-Crawler läuft auf Port ${PORT} (12s Delay aktiv)`);
 });
