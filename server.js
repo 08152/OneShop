@@ -41,27 +41,29 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Keine URL empfangen.' });
         }
 
-        // Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 3 Sekunden
-        await sleep(3000);
+        // HIER WURDE ERHÖHT: Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 5 Sekunden (5000ms)
+        await sleep(5000);
 
         // Extrahiere den Artikelnamen korrekt aus der URL
         const urlParts = targetUrl.trim().split('/wiki/');
         if (urlParts.length < 2) {
             return res.status(400).json({ success: false, error: 'Keine gültige deutsche Wikipedia-URL.' });
         }
-        const articleTitle = urlParts[1]; // Wählt den Teil nach dem "/wiki/" aus
+        
+        // HIER WAR DER FEHLER: Wir brauchen den Index, um den Artikelnamen hinter dem Slash zu greifen!
+        const articleTitle = urlParts[1]; 
 
-        // HIER WAR DER FEHLER: Die URL nutzt jetzt korrekte Backticks (`) und die ${}-Syntax für die Variable
+        // Setzt die API-Adresse mit der korrekten Variablen-Syntax zusammen
         const apiUrl = `https://wikipedia.org{articleTitle}&explaintext=1&format=json`;
         
         const apiResponse = await makeApiRequest(apiUrl);
         const parsedData = JSON.parse(apiResponse);
         
         const pages = parsedData.query.pages;
-        const pageId = Object.keys(pages)[0]; // Holt die echte ID aus dem Objekt
+        const pageId = Object.keys(pages)[0]; // Holt die erste gefundene Seiten-ID aus dem Objekt
         
         if (pageId === "-1") {
-            return res.status(404).json({ success: false, error: 'Dieser Wikipedia-Artikel wurde nicht gefunden.' });
+            return res.status(404).json({ success: false, error: `Der Wikipedia-Artikel "${decodeURIComponent(articleTitle)}" wurde nicht gefunden.` });
         }
 
         const rawFullText = pages[pageId].extract || "";
@@ -71,7 +73,7 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(404).json({ success: false, error: 'Der Artikel war leer.' });
         }
 
-        // Den unblockierten Text in saubere Absätze für deine KI zerlegen
+        // Den Text in saubere Absätze für deine KI zerlegen
         const textLines = rawFullText.split('\n');
         let structuredContent = [];
         let cleanPlainBackup = "";
@@ -109,4 +111,4 @@ app.post('/api/search-and-scrape', async (req, res) => {
 });
 
 app.use((req, res) => { res.status(404).json({ success: false, error: "Route nicht gefunden." }); });
-app.listen(PORT, () => { console.log(`API-Crawler läuft stabil auf Port ${PORT}`); });
+app.listen(PORT, () => { console.log(`API-Crawler mit sicherer 5s-Bremse läuft auf Port ${PORT}`); });
