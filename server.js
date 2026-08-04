@@ -1,21 +1,32 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const brain = require('brain.js');
 
-const app = express();
-const port = process.env.PORT || 3000;
+// 1. Neues neuronale Netzwerk für Text/Sequenzen erstellen (LSTM)
+const net = new brain.recurrent.LSTM();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// 2. Die "riesigen Textmengen" (unsere Trainingsdaten)
+// Die KI lernt hier die Struktur von einfachen Sätzen
+const trainingsDaten = [
+  'ki ist super',
+  'ki kann lernen',
+  'coder bauen software',
+  'javascript läuft auf dem server'
+];
 
-// Schaltet den Ordner für statische Dateien frei
-app.use(express.static(__dirname));
+console.log('--- Training startet ---');
+console.log('Bitte warten, die KI lernt gerade den Text...');
 
-// Liefert die index.html aus
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// 3. Das Training (Pre-training auf Sparflamme)
+// iterations: Wie oft die KI den Text liest (mehr = besseres Lernen)
+net.train(trainingsDaten, {
+  iterations: 150,
+  log: (stats) => console.log(stats)
 });
 
-app.listen(port, () => {
-    console.log(`Webseite läuft live auf Port ${port}`);
-});
+console.log('--- Training abgeschlossen! ---');
+
+// 4. Der Test: Die KI soll das nächste Wort vorhersagen
+const startText = 'ki ';
+const vorhersage = net.run(startText);
+
+console.log(`Eingabe: "${startText}"`);
+console.log(`KI-Vorhersage für das nächste Wort: "${vorhersage}"`);
