@@ -2,165 +2,17 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video-to-Video KI Controller</title>
+    <title>Mini KI Vorhersage</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 20px; background-color: #0f172a; color: #f8fafc; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5); margin-bottom: 20px; border: 1px solid #334155; }
-        .flex { display: flex; gap: 10px; margin-bottom: 10px; }
-        input, textarea { flex: 1; padding: 12px; border: 1px solid #475569; border-radius: 6px; font-size: 14px; background: #0f172a; color: white; }
-        input:focus, textarea:focus { border-color: #38bdf8; outline: none; }
-        button { padding: 12px 20px; border: none; border-radius: 6px; background-color: #38bdf8; color: #0f172a; cursor: pointer; font-weight: bold; transition: all 0.2s; }
-        button:hover { background-color: #7dd3fc; transform: translateY(-1px); }
-        button.delete { background-color: #ef4444; color: white; }
-        button.delete:hover { background-color: #f87171; }
-        .status-box { background: #020617; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #38bdf8; display: none; }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .video-box { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #475569; text-align: center; }
-        video { width: 100%; border-radius: 6px; margin-top: 10px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
-        .loader { color: #38bdf8; font-weight: bold; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
     </style>
 </head>
 <body>
-
-    <h1>Video-zu-Video KI Steuerung</h1>
-    <p style="color: #94a3b8; margin-top: -10px;">Füge Video-Links ein, um sie per KI umzustylen (Kostenlos via Render & HuggingFace).</p>
-    
-    <div class="card">
-        <h3>Szenen-Konfigurator</h3>
-        <div id="scenesContainer"><!-- Szenen landen hier --></div>
-        <button onclick="addScene()">+ Neue Video-Szene hinzufügen</button>
+    <div class="container">
+        <h1>KI Text-Vorhersage</h1>
+        <p>Schau in deine Server-Konsole (Terminal), um das Training und die Vorhersage der KI live zu sehen!</p>
     </div>
-
-    <button onclick="generateVideoToVideo()" style="background-color: #10b981; color: white; width: 100%; font-size: 16px; padding: 15px;">
-        🚀 Video-KI Transformation starten
-    </button>
-
-    <div class="status-box" id="statusSection">
-        <h3>KI-Verarbeitungsstatus</h3>
-        <p id="statusMessage">Bereite Video-Pipelines vor...</p>
-        <div class="video-grid" id="videoGrid"></div>
-    </div>
-
-    <script>
-        window.onload = () => { addScene(); };
-
-        function addScene() {
-            const container = document.getElementById('scenesContainer');
-            const id = Date.now();
-            
-            container.insertAdjacentHTML('beforeend', `
-                <div class="card" id="scene_${id}" style="background: #111827; margin-bottom: 15px;">
-                    <div class="flex">
-                        <input type="url" class="scene-url" placeholder="Hier MP4-Videolink einfügen (z.B. https://domain.com)" required>
-                        <button class="delete" onclick="document.getElementById('scene_${id}').remove()">X</button>
-                    </div>
-                    <div class="flex">
-                        <textarea class="scene-prompt" placeholder="Wie soll das Video verändert werden? (z.B. 'Verwandle das Video in einen Anime-Stil, üppige Farben')" rows="2" required></textarea>
-                    </div>
-                </div>
-            `);
-        }
-
-        async function generateVideoToVideo() {
-            const prompts = document.querySelectorAll('.scene-prompt');
-            const urls = document.querySelectorAll('.scene-url');
-            const grid = document.getElementById('videoGrid');
-            
-            let activeScenes = [];
-            urls.forEach((u, i) => {
-                if(u.value.trim() !== "" && prompts[i].value.trim() !== "") {
-                    activeScenes.push({ url: u.value.trim(), prompt: prompts[i].value.trim() });
-                }
-            });
-
-            if(activeScenes.length === 0) return alert("Bitte füge sowohl einen funktionierenden Video-Link als auch einen Prompt ein!");
-
-            document.getElementById('statusSection').style.display = 'block';
-            document.getElementById('statusMessage').innerHTML = "<span class='loader'>Verbindung zur kostenlosen GPU wird aufgebaut...</span>";
-            grid.innerHTML = "";
-
-            // Verarbeite jede Szene nacheinander über das freie LTX-Video-Modell
-            for(let i = 0; i < activeScenes.length; i++) {
-                const scene = activeScenes[i];
-                const boxId = `box_${i}`;
-                
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="video-box" id="${boxId}">
-                        <strong>Szene ${i+1}</strong>
-                        <p style="font-size: 11px; color: #94a3b8; margin: 5px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Link: ${scene.url}</p>
-                        <div class="status-lbl" style="color: #fbbf24;">In Warteschlange...</div>
-                    </div>
-                `);
-
-                try {
-                    // API Call an die offizielle, gesponserte LTX-Video Pipeline auf Hugging Face
-                    const response = await fetch("https://hf.space", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            data: [
-                                scene.url,            // Dein Video-Link als Quellmaterial
-                                scene.prompt,         // Die KI-Anweisung zum Umstyling
-                                "low quality, blur",  // Negativer Prompt
-                                12345,                // Seed
-                                512,                  // Breite
-                                512,                  // Höhe
-                                20                    // Steps
-                            ]
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    const eventId = result.event_id;
-
-                    if(eventId) {
-                        checkVideoProgress(eventId, boxId);
-                    } else {
-                        throw new Error("Keine Event-ID erhalten.");
-                    }
-                } catch (error) {
-                    document.getElementById(boxId).querySelector('.status-lbl').innerText = "Fehler bei der Übertragung.";
-                    document.getElementById(boxId).querySelector('.status-lbl').style.color = "#ef4444";
-                }
-            }
-            document.getElementById('statusMessage').innerText = "Alle Video-Links wurden erfolgreich an die KI übermittelt!";
-        }
-
-        async function checkVideoProgress(eventId, boxId) {
-            const box = document.getElementById(boxId);
-            const label = box.querySelector('.status-lbl');
-            
-            const interval = setInterval(async () => {
-                try {
-                    const res = await fetch(`https://hf.space/${eventId}`);
-                    if(res.status === 200) {
-                        const textData = await res.text();
-                        
-                        // Wenn der Cloud-Server fertig gerendert hat, liefert er das neue MP4
-                        if(textData.includes("complete") && textData.includes(".mp4")) {
-                            clearInterval(interval);
-                            
-                            // Filtert den generierten Video-Pfad aus den Server-Daten
-                            const match = textData.match(/"([^"]+\.mp4)"/);
-                            if(match && match[1]) {
-                                const newVideoUrl = "https://hf.space" + match[1];
-                                label.innerText = "Fertig transformiert!";
-                                label.style.color = "#10b981";
-                                box.insertAdjacentHTML('beforeend', `<video src="${newVideoUrl}" controls autoplay loop></video>`);
-                            }
-                        } else {
-                            label.innerHTML = "<span class='loader'>KI analysiert & rendert Video...</span>";
-                        }
-                    }
-                } catch (e) {
-                    clearInterval(interval);
-                    label.innerText = "Fehler beim Rendern.";
-                    label.style.color = "#ef4444";
-                }
-            }, 5000); // Überprüfung alle 5 Sekunden
-        }
-    </script>
 </body>
 </html>
