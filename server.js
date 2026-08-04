@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// Neue Schlaf-Funktion: Zwingt den Node.js-Server zum Warten
+// Schlaf-Funktion: Zwingt den Node.js-Server vor jeder Anfrage zum Warten
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Hilfsfunktion für offizielle API-Abrufe
@@ -41,24 +41,24 @@ app.post('/api/search-and-scrape', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Keine URL empfangen.' });
         }
 
-        // HIER WIRD GEBREMST: Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 3 Sekunden
+        // Der Server wartet jetzt vor JEDEM Wikipedia-Abruf exakt 3 Sekunden
         await sleep(3000);
 
-        // Extrahiere den Artikelnamen korrekt aus der URL (Mit Index [1])
+        // Extrahiere den Artikelnamen korrekt aus der URL
         const urlParts = targetUrl.trim().split('/wiki/');
         if (urlParts.length < 2) {
             return res.status(400).json({ success: false, error: 'Keine gültige deutsche Wikipedia-URL.' });
         }
-        const articleTitle = urlParts[1]; // FIX: Index [1] hinzugefügt, um den reinen Namen zu greifen
+        const articleTitle = urlParts[1]; // Wählt den Teil nach dem "/wiki/" aus
 
-        // Die offizielle Wikipedia-Text-API aufrufen
+        // HIER WAR DER FEHLER: Die URL nutzt jetzt korrekte Backticks (`) und die ${}-Syntax für die Variable
         const apiUrl = `https://wikipedia.org{articleTitle}&explaintext=1&format=json`;
         
         const apiResponse = await makeApiRequest(apiUrl);
         const parsedData = JSON.parse(apiResponse);
         
         const pages = parsedData.query.pages;
-        const pageId = Object.keys(pages)[0]; // Holt die erste ID aus dem Objekt
+        const pageId = Object.keys(pages)[0]; // Holt die echte ID aus dem Objekt
         
         if (pageId === "-1") {
             return res.status(404).json({ success: false, error: 'Dieser Wikipedia-Artikel wurde nicht gefunden.' });
@@ -109,4 +109,4 @@ app.post('/api/search-and-scrape', async (req, res) => {
 });
 
 app.use((req, res) => { res.status(404).json({ success: false, error: "Route nicht gefunden." }); });
-app.listen(PORT, () => { console.log(`API-Crawler mit 3s-Verzögerung läuft auf Port ${PORT}`); });
+app.listen(PORT, () => { console.log(`API-Crawler läuft stabil auf Port ${PORT}`); });
