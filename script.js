@@ -1,5 +1,5 @@
 let masterTrainingDataset = {
-    crawlerVersion: "7.0-ManualUrlQueue",
+    crawlerVersion: "8.0-UniversalJSONImporter",
     generiertAm: new Date().toISOString(),
     metriken: { seitenAnzahl: 0, elementeAnzahl: 0, zeichenAnzahl: 0, woerterAnzahl: 0 },
     erfassteWebseiten: []
@@ -12,8 +12,8 @@ const urlListField = document.getElementById('urlList');
 
 let autopilotTimer = null;
 let isAutopilotRunning = false;
-let urlQueue = []; // Warteschlange für deine eingegebenen Links
-const SCRAPE_INTERVAL = 3000; // Alle 3 Sekunden den nächsten Link auslesen
+let urlQueue = [];
+const SCRAPE_INTERVAL = 3000; // 3 Sekunden Pause zwischen den Wikipedia-Seiten
 
 function countWords(text) {
     if (!text) return 0;
@@ -42,20 +42,15 @@ function updateUI() {
     }
 }
 
-// STEUERUNG: START / STOPP
+// STEUERUNG
 btnAutopilot.addEventListener('click', () => {
-    if (isAutopilotRunning) {
-        stopAutopilot();
-    } else {
-        startAutopilot();
-    }
+    if (isAutopilotRunning) { stopAutopilot(); } else { startAutopilot(); }
 });
 
 function startAutopilot() {
-    // Links aus dem Textfeld auslesen und aufteilen (jeder Link in einer Zeile)
     const rawInput = urlListField.value.trim();
     if (rawInput === "" && urlQueue.length === 0) {
-        alert("Bitte gib zuerst mindestens eine Webadresse im Textfeld ein!");
+        alert("Bitte gib zuerst mindestens eine Wikipedia-URL im Textfeld ein!");
         return;
     }
 
@@ -71,7 +66,7 @@ function startAutopilot() {
     btnAutopilot.innerText = "🛑 ABARBEITUNG STOPPEN";
     btnAutopilot.style.backgroundColor = "#dc2626";
     
-    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet! ${urlQueue.length} Links in der Warteschlange...`;
+    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet! ${urlQueue.length} Links in Warteschlange...`;
     log.scrollTop = log.scrollHeight;
     
     triggerManualQueueScrape();
@@ -87,21 +82,17 @@ function stopAutopilot() {
     log.scrollTop = log.scrollHeight;
 }
 
-// ARBEITET DIE LINKS NACHEINANDER AB
 async function triggerManualQueueScrape() {
     if (urlQueue.length === 0) {
         stopAutopilot();
         btnAutopilot.innerText = "▶️ ABARBEITUNG STARTEN";
         log.innerHTML += `<br>> 🎉 FERTIG! Alle eingegebenen Links wurden erfolgreich durchsucht.`;
         log.scrollTop = log.scrollHeight;
-        urlListField.value = ""; // Textfeld leeren, wenn fertig
+        urlListField.value = "";
         return;
     }
 
-    // Den ersten Link aus der Liste herauspicken
     const nextUrl = urlQueue.shift();
-    
-    // Textfeld im Browser live aktualisieren, um zu zeigen, was noch übrig ist
     urlListField.value = urlQueue.join('\n');
 
     try {
@@ -111,7 +102,7 @@ async function triggerManualQueueScrape() {
         const response = await fetch('/api/search-and-scrape', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetUrl: nextUrl }) // Schickt deine Wunsch-URL an den Server
+            body: JSON.stringify({ targetUrl: nextUrl })
         });
         const data = await response.json();
         
@@ -141,9 +132,9 @@ async function triggerManualQueueScrape() {
     log.scrollTop = log.scrollHeight;
 }
 
-// LOGIK FÜR DEN DATEI-UPLOAD
+// FIX FÜR DEN DATEI-UPLOAD (AKZEPTIERT JEDE STRUKTUR)
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files;
+    const file = e.target.files[0];
     if (!file) return;
 
     if (isAutopilotRunning) stopAutopilot();
@@ -152,14 +143,26 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.onload = function(evt) {
         try {
             const parsedJson = JSON.parse(evt.target.result);
-            let importedPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
             
-            masterTrainingDataset.erfassteWebseiten = importedPages.map(d => ({
-                titel: d.titel || d.seite || d.suchbegriff || "Importierte Seite",
-                url: d.url || (d.quellen ? d.quellen.url : "#"),
-                reinText: d.reinText || d.rohText || d.text || ""
-            }));
+            // Finde heraus, wo die Seiten-Liste in der hochgeladenen Datei versteckt ist
+            let rawPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
+            
+            if (!Array.isArray(rawPages) && typeof parsedJson === 'object') {
+                // Falls die Datei direkt ein Array oder ein anderes Objekt ist, versuchen wir es zu retten
+                rawPages = Array.isArray(parsedJson) ? parsedJson : [parsedJson];
+            }
 
+            // Mappe alle importierten Daten in unser aktuelles, sauberes Format
+            masterTrainingDataset.erfassteWebseiten = rawPages.map(d => {
+                return {
+                    titel: d.titel || d.seite || d.suchbegriff || "Geladene Alt-Seite",
+                    url: d.url || (d.quellen && d.quellen.url) || "https://wikipedia.org",
+                    reinText: d.reinText || d.rohText || d.text || JSON.stringify(d),
+                    strukturierterInhalt: d.strukturierterInhalt || d.contentTree || []
+                };
+            });
+
+            // Berechne die gelernten Wörter und Zeichen komplett neu
             let totalWords = 0;
             let totalChars = 0;
             masterTrainingDataset.erfassteWebseiten.forEach(site => {
@@ -173,8 +176,12 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
             updateUI();
             document.getElementById('uploadText').innerText = `✅ Geladen: ${file.name}`;
-            log.innerHTML += `<br>> [UPLOAD] "${file.name}" eingelesen! ${masterTrainingDataset.metriken.woerterAnzahl.toLocaleString()} Wörter geladen.`;
-        } catch (err) { alert("Fehler beim Lesen."); }
+            log.innerHTML += `<br>> [UPLOAD] "${file.name}" erfolgreich repariert und importiert!`;
+            log.innerHTML += `<br>> ZUSTAND: ${masterTrainingDataset.metriken.seitenAnzahl} Seiten mit ${masterTrainingDataset.metriken.woerterAnzahl.toLocaleString()} Wörtern geladen.`;
+        } catch (err) {
+            alert("Kritischer Fehler: Die hochgeladene Datei ist beschädigt oder keine echte JSON.");
+            log.innerHTML += `<br>> ❌ [UPLOAD] Fehler beim Einlesen.`;
+        }
         log.scrollTop = log.scrollHeight;
     };
     reader.readAsText(file);
@@ -191,7 +198,7 @@ downloadBtn.addEventListener('click', () => {
     
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", blobUrl);
-    downloadAnchor.setAttribute("download", `bessere_trainingsdaten_${Date.now()}.json`);
+    downloadAnchor.setAttribute("download", `erweitert_ki_dataset_${Date.now()}.json`);
     
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
