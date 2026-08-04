@@ -15,7 +15,7 @@ let verlauf = {
   saetze: []
 };
 
-// Wir nutzen offene Text-APIs anstelle von verschachtelten RSS-Feeds
+// Offene Text-Quellen, die ohne RSS-Parser auskommen
 const quellen = [
   { name: 'Zitat-Dienst API', url: 'https://quotable.io' },
   { name: 'Krypto-News API', url: 'https://coingecko.com' },
@@ -44,8 +44,8 @@ function ladeTextAusInternet(url) {
       res.on('data', (chunk) => daten += chunk);
       res.on('end', () => resolve(daten));
     }).on('error', (e) => reject(e));
-  });
-});
+  }); // HIER WAR DER FEHLER: }) statt });
+}
 
 async function durchsucheUndLerneZufaellig() {
   const zufallsIndex = Math.floor(Math.random() * quellen.length);
