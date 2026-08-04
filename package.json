@@ -1,14 +1,13 @@
 {
-  "name": "lokale-video-ki",
+  "name": "github-render-video-ki",
   "version": "1.0.0",
-  "description": "Lokale Video-KI ohne externe APIs",
+  "description": "Video KI gesteuert über HTML, gehostet auf Render",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "axios": "^1.7.2",
     "express": "^4.19.2"
   }
 }
