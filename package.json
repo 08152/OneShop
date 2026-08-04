@@ -1,13 +1,14 @@
 {
-  "name": "mini-ki-render",
+  "name": "mini-ki-auto-lerner",
   "version": "1.0.0",
-  "description": "KI Textvorhersage auf Render",
+  "description": "KI lernt automatisch aus dem Internet",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "brain.js": "1.6.0"
+    "brain.js": "1.6.0",
+    "rss-parser": "^3.13.0"
   }
 }
