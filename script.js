@@ -1,5 +1,5 @@
 let masterTrainingDataset = {
-    crawlerVersion: "6.0-Final-Fix",
+    crawlerVersion: "7.0-ManualUrlQueue",
     generiertAm: new Date().toISOString(),
     metriken: { seitenAnzahl: 0, elementeAnzahl: 0, zeichenAnzahl: 0, woerterAnzahl: 0 },
     erfassteWebseiten: []
@@ -8,12 +8,13 @@ let masterTrainingDataset = {
 const log = document.getElementById('statusLog');
 const downloadBtn = document.getElementById('downloadBtn');
 const btnAutopilot = document.getElementById('btnAutopilot');
+const urlListField = document.getElementById('urlList');
 
 let autopilotTimer = null;
 let isAutopilotRunning = false;
-const SCRAPE_INTERVAL = 3000; // Alle 3 Sekunden eine neue Seite holen
+let urlQueue = []; // Warteschlange für deine eingegebenen Links
+const SCRAPE_INTERVAL = 3000; // Alle 3 Sekunden den nächsten Link auslesen
 
-// Robuster Wortzähler
 function countWords(text) {
     if (!text) return 0;
     const cleanText = text.toString().trim().replace(/\s+/g, ' ');
@@ -21,7 +22,6 @@ function countWords(text) {
     return cleanText.split(' ').length;
 }
 
-// UI AKTUALISIEREN (Zeigt alle 3 Werte an)
 function updateUI() {
     document.getElementById('statPages').innerText = masterTrainingDataset.metriken.seitenAnzahl;
     document.getElementById('statChars').innerText = masterTrainingDataset.metriken.zeichenAnzahl.toLocaleString();
@@ -42,42 +42,80 @@ function updateUI() {
     }
 }
 
-// STEUERUNG
+// STEUERUNG: START / STOPP
 btnAutopilot.addEventListener('click', () => {
-    if (isAutopilotRunning) { stopAutopilot(); } else { startAutopilot(); }
+    if (isAutopilotRunning) {
+        stopAutopilot();
+    } else {
+        startAutopilot();
+    }
 });
 
 function startAutopilot() {
+    // Links aus dem Textfeld auslesen und aufteilen (jeder Link in einer Zeile)
+    const rawInput = urlListField.value.trim();
+    if (rawInput === "" && urlQueue.length === 0) {
+        alert("Bitte gib zuerst mindestens eine Webadresse im Textfeld ein!");
+        return;
+    }
+
+    if (urlQueue.length === 0) {
+        urlQueue = rawInput.split('\n').map(url => url.trim()).filter(url => url.startsWith('http'));
+        if (urlQueue.length === 0) {
+            alert("Keine gültigen URLs gefunden! Die Links müssen mit http:// oder https:// beginnen.");
+            return;
+        }
+    }
+
     isAutopilotRunning = true;
-    btnAutopilot.innerText = "🛑 AUTOMATIK STOPPEN";
+    btnAutopilot.innerText = "🛑 ABARBEITUNG STOPPEN";
     btnAutopilot.style.backgroundColor = "#dc2626";
-    log.innerHTML += `<br>> 🤖 Autopilot gestartet...`;
+    
+    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet! ${urlQueue.length} Links in der Warteschlange...`;
     log.scrollTop = log.scrollHeight;
-    triggerAutomaticScrape();
-    autopilotTimer = setInterval(triggerAutomaticScrape, SCRAPE_INTERVAL);
+    
+    triggerManualQueueScrape();
+    autopilotTimer = setInterval(triggerManualQueueScrape, SCRAPE_INTERVAL);
 }
 
 function stopAutopilot() {
     isAutopilotRunning = false;
     clearInterval(autopilotTimer);
-    btnAutopilot.innerText = "▶️ AUTOPILOT STARTEN";
+    btnAutopilot.innerText = "▶️ LINKS ABARBEITEN FORTSETZEN";
     btnAutopilot.style.backgroundColor = "#2563eb";
-    log.innerHTML += `<br>> ⏸️ Autopilot gestoppt.`;
+    log.innerHTML += `<br>> ⏸️ Pause. Datensatz gesichert.`;
     log.scrollTop = log.scrollHeight;
 }
 
-// CRAWLER SCHLEIFE
-async function triggerAutomaticScrape() {
+// ARBEITET DIE LINKS NACHEINANDER AB
+async function triggerManualQueueScrape() {
+    if (urlQueue.length === 0) {
+        stopAutopilot();
+        btnAutopilot.innerText = "▶️ ABARBEITUNG STARTEN";
+        log.innerHTML += `<br>> 🎉 FERTIG! Alle eingegebenen Links wurden erfolgreich durchsucht.`;
+        log.scrollTop = log.scrollHeight;
+        urlListField.value = ""; // Textfeld leeren, wenn fertig
+        return;
+    }
+
+    // Den ersten Link aus der Liste herauspicken
+    const nextUrl = urlQueue.shift();
+    
+    // Textfeld im Browser live aktualisieren, um zu zeigen, was noch übrig ist
+    urlListField.value = urlQueue.join('\n');
+
     try {
+        log.innerHTML += `<br>> [Crawler] Lese Seite: "${nextUrl}"...`;
+        log.scrollTop = log.scrollHeight;
+
         const response = await fetch('/api/search-and-scrape', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetUrl: "" })
+            body: JSON.stringify({ targetUrl: nextUrl }) // Schickt deine Wunsch-URL an den Server
         });
         const data = await response.json();
         
         if (data.success) {
-            // Holt sich den Text, egal wie die Server-Variable heißt
             const textContent = data.fullTextPlain || data.text || "";
             const newWords = countWords(textContent);
 
@@ -88,7 +126,6 @@ async function triggerAutomaticScrape() {
                 strukturierterInhalt: data.contentTree || []
             });
 
-            // Metriken erhöhen
             masterTrainingDataset.metriken.seitenAnzahl += 1;
             masterTrainingDataset.metriken.zeichenAnzahl += (data.totalCharacters || textContent.length);
             masterTrainingDataset.metriken.woerterAnzahl += newWords;
@@ -96,17 +133,17 @@ async function triggerAutomaticScrape() {
             updateUI();
             log.innerHTML += `<br>> [NEU GELERNT] "${data.title}" (+${newWords.toLocaleString()} Wörter).`;
         } else {
-            log.innerHTML += `<br>> ⚠️ Fehler übersprungen: ${data.error}`;
+            log.innerHTML += `<br>> ⚠️ Fehler bei dieser URL übersprungen: ${data.error}`;
         }
     } catch (err) {
-        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Render-Server.`;
+        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Server bei dieser URL.`;
     }
     log.scrollTop = log.scrollHeight;
 }
 
 // LOGIK FÜR DEN DATEI-UPLOAD
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
+    const file = e.target.files;
     if (!file) return;
 
     if (isAutopilotRunning) stopAutopilot();
@@ -115,8 +152,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.onload = function(evt) {
         try {
             const parsedJson = JSON.parse(evt.target.result);
-            
-            // Flexibler Import für alle alten JSON-Dateien
             let importedPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
             
             masterTrainingDataset.erfassteWebseiten = importedPages.map(d => ({
@@ -125,7 +160,6 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
                 reinText: d.reinText || d.rohText || d.text || ""
             }));
 
-            // Wörter aus der hochgeladenen Datei neu berechnen
             let totalWords = 0;
             let totalChars = 0;
             masterTrainingDataset.erfassteWebseiten.forEach(site => {
@@ -139,10 +173,8 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
             updateUI();
             document.getElementById('uploadText').innerText = `✅ Geladen: ${file.name}`;
-            log.innerHTML += `<br>> [UPLOAD] Erfogreich! ${masterTrainingDataset.metriken.woerterAnzahl.toLocaleString()} Wörter eingelesen. Klicke auf START zum Erweitern.`;
-        } catch (err) {
-            alert("Fehler beim Lesen der JSON-Datei.");
-        }
+            log.innerHTML += `<br>> [UPLOAD] "${file.name}" eingelesen! ${masterTrainingDataset.metriken.woerterAnzahl.toLocaleString()} Wörter geladen.`;
+        } catch (err) { alert("Fehler beim Lesen."); }
         log.scrollTop = log.scrollHeight;
     };
     reader.readAsText(file);
@@ -166,6 +198,6 @@ downloadBtn.addEventListener('click', () => {
     downloadAnchor.remove();
     URL.revokeObjectURL(blobUrl);
     
-    log.innerHTML += `<br>> ✓ Download gestartet!`;
+    log.innerHTML += `<br>> ✓ Download abgeschlossen!`;
     log.scrollTop = log.scrollHeight;
 });
