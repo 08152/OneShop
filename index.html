@@ -3,63 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internet-Scraper KI</title>
+    <title>KI Highspeed-Scraper</title>
     <style>
-        body { font-family: sans-serif; background: #121214; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #202024; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 350px; }
+        body { font-family: sans-serif; background: #121214; color: white; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .box { background: #202024; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .full-width { grid-column: span 2; }
+        h2 { margin-top: 0; color: #8257e5; }
         input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #444; background: #121214; color: white; box-sizing: border-box; }
-        button { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-bottom: 10px; color: white; }
+        button { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 15px; width: 100%; margin-bottom: 10px; color: white; font-weight: bold; }
         .btn-predict { background: #8257e5; }
-        .btn-predict:hover { background: #9466ff; }
+        .btn-start { background: #04d361; color: #121214; }
+        .btn-stop { background: #df4444; display: none; }
         .btn-download { background: #20b2aa; }
-        .btn-download:hover { background: #1c9690; }
-        .btn-scrape { background: #007acd; }
-        .btn-scrape:hover { background: #0098ff; }
-        .upload-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; }
-        #output { margin-top: 20px; font-weight: bold; color: #04d361; min-height: 40px; white-space: pre-line; }
+        .log-list { background: #121214; padding: 10px; border-radius: 5px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 12px; border: 1px solid #333; }
+        .source-log { color: #0098ff; }
+        .brain-log { color: #e1e1e6; }
+        #output { margin-top: 15px; font-weight: bold; color: #04d361; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <div class="box">
-        <h1>Internet KI-Scraper</h1>
-        <input type="text" id="userInput" value="ki " placeholder="Satzanfang eingeben...">
-        
+        <h2>KI Steuerung</h2>
+        <input type="text" id="userInput" value="ki " placeholder="Satzanfang...">
         <button onclick="fragKI()" class="btn-predict">Satz vervollständigen</button>
-        <button onclick="starteInternetSuche()" class="btn-scrape">🌐 Internet durchsuchen & lernen</button>
-        <button onclick="downloadKI()" class="btn-download">KI-Daten herunterladen (1.json)</button>
-        
-        <div id="output">Die KI sucht beim Start automatisch nach echten Internet-Daten!</div>
+        <button id="startBtn" onclick="startEndlosSchleife()" class="btn-start">🔄 Endlos-Suche STARTEN</button>
+        <button id="stopBtn" onclick="stopEndlosSchleife()" class="btn-stop">🛑 Endlos-Suche STOPPEN</button>
+        <button onclick="downloadKI()" class="btn-download">1.json Herunterladen</button>
+        <div id="output">Bereit zum Lernen!</div>
     </div>
 
-    <script>
-        async function fragKI() {
-            const inputFeld = document.getElementById('userInput').value;
-            const status = document.getElementById('output');
-            status.innerText = 'KI denkt nach...';
-            try {
-                const response = await fetch(`/api/predict?text=${encodeURIComponent(inputFeld)}`);
-                const data = await response.json();
-                status.innerText = `KI ergänzt: "${data.vorhersage}"`;
-            } catch (error) {
-                status.innerText = 'Fehler beim Abrufen der KI-Daten.';
-            }
-        }
+    <div class="box">
+        <h2>Dazugelernt (Sätze)</h2>
+        <div id="brainLog" class="log-list brain-log"><div>Noch kein Wissen vorhanden...</div></div>
+    </div>
 
-        async function starteInternetSuche() {
-            const status = document.getElementById('output');
-            status.innerText = 'Durchsuche das Web nach echten Daten und trainiere das Modell...\n(Das kann 30-60 Sek. dauern)';
-            try {
-                const response = await fetch('/api/auto-learn', { method: 'POST' });
-                const data = await response.json();
-                status.innerText = `🎉 Fertig gelernt!\n\nAktuelle Lerndaten:\n- ` + data.daten.slice(0, 3).join('\n- ') + '\n... und mehr!';
-            } catch (error) {
-                status.innerText = 'Fehler beim automatischen Online-Lernen.';
-            }
-        }
+    <div class="box full-width">
+        <h2>Durchsuchte Internet-Quellen</h2>
+        <div id="sourceLog" class="log-list source-log"><div>Warte auf Start...</div></div>
+    </div>
+</div>
 
-        function downloadKI() {
-            window.location.href = '/api/download-ki';
+<script>
+    let loopAktiv = false;
+
+    async function fragKI() {
+        const inputFeld = document.getElementById('userInput').value;
+        const status = document.getElementById('output');
+        status.innerText = 'KI sucht nach Antworten...';
+        try {
+            const response = await fetch(`/api/predict?text=${encodeURIComponent(inputFeld)}`);
+            const data = await response.json();
+            status.innerText = `KI ergänzt: "${data.vorhersage || '...'}"`;
+        } catch (error) {
+            status.innerText = 'Fehler beim Abrufen.';
         }
-    </script>
+    }
+
+    function startEndlosSchleife() {
+        if (loopAktiv) return;
+        loopAktiv = true;
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'block';
+        document.getElementById('output').innerText = 'Endlos-Suche aktiv...';
+        runLoopStep();
+    }
+
+    async function runLoopStep() {
+        if (!loopAktiv) return;
+        try {
+            const response = await fetch('/api/scrape-step', { method: 'POST' });
+            if (response.ok) {
+                const data = await response.json();
+                updateDashboard(data.verlauf);
+            }
+        } catch (e) {
+            console.log("Server pausiert kurz...");
+        }
+        // 3000ms (3 Sekunden) Pause, um den Server stabil und fehlerfrei fliegen zu lassen
+        setTimeout(runLoopStep, 3000); 
+    }
+
+    function stopEndlosSchleife() {
+        loopAktiv = false;
+        document.getElementById('startBtn').style.display = 'block';
+        document.getElementById('stopBtn').style.display = 'none';
+        document.getElementById('output').innerText = 'Suche pausiert.';
+    }
+
+    function updateDashboard(verlauf) {
+        if(verlauf.quellen.length > 0) {
+            document.getElementById('sourceLog').innerHTML = verlauf.quellen.map(q => `<div>${q}</div>`).join('');
+        }
+        if(verlauf.saetze.length > 0) {
+            document.getElementById('brainLog').innerHTML = verlauf.saetze.map(s => `<div>${s}</div>`).join('');
+        }
+    }
+
+    function downloadKI() { window.location.href = '/api/download-ki'; }
+</script>
 </body>
 </html>
