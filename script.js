@@ -1,5 +1,5 @@
 let masterTrainingDataset = {
-    crawlerVersion: "9.0-JSON-Data-Cleaner",
+    crawlerVersion: "9.5-Final-Fix",
     generiertAm: new Date().toISOString(),
     metriken: { seitenAnzahl: 0, elementeAnzahl: 0, zeichenAnzahl: 0, woerterAnzahl: 0 },
     erfassteWebseiten: []
@@ -13,7 +13,7 @@ const urlListField = document.getElementById('urlList');
 let autopilotTimer = null;
 let isAutopilotRunning = false;
 let urlQueue = [];
-const SCRAPE_INTERVAL = 3000; // Da der Server 5 Sek bremst, reichen hier 3 Sek im Frontend völlig aus
+const SCRAPE_INTERVAL = 1000; // Fragt jede Sekunde an, der Server bremst sich selbst auf 5 Sekunden ein
 
 function countWords(text) {
     if (!text) return 0;
@@ -65,7 +65,7 @@ function startAutopilot() {
     btnAutopilot.innerText = "🛑 ABARBEITUNG STOPPEN";
     btnAutopilot.style.backgroundColor = "#dc2626";
     
-    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet. Warteschlange: ${urlQueue.length} Links...`;
+    log.innerHTML += `<br>> 🤖 Automatische Abarbeitung gestartet...`;
     log.scrollTop = log.scrollHeight;
     
     triggerManualQueueScrape();
@@ -131,9 +131,8 @@ async function triggerManualQueueScrape() {
     log.scrollTop = log.scrollHeight;
 }
 
-// DER REPARATUR-COACH FÜR DEINE HOCHGELADENE JSON-DATEI
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0]; // KORRIGIERT: Wählt die erste ausgewählte Datei aus
+    const file = e.target.files;
     if (!file) return;
 
     if (isAutopilotRunning) stopAutopilot();
@@ -144,15 +143,13 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
             const parsedJson = JSON.parse(evt.target.result);
             let importedPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
             
-            // Filtert alle kaputten Links und Fehlermeldungen restlos aus deiner alten JSON heraus!
             masterTrainingDataset.erfassteWebseiten = importedPages
                 .map(d => ({
                     titel: d.titel || d.seite || d.suchbegriff || "Geladene Alt-Seite",
-                    url: d.url || (d.quellen && d.quellen.url) || "https://wikipedia.org",
+                    url: d.url || (d.quellen && d.quellen.url) || "https://de.wikipedia.org",
                     reinText: d.reinText || d.rohText || d.text || "",
                     strukturierterInhalt: d.strukturierterInhalt || d.contentTree || []
                 }))
-                // WICHTIG: Löscht Einträge, bei denen fälschlicherweise die Fehlermeldung als URL gespeichert wurde
                 .filter(site => site.url.startsWith('http') && !site.url.includes('{articletitle}'));
 
             let totalWords = 0; 
@@ -168,8 +165,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
             updateUI();
             document.getElementById('uploadText').innerText = `✅ Geladen: ${file.name}`;
-            log.innerHTML += `<br>> [UPLOAD] "${file.name}" eingelesen und von Fehlern bereinigt!`;
-            log.innerHTML += `<br>> ZUSTAND: ${masterTrainingDataset.metriken.seitenAnzahl} saubere Seiten aktiv.`;
+            log.innerHTML += `<br>> [UPLOAD] "${file.name}" eingelesen und bereinigt!`;
         } catch (err) { alert("Fehler beim JSON-Upload."); }
         log.scrollTop = log.scrollHeight;
     };
