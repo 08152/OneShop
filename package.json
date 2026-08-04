@@ -1,9 +1,13 @@
 {
-  "name": "mini-ki-textvorhersage",
+  "name": "mini-ki-render",
   "version": "1.0.0",
-  "description": "Eine einfache KI zur Textvorhersage",
+  "description": "KI Textvorhersage auf Render",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "brain.js": "^2.0.0-alpha.4"
+    "brain.js": "^2.0.0-alpha.4",
+    "express": "^4.19.2"
   }
 }
