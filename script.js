@@ -13,7 +13,7 @@ const urlListField = document.getElementById('urlList');
 let autopilotTimer = null;
 let isAutopilotRunning = false;
 let urlQueue = [];
-const SCRAPE_INTERVAL = 1000; // Fragt jede Sekunde an, der Server bremst sich selbst auf 5 Sekunden ein
+const SCRAPE_INTERVAL = 3000; // Erhöht auf 3 Sek., um Blockaden durch die API zu verhindern
 
 function countWords(text) {
     if (!text) return 0;
@@ -54,9 +54,13 @@ function startAutopilot() {
     }
 
     if (urlQueue.length === 0) {
-        urlQueue = rawInput.split('\n').map(url => url.trim()).filter(url => url.startsWith('http'));
+        // ZWINGEND HTTPS ERZWINGEN (Verhindert Protokollfehler 426 im Browser)
+        urlQueue = rawInput.split('\n')
+            .map(url => url.trim())
+            .filter(url => url.startsWith('https://'));
+            
         if (urlQueue.length === 0) {
-            alert("Keine gültigen URLs gefunden!");
+            alert("Keine gültigen HTTPS-URLs gefunden! Wikipedia erlaubt keine unverschlüsselten Verbindungen.");
             return;
         }
     }
@@ -98,11 +102,23 @@ async function triggerManualQueueScrape() {
         log.innerHTML += `<br>> [Crawler] Lese Seite: "${nextUrl}"...`;
         log.scrollTop = log.scrollHeight;
 
+        // Anfrage an deine lokale API-Schnittstelle
         const response = await fetch('/api/search-and-scrape', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Upgrade-Insecure-Requests': '1' // Signalisiert dem Browser, die Verbindung sauber zu halten
+            },
             body: JSON.stringify({ targetUrl: nextUrl })
         });
+        
+        // Fängt den Protokoll-Fehler 426 ab, falls die API-Gegenstelle falsch konfiguriert ist
+        if (response.status === 426) {
+            log.innerHTML += `<br>> ❌ Fehler 426: Das System verlangt ein Protokoll-Upgrade (HTTPS/TLS).`;
+            stopAutopilot();
+            return;
+        }
+
         const data = await response.json();
         
         if (data.success) {
@@ -126,14 +142,16 @@ async function triggerManualQueueScrape() {
             log.innerHTML += `<br>> ❌ Fehler übersprungen: ${data.error}`;
         }
     } catch (err) {
-        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Server.`;
+        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Server (CORS/Netzwerkblockade).`;
     }
     log.scrollTop = log.scrollHeight;
 }
 
+// FIX: 'e.target.files' korrigiert, um das erste File-Objekt [0] korrekt auszulesen
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files;
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
 
     if (isAutopilotRunning) stopAutopilot();
 
@@ -146,7 +164,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
             masterTrainingDataset.erfassteWebseiten = importedPages
                 .map(d => ({
                     titel: d.titel || d.seite || d.suchbegriff || "Geladene Alt-Seite",
-                    url: d.url || (d.quellen && d.quellen.url) || "https://de.wikipedia.org",
+                    url: d.url || (d.quellen && d.quellen.url) || "https://wikipedia.org",
                     reinText: d.reinText || d.rohText || d.text || "",
                     strukturierterInhalt: d.strukturierterInhalt || d.contentTree || []
                 }))
