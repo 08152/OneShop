@@ -1,5 +1,5 @@
 let masterTrainingDataset = {
-    crawlerVersion: "8.0-UniversalJSONImporter",
+    crawlerVersion: "9.0-JSON-Data-Cleaner",
     generiertAm: new Date().toISOString(),
     metriken: { seitenAnzahl: 0, elementeAnzahl: 0, zeichenAnzahl: 0, woerterAnzahl: 0 },
     erfassteWebseiten: []
@@ -13,7 +13,7 @@ const urlListField = document.getElementById('urlList');
 let autopilotTimer = null;
 let isAutopilotRunning = false;
 let urlQueue = [];
-const SCRAPE_INTERVAL = 3000; // 3 Sekunden Pause zwischen den Wikipedia-Seiten
+const SCRAPE_INTERVAL = 3000; // Da der Server 5 Sek bremst, reichen hier 3 Sek im Frontend völlig aus
 
 function countWords(text) {
     if (!text) return 0;
@@ -42,7 +42,6 @@ function updateUI() {
     }
 }
 
-// STEUERUNG
 btnAutopilot.addEventListener('click', () => {
     if (isAutopilotRunning) { stopAutopilot(); } else { startAutopilot(); }
 });
@@ -50,14 +49,14 @@ btnAutopilot.addEventListener('click', () => {
 function startAutopilot() {
     const rawInput = urlListField.value.trim();
     if (rawInput === "" && urlQueue.length === 0) {
-        alert("Bitte gib zuerst mindestens eine Wikipedia-URL im Textfeld ein!");
+        alert("Bitte gib zuerst Wikipedia-URLs ein!");
         return;
     }
 
     if (urlQueue.length === 0) {
         urlQueue = rawInput.split('\n').map(url => url.trim()).filter(url => url.startsWith('http'));
         if (urlQueue.length === 0) {
-            alert("Keine gültigen URLs gefunden! Die Links müssen mit http:// oder https:// beginnen.");
+            alert("Keine gültigen URLs gefunden!");
             return;
         }
     }
@@ -66,7 +65,7 @@ function startAutopilot() {
     btnAutopilot.innerText = "🛑 ABARBEITUNG STOPPEN";
     btnAutopilot.style.backgroundColor = "#dc2626";
     
-    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet! ${urlQueue.length} Links in Warteschlange...`;
+    log.innerHTML += `<br>> 🤖 Abarbeitung gestartet. Warteschlange: ${urlQueue.length} Links...`;
     log.scrollTop = log.scrollHeight;
     
     triggerManualQueueScrape();
@@ -124,17 +123,17 @@ async function triggerManualQueueScrape() {
             updateUI();
             log.innerHTML += `<br>> [NEU GELERNT] "${data.title}" (+${newWords.toLocaleString()} Wörter).`;
         } else {
-            log.innerHTML += `<br>> ⚠️ Fehler bei dieser URL übersprungen: ${data.error}`;
+            log.innerHTML += `<br>> ❌ Fehler übersprungen: ${data.error}`;
         }
     } catch (err) {
-        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Server bei dieser URL.`;
+        log.innerHTML += `<br>> ❌ Verbindungsfehler zum Server.`;
     }
     log.scrollTop = log.scrollHeight;
 }
 
-// FIX FÜR DEN DATEI-UPLOAD (AKZEPTIERT JEDE STRUKTUR)
+// DER REPARATUR-COACH FÜR DEINE HOCHGELADENE JSON-DATEI
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
+    const file = e.target.files;
     if (!file) return;
 
     if (isAutopilotRunning) stopAutopilot();
@@ -143,30 +142,23 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
     reader.onload = function(evt) {
         try {
             const parsedJson = JSON.parse(evt.target.result);
+            let importedPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
             
-            // Finde heraus, wo die Seiten-Liste in der hochgeladenen Datei versteckt ist
-            let rawPages = parsedJson.erfassteWebseiten || parsedJson.datenSaetze || [];
-            
-            if (!Array.isArray(rawPages) && typeof parsedJson === 'object') {
-                // Falls die Datei direkt ein Array oder ein anderes Objekt ist, versuchen wir es zu retten
-                rawPages = Array.isArray(parsedJson) ? parsedJson : [parsedJson];
-            }
-
-            // Mappe alle importierten Daten in unser aktuelles, sauberes Format
-            masterTrainingDataset.erfassteWebseiten = rawPages.map(d => {
-                return {
+            // Filtert alle kaputten Links und Fehlermeldungen restlos aus deiner alten JSON heraus!
+            masterTrainingDataset.erfassteWebseiten = importedPages
+                .map(d => ({
                     titel: d.titel || d.seite || d.suchbegriff || "Geladene Alt-Seite",
-                    url: d.url || (d.quellen && d.quellen.url) || "https://wikipedia.org",
-                    reinText: d.reinText || d.rohText || d.text || JSON.stringify(d),
+                    url: d.url || (d.quellen && d.quellen.url) || "https://de.wikipedia.org",
+                    reinText: d.reinText || d.rohText || d.text || "",
                     strukturierterInhalt: d.strukturierterInhalt || d.contentTree || []
-                };
-            });
+                }))
+                // WICHTIG: Löscht Einträge, bei denen fälschlicherweise die Fehlermeldung als URL gespeichert wurde
+                .filter(site => site.url.startsWith('http') && !site.url.includes('{articletitle}'));
 
-            // Berechne die gelernten Wörter und Zeichen komplett neu
-            let totalWords = 0;
+            let totalWords = 0; 
             let totalChars = 0;
             masterTrainingDataset.erfassteWebseiten.forEach(site => {
-                totalWords += countWords(site.reinText);
+                totalWords += countWords(site.reinText); 
                 totalChars += site.reinText.length;
             });
 
@@ -176,35 +168,23 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
 
             updateUI();
             document.getElementById('uploadText').innerText = `✅ Geladen: ${file.name}`;
-            log.innerHTML += `<br>> [UPLOAD] "${file.name}" erfolgreich repariert und importiert!`;
-            log.innerHTML += `<br>> ZUSTAND: ${masterTrainingDataset.metriken.seitenAnzahl} Seiten mit ${masterTrainingDataset.metriken.woerterAnzahl.toLocaleString()} Wörtern geladen.`;
-        } catch (err) {
-            alert("Kritischer Fehler: Die hochgeladene Datei ist beschädigt oder keine echte JSON.");
-            log.innerHTML += `<br>> ❌ [UPLOAD] Fehler beim Einlesen.`;
-        }
+            log.innerHTML += `<br>> [UPLOAD] "${file.name}" eingelesen und von Fehlern bereinigt!`;
+            log.innerHTML += `<br>> ZUSTAND: ${masterTrainingDataset.metriken.seitenAnzahl} saubere Seiten aktiv.`;
+        } catch (err) { alert("Fehler beim JSON-Upload."); }
         log.scrollTop = log.scrollHeight;
     };
     reader.readAsText(file);
 });
 
-// DOWNLOAD AUSFÜHREN
 downloadBtn.addEventListener('click', () => {
     if (masterTrainingDataset.erfassteWebseiten.length === 0) return;
     if (isAutopilotRunning) stopAutopilot();
-
     const jsonString = JSON.stringify(masterTrainingDataset, null, 2);
     const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
     const blobUrl = URL.createObjectURL(blob);
-    
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute("href", blobUrl);
-    downloadAnchor.setAttribute("download", `erweitert_ki_dataset_${Date.now()}.json`);
-    
-    document.body.appendChild(downloadAnchor);
+    downloadAnchor.setAttribute("download", `bereinigt_ki_dataset_${Date.now()}.json`);
     downloadAnchor.click();
     downloadAnchor.remove();
-    URL.revokeObjectURL(blobUrl);
-    
-    log.innerHTML += `<br>> ✓ Download abgeschlossen!`;
-    log.scrollTop = log.scrollHeight;
 });
