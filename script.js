@@ -133,7 +133,7 @@ async function triggerManualQueueScrape() {
 
 // DER REPARATUR-COACH FÜR DEINE HOCHGELADENE JSON-DATEI
 document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files;
+    const file = e.target.files[0]; // KORRIGIERT: Wählt die erste ausgewählte Datei aus
     if (!file) return;
 
     if (isAutopilotRunning) stopAutopilot();
@@ -148,7 +148,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
             masterTrainingDataset.erfassteWebseiten = importedPages
                 .map(d => ({
                     titel: d.titel || d.seite || d.suchbegriff || "Geladene Alt-Seite",
-                    url: d.url || (d.quellen && d.quellen.url) || "https://de.wikipedia.org",
+                    url: d.url || (d.quellen && d.quellen.url) || "https://wikipedia.org",
                     reinText: d.reinText || d.rohText || d.text || "",
                     strukturierterInhalt: d.strukturierterInhalt || d.contentTree || []
                 }))
