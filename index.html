@@ -2,17 +2,95 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Mini KI Vorhersage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meine interaktive KI</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #333; }
+        body { font-family: sans-serif; background: #121214; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #202024; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 350px; }
+        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #444; background: #121214; color: white; box-sizing: border-box; }
+        button { background: #8257e5; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; margin-bottom: 10px; }
+        button:hover { background: #9466ff; }
+        .btn-download { background: #20b2aa; }
+        .btn-download:hover { background: #1c9690; }
+        .upload-section { margin-top: 15px; padding-top: 15px; border-top: 1px solid #444; }
+        input[type="file"] { display: none; }
+        .custom-file-upload { display: block; background: #e0a82e; color: #121214; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        .custom-file-upload:hover { background: #f5b933; }
+        #output { margin-top: 20px; font-weight: bold; color: #04d361; min-height: 40px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>KI Text-Vorhersage</h1>
-        <p>Schau in deine Server-Konsole (Terminal), um das Training und die Vorhersage der KI live zu sehen!</p>
+    <div class="box">
+        <h1>Interaktive KI</h1>
+        <input type="text" id="userInput" value="javascript " placeholder="Schreib etwas...">
+        <button onclick="fragKI()">Satz vervollständigen</button>
+        <button onclick="downloadKI()" class="btn-download">KI-Daten herunterladen (1.json)</button>
+        
+        <!-- NEU: UPLOAD BEREICH -->
+        <div class="upload-section">
+            <label class="custom-file-upload">
+                <input type="file" id="fileInput" accept=".json" onchange="uploadKI()">
+                1.json hochladen & laden
+            </label>
+        </div>
+        
+        <div id="output">Schreib einen Text oder lade ein Gehirn hoch!</div>
     </div>
+
+    <script>
+        async function fragKI() {
+            const inputFeld = document.getElementById('userInput').value;
+            const status = document.getElementById('output');
+            status.innerText = 'KI denkt nach...';
+            try {
+                const response = await fetch(`/api/predict?text=${encodeURIComponent(inputFeld)}`);
+                const data = await response.json();
+                status.innerText = `KI ergänzt: "${data.vorhersage}"`;
+            } catch (error) {
+                status.innerText = 'Fehler beim Abrufen der KI-Daten.';
+            }
+        }
+
+        function downloadKI() {
+            window.location.href = '/api/download-ki';
+        }
+
+        // NEUE FUNKTION FÜR DEN JSON-UPLOAD
+        function uploadKI() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('output');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            status.innerText = 'Datei wird gelesen...';
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const jsonDaten = JSON.parse(e.target.result);
+                    status.innerText = 'Sende Daten an den Server...';
+
+                    const response = await fetch('/api/upload-ki', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonDaten)
+                    });
+
+                    const ergebnis = await response.json();
+                    if (ergebnis.status === 'success') {
+                        status.innerText = '🎉 KI erfolgreich überschrieben!';
+                    } else {
+                        status.innerText = '❌ Fehler: ' + ergebnis.message;
+                    }
+                } catch (err) {
+                    status.innerText = '❌ Fehler beim Lesen der JSON-Datei.';
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
 </body>
 </html>
