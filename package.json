@@ -1,10 +1,11 @@
 {
-  "name": "local-file-tokenizer",
+  "name": "render-file-tokenizer",
   "version": "1.0.0",
   "type": "module",
-  "description": "Tokenisiert lokale Textdateien völlig kostenlos und offline",
+  "description": "Kostenloser Offline-Tokenizer optimiert für Render",
   "main": "server.js",
   "scripts": {
+    "build": "node -e \"import('@xenova/transformers').then(t => t.AutoTokenizer.from_pretrained('Xenova/gpt2'))\"",
     "start": "node server.js"
   },
   "dependencies": {
