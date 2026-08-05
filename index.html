@@ -28,8 +28,8 @@
     <!-- Suche und automatisches Stapel-Scraping -->
     <div class="box">
         <h3>1. Internet-Suchbegriffe stapeln</h3>
-        <p><em>Trage pro Zeile einen Begriff ein (z. B. einen Begriff schreiben, Enter drücken, nächsten schreiben):</em></p>
-        <textarea id="searchBatch" class="input-batch" placeholder="Künstliche Intelligenz&#10;Hunderassen&#10;Quantencomputer&#10;Klimawandel"></textarea><br><br>
+        <p><em>Trage pro Zeile einen Begriff ein und klicke auf Start:</em></p>
+        <textarea id="searchBatch" class="input-batch" placeholder="Tippe hier deine Begriffe ein..."></textarea><br><br>
         <button id="crawlBtn" onclick="starteStapelSuche()">🌐 Stapel-Suche starten</button>
         <div id="statusMeldung" style="display:none;" class="status"></div>
     </div>
@@ -54,10 +54,8 @@
         const SERVER_BASE_URL = window.location.origin;
         let kiDatenbank = [];
 
-        // Hilfsfunktion für künstliche Pausen (Verhindert Server-Sperren)
         const warte = ms => new Promise(res => setTimeout(res, ms));
 
-        // Startet die nacheinander folgende Abarbeitung des Stapels
         async function starteStapelSuche() {
             const input = document.getElementById("searchBatch").value.trim();
             const statusDiv = document.getElementById("statusMeldung");
@@ -68,69 +66,77 @@
                 return;
             }
 
-            // Zeilenweise trennen und leere Zeilen löschen
             const begriffe = input.split("\n").map(b => b.trim()).filter(b => b.length > 0);
             
             statusDiv.style.display = "block";
             crawlBtn.disabled = true;
 
-            let gesamtSaetzeGecrawlt = 0;
-
             for (let i = 0; i < begriffe.length; i++) {
                 const aktuellerBegriff = begriffe[i];
                 
-                // Status-Update auf der Oberfläche anzeigen
                 statusDiv.className = "status running";
                 statusDiv.innerText = `⏳ [${i + 1}/${begriffe.length}] Verarbeite Begriff: "${aktuellerBegriff}"...`;
 
                 try {
                     const url = `${SERVER_BASE_URL}/api/crawl?q=${encodeURIComponent(aktuellerBegriff)}`;
                     const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server-Fehler: Status ${response.status}`);
+                    }
+
                     const data = await response.json();
                     
-                    if (!data.error && data.saetze && data.saetze.length > 0) {
+                    if (data.saetze && data.saetze.length > 0) {
                         verarbeiteGecrawlteTexte(data.saetze);
-                        gesamtSaetzeGecrawlt += data.saetze.length;
-                    } else {
-                        console.warn(`Keine Daten für Begriff "${aktuellerBegriff}" gefunden.`);
                     }
                 } catch (error) {
                     console.error(`Fehler bei Begriff "${aktuellerBegriff}":`, error);
                 }
 
-                // Wartet 1,5 Sekunden vor dem nächsten Begriff (außer beim letzten Element)
                 if (i < begriffe.length - 1) {
                     await warte(1500);
                 }
             }
 
-            // Fertig mit allen Begriffen
             statusDiv.className = "status success";
-            statusDiv.innerText = `✅ Fertig! Insgesamt wurden ${begriffe.length} Begriffe abgearbeitet und ${gesamtSaetzeGecrawlt} neue Vektoren hinzugefügt.`;
+            statusDiv.innerText = `✅ Fertig! Insgesamt wurden ${begriffe.length} Begriffe abgearbeitet. Aktuelle Datensätze: ${kiDatenbank.length}`;
             document.getElementById("searchBatch").value = "";
             crawlBtn.disabled = false;
         }
 
-        // Mathematische Funktion: Text in Zahlen-Vektor übersetzen
-        function textZuVektor(text, globalerWortschatz) {
-            const woerter = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
-            return globalerWortschatz.map(wort => woerter.filter(w => w === wort).length);
+        // Bereinigt Texte sauber in einzelne Wörter
+        function extrahiereWoerter(text) {
+            return text.toLowerCase()
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+                .split(/\s+/)
+                .filter(w => w.trim().length > 0);
         }
 
-        // Erstellt die Liste aller jemals gefundenen einzigartigen Wörter
+        // Erstellt den globalen Wortschatz aus allen Texten
         function erstelleWortSchatz(alleTexte) {
             let alleWoerter = new Set();
             alleTexte.forEach(t => {
-                const woerter = t.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
-                woerter.forEach(w => { if(w.trim().length > 1) alleWoerter.add(w); });
+                const woerter = extrahiereWoerter(t);
+                woerter.forEach(w => alleWoerter.add(w));
             });
             return Array.from(alleWoerter);
         }
 
-        // Integriert die gecrawlten Web-Texte in die KI-Datenbank
+        // Übersetzt Text anhand des Wortschatzes in einen Zahlen-Vektor
+        function textZuVektor(text, globalerWortschatz) {
+            const woerter = extrahiereWoerter(text);
+            return globalerWortschatz.map(wort => woerter.filter(w => w === wort).length);
+        }
+
+        // Integriert die Sätze in die KI-Datenbank und berechnet alle Vektoren neu
         function verarbeiteGecrawlteTexte(neueSätze) {
             let alleTexte = kiDatenbank.map(d => d.originalText).concat(neueSätze);
-            let globalerWortschatz = erstelleWortSchatz(alleTexte);
+            
+            // Verhindert doppelte Sätze in der Datenbank
+            alleTexte = Array.from(new Set(alleTexte));
+
+            const globalerWortschatz = erstelleWortSchatz(alleTexte);
 
             kiDatenbank = alleTexte.map(text => {
                 return {
@@ -147,7 +153,6 @@
             document.getElementById("jsonPreview").innerText = JSON.stringify(kiDatenbank, null, 2);
         }
 
-        // JSON-Download der Trainingsdaten
         function downloadJSON() {
             if (kiDatenbank.length === 0) return alert("Keine Daten zum Herunterladen vorhanden!");
             
@@ -160,7 +165,6 @@
             downloadAnchor.remove();
         }
 
-        // JSON-Upload zum Weitermachen
         function uploadJSON() {
             const fileInput = document.getElementById("uploadInput");
             if (!fileInput.files || fileInput.files.length === 0) return;
