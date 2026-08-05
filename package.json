@@ -1,15 +1,15 @@
 {
-  "name": "render-file-tokenizer",
+  "name": "render-link-stacker-tokenizer",
   "version": "1.0.0",
   "type": "module",
-  "description": "Kostenloser Offline-Tokenizer optimiert für Render",
+  "description": "Autarker URL-Stacker und Tokenizer für Render",
   "main": "server.js",
   "scripts": {
-    "build": "node -e \"import('@xenova/transformers').then(t => t.AutoTokenizer.from_pretrained('Xenova/gpt2'))\"",
     "start": "node server.js"
   },
   "dependencies": {
-    "@xenova/transformers": "^2.17.2",
-    "express": "^4.19.2"
+    "cheerio": "^1.0.0",
+    "express": "^4.19.2",
+    "gpt-tokenizer": "^2.1.2"
   }
 }
