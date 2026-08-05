@@ -1,19 +1,20 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // Neu: Für die korrekte Pfadfindung
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// CORS erlauben, damit Daten fließen können
 app.use(cors());
 app.use(express.json());
 
-// NEU: Liefert deine index.html aus, wenn man die Startseite aufruft
+// Liefert deine index.html auf der Startseite (/) aus
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Der Crawler-Endpunkt bleibt unverändert
+// Der korrigierte API-Endpunkt mit zwingend erforderlichem User-Agent für Wikipedia
 app.get('/api/crawl', async (req, res) => {
     const query = req.query.q;
     if (!query) {
@@ -21,37 +22,52 @@ app.get('/api/crawl', async (req, res) => {
     }
 
     try {
+        // WICHTIG: Wikipedia verlangt seit Node-Updates einen eindeutigen User-Agent-Header, um Scraper nicht zu sperren
+        const fetchOptions = {
+            headers: {
+                'User-Agent': 'KIBotAktivator/1.0 (mein-ki-projekt@example.com) Node.js-Fetch'
+            }
+        };
+
+        // Schritt A: Wikipedia nach passenden Artikeln durchsuchen
         const searchUrl = `https://wikipedia.org{encodeURIComponent(query)}&format=json&origin=*`;
-        const searchResponse = await fetch(searchUrl);
+        const searchResponse = await fetch(searchUrl, fetchOptions);
         const searchData = await searchResponse.json();
 
         if (!searchData.query || !searchData.query.search || searchData.query.search.length === 0) {
-            return res.status(404).json({ error: 'Keine passenden Texte im Internet gefunden.' });
+            return res.json({ saetze: [] }); // Keine Ergebnisse gefunden
         }
 
+        // Die Top 3 Artikel-Ergebnisse heraussuchen
         const topResults = searchData.query.search.slice(0, 3);
         let gefundeneSaetze = [];
 
+        // Schritt B: Die echten Volltexte der Artikel abrufen
         for (let result of topResults) {
             const contentUrl = `https://wikipedia.org{result.pageid}&format=json&origin=*`;
-            const contentResponse = await fetch(contentUrl);
+            const contentResponse = await fetch(contentUrl, fetchOptions);
             const contentData = await contentResponse.json();
-            const text = contentData.query.pages[result.pageid].extract;
-
-            if (text) {
-                const saetze = text.split(/[.!?]/).map(s => s.trim()).filter(s => s.length > 15);
-                gefundeneSaetze = gefundeneSaetze.concat(saetze);
+            
+            if (contentData.query && contentData.query.pages && contentData.query.pages[result.pageid]) {
+                const text = contentData.query.pages[result.pageid].extract;
+                if (text) {
+                    // Text säubern und in Sätze aufteilen
+                    const saetze = text.split(/[.!?]/).map(s => s.trim()).filter(s => s.length > 15);
+                    gefundeneSaetze = gefundeneSaetze.concat(saetze);
+                }
             }
         }
 
+        // Die fertigen Texte an deine HTML-Datei schicken
         res.json({ saetze: gefundeneSaetze });
 
     } catch (error) {
-        console.error("Crawler Fehler:", error);
-        res.status(500).json({ error: 'Fehler beim Abrufen der Web-Daten.' });
+        console.error("Crawler Fehler im Backend:", error);
+        res.status(500).json({ error: 'Fehler beim Abrufen der Web-Daten im Backend.' });
     }
 });
 
+// Server auf dem Port von Render (oder lokal 3000) starten
 app.listen(PORT, () => {
-    console.log(`Server läuft auf Port ${PORT}`);
+    console.log(`Server läuft erfolgreich auf Port ${PORT}`);
 });
