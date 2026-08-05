@@ -3,106 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI Highspeed-Scraper</title>
+    <title>Eigener KI-Webcrawler & Vektorisierer</title>
     <style>
-        body { font-family: sans-serif; background: #121214; color: white; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 800px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .box { background: #202024; padding: 20px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .full-width { grid-column: span 2; }
-        h2 { margin-top: 0; color: #8257e5; }
-        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #444; background: #121214; color: white; box-sizing: border-box; }
-        button { border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 15px; width: 100%; margin-bottom: 10px; color: white; font-weight: bold; }
-        .btn-predict { background: #8257e5; }
-        .btn-start { background: #04d361; color: #121214; }
-        .btn-stop { background: #df4444; display: none; }
-        .btn-download { background: #20b2aa; }
-        .log-list { background: #121214; padding: 10px; border-radius: 5px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 12px; border: 1px solid #333; }
-        .source-log { color: #0098ff; }
-        .brain-log { color: #e1e1e6; }
-        #output { margin-top: 15px; font-weight: bold; color: #04d361; }
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; line-height: 1.6; background-color: #f4f7f6; color: #333; }
+        .box { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-download { background: #28a745; }
+        .btn-download:hover { background: #218838; }
+        .status { font-weight: bold; color: #d9534f; margin-top: 10px; }
+        .success { color: #5cb85c; }
+        pre { background: #272822; color: #f8f8f2; padding: 15px; overflow-x: auto; max-height: 250px; border-radius: 4px; font-size: 13px; }
+        .stats-badge { background: #17a2b8; color: white; padding: 3px 8px; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+    <h1>🤖 KI-Schritt 1: Automatischer Webcrawler & Vektorisierer</h1>
+    <p>Gesteuert über deinen eigenen Node.js Backend-Server auf Render.</p>
+
+    <!-- Suche und automatisches Scraping -->
     <div class="box">
-        <h2>KI Steuerung</h2>
-        <input type="text" id="userInput" value="ki " placeholder="Satzanfang...">
-        <button onclick="fragKI()" class="btn-predict">Satz vervollständigen</button>
-        <button id="startBtn" onclick="startEndlosSchleife()" class="btn-start">🔄 Endlos-Suche STARTEN</button>
-        <button id="stopBtn" onclick="stopEndlosSchleife()" class="btn-stop">🛑 Endlos-Suche STOPPEN</button>
-        <button onclick="downloadKI()" class="btn-download">1.json Herunterladen</button>
-        <div id="output">Bereit zum Lernen!</div>
+        <h3>1. Internet über eigenen Server durchsuchen</h3>
+        <p><em>Schickt die Anfrage an dein Node.js-Backend, welches die Texte lädt und an das HTML zurückgibt.</em></p>
+        <input type="text" id="searchQuery" placeholder="Z.B. Künstliche Intelligenz, Hunde, Quantencomputer...">
+        <button id="crawlBtn" onclick="starteWebSuche()">🌐 Internet durchsuchen</button>
+        <div id="statusMeldung" class="status"></div>
     </div>
 
+    <!-- JSON Speichern und Laden -->
     <div class="box">
-        <h2>Dazugelernt (Sätze)</h2>
-        <div id="brainLog" class="log-list brain-log"><div>Noch kein Wissen vorhanden...</div></div>
+        <h3>2. Daten-Verwaltung (Fortschritt sichern/laden)</h3>
+        <button class="btn-download" onclick="downloadJSON()">📥 Daten als JSON speichern</button>
+        <span style="margin: 0 15px;">|</span>
+        <label for="uploadInput"><strong>Alte Session laden:</strong></label>
+        <input type="file" id="uploadInput" accept=".json" onchange="uploadJSON()">
     </div>
 
-    <div class="box full-width">
-        <h2>Durchsuchte Internet-Quellen</h2>
-        <div id="sourceLog" class="log-list source-log"><div>Warte auf Start...</div></div>
+    <!-- Live-Vorschau der KI-Datenbank -->
+    <div class="box">
+        <h3>3. Aktuelle KI-Datenstruktur (Vorschau)</h3>
+        <p>Gespeicherte Text-Vektoren: <span id="dataCount" class="stats-badge">0</span></p>
+        <pre id="jsonPreview">Noch keine Daten im KI-Speicher.</pre>
     </div>
-</div>
 
-<script>
-    let loopAktiv = false;
+    <script>
+        // ⚠️ WICHTIG: Tausche diese URL aus, sobald dein Server auf Render.com online ist!
+        // Zum lokalen Testen am PC nutze: 'http://localhost:3000'
+        // Für Render nutzt du z.B.: 'https://onrender.com'
+        const SERVER_BASE_URL = 'http://localhost:3000';
 
-    async function fragKI() {
-        const inputFeld = document.getElementById('userInput').value;
-        const status = document.getElementById('output');
-        status.innerText = 'KI sucht nach Antworten...';
-        try {
-            const response = await fetch(`/api/predict?text=${encodeURIComponent(inputFeld)}`);
-            const data = await response.json();
-            status.innerText = `KI ergänzt: "${data.vorhersage || '...'}"`;
-        } catch (error) {
-            status.innerText = 'Fehler beim Abrufen.';
-        }
-    }
+        // Die zentrale Datenbank für deine KI
+        let kiDatenbank = [];
 
-    function startEndlosSchleife() {
-        if (loopAktiv) return;
-        loopAktiv = true;
-        document.getElementById('startBtn').style.display = 'none';
-        document.getElementById('stopBtn').style.display = 'block';
-        document.getElementById('output').innerText = 'Endlos-Suche aktiv...';
-        runLoopStep();
-    }
+        // Funktion: Ruft das Node.js Backend auf
+        async function starteWebSuche() {
+            const query = document.getElementById("searchQuery").value.trim();
+            const statusDiv = document.getElementById("statusMeldung");
+            const crawlBtn = document.getElementById("crawlBtn");
 
-    async function runLoopStep() {
-        if (!loopAktiv) return;
-        try {
-            const response = await fetch('/api/scrape-step', { method: 'POST' });
-            if (response.ok) {
-                const data = await response.json();
-                updateDashboard(data.verlauf);
+            if (!query) {
+                alert("Bitte gib einen Suchbegriff ein!");
+                return;
             }
-        } catch (e) {
-            console.log("Server pausiert kurz...");
-        }
-        // 3000ms (3 Sekunden) Pause, um den Server stabil und fehlerfrei fliegen zu lassen
-        setTimeout(runLoopStep, 3000); 
-    }
 
-    function stopEndlosSchleife() {
-        loopAktiv = false;
-        document.getElementById('startBtn').style.display = 'block';
-        document.getElementById('stopBtn').style.display = 'none';
-        document.getElementById('output').innerText = 'Suche pausiert.';
-    }
+            statusDiv.className = "status";
+            statusDiv.innerText = `Server crawlt das Netz nach "${query}"...`;
+            crawlBtn.disabled = true;
 
-    function updateDashboard(verlauf) {
-        if(verlauf.quellen.length > 0) {
-            document.getElementById('sourceLog').innerHTML = verlauf.quellen.map(q => `<div>${q}</div>`).join('');
-        }
-        if(verlauf.saetze.length > 0) {
-            document.getElementById('brainLog').innerHTML = verlauf.saetze.map(s => `<div>${s}</div>`).join('');
-        }
-    }
+            try {
+                // Anfrage an das Node.js Backend senden
+                const url = `${SERVER_BASE_URL}/api/crawl?q=${encodeURIComponent(query)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) throw new Error(data.error);
 
-    function downloadKI() { window.location.href = '/api/download-ki'; }
-</script>
+                const gefundeneSätze = data.saetze;
+
+                if (!gefundeneSätze || gefundeneSätze.length === 0) {
+                    throw new Error("Der Server hat keine Sätze zurückgegeben.");
+                }
+
+                // Die neuen Texte verarbeiten und vektorisieren
+                verarbeiteGecrawlteTexte(gefundeneSätze);
+                
+                statusDiv.className = "status success";
+                statusDiv.innerText = `Erfolgreich! ${gefundeneSätze.length} Sätze vom eigenen Server geladen und mathematisch vektorisiert.`;
+                document.getElementById("searchQuery").value = "";
+
+            } catch (error) {
+                statusDiv.className = "status";
+                statusDiv.innerText = "Fehler beim Web-Abruf: " + error.message;
+            } finally {
+                crawlBtn.disabled = false;
+            }
+        }
+
+        // Mathematische Funktion: Text in Zahlen-Vektor übersetzen
+        function textZuVektor(text, globalerWortschatz) {
+            const woerter = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
+            // Zählt, wie oft jedes Wort aus dem globalen Wortschatz in diesem spezifischen Satz vorkommt
+            return globalerWortschatz.map(wort => woerter.filter(w => w === wort).length);
+        }
+
+        // Erstellt die Liste aller jemals gefundenen einzigartigen Wörter
+        function erstelleWortSchatz(alleTexte) {
+            let alleWoerter = new Set();
+            alleTexte.forEach(t => {
+                const woerter = t.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
+                woerter.forEach(w => { if(w.trim().length > 1) alleWoerter.add(w); });
+            });
+            return Array.from(alleWoerter);
+        }
+
+        // Integriert die gecrawlten Web-Texte in die KI-Datenbank
+        function verarbeiteGecrawlteTexte(neueSätze) {
+            // Bestehende Sätze mit den neuen Sätzen zusammenführen
+            let alleTexte = kiDatenbank.map(d => d.originalText).concat(neueSätze);
+            
+            // Wortschatz dynamisch erweitern
+            let globalerWortschatz = erstelleWortSchatz(alleTexte);
+
+            // Alle Einträge mit dem neuen, größeren Vektor-Muster neu berechnen
+            kiDatenbank = alleTexte.map(text => {
+                return {
+                    originalText: text,
+                    vektor: textZuVektor(text, globalerWortschatz)
+                };
+            });
+
+            aktualisiereAnsicht();
+        }
+
+        function aktualisiereAnsicht() {
+            document.getElementById("dataCount").innerText = kiDatenbank.length;
+            document.getElementById("jsonPreview").innerText = JSON.stringify(kiDatenbank, null, 2);
+        }
+
+        // JSON-Download der Trainingsdaten
+        function downloadJSON() {
+            if (kiDatenbank.length === 0) return alert("Keine Daten zum Herunterladen vorhanden! Suche zuerst nach Themen.");
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(kiDatenbank, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "ki_crawler_trainingsdaten.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // JSON-Upload zum Weitermachen
+        function uploadJSON() {
+            const fileInput = document.getElementById("uploadInput");
+            if (!fileInput.files || fileInput.files.length === 0) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const geladeneDaten = JSON.parse(e.target.result);
+                    if (Array.isArray(geladeneDaten)) {
+                        kiDatenbank = geladeneDaten;
+                        aktualisiereAnsicht();
+                        document.getElementById("statusMeldung").className = "status success";
+                        document.getElementById("statusMeldung").innerText = "Alte JSON-Daten erfolgreich geladen! Du kannst weiter im Netz suchen.";
+                    } else {
+                        alert("Ungültiges JSON-Format.");
+                    }
+                } catch (err) {
+                    alert("Fehler beim Einlesen der JSON-Datei.");
+                }
+            };
+            reader.readAsText(fileInput.files);
+        }
+    </script>
 </body>
 </html>
