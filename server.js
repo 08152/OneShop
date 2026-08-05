@@ -1,14 +1,19 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // Neu: Für die korrekte Pfadfindung
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Erlaubt deiner HTML-Datei, sicher mit dem Server zu kommunizieren
 app.use(cors());
 app.use(express.json());
 
-// Endpunkt für die Text-Suche
+// NEU: Liefert deine index.html aus, wenn man die Startseite aufruft
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Der Crawler-Endpunkt bleibt unverändert
 app.get('/api/crawl', async (req, res) => {
     const query = req.query.q;
     if (!query) {
@@ -16,7 +21,6 @@ app.get('/api/crawl', async (req, res) => {
     }
 
     try {
-        // Schritt A: Wikipedia nach passenden Artikeln durchsuchen
         const searchUrl = `https://wikipedia.org{encodeURIComponent(query)}&format=json&origin=*`;
         const searchResponse = await fetch(searchUrl);
         const searchData = await searchResponse.json();
@@ -25,11 +29,9 @@ app.get('/api/crawl', async (req, res) => {
             return res.status(404).json({ error: 'Keine passenden Texte im Internet gefunden.' });
         }
 
-        // Die Top 3 Artikel-Ergebnisse nehmen
         const topResults = searchData.query.search.slice(0, 3);
         let gefundeneSaetze = [];
 
-        // Schritt B: Die echten Volltexte der Artikel abrufen
         for (let result of topResults) {
             const contentUrl = `https://wikipedia.org{result.pageid}&format=json&origin=*`;
             const contentResponse = await fetch(contentUrl);
@@ -37,13 +39,11 @@ app.get('/api/crawl', async (req, res) => {
             const text = contentData.query.pages[result.pageid].extract;
 
             if (text) {
-                // Text in Sätze zerlegen und säubern
                 const saetze = text.split(/[.!?]/).map(s => s.trim()).filter(s => s.length > 15);
                 gefundeneSaetze = gefundeneSaetze.concat(saetze);
             }
         }
 
-        // Sätze als sauberes JSON-Array an die HTML-Datei zurückgeben
         res.json({ saetze: gefundeneSaetze });
 
     } catch (error) {
@@ -52,7 +52,6 @@ app.get('/api/crawl', async (req, res) => {
     }
 });
 
-// Server starten
 app.listen(PORT, () => {
     console.log(`Server läuft auf Port ${PORT}`);
 });
