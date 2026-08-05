@@ -3,34 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eigener KI-Webcrawler & Vektorisierer</title>
+    <title>Multi-KI-Webcrawler & Vektorisierer</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 900px; margin: 20px auto; padding: 20px; line-height: 1.6; background-color: #f4f7f6; color: #333; }
         .box { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        textarea.input-batch { width: 95%; height: 100px; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; font-family: Arial, sans-serif; }
         button { background: #007bff; color: white; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         button:hover { background: #0056b3; }
         button:disabled { background: #ccc; cursor: not-allowed; }
         .btn-download { background: #28a745; }
         .btn-download:hover { background: #218838; }
-        .status { font-weight: bold; color: #d9534f; margin-top: 10px; }
-        .success { color: #5cb85c; }
+        .status { font-weight: bold; color: #333; margin-top: 10px; padding: 8px; border-radius: 4px; background: #eee; }
+        .success { color: #2b542c; background: #dff0d8; }
+        .running { color: #31708f; background: #d9edf7; }
         pre { background: #272822; color: #f8f8f2; padding: 15px; overflow-x: auto; max-height: 250px; border-radius: 4px; font-size: 13px; }
         .stats-badge { background: #17a2b8; color: white; padding: 3px 8px; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <h1>🤖 KI-Schritt 1: Automatischer Webcrawler & Vektorisierer</h1>
-    <p>Gesteuert über deinen eigenen Node.js Backend-Server auf Render.</p>
+    <h1>🤖 KI-Schritt 1: Multi-Webcrawler & Vektorisierer</h1>
+    <p>Schreibe mehrere Suchbegriffe untereinander, um sie nacheinander automatisch abzuarbeiten.</p>
 
-    <!-- Suche und automatisches Scraping -->
+    <!-- Suche und automatisches Stapel-Scraping -->
     <div class="box">
-        <h3>1. Internet über eigenen Server durchsuchen</h3>
-        <p><em>Schickt die Anfrage an dein Node.js-Backend, welches die Texte lädt und an das HTML zurückgibt.</em></p>
-        <input type="text" id="searchQuery" placeholder="Z.B. Künstliche Intelligenz, Hunde, Quantencomputer...">
-        <button id="crawlBtn" onclick="starteWebSuche()">🌐 Internet durchsuchen</button>
-        <div id="statusMeldung" class="status"></div>
+        <h3>1. Internet-Suchbegriffe stapeln</h3>
+        <p><em>Trage pro Zeile einen Begriff ein (z. B. einen Begriff schreiben, Enter drücken, nächsten schreiben):</em></p>
+        <textarea id="searchBatch" class="input-batch" placeholder="Künstliche Intelligenz&#10;Hunderassen&#10;Quantencomputer&#10;Klimawandel"></textarea><br><br>
+        <button id="crawlBtn" onclick="starteStapelSuche()">🌐 Stapel-Suche starten</button>
+        <div id="statusMeldung" style="display:none;" class="status"></div>
     </div>
 
     <!-- JSON Speichern und Laden -->
@@ -50,62 +51,69 @@
     </div>
 
     <script>
-        // ⚠️ WICHTIG: Tausche diese URL aus, sobald dein Server auf Render.com online ist!
-        // Zum lokalen Testen am PC nutze: 'http://localhost:3000'
-        // Für Render nutzt du z.B.: 'https://onrender.com'
-        const SERVER_BASE_URL = 'http://localhost:3000';
-
-        // Die zentrale Datenbank für deine KI
+        const SERVER_BASE_URL = window.location.origin;
         let kiDatenbank = [];
 
-        // Funktion: Ruft das Node.js Backend auf
-        async function starteWebSuche() {
-            const query = document.getElementById("searchQuery").value.trim();
+        // Hilfsfunktion für künstliche Pausen (Verhindert Server-Sperren)
+        const warte = ms => new Promise(res => setTimeout(res, ms));
+
+        // Startet die nacheinander folgende Abarbeitung des Stapels
+        async function starteStapelSuche() {
+            const input = document.getElementById("searchBatch").value.trim();
             const statusDiv = document.getElementById("statusMeldung");
             const crawlBtn = document.getElementById("crawlBtn");
 
-            if (!query) {
-                alert("Bitte gib einen Suchbegriff ein!");
+            if (!input) {
+                alert("Bitte gib mindestens einen Begriff ein!");
                 return;
             }
 
-            statusDiv.className = "status";
-            statusDiv.innerText = `Server crawlt das Netz nach "${query}"...`;
+            // Zeilenweise trennen und leere Zeilen löschen
+            const begriffe = input.split("\n").map(b => b.trim()).filter(b => b.length > 0);
+            
+            statusDiv.style.display = "block";
             crawlBtn.disabled = true;
 
-            try {
-                // Anfrage an das Node.js Backend senden
-                const url = `${SERVER_BASE_URL}/api/crawl?q=${encodeURIComponent(query)}`;
-                const response = await fetch(url);
-                const data = await response.json();
+            let gesamtSaetzeGecrawlt = 0;
+
+            for (let i = 0; i < begriffe.length; i++) {
+                const aktuellerBegriff = begriffe[i];
                 
-                if (data.error) throw new Error(data.error);
+                // Status-Update auf der Oberfläche anzeigen
+                statusDiv.className = "status running";
+                statusDiv.innerText = `⏳ [${i + 1}/${begriffe.length}] Verarbeite Begriff: "${aktuellerBegriff}"...`;
 
-                const gefundeneSätze = data.saetze;
-
-                if (!gefundeneSätze || gefundeneSätze.length === 0) {
-                    throw new Error("Der Server hat keine Sätze zurückgegeben.");
+                try {
+                    const url = `${SERVER_BASE_URL}/api/crawl?q=${encodeURIComponent(aktuellerBegriff)}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (!data.error && data.saetze && data.saetze.length > 0) {
+                        verarbeiteGecrawlteTexte(data.saetze);
+                        gesamtSaetzeGecrawlt += data.saetze.length;
+                    } else {
+                        console.warn(`Keine Daten für Begriff "${aktuellerBegriff}" gefunden.`);
+                    }
+                } catch (error) {
+                    console.error(`Fehler bei Begriff "${aktuellerBegriff}":`, error);
                 }
 
-                // Die neuen Texte verarbeiten und vektorisieren
-                verarbeiteGecrawlteTexte(gefundeneSätze);
-                
-                statusDiv.className = "status success";
-                statusDiv.innerText = `Erfolgreich! ${gefundeneSätze.length} Sätze vom eigenen Server geladen und mathematisch vektorisiert.`;
-                document.getElementById("searchQuery").value = "";
-
-            } catch (error) {
-                statusDiv.className = "status";
-                statusDiv.innerText = "Fehler beim Web-Abruf: " + error.message;
-            } finally {
-                crawlBtn.disabled = false;
+                // Wartet 1,5 Sekunden vor dem nächsten Begriff (außer beim letzten Element)
+                if (i < begriffe.length - 1) {
+                    await warte(1500);
+                }
             }
+
+            // Fertig mit allen Begriffen
+            statusDiv.className = "status success";
+            statusDiv.innerText = `✅ Fertig! Insgesamt wurden ${begriffe.length} Begriffe abgearbeitet und ${gesamtSaetzeGecrawlt} neue Vektoren hinzugefügt.`;
+            document.getElementById("searchBatch").value = "";
+            crawlBtn.disabled = false;
         }
 
         // Mathematische Funktion: Text in Zahlen-Vektor übersetzen
         function textZuVektor(text, globalerWortschatz) {
             const woerter = text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").split(/\s+/);
-            // Zählt, wie oft jedes Wort aus dem globalen Wortschatz in diesem spezifischen Satz vorkommt
             return globalerWortschatz.map(wort => woerter.filter(w => w === wort).length);
         }
 
@@ -121,13 +129,9 @@
 
         // Integriert die gecrawlten Web-Texte in die KI-Datenbank
         function verarbeiteGecrawlteTexte(neueSätze) {
-            // Bestehende Sätze mit den neuen Sätzen zusammenführen
             let alleTexte = kiDatenbank.map(d => d.originalText).concat(neueSätze);
-            
-            // Wortschatz dynamisch erweitern
             let globalerWortschatz = erstelleWortSchatz(alleTexte);
 
-            // Alle Einträge mit dem neuen, größeren Vektor-Muster neu berechnen
             kiDatenbank = alleTexte.map(text => {
                 return {
                     originalText: text,
@@ -145,7 +149,7 @@
 
         // JSON-Download der Trainingsdaten
         function downloadJSON() {
-            if (kiDatenbank.length === 0) return alert("Keine Daten zum Herunterladen vorhanden! Suche zuerst nach Themen.");
+            if (kiDatenbank.length === 0) return alert("Keine Daten zum Herunterladen vorhanden!");
             
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(kiDatenbank, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -168,8 +172,9 @@
                     if (Array.isArray(geladeneDaten)) {
                         kiDatenbank = geladeneDaten;
                         aktualisiereAnsicht();
+                        document.getElementById("statusMeldung").style.display = "block";
                         document.getElementById("statusMeldung").className = "status success";
-                        document.getElementById("statusMeldung").innerText = "Alte JSON-Daten erfolgreich geladen! Du kannst weiter im Netz suchen.";
+                        document.getElementById("statusMeldung").innerText = "Alte JSON-Daten erfolgreich geladen!";
                     } else {
                         alert("Ungültiges JSON-Format.");
                     }
