@@ -3,104 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kostenloser Tokenizer (Render Web Service)</title>
+    <title>KI Wissen Stacker & Tokenizer</title>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 40px; color: #2d3748; }
-        .container { max-width: 800px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin: 0 auto; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; color: #2d3748; }
+        .container { max-width: 1000px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin: 0 auto; }
         h1 { margin-top: 0; color: #1a202c; }
-        .file-area { border: 2px dashed #cbd5e0; padding: 30px; text-align: center; border-radius: 8px; background: #f7fafc; cursor: pointer; margin-bottom: 20px; }
-        .file-area:hover { border-color: #4a5568; background: #edf2f7; }
-        input[type="file"] { display: none; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0; }
-        .card { background: #e2e8f0; padding: 20px; border-radius: 8px; text-align: center; }
-        .card-val { font-size: 28px; font-weight: bold; color: #2b6cb0; }
-        pre { background: #1a202c; color: #e2e8f0; padding: 15px; border-radius: 8px; overflow-x: auto; max-height: 200px; font-size: 13px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #f7fafc; }
+        textarea { width: 100%; height: 100px; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; resize: vertical; }
+        button { padding: 10px 15px; background: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        button:hover { background: #2b6cb0; }
+        .btn-success { background: #38a169; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-secondary { background: #718096; }
+        .btn-secondary:hover { background: #4a5568; }
+        .url-list, .knowledge-list { list-style: none; padding: 0; max-height: 250px; overflow-y: auto; border: 1px solid #e2e8f0; background: white; border-radius: 6px; }
+        .url-list li, .knowledge-list li { padding: 8px 12px; border-bottom: 1px solid #edf2f7; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .waiting { background: #feebc8; color: #c05621; }
+        .processing { background: #bee3f8; color: #2b6cb0; }
+        .done { background: #c6f6d5; color: #22543d; }
+        .failed { background: #fed7d7; color: #9b2c2c; }
+        .stats-banner { display: flex; gap: 20px; margin: 15px 0; background: #e2e8f0; padding: 15px; border-radius: 8px; font-weight: bold; }
         .hidden { display: none; }
-        .error { color: #e53e3e; font-weight: bold; }
-        .status { color: #4a5568; font-style: italic; }
+        .actions { margin-top: 15px; display: flex; gap: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Datei Tokenizer</h1>
-    <p>Wählen Sie eine <strong>.txt Datei</strong> aus. Die Verarbeitung läuft komplett kostenlos.</p>
-    
-    <div class="file-area" onclick="document.getElementById('fileInput').click()">
-        <span id="fileLabel">Hier klicken, um eine .txt Datei auszuwählen</span>
-        <input type="file" id="fileInput" accept=".txt" onchange="handleFile(this)">
+    <h1>KI Wissen Stacker & Tokenizer</h1>
+    <p>Füge Links hinzu, arbeite sie nacheinander ab und lade dein gesammeltes Wissen als Backup herunter.</p>
+
+    <div class="actions">
+        <button class="btn-secondary" onclick="downloadKnowledge()">💾 Wissen herunterladen (.json)</button>
+        <button class="btn-secondary" onclick="document.getElementById('uploadInput').click()">📂 Backup hochladen</button>
+        <input type="file" id="uploadInput" accept=".json" class="hidden" onchange="uploadKnowledge(this)">
     </div>
 
-    <div id="statusMsg" class="status hidden">Datei wird verarbeitet... Bitte warten...</div>
-    <div id="errorMsg" class="error hidden"></div>
+    <div class="stats-banner">
+        <div>Seiten im System: <span id="totalDocs">0</span></div>
+        <div>Gesamt-Tokens gesammelt: <span id="totalTokens">0</span></div>
+    </div>
 
-    <div id="results" class="hidden">
-        <div class="stats">
-            <div class="card">
-                <label>Zeichenanzahl</label>
-                <div id="charCount" class="card-val">0</div>
-            </div>
-            <div class="card">
-                <label>Gesamt-Tokens</label>
-                <div id="tokenCount" class="card-val">0</div>
-            </div>
+    <div class="grid">
+        <!-- Linke Seite: Links stacken -->
+        <div class="panel">
+            <h3>1. Webseiten stacken</h3>
+            <textarea id="urlInput" placeholder="Hier URLs einfügen (Eine URL pro Zeile)"></textarea>
+            <button onclick="addUrlsToStack()">＋ Zum Stack hinzufügen</button>
+            
+            <h4>Warteschlange (Wartet auf Verarbeitung)</h4>
+            <ul id="urlStackList" class="url-list"></ul>
+            <button id="startBtn" class="btn-success" onclick="processStack()">▶ Stack abarbeiten</button>
         </div>
 
-        <h3>Text-Inhalt (Vorschau)</h3>
-        <pre id="textView"></pre>
-
-        <h3>Token-Fragmente</h3>
-        <pre id="tokenView"></pre>
+        <!-- Rechte Seite: Gesammeltes Wissen -->
+        <div class="panel">
+            <h3>2. Gesammeltes Wissen (Daten)</h3>
+            <h4>Erfolgreich verarbeitete Seiten</h4>
+            <ul id="knowledgeList" class="knowledge-list"></ul>
+            
+            <div id="detailsBox" class="hidden">
+                <h4>Vorschau für ausgewählte Seite:</h4>
+                <p><strong>Tokens:</strong> <span id="detTokens">0</span></p>
+                <textarea id="detText" readonly style="height: 120px;"></textarea>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-    function handleFile(input) {
+    let urlStack = [];
+    let savedKnowledge = []; // Hier wird das gesamte extrahierte "Wissen" gehalten
+    let isProcessing = false;
+
+    function addUrlsToStack() {
+        const lines = document.getElementById('urlInput').value.split('\n');
+        lines.forEach(line => {
+            const url = line.trim();
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                if (!urlStack.some(item => item.url === url)) {
+                    urlStack.push({ url: url, status: 'waiting' });
+                }
+            }
+        });
+        document.getElementById('urlInput').value = '';
+        renderUI();
+    }
+
+    function renderUI() {
+        // Render Warteschlange
+        const stackList = document.getElementById('urlStackList');
+        stackList.innerHTML = '';
+        urlStack.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="url-text">${item.url.substring(0, 50)}...</span> 
+                            <span class="status-badge ${item.status}">${item.status.toUpperCase()}</span>`;
+            stackList.appendChild(li);
+        });
+
+        // Render Wissensliste
+        const kList = document.getElementById('knowledgeList');
+        kList.innerHTML = '';
+        savedKnowledge.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.style.cursor = 'pointer';
+            li.onclick = () => showDetails(index);
+            li.innerHTML = `<span>🌐 ${item.url.substring(0, 40)}...</span> 
+                            <strong>${item.tokenCount} Tokens</strong>`;
+            kList.appendChild(li);
+        });
+
+        // Update Statistiken
+        document.getElementById('totalDocs').textContent = savedKnowledge.length;
+        const totalTokens = savedKnowledge.reduce((sum, item) => sum + item.tokenCount, 0);
+        document.getElementById('totalTokens').textContent = totalTokens;
+    }
+
+    async function processStack() {
+        if (isProcessing) return;
+        isProcessing = true;
+        document.getElementById('startBtn').disabled = true;
+
+        for (let i = 0; i < urlStack.length; i++) {
+            if (urlStack[i].status === 'waiting' || urlStack[i].status === 'failed') {
+                urlStack[i].status = 'processing';
+                renderUI();
+
+                try {
+                    const response = await fetch('/api/tokenize-url', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ url: urlStack[i].url })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        urlStack[i].status = 'done';
+                        // Wissen dauerhaft im Frontend-Array speichern
+                        savedKnowledge.push({
+                            url: data.url,
+                            characterCount: data.characterCount,
+                            tokenCount: data.tokenCount,
+                            text: data.text
+                        });
+                    } else {
+                        urlStack[i].status = 'failed';
+                    }
+                } catch (e) {
+                    urlStack[i].status = 'failed';
+                }
+                renderUI();
+            }
+        }
+
+        // Bereinige den Stack von fertigen Einträgen
+        urlStack = urlStack.filter(item => item.status !== 'done');
+        isProcessing = false;
+        document.getElementById('startBtn').disabled = false;
+        renderUI();
+    }
+
+    function showDetails(index) {
+        const item = savedKnowledge[index];
+        document.getElementById('detailsBox').classList.remove('hidden');
+        document.getElementById('detTokens').textContent = item.tokenCount;
+        document.getElementById('detText').value = item.text;
+    }
+
+    // WISSEN DOWNLOADEN (Als JSON-Datei auf die Festplatte)
+    function downloadKnowledge() {
+        if (savedKnowledge.length === 0) {
+            alert("Noch kein Wissen vorhanden, das heruntergeladen werden kann!");
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(savedKnowledge, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "ki_gesammeltes_wissen.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    // WISSEN UPLOADEN (Backup-JSON einlesen und weitermachen)
+    function uploadKnowledge(input) {
         const file = input.files[0];
         if (!file) return;
 
-        document.getElementById('fileLabel').textContent = `Ausgewählt: ${file.name}`;
-        
         const reader = new FileReader();
-        reader.onload = async function(e) {
-            await sendToTokenizer(e.target.result);
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (Array.isArray(importedData)) {
+                    savedKnowledge = importedData;
+                    renderUI();
+                    alert(`${importedData.length} Webseiten-Backups erfolgreich geladen!`);
+                } else {
+                    alert("Ungültiges Dateiformat.");
+                }
+            } catch (err) {
+                alert("Fehler beim Lesen der Backup-Datei.");
+            }
         };
         reader.readAsText(file);
-    }
-
-    async function sendToTokenizer(rawText) {
-        const statusMsg = document.getElementById('statusMsg');
-        const errorMsg = document.getElementById('errorMsg');
-        const results = document.getElementById('results');
-
-        statusMsg.classList.remove('hidden');
-        errorMsg.classList.add('hidden');
-        results.classList.add('hidden');
-
-        try {
-            const response = await fetch('/api/tokenize-text', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: rawText })
-            });
-
-            const data = await response.json();
-            if (!data.success) throw new Error(data.error || 'Fehler beim Tokenisieren.');
-
-            document.getElementById('charCount').textContent = data.characterCount;
-            document.getElementById('tokenCount').textContent = data.tokenCount;
-            document.getElementById('textView').textContent = data.previewText;
-            
-            const cleanTokens = data.tokens.map(t => typeof t === 'string' ? t.replace('Ġ', ' ') : t);
-            document.getElementById('tokenView').textContent = JSON.stringify(cleanTokens, null, 2);
-
-            results.classList.remove('hidden');
-        } catch (err) {
-            errorMsg.textContent = "Fehler: " + err.message;
-            errorMsg.classList.remove('hidden');
-        } finally {
-            statusMsg.classList.add('hidden');
-        }
+        input.value = ''; // Input zurücksetzen
     }
 </script>
 
