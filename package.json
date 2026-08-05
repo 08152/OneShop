@@ -1,15 +1,14 @@
 {
-  "name": "render-link-stacker-tokenizer",
+  "name": "render-zero-dependency-tokenizer",
   "version": "1.0.0",
   "type": "module",
-  "description": "Autarker URL-Stacker und Tokenizer für Render",
+  "description": "Token-Schätzer ohne jegliche Tokenizer-Bibliotheken",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
-    "express": "^4.19.2",
-    "gpt-tokenizer": "^2.1.2"
+    "express": "^4.19.2"
   }
 }
