@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Kugel Plattform - Jump Edition</title>
+    <title>3D Kugel Plattform - Event Edition</title>
     <style>
         body {
             margin: 0;
@@ -23,6 +23,33 @@
             border-radius: 5px;
             pointer-events: none;
         }
+        #timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 24px;
+            z-index: 10;
+            text-shadow: 0 0 10px #00ff00;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        #dialog {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            text-align: center;
+            color: yellow;
+            font-size: 32px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            z-index: 10;
+            opacity: 0;
+            transition: 0.5s;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
     </style>
 </head>
 <body>
@@ -35,7 +62,11 @@
         Klick = Aktivieren
     </div>
 
-    <script src="https://jsdelivr.net"></script>
+    <div id="timer">WAITING PLAYERS...</div>
+    <div id="dialog"></div>
+
+    <!-- Three.js und Skript laden -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="https://socket.io"></script>
     <script src="game.js"></script>
 </body>
