@@ -1,14 +1,12 @@
 {
-  "name": "render-zero-dependency-tokenizer",
+  "name": "parkour-game",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Token-Schätzer ohne jegliche Tokenizer-Bibliotheken",
+  "description": "Three.js Parkour",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "cheerio": "^1.0.0",
     "express": "^4.19.2"
   }
 }
