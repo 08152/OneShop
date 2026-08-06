@@ -5,11 +5,13 @@ const io = require('socket.io')(http, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    }
+    },
+    transports: ['websocket', 'polling'] // Erlaubt Fallback, falls WebSockets blockiert werden
 });
 const path = require('path');
 
-app.use(express.static(path.join(__dirname)));
+// Wichtig für Render: Schützt die Ordnerstruktur
+app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -23,7 +25,6 @@ io.on('connection', (socket) => {
     });
 });
 
-// Wichtig für Render: Nutzt den dynamischen Port oder 3000 als Fallback
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, '0.0.0.0', () => {
     console.log(`Server läuft auf Port ${PORT}`);
