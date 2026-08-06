@@ -1,0 +1,177 @@
+// Socket-Verbindung mit Polling-Fallback für ChromeOS
+const socket = io(window.location.origin, {
+    transports: ['polling', 'websocket']
+});
+
+// 1. Szene & Kamera aufsetzen
+const scene = new THREE.Scene();
+
+// --- SHADER 1: Blauer Himmel (Hintergrund-Kuppel) ---
+const skyVertexShader = `
+    varying vec3 vWorldPosition;
+    void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    }
+`;
+const skyFragmentShader = `
+    varying vec3 vWorldPosition;
+    void main() {
+        float h = normalize(vWorldPosition).y;
+        vec3 skyColor = mix(vec3(0.4, 0.7, 1.0), vec3(0.1, 0.4, 0.8), max(h, 0.0));
+        gl_FragColor = vec4(skyColor, 1.0);
+    }
+`;
+const skyGeo = new THREE.SphereGeometry(400, 32, 15);
+const skyMat = new THREE.ShaderMaterial({
+    vertexShader: skyVertexShader,
+    fragmentShader: skyFragmentShader,
+    side: THREE.BackSide
+});
+const sky = new THREE.Mesh(skyGeo, skyMat);
+scene.add(sky);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+
+let renderer;
+try {
+    renderer = new THREE.WebGLRenderer({ 
+        antialias: false,        
+        powerPreference: "high-performance",
+        precision: "mediump"     
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+} catch (e) {
+    alert("WebGL wird nicht unterstützt.");
+}
+
+// 2. Große Rote Plattform mit Custom-Grid-Shader
+const platformRadius = 40;
+const floorGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 1, 64);
+
+// --- SHADER 2: Rote Plattform mit integriertem Gitter-Muster ---
+const floorVertexShader = `
+    varying vec2 vUv;
+    void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    }
+`;
+const floorFragmentShader = `
+    varying vec2 vUv;
+    void main() {
+        vec2 grid = abs(fract(vUv * 40.0 - 0.5) - 0.5) / fwidth(vUv * 40.0);
+        float line = min(grid.x, grid.y);
+        float c = 1.0 - min(line, 1.0);
+        
+        vec3 baseColor = vec3(0.8, 0.1, 0.1);
+        vec3 lineColor = vec3(0.2, 0.0, 0.0);
+        
+        gl_FragColor = vec4(mix(baseColor, lineColor, c), 1.0);
+    }
+`;
+
+const floorMat = new THREE.ShaderMaterial({
+    vertexShader: floorVertexShader,
+    fragmentShader: floorFragmentShader
+});
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.position.y = -0.5;
+scene.add(floor);
+
+// 3. Spieler (Kugel) erstellen
+const playerRadius = 1;
+const playerGeo = new THREE.SphereGeometry(playerRadius, 16, 16); 
+const playerMat = new THREE.MeshBasicMaterial({ color: 0xfff000 });
+const player = new THREE.Mesh(playerGeo, playerMat);
+player.position.set(0, playerRadius, 0); 
+scene.add(player);
+
+// 4. Steuerung & Kamera-Variablen
+const keys = { w: false, a: false, s: false, d: false };
+const moveSpeed = 0.15; 
+
+
+let cameraYaw = 0;
+let cameraPitch = -0.2; 
+const cameraDistance = 7;
+
+// Gültige Kamera-Startposition erzwingen
+camera.position.x = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
+camera.position.y = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
+camera.position.z = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
+camera.lookAt(player.position.x, player.position.y + 0.5, player.position.z);
+
+// Eingabe-Abfragen
+window.addEventListener('keydown', (e) => {
+    if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = true;
+});
+window.addEventListener('keyup', (e) => {
+    if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
+});
+
+// Pointer-Lock
+document.body.addEventListener('click', () => {
+    document.body.requestPointerLock();
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (document.pointerLockElement === document.body) {
+        cameraYaw -= e.movementX * 0.0025;
+        cameraPitch -= e.movementY * 0.0025;
+        cameraPitch = Math.max(-Math.PI/3, Math.min(Math.PI/6, cameraPitch));
+    }
+});
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    if(renderer) renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// 5. Game Loop
+function animate() {
+    requestAnimationFrame(animate);
+
+    let moveX = 0;
+    let moveZ = 0;
+
+    if (keys.w) { moveX += Math.sin(cameraYaw); moveZ += Math.cos(cameraYaw); }
+    if (keys.s) { moveX -= Math.sin(cameraYaw); moveZ -= Math.cos(cameraYaw); }
+    if (keys.a) { moveX += Math.sin(cameraYaw + Math.PI / 2); moveZ += Math.cos(cameraYaw + Math.PI / 2); }
+    if (keys.d) { moveX -= Math.sin(cameraYaw + Math.PI / 2); moveZ -= Math.cos(cameraYaw + Math.PI / 2); }
+
+    if (moveX !== 0 || moveZ !== 0) {
+        const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+        player.position.x += (moveX / length) * moveSpeed;
+        player.position.z += (moveZ / length) * moveSpeed;
+
+        player.rotation.z -= (moveX / length) * moveSpeed / playerRadius;
+        player.rotation.x += (moveZ / length) * moveSpeed / playerRadius;
+    }
+
+    // Spielfeldbegrenzung
+    const distanceFromCenter = Math.sqrt(player.position.x ** 2 + player.position.z ** 2);
+    if (distanceFromCenter > platformRadius - playerRadius) {
+        const angle = Math.atan2(player.position.z, player.position.x);
+        player.position.x = Math.cos(angle) * (platformRadius - playerRadius);
+        player.position.z = Math.sin(angle) * (platformRadius - playerRadius);
+    }
+
+    // Kamera-Positionierung hinter der Kugel
+    const targetCamX = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
+    const targetCamY = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
+    const targetCamZ = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
+
+    camera.position.x += (targetCamX - camera.position.x) * 0.15;
+    camera.position.y += (targetCamY - camera.position.y) * 0.15;
+    camera.position.z += (targetCamZ - camera.position.z) * 0.15;
+    
+    camera.lookAt(player.position.x, player.position.y + 0.5, player.position.z);
+
+    if(renderer) renderer.render(scene, camera);
+}
+
+if(renderer) animate();
