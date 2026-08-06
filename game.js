@@ -33,14 +33,14 @@ scene.add(platform);
 // ======================
 const stickLength = platformRadius * 2; 
 const stickWidth = 1.2;
-const stickHeight = 0.8; // Etwas flacher, damit man gut drüberspringen kann
+const stickHeight = 0.8; 
 const stickGeo = new THREE.BoxGeometry(stickLength, stickHeight, stickWidth);
 const stickMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.5 });
 const stick = new THREE.Mesh(stickGeo, stickMat);
 stick.position.set(0, stickHeight / 2, 0); 
 scene.add(stick);
 
-let stickRotationSpeed = 0.035; // Deutlich SCHNELLER rotiert!
+let stickRotationSpeed = 0.035; 
 
 // ======================
 // SPIELER (Kugel) & PHYSIK
@@ -55,7 +55,7 @@ scene.add(player);
 let velocity = new THREE.Vector3(0, 0, 0);
 let externalForce = new THREE.Vector3(0, 0, 0); 
 let gravity = 0.015;
-let jumpForce = 0.45; // Stärke des Sprungs
+let jumpForce = 0.45; 
 let canJump = true;
 let isDead = false;
 
@@ -63,14 +63,18 @@ let isDead = false;
 // STEUERUNG (Inklusive Jump & Space)
 // ======================
 let keys = {};
-let rx = -0.3; 
+let rx = -0.4; // FIX: Start-Neigung nach unten angepasst (schaut direkt auf den Boden)
 let ry = 0;    
 const cameraDistance = 8;
 
+// Erstmalige Kamera-Ausrichtung direkt beim Laden erzwingen
+camera.position.x = player.position.x + cameraDistance * Math.sin(ry) * Math.cos(rx);
+camera.position.y = player.position.y - cameraDistance * Math.sin(rx) + 0.5;
+camera.position.z = player.position.z + cameraDistance * Math.cos(ry) * Math.cos(rx);
+camera.lookAt(player.position.x, player.position.y, player.position.z);
+
 window.onkeydown = (e) => { 
     keys[e.key.toLowerCase()] = true; 
-    
-    // Sprung auslösen bei Leertaste (e.code für präzise Erkennung)
     if (e.code === "Space" && canJump && !isDead) {
         externalForce.y = jumpForce;
         canJump = false;
@@ -98,36 +102,30 @@ window.onresize = () => {
 };
 
 // ======================
-// KOLLISIONS-LOGIK (Stangen-Treffer)
+// KOLLISIONS-LOGIK
 // ======================
 function checkStickCollision() {
     if (isDead) return;
 
-    // Prüfen, ob die Kugel vertikal auf Höhe des Stabes ist (Höhen-Check)
     if (player.position.y - playerRadius < stick.position.y + stickHeight / 2 && 
         player.position.y + playerRadius > stick.position.y - stickHeight / 2) {
         
         const angle = stick.rotation.y;
         
-        // Kugel in das lokale Koordinatensystem der Stange umrechnen
         const localX = player.position.x * Math.cos(-angle) - player.position.z * Math.sin(-angle);
         const localZ = player.position.x * Math.sin(-angle) + player.position.z * Math.cos(-angle);
 
         const halfLength = stickLength / 2;
         const halfWidth = stickWidth / 2;
 
-        // Hitbox-Überprüfung
         if (Math.abs(localX) < halfLength + playerRadius && Math.abs(localZ) < halfWidth + playerRadius) {
             
-            // Abstoß-Richtung (Vektor senkrecht von der Stangenkante weg)
             const pushDir = new THREE.Vector3(0, 0, Math.sign(localZ));
             pushDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
 
-            // Zentrifugalkraft: Außen wird man härter getroffen als innen
             const distanceFromCenter = Math.abs(localX);
             const speedMultiplier = 0.2 + (distanceFromCenter / halfLength) * 0.8;
 
-            // Wucht des Aufpralls zuweisen (Wegschleudern + leichter Aufwärts-Impuls)
             externalForce.x = pushDir.x * speedMultiplier;
             externalForce.y = 0.2; 
             externalForce.z = pushDir.z * speedMultiplier;
@@ -141,10 +139,8 @@ function checkStickCollision() {
 const moveSpeed = 0.15;
 
 function update() {
-    // 1. Stab schnell rotieren lassen
     stick.rotation.y += stickRotationSpeed;
 
-    // 2. Bewegung berechnen
     let moveX = 0;
     let moveZ = 0;
 
@@ -160,7 +156,6 @@ function update() {
         velocity.x = (moveX / length) * moveSpeed;
         velocity.z = (moveZ / length) * moveSpeed;
 
-        // Roll-Animation
         player.rotation.z -= velocity.x / playerRadius;
         player.rotation.x += velocity.z / playerRadius;
     } else {
@@ -168,33 +163,28 @@ function update() {
         velocity.z *= 0.85;
     }
 
-    // 3. Kräfte & Schwerkraft anwenden
     externalForce.x *= 0.96;
-    externalForce.y -= gravity; // Schwerkraft zieht Kugel nach unten
+    externalForce.y -= gravity; 
     externalForce.z *= 0.96;
 
     player.position.x += velocity.x + externalForce.x;
     player.position.y += externalForce.y;
     player.position.z += velocity.z + externalForce.z;
 
-    // 4. Bodenkontakt auf der Plattform prüfen
     const playerDistanceFromCenter = Math.sqrt(player.position.x ** 2 + player.position.z ** 2);
     
     if (playerDistanceFromCenter <= platformRadius) {
         if (player.position.y < playerRadius) {
             player.position.y = playerRadius;
             externalForce.y = 0; 
-            canJump = true; // Sprung wieder erlauben, wenn man landet
+            canJump = true; 
         }
     } else {
-        // Wenn man über den Rand fliegt, verliert man den Bodenkontakt
         canJump = false;
     }
 
-    // Hitbox-Check triggern
     checkStickCollision();
 
-    // 5. Respawn bei Sturz ins Nichts
     if (player.position.y < -20 && !isDead) {
         isDead = true;
         setTimeout(() => {
@@ -206,7 +196,6 @@ function update() {
         }, 1200);
     }
 
-    // 6. Kamera-Nachführung
     const targetCamX = player.position.x + cameraDistance * Math.sin(ry) * Math.cos(rx);
     const targetCamY = player.position.y - cameraDistance * Math.sin(rx) + 0.5;
     const targetCamZ = player.position.z + cameraDistance * Math.cos(ry) * Math.cos(rx);
