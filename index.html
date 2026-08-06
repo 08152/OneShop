@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Kugel Plattform</title>
+    <title>3D Kugel Plattform - Jump Edition</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background: #6ba7e6; /* Fallback-Himmelblau */
+            background: #6ba7e6;
         }
         canvas { display: block; }
         #hud {
@@ -30,12 +30,13 @@
     <div id="hud">
         <strong>Steuerung:</strong><br>
         WASD = Kugel rollen<br>
+        LEERTASTE = Springen<br>
         Maus = Kamera drehen<br>
         Klick = Aktivieren
     </div>
 
-    <!-- Die exakt gleiche, funktionierende Version von Three.js nutzen -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://socket.io"></script>
     <script src="game.js"></script>
 </body>
 </html>
