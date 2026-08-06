@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Kugel Plattform - Render</title>
+    <title>3D Kugel Plattform - Chromebook Edition</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #050505;
+            background-color: #1a1a2e;
             font-family: sans-serif;
         }
         #info {
@@ -16,86 +16,93 @@
             top: 10px;
             left: 10px;
             color: white;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             padding: 10px;
             border-radius: 5px;
             pointer-events: none;
             z-index: 100;
         }
     </style>
-    <!-- Zuverlässige CDN-Links für Render -->
+    <!-- Stabile CDNs -->
     <script src="https://cloudflare.com"></script>
     <script src="https://socket.io"></script>
 </head>
 <body>
 
     <div id="info">
-        <strong>Steuerung:</strong><br>
+        <strong>Steuerung (Chromebook optimiert):</strong><br>
         W, A, S, D = Bewegen<br>
         Maus bewegen = Kamera drehen<br>
         Klick ins Fenster = Maus sperren
     </div>
 
     <script>
-        // Sichere Verbindung für Render erzwingen mit Fallbacks
+        // Socket-Verbindung mit Polling-Fallback für ChromeOS
         const socket = io(window.location.origin, {
-            transports: ['websocket', 'polling']
+            transports: ['polling', 'websocket']
         });
 
-        // 1. Szene, Kamera und Renderer aufsetzen
+        // 1. Szene & Kamera aufsetzen
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x1a1a2e);
-        scene.fog = new THREE.FogExp2(0x1a1a2e, 0.015);
 
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
 
-        // 2. Licht hinzufügen
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        // Chromebook-Fix: WebGLRenderer ohne stromfressendes Antialiasing initialisieren
+        let renderer;
+        try {
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: false,        // WICHTIG: Spart massig GPU-Leistung auf ChromeOS
+                powerPreference: "high-performance",
+                precision: "mediump"     // Nutzt mittlere Präzision für ältere Chromebook-Prozessoren
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            // Schatten deaktiviert, da viele Chromebooks bei dynamischen Schatten schwarz anzeigen
+            renderer.shadowMap.enabled = false; 
+            document.body.appendChild(renderer.domElement);
+        } catch (e) {
+            alert("WebGL wird von diesem Chromebook im Moment blockiert oder nicht unterstützt.");
+        }
+
+        // 2. Einfache, performante Beleuchtung (Keine Rechenlast)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(20, 40, 20);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(10, 20, 10);
         scene.add(dirLight);
 
         // 3. Große runde Plattform erstellen
-        const platformRadius = 50;
-        const floorGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 2, 64);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x222831, roughness: 0.8 });
+        const platformRadius = 40;
+        const floorGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 1, 32); // Weniger Polygone
+        // MeshBasicMaterial statt StandardMaterial nutzen, falls die Shader-Berechnung fehlschlägt
+        const floorMat = new THREE.MeshBasicMaterial({ color: 0x222831 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.position.y = -1; // Oberfläche auf Höhe 0 bringen
-        floor.receiveShadow = true;
+        floor.position.y = -0.5;
         scene.add(floor);
 
-        // Raster für Geschwindigkeitsgefühl
-        const grid = new THREE.GridHelper(platformRadius * 2, 50, 0x00adb5, 0x393e46);
+        // Raster zur Orientierung
+        const grid = new THREE.GridHelper(platformRadius * 2, 30, 0x00adb5, 0x393e46);
         grid.position.y = 0.01;
         scene.add(grid);
 
         // 4. Spieler (Kugel) erstellen
         const playerRadius = 1;
-        const playerGeo = new THREE.SphereGeometry(playerRadius, 32, 32);
-        const playerMat = new THREE.MeshStandardMaterial({ color: 0x00adb5, roughness: 0.2, metalness: 0.5 });
+        const playerGeo = new THREE.SphereGeometry(playerRadius, 16, 16); // Polygonanzahl halbiert
+        const playerMat = new THREE.MeshBasicMaterial({ color: 0x00adb5 });
         const player = new THREE.Mesh(playerGeo, playerMat);
         player.position.set(0, playerRadius, 0); 
-        player.castShadow = true;
         scene.add(player);
 
         // 5. Steuerung & Kamera-Variablen
         const keys = { w: false, a: false, s: false, d: false };
-        const moveSpeed = 0.15;
+        const moveSpeed = 0.12; // Minimal angepasst für flüssigere Framerates
         
         let cameraYaw = 0;
         let cameraPitch = -0.3; 
-        const cameraDistance = 8;
+        const cameraDistance = 7;
 
-        // Tastatur-Events
+        // Eingabe-Abfragen
         window.addEventListener('keydown', (e) => {
             if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = true;
         });
@@ -103,15 +110,15 @@
             if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
         });
 
-        // Maussteuerung aktivieren
+        // Pointer-Lock Aktivierung
         document.body.addEventListener('click', () => {
             document.body.requestPointerLock();
         });
 
         window.addEventListener('mousemove', (e) => {
             if (document.pointerLockElement === document.body) {
-                cameraYaw -= e.movementX * 0.002;
-                cameraPitch -= e.movementY * 0.002;
+                cameraYaw -= e.movementX * 0.0025;
+                cameraPitch -= e.movementY * 0.0025;
                 cameraPitch = Math.max(-Math.PI/3, Math.min(Math.PI/6, cameraPitch));
             }
         });
@@ -119,7 +126,7 @@
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            if(renderer) renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         // 6. Game Loop
@@ -134,17 +141,17 @@
             if (keys.a) { moveX += Math.sin(cameraYaw + Math.PI / 2); moveZ += Math.cos(cameraYaw + Math.PI / 2); }
             if (keys.d) { moveX -= Math.sin(cameraYaw + Math.PI / 2); moveZ -= Math.cos(cameraYaw + Math.PI / 2); }
 
-            // Bewegung und echtes 3D-Rollen berechnen
             if (moveX !== 0 || moveZ !== 0) {
                 const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
                 player.position.x += (moveX / length) * moveSpeed;
                 player.position.z += (moveZ / length) * moveSpeed;
 
+                // Rotations-Berechnung für das Rollen
                 player.rotation.z -= (moveX / length) * moveSpeed / playerRadius;
                 player.rotation.x += (moveZ / length) * moveSpeed / playerRadius;
             }
 
-            // Runde Plattform-Grenze einhalten
+            // Spielfeldbegrenzung
             const distanceFromCenter = Math.sqrt(player.position.x ** 2 + player.position.z ** 2);
             if (distanceFromCenter > platformRadius - playerRadius) {
                 const angle = Math.atan2(player.position.z, player.position.x);
@@ -152,21 +159,22 @@
                 player.position.z = Math.sin(angle) * (platformRadius - playerRadius);
             }
 
-            // Third-Person Kamera hinter Spieler positionieren
+            // Kamera-Führung
             const targetCamX = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
             const targetCamY = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
             const targetCamZ = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
 
-            camera.position.x += (targetCamX - camera.position.x) * 0.1;
-            camera.position.y += (targetCamY - camera.position.y) * 0.1;
-            camera.position.z += (targetCamZ - camera.position.z) * 0.1;
+            camera.position.x += (targetCamX - camera.position.x) * 0.15;
+            camera.position.y += (targetCamY - camera.position.y) * 0.15;
+            camera.position.z += (targetCamZ - camera.position.z) * 0.15;
             
             camera.lookAt(player.position.x, player.position.y + 0.5, player.position.z);
 
-            renderer.render(scene, camera);
+            if(renderer) renderer.render(scene, camera);
         }
 
-        animate();
+        // Starte die Schleife nur, wenn der Renderer bereit ist
+        if(renderer) animate();
     </script>
 </body>
 </html>
