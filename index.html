@@ -3,40 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Kugel Plattform - Shader Edition</title>
+    <title>3D Kugel Plattform</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #1a1a2e;
-            font-family: sans-serif;
+            background: #6ba7e6; /* Fallback-Himmelblau */
         }
-        #info {
+        canvas { display: block; }
+        #hud {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 20px;
+            left: 20px;
             color: white;
-            background: rgba(0,0,0,0.7);
+            font-family: Arial;
+            z-index: 10;
+            background: rgba(0,0,0,0.5);
             padding: 10px;
             border-radius: 5px;
             pointer-events: none;
-            z-index: 100;
         }
     </style>
-    <!-- Externe Bibliotheken laden -->
-    <script src="https://cloudflare.com"></script>
-    <script src="https://socket.io"></script>
 </head>
 <body>
 
-    <div id="info">
-        <strong>Steuerung (Zwei-Dateien-Struktur):</strong><br>
-        W, A, S, D = Bewegen<br>
-        Maus bewegen = Kamera drehen<br>
-        Klick ins Fenster = Maus sperren
+    <div id="hud">
+        <strong>Steuerung:</strong><br>
+        WASD = Kugel rollen<br>
+        Maus = Kamera drehen<br>
+        Klick = Aktivieren
     </div>
 
-    <!-- Das ausgelagerte 3D-Spiellogik-Skript laden -->
+    <!-- Die exakt gleiche, funktionierende Version von Three.js nutzen -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
