@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Kugel Plattform - Event Edition</title>
+    <title>3D Kugel Plattform - Event & Shader Edition</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background: #6ba7e6;
+            background: #1a1a2e;
+            font-family: sans-serif;
         }
-        canvas { display: block; }
+        canvas { 
+            display: block; 
+        }
         #hud {
             position: absolute;
             top: 20px;
             left: 20px;
             color: white;
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             z-index: 10;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 5px;
             pointer-events: none;
@@ -32,7 +35,7 @@
             font-size: 24px;
             z-index: 10;
             text-shadow: 0 0 10px #00ff00;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             padding: 5px 10px;
             border-radius: 5px;
         }
@@ -47,13 +50,14 @@
             font-weight: bold;
             z-index: 10;
             opacity: 0;
-            transition: 0.5s;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            transition: opacity 0.5s;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
     </style>
 </head>
 <body>
 
+    <!-- HUD-Anzeige für die Steuerung -->
     <div id="hud">
         <strong>Steuerung:</strong><br>
         WASD = Kugel rollen<br>
@@ -62,12 +66,19 @@
         Klick = Aktivieren
     </div>
 
+    <!-- Timer für das Raum-Event -->
     <div id="timer">WAITING PLAYERS...</div>
+
+    <!-- Dialogbox für NPC-Nachrichten -->
     <div id="dialog"></div>
 
-    <!-- Three.js und Skript laden -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://socket.io"></script>
+    <!-- Externe 3D- und Netzwerk-Bibliotheken laden -->
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://jsdelivr.net"></script>
+    
+    <!-- WICHTIG: Erst die Shader laden, danach die Spiellogik ausführen -->
+    <script src="shader.js"></script>
     <script src="game.js"></script>
+
 </body>
 </html>
