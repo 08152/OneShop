@@ -6,8 +6,9 @@ const socket = io(window.location.origin, {
 // 1. Szene & Kamera aufsetzen
 const scene = new THREE.Scene();
 
-// --- SHADER 1: Blauer Himmel (Hintergrund-Kuppel) ---
+// --- SHADER 1: Blauer Himmel (Chromebook Fix) ---
 const skyVertexShader = `
+    precision mediump float;
     varying vec3 vWorldPosition;
     void main() {
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
@@ -16,6 +17,7 @@ const skyVertexShader = `
     }
 `;
 const skyFragmentShader = `
+    precision mediump float;
     varying vec3 vWorldPosition;
     void main() {
         float h = normalize(vWorldPosition).y;
@@ -47,12 +49,12 @@ try {
     alert("WebGL wird nicht unterstützt.");
 }
 
-// 2. Große Rote Plattform mit Custom-Grid-Shader
+// 2. Große Rote Plattform mit Custom-Grid-Shader (Chromebook Fix)
 const platformRadius = 40;
 const floorGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 1, 64);
 
-// --- SHADER 2: Rote Plattform mit integriertem Gitter-Muster ---
 const floorVertexShader = `
+    precision mediump float;
     varying vec2 vUv;
     void main() {
         vUv = uv;
@@ -60,9 +62,11 @@ const floorVertexShader = `
     }
 `;
 const floorFragmentShader = `
+    precision mediump float;
     varying vec2 vUv;
     void main() {
-        vec2 grid = abs(fract(vUv * 40.0 - 0.5) - 0.5) / fwidth(vUv * 40.0);
+        // Sicherer Chromebook-Ersatz für das fehleranfällige fwidth()
+        vec2 grid = abs(fract(vUv * 40.0 - 0.5) - 0.5) / 0.05;
         float line = min(grid.x, grid.y);
         float c = 1.0 - min(line, 1.0);
         
@@ -93,12 +97,11 @@ scene.add(player);
 const keys = { w: false, a: false, s: false, d: false };
 const moveSpeed = 0.15; 
 
-
 let cameraYaw = 0;
 let cameraPitch = -0.2; 
 const cameraDistance = 7;
 
-// Gültige Kamera-Startposition erzwingen
+// Startposition erzwingen
 camera.position.x = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
 camera.position.y = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
 camera.position.z = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
@@ -112,7 +115,6 @@ window.addEventListener('keyup', (e) => {
     if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
 });
 
-// Pointer-Lock
 document.body.addEventListener('click', () => {
     document.body.requestPointerLock();
 });
@@ -152,7 +154,6 @@ function animate() {
         player.rotation.x += (moveZ / length) * moveSpeed / playerRadius;
     }
 
-    // Spielfeldbegrenzung
     const distanceFromCenter = Math.sqrt(player.position.x ** 2 + player.position.z ** 2);
     if (distanceFromCenter > platformRadius - playerRadius) {
         const angle = Math.atan2(player.position.z, player.position.x);
@@ -160,7 +161,6 @@ function animate() {
         player.position.z = Math.sin(angle) * (platformRadius - playerRadius);
     }
 
-    // Kamera-Positionierung hinter der Kugel
     const targetCamX = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
     const targetCamY = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
     const targetCamZ = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
