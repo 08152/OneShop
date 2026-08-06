@@ -1,159 +1,112 @@
-// Socket-Verbindung mit Polling-Fallback für ChromeOS
-const socket = io(window.location.origin, {
-    transports: ['polling', 'websocket']
-});
-
-// 1. Szene & Kamera aufsetzen
+// ======================
+// SCENE & SETUP
+// ======================
 const scene = new THREE.Scene();
+// Heller blauer Himmel als Hintergrundfarbe
+scene.background = new THREE.Color(0x6ba7e6);
 
-// --- SHADER 1: Blauer Himmel (Chromebook Fix) ---
-const skyVertexShader = `
-    precision mediump float;
-    varying vec3 vWorldPosition;
-    void main() {
-        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-        vWorldPosition = worldPosition.xyz;
-        gl_Position = projectionMatrix * viewMatrix * worldPosition;
-    }
-`;
-const skyFragmentShader = `
-    precision mediump float;
-    varying vec3 vWorldPosition;
-    void main() {
-        float h = normalize(vWorldPosition).y;
-        vec3 skyColor = mix(vec3(0.4, 0.7, 1.0), vec3(0.1, 0.4, 0.8), max(h, 0.0));
-        gl_FragColor = vec4(skyColor, 1.0);
-    }
-`;
-const skyGeo = new THREE.SphereGeometry(400, 32, 15);
-const skyMat = new THREE.ShaderMaterial({
-    vertexShader: skyVertexShader,
-    fragmentShader: skyFragmentShader,
-    side: THREE.BackSide
-});
-const sky = new THREE.Mesh(skyGeo, skyMat);
-scene.add(sky);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+// Schatten deaktiviert für maximale Performance auf dem Chromebook
+renderer.shadowMap.enabled = false; 
+document.body.appendChild(renderer.domElement);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
+// ======================
+// LIGHTING (Aus dem funktionierenden Code)
+// ======================
+scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+mainLight.position.set(50, 100, 50);
+scene.add(mainLight);
 
-let renderer;
-try {
-    renderer = new THREE.WebGLRenderer({ 
-        antialias: false,        
-        powerPreference: "high-performance",
-        precision: "mediump"     
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-} catch (e) {
-    alert("WebGL wird nicht unterstützt.");
-}
+// ======================
+// GROSSE RUNDE PLATTFORM (Rot)
+// ======================
+const platformRadius = 60;
+// Zylinder erzeugt eine perfekte runde Plattform
+const platformGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 2, 64);
+// Rotes StandardMaterial (Sicher für Chromebooks)
+const platformMat = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.6 });
+const platform = new THREE.Mesh(platformGeo, platformMat);
+platform.position.y = -1; // Oberfläche genau auf Höhe 0 setzen
+scene.add(platform);
 
-// 2. Große Rote Plattform mit Custom-Grid-Shader (Chromebook Fix)
-const platformRadius = 40;
-const floorGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 1, 64);
+// Ein helleres Gitter auf der Plattform für das Geschwindigkeitsgefühl
+const grid = new THREE.GridHelper(platformRadius * 2, 40, 0xffffff, 0x990000);
+grid.position.y = 0.01;
+scene.add(grid);
 
-const floorVertexShader = `
-    precision mediump float;
-    varying vec2 vUv;
-    void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    }
-`;
-const floorFragmentShader = `
-    precision mediump float;
-    varying vec2 vUv;
-    void main() {
-        // Sicherer Chromebook-Ersatz für das fehleranfällige fwidth()
-        vec2 grid = abs(fract(vUv * 40.0 - 0.5) - 0.5) / 0.05;
-        float line = min(grid.x, grid.y);
-        float c = 1.0 - min(line, 1.0);
-        
-        vec3 baseColor = vec3(0.8, 0.1, 0.1);
-        vec3 lineColor = vec3(0.2, 0.0, 0.0);
-        
-        gl_FragColor = vec4(mix(baseColor, lineColor, c), 1.0);
-    }
-`;
-
-const floorMat = new THREE.ShaderMaterial({
-    vertexShader: floorVertexShader,
-    fragmentShader: floorFragmentShader
-});
-const floor = new THREE.Mesh(floorGeo, floorMat);
-floor.position.y = -0.5;
-scene.add(floor);
-
-// 3. Spieler (Kugel) erstellen
-const playerRadius = 1;
-const playerGeo = new THREE.SphereGeometry(playerRadius, 16, 16); 
-const playerMat = new THREE.MeshBasicMaterial({ color: 0xfff000 });
+// ======================
+// SPIELER (Kugel)
+// ======================
+const playerRadius = 1.2;
+const playerGeo = new THREE.SphereGeometry(playerRadius, 32, 32);
+// Kontrastierende gelbe Kugel, damit man das Rollen gut sieht
+const playerMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.4 });
 const player = new THREE.Mesh(playerGeo, playerMat);
-player.position.set(0, playerRadius, 0); 
+player.position.set(0, playerRadius, 0);
 scene.add(player);
 
-// 4. Steuerung & Kamera-Variablen
-const keys = { w: false, a: false, s: false, d: false };
-const moveSpeed = 0.15; 
+// ======================
+// STEUERUNG & MAUS (Third Person)
+// ======================
+let keys = {};
+let rx = -0.3; // Vertikaler Winkel (Blick leicht nach unten)
+let ry = 0;    // Horizontaler Drehwinkel
+const cameraDistance = 8;
 
-let cameraYaw = 0;
-let cameraPitch = -0.2; 
-const cameraDistance = 7;
+window.onkeydown = (e) => { keys[e.key.toLowerCase()] = true; };
+window.onkeyup = (e) => { keys[e.key.toLowerCase()] = false; };
 
-// Startposition erzwingen
-camera.position.x = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
-camera.position.y = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
-camera.position.z = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
-camera.lookAt(player.position.x, player.position.y + 0.5, player.position.z);
+document.body.onclick = () => { document.body.requestPointerLock(); };
 
-// Eingabe-Abfragen
-window.addEventListener('keydown', (e) => {
-    if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = true;
-});
-window.addEventListener('keyup', (e) => {
-    if(e.key.toLowerCase() in keys) keys[e.key.toLowerCase()] = false;
-});
-
-document.body.addEventListener('click', () => {
-    document.body.requestPointerLock();
-});
-
-window.addEventListener('mousemove', (e) => {
-    if (document.pointerLockElement === document.body) {
-        cameraYaw -= e.movementX * 0.0025;
-        cameraPitch -= e.movementY * 0.0025;
-        cameraPitch = Math.max(-Math.PI/3, Math.min(Math.PI/6, cameraPitch));
+window.onmousemove = (e) => {
+    if (document.pointerLockElement) {
+        ry -= e.movementX * 0.0025;
+        rx -= e.movementY * 0.0025;
+        // Begrenzung, damit die Kamera nicht unter den Boden oder über Kopf flippt
+        rx = Math.max(-0.6, Math.min(0.2, rx));
     }
-});
+};
 
-window.addEventListener('resize', () => {
+// Fenstergröße anpassen
+window.onresize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    if(renderer) renderer.setSize(window.innerWidth, window.innerHeight);
-});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+};
 
-// 5. Game Loop
-function animate() {
-    requestAnimationFrame(animate);
+// ======================
+// GAME LOOP & PHYSIK
+// ======================
+const moveSpeed = 0.15;
 
+function update() {
     let moveX = 0;
     let moveZ = 0;
 
-    if (keys.w) { moveX += Math.sin(cameraYaw); moveZ += Math.cos(cameraYaw); }
-    if (keys.s) { moveX -= Math.sin(cameraYaw); moveZ -= Math.cos(cameraYaw); }
-    if (keys.a) { moveX += Math.sin(cameraYaw + Math.PI / 2); moveZ += Math.cos(cameraYaw + Math.PI / 2); }
-    if (keys.d) { moveX -= Math.sin(cameraYaw + Math.PI / 2); moveZ -= Math.cos(cameraYaw + Math.PI / 2); }
+    // Bewegung relativ zur Kamera-Blickrichtung (ry) berechnen
+    if (keys.w) { moveX += Math.sin(ry); moveZ += Math.cos(ry); }
+    if (keys.s) { moveX -= Math.sin(ry); moveZ -= Math.cos(ry); }
+    if (keys.a) { moveX += Math.sin(ry + Math.PI / 2); moveZ += Math.cos(ry + Math.PI / 2); }
+    if (keys.d) { moveX -= Math.sin(ry + Math.PI / 2); moveZ -= Math.cos(ry + Math.PI / 2); }
 
     if (moveX !== 0 || moveZ !== 0) {
+        // Normalisieren für gleichmäßige Geschwindigkeit bei diagonalem Laufen
         const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
-        player.position.x += (moveX / length) * moveSpeed;
-        player.position.z += (moveZ / length) * moveSpeed;
+        const stepX = (moveX / length) * moveSpeed;
+        const stepZ = (moveZ / length) * moveSpeed;
 
-        player.rotation.z -= (moveX / length) * moveSpeed / playerRadius;
-        player.rotation.x += (moveZ / length) * moveSpeed / playerRadius;
+        player.position.x += stepX;
+        player.position.z += stepZ;
+
+        // ECHTES 3D-ROLLEN: Kugel rotieren lassen basierend auf Bewegung
+        player.rotation.z -= stepX / playerRadius;
+        player.rotation.x += stepZ / playerRadius;
     }
 
+    // Runde Plattformgrenze einhalten (Kugel kann nicht herunterfallen)
     const distanceFromCenter = Math.sqrt(player.position.x ** 2 + player.position.z ** 2);
     if (distanceFromCenter > platformRadius - playerRadius) {
         const angle = Math.atan2(player.position.z, player.position.x);
@@ -161,17 +114,25 @@ function animate() {
         player.position.z = Math.sin(angle) * (platformRadius - playerRadius);
     }
 
-    const targetCamX = player.position.x + cameraDistance * Math.sin(cameraYaw) * Math.cos(cameraPitch);
-    const targetCamY = player.position.y - cameraDistance * Math.sin(cameraPitch) + 1;
-    const targetCamZ = player.position.z + cameraDistance * Math.cos(cameraYaw) * Math.cos(cameraPitch);
+    // THIRD PERSON KAMERA-BERECHNUNG: Immer hinter der Kugel positionieren
+    const targetCamX = player.position.x + cameraDistance * Math.sin(ry) * Math.cos(rx);
+    const targetCamY = player.position.y - cameraDistance * Math.sin(rx) + 0.5;
+    const targetCamZ = player.position.z + cameraDistance * Math.cos(ry) * Math.cos(rx);
 
-    camera.position.x += (targetCamX - camera.position.x) * 0.15;
-    camera.position.y += (targetCamY - camera.position.y) * 0.15;
-    camera.position.z += (targetCamZ - camera.position.z) * 0.15;
-    
-    camera.lookAt(player.position.x, player.position.y + 0.5, player.position.z);
+    // Kamera weich der Kugel folgen lassen (Lerp-Effekt)
+    camera.position.x += (targetCamX - camera.position.x) * 0.12;
+    camera.position.y += (targetCamY - camera.position.y) * 0.12;
+    camera.position.z += (targetCamZ - camera.position.z) * 0.12;
 
-    if(renderer) renderer.render(scene, camera);
+    // Kamera blickt immer auf die Mitte der Kugel
+    camera.lookAt(player.position.x, player.position.y, player.position.z);
 }
 
-if(renderer) animate();
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+    renderer.render(scene, camera);
+}
+
+// Spiel starten
+animate();
