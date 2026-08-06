@@ -23,9 +23,9 @@
             z-index: 100;
         }
     </style>
-    <!-- Three.js und Socket.io über CDN laden -->
+    <!-- Zuverlässige CDN-Links für Render -->
     <script src="https://cloudflare.com"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://socket.io"></script>
 </head>
 <body>
 
@@ -37,8 +37,10 @@
     </div>
 
     <script>
-        // Automatische Verbindung zur Render-Domain herstellen
-        const socket = io(window.location.origin);
+        // Sichere Verbindung für Render erzwingen mit Fallbacks
+        const socket = io(window.location.origin, {
+            transports: ['websocket', 'polling']
+        });
 
         // 1. Szene, Kamera und Renderer aufsetzen
         const scene = new THREE.Scene();
