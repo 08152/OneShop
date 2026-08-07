@@ -1,157 +1,140 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Automat</title>
+/**
+ * 1.js - Core Mapping Engine & Geometrie
+ */
 
-<link rel="stylesheet" href="style.css">
+let map = null;
+let routeLine = null;
+let currentMarker = null;
+let targetMarker = null;
 
-<style>
+// Konfiguration Dark Theme (CartoDB Dark Matter)
+const DARK_TILE_URL = 'https://{s}://{z}/{x}/{y}{r}.png';
+const MAP_ATTRIBUTION = '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>';
 
-body{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
+/**
+ * Initialisiert das Leaflet-Kartensystem auf dem bereitstehenden HTML-Element.
+ * Verhindert den "Black-Screen"-Bug bei asynchronem Laden.
+ */
+function initLeafletMapSystem(containerId, defaultLat = 52.520008, defaultLng = 13.404954) {
+    if (map) return; // Verhindert Mehrfach-Initialisierung
+
+    // Reine 2D-Karte mit Maus-Drag und Scroll-Zoom
+    map = L.map(containerId, {
+        zoomControl: true,
+        boxZoom: true,
+        doubleClickZoom: true,
+        dragging: true,
+        scrollWheelZoom: true,
+        wheelDebounceTime: 40
+    }).setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer(DARK_TILE_URL, {
+        attribution: MAP_ATTRIBUTION,
+        maxZoom: 19
+    }).addTo(map);
+
+    // Initialen Positionsmarker setzen
+    currentMarker = L.marker([defaultLat, defaultLng]).addTo(map)
+        .bindPopup("Aktueller Standort")
+        .openPopup();
 }
 
-#slots{
-    display:flex;
-    gap:20px;
-    margin:40px;
+/**
+ * Aktualisiert die visuelle Position des Benutzers auf der Karte
+ */
+function updateMapUserPosition(lat, lng) {
+    if (!map) return;
+    currentMarker.setLatLng([lat, lng]);
 }
 
-.slot{
-    width:110px;
-    height:110px;
-    background:white;
-    color:black;
-    border-radius:15px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:60px;
-    font-weight:bold;
+/**
+ * Zentriert die Ansicht auf den Benutzer
+ */
+function centerMapOnUser(lat, lng) {
+    if (map) {
+        map.setView([lat, lng], 15);
+    }
 }
 
-.spinning{
-    animation:spin .08s linear infinite;
+/**
+ * Setzt oder aktualisiert den Ziel-Marker
+ */
+function updateMapTargetMarker(lat, lng, label = "Ziel") {
+    if (!map) return;
+    if (targetMarker) {
+        targetMarker.setLatLng([lat, lng]).setPopupContent(label);
+    } else {
+        targetMarker = L.marker([lat, lng], {
+            icon: L.icon({
+                iconUrl: 'https://githubusercontent.com',
+                shadowUrl: 'https://cloudflare.com',
+                iconSize:,
+                iconAnchor:,
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).addTo(map).bindPopup(label);
+    }
+    targetMarker.openPopup();
 }
 
-@keyframes spin{
+/**
+ * Zeichnet eine neue blaue Routenlinie basierend auf einem Array von Geopunkten
+ */
+function drawRouteOnMap(pointsArray) {
+    if (!map) return;
+    
+    // Falls alte Linie existiert, entfernen
+    clearRouteFromMap();
 
-0%{transform:translateY(-5px);}
-50%{transform:translateY(5px);}
-100%{transform:translateY(-5px);}
+    // Erstelle ein Leaflet-kompatibles LatLng-Array
+    const latLngs = pointsArray.map(p => [p.lat, p.lng]);
 
+    routeLine = L.polyline(latLngs, {
+        color: '#3b82f6',
+        weight: 6,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(map);
+
+    // Kartenausschnitt an Route anpassen
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
 }
 
-#info{
-    margin-top:25px;
-    font-size:28px;
+/**
+ * Entfernt die Routenlinie von der Karte
+ */
+function clearRouteFromMap() {
+    if (routeLine && map) {
+        map.removeLayer(routeLine);
+        routeLine = null;
+    }
 }
 
-</style>
-
-</head>
-<body>
-
-<h1>🎰 Automat</h1>
-
-<div id="slots">
-
-<div id="s1" class="slot">🍒</div>
-<div id="s2" class="slot">🍋</div>
-<div id="s3" class="slot">⭐</div>
-
-</div>
-
-<button onclick="drehen()">
-Drehen
-</button>
-
-<br>
-
-<a href="index.html">
-<button>Zurück</button>
-</a>
-
-<div id="info"></div>
-
-<script>
-
-const emojis=[
-"🍒",
-"🍋",
-"🍇",
-"🍀",
-"⭐",
-"7️⃣"
-];
-
-function zufall(){
-
-return emojis[Math.floor(Math.random()*emojis.length)];
-
+/**
+ * Aktualisiert die Routenlinie dynamisch (löscht das erste/abgefahrene Teilstück)
+ */
+function updateActiveRouteLine(remainingPoints) {
+    if (!routeLine || !map) return;
+    const latLngs = remainingPoints.map(p => [p.lat, p.lng]);
+    routeLine.setLatLngs(latLngs);
 }
 
-function drehen(){
+/**
+ * Mathematische Distanzberechnung zwischen zwei Koordinaten (Haversine-Formel) in Metern.
+ */
+function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Erdradius in Metern
+    const phi1 = lat1 * Math.PI / 180;
+    const phi2 = lat2 * Math.PI / 180;
+    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
-const slots=[
-document.getElementById("s1"),
-document.getElementById("s2"),
-document.getElementById("s3")
-];
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+              Math.cos(phi1) * Math.cos(phi2) *
+              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-document.getElementById("info").innerHTML="";
-
-slots.forEach(s=>s.classList.add("spinning"));
-
-let i=0;
-
-const timer=setInterval(()=>{
-
-slots.forEach(s=>s.textContent=zufall());
-
-i++;
-
-if(i>30){
-
-clearInterval(timer);
-
-slots.forEach(s=>s.classList.remove("spinning"));
-
-const a=zufall();
-const b=zufall();
-const c=zufall();
-
-slots[0].textContent=a;
-slots[1].textContent=b;
-slots[2].textContent=c;
-
-if(a===b && b===c){
-
-document.getElementById("info").innerHTML="🎉 Drei gleiche!";
-
-}else if(a===b || a===c || b===c){
-
-document.getElementById("info").innerHTML="✨ Zwei gleiche!";
-
-}else{
-
-document.getElementById("info").innerHTML="🙂 Keine Übereinstimmung.";
-
+    return R * c;
 }
-
-}
-
-},80);
-
-}
-
-</script>
-
-</body>
-</html>
