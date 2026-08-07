@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cyber-Matrix Navigator & Game</title>
-    <!-- JSZip für den automatischen Download -->
+    <title>3D Cyber-Matrix Map Navigator</title>
+    <!-- JSZip für den automatischen Download aller Projektdateien -->
     <script src="https://cloudflare.com"></script>
     <!-- Three.js für echte, hardwarebeschleunigte 3D-Grafik -->
     <script src="https://cloudflare.com"></script>
@@ -24,31 +24,31 @@
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 6px; font-size: 11px; color: #8a99ad; text-transform: uppercase; }
         .input-group select { width: 100%; padding: 10px; background: #0c0d14; border: 1px solid #00d2ff; border-radius: 6px; color: white; font-size: 14px; }
-        #btn-route { width: 100%; background: linear-gradient(135deg, #0052d4, #4364f7); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(67,100,247,0.4); margin-bottom: 10px; }
+        #btn-route { width: 100%; background: linear-gradient(135deg, #0052d4, #4364f7); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(67,100,247,0.4); }
         #btn-route:hover { filter: brightness(1.2); }
-        #results { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,210,255,0.3); display: none; }
+        #results { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,210,255,0.3); display: none; }
         .result-line { margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; }
         .result-label { color: #8a99ad; }
         .result-val { font-weight: bold; color: #00d2ff; text-shadow: 0 0 5px rgba(0,210,255,0.5); }
-        #game-instructions { background: rgba(0, 210, 255, 0.1); border: 1px dashed #00d2ff; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 12px; display: none; }
-        #game-instructions p { margin: 4px 0; color: #00d2ff; }
+        #hint-3d { font-size: 11px; color: #8a99ad; text-align: center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
     </style>
 </head>
 <body>
 
     <div id="header">
-        <h2>✦ 3D Cyber-Matrix Map & Drive</h2>
+        <h2>✦ 3D Cyber-Matrix Map</h2>
         <div style="display: flex; gap: 20px; align-items: center;">
             <div id="status" class="online">3D Online</div>
-            <button id="btn-download" onclick="downloadOfflineZip()">Gesamtes 3D-Paket (ZIP) laden</button>
+            <button id="btn-download" onclick="downloadOfflineZip()">Riesige 3D-Karten-ZIP laden</button>
         </div>
     </div>
 
     <div id="main-container">
+        <!-- 3D-Leinwand für das WebGL-Mapping -->
         <div id="webgl-container"></div>
 
         <div id="routing-panel">
-            <h3>3D Navigator & Game</h3>
+            <h3>3D Kartensteuerung</h3>
             <div class="input-group">
                 <label>Start-Metropole:</label>
                 <select id="start-city">
@@ -71,25 +71,18 @@
                     <option value="47.376,8.541,Zürich">Zürich</option>
                 </select>
             </div>
-            <button id="btn-route" onclick="generate3DRoute()">3D ROUTE GENERIEREN</button>
+            <button id="btn-route" onclick="trigger3DMapping()">3D ROUTE PLANEN</button>
 
             <div id="results">
-                <div class="result-line"><span class="result-label">3D-Distanz:</span> <span id="res-km" class="result-val">-</span></div>
+                <div class="result-line"><span class="result-label">Reale Distanz:</span> <span id="res-km" class="result-val">-</span></div>
                 <div class="result-line"><span class="result-label">Fahrzeit ca.:</span> <span id="res-time" class="result-val">-</span></div>
-                
-                <div id="game-instructions">
-                    <strong>🎮 RENN-MODUS AKTIV!</strong>
-                    <p>• Gas geben: <b>Pfeiltaste oben / W</b></p>
-                    <p>• Lenken: <b>Links & Rechts / A & D</b></p>
-                    <p>• Bremsen: <b>Pfeiltaste unten / S</b></p>
-                    <small style="color:#8a99ad;">Fahre die blaue Strecke ab!</small>
-                </div>
+                <div id="hint-3d">💡 Die Kamera verfolgt den blauen Routenpfeil automatisch!</div>
             </div>
         </div>
     </div>
 
-    <!-- Einbindung der getrennten Skript-Dateien -->
+    <!-- Einbindung der Logik- und Grafikdateien -->
     <script src="script.js"></script>
-    <script src="game.js"></script>
+    <script src="map.js"></script>
 </body>
 </html>
