@@ -2,86 +2,198 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interaktive 2D-Weltkarte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flexible Touch-Karte mit Routing</title>
     
-    <!-- Leaflet CSS Bibliothek für das Karten-Styling -->
-    <link rel="stylesheet" href="https://unpkg.com" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://unpkg.com" />
     
     <style>
-        /* Macht die Karte vollflächig im Browserfenster sichtbar */
+        /* Verhindert unschöne Scrollbalken auf Chromebooks und Mobilgeräten */
         html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             width: 100%;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
         }
-        #map {
+
+        /* Flexbox-Layout für perfekte Anpassung an jede Bildschirmgröße */
+        .app-container {
+            display: flex;
+            flex-direction: column;
             height: 100%;
             width: 100%;
         }
-        /* Styling für die Infobox */
-        .info-box {
-            position: absolute;
-            top: 10px;
-            left: 50px;
-            z-index: 1000;
+
+        #map {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Bedienfeld: Passt sich automatisch per Media-Queries an */
+        .sidebar {
             background: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .sidebar h3 { 
+            margin: 0 0 10px 0; 
+            font-size: 16px; 
+            text-align: center;
+        }
+
+        /* Button-Layout für Touch-Bedienung */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .input-group { 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label { 
+            font-size: 11px; 
+            margin-bottom: 3px; 
+            color: #555; 
+            font-weight: bold;
+        }
+        
+        /* Große Eingabefelder für einfaches Tippen auf Touchscreens */
+        .input-group input { 
+            width: 100%; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            border: 2px solid #ccc; 
+            border-radius: 6px; 
+            font-size: 14px;
+        }
+        
+        /* Optimierte Buttons für Fingerbedienung */
+        button {
+            flex: 1;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            touch-action: manipulation;
+        }
+        
+        button:active { background-color: #004085; }
+        
+        #focus-btn { background-color: #28a745; }
+        #focus-btn:active { background-color: #1e7e34; }
+        
+        #route-btn { background-color: #17a2b8; width: 100%; }
+        #route-btn:active { background-color: #117a8b; }
+
+        /* Infobox für Routendaten */
+        #route-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* 📱 RESPONSIVE DESIGN */
+        @media (max-width: 767px) {
+            .sidebar {
+                width: 100%;
+                max-height: 50%;
+                overflow-y: auto;
+                order: 1;
+            }
+            #map {
+                order: 2;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                position: relative;
+                flex-direction: row;
+            }
+            .sidebar {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 320px;
+                border-radius: 8px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Infobox über der Karte -->
-    <div class="info-box">
-        <h3>2D-Weltkarte</h3>
-        <p>Nutze das Mausrad zum Zoomen. Klicke, um Koordinaten zu sehen.</p>
+    <div class="app-container">
+        <div class="sidebar">
+            <h3>📍 Touch-Navigation</h3>
+            
+            <div class="button-group">
+                <button id="focus-btn">🚗 Auto</button>
+                <button id="locate-btn">🛰️ GPS Ortung</button>
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="start">STARTADRESSE:</label>
+                    <input type="text" id="start" placeholder="z.B. Berlin">
+                </div>
+                <div class="input-group">
+                    <label for="ziel">ZIELADRESSE:</label>
+                    <input type="text" id="ziel" placeholder="z.B. München">
+                </div>
+            </div>
+            
+            <button id="route-btn">🗺️ Route berechnen</button>
+
+            <div id="route-info">
+                <strong>🗺️ Route geladen:</strong>
+                <div id="distance">Distanz: -</div>
+                <div id="duration">Dauer: -</div>
+            </div>
+        </div>
+
+        <div id="map"></div>
     </div>
 
-    <!-- Das Kartenelement -->
-    <div id="map"></div>
-
-    <!-- Leaflet JavaScript Bibliothek -->
-    <script src="https://unpkg.com" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Externe Bibliotheken -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
     
-    <script>
-        // 1. Karte initialisieren (Startpunkt: Mitte der Welt bei Zoomstufe 2)
-        const map = L.map('map', {
-            minZoom: 2,
-            maxZoom: 18
-        }).setView([20, 0], 2);
-
-        // 2. OpenStreetMap-Kacheln (Hintergrundkarte) hinzufügen
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> Mitwirkende'
-        }).addTo(map);
-
-        // 3. Beispiel-Marker für ein paar Hauptstädte setzen
-        const markers = [
-            { coords: [52.52, 13.40], text: "<b>Berlin</b><br>Hauptstadt von Deutschland." },
-            { coords: [40.71, -74.00], text: "<b>New York City</b><br>Großstadt in den USA." },
-            { coords: [35.67, 139.65], text: "<b>Tokio</b><br>Hauptstadt von Japan." },
-            { coords: [-22.90, -43.17], text: "<b>Rio de Janeiro</b><br>Metropole in Brasilien." }
-        ];
-
-        // Marker in einer Schleife auf der Karte platzieren
-        markers.forEach(m => {
-            L.marker(m.coords).addTo(map).bindPopup(m.text);
-        });
-
-        // 4. Interaktive Funktion: Zeigt Koordinaten beim Klicken an
-        const popup = L.popup();
-        function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("Koordinaten an dieser Stelle:<br>" + e.latlng.toString())
-                .openOn(map);
-        }
-        map.on('click', onMapClick);
-    </script>
+    <!-- Deine Logik-Datei verknüpfen -->
+    <script src="map-logic.js"></script>
 </body>
 </html>
