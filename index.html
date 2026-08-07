@@ -3,27 +3,25 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GPS Navi</title>
+<title>Live GPS Navi</title>
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet/dist/leaflet.css">
-
 
 <style>
 
 html,body{
 margin:0;
 height:100%;
-font-family:Arial;
 overflow:hidden;
+font-family:Arial;
 }
 
-
 #map{
-height:100%;
 width:100%;
+height:100%;
 }
 
 
@@ -33,9 +31,11 @@ position:absolute;
 top:10px;
 left:10px;
 right:10px;
+
 z-index:1000;
 
 background:white;
+
 padding:12px;
 
 border-radius:18px;
@@ -48,14 +48,16 @@ box-shadow:0 0 15px #555;
 input,button{
 
 width:100%;
+
 padding:14px;
+
 margin-top:8px;
+
+font-size:17px;
 
 border-radius:12px;
 
 border:1px solid #aaa;
-
-font-size:17px;
 
 }
 
@@ -70,10 +72,14 @@ color:white;
 
 .car-icon{
 
-font-size:45px;
+font-size:50px;
+
 text-align:center;
 
+transform-origin:center;
+
 }
+
 
 
 #naviInfo{
@@ -105,7 +111,7 @@ display:none;
 }
 
 
-.bigArrow{
+.arrow{
 
 font-size:90px;
 
@@ -160,7 +166,7 @@ onclick="startNavigation()">
 
 <div id="info">
 
-Warte auf GPS...
+GPS wird gesucht...
 
 </div>
 
@@ -180,10 +186,8 @@ onclick="toggleNaviMode()">
 
 <div id="naviInfo">
 
-<div class="bigArrow">
-
+<div class="arrow">
 ⬆️
-
 </div>
 
 
@@ -208,26 +212,31 @@ Navigation
 <script>
 
 
-let map=L.map("map")
+let map =
+L.map("map")
 .setView([48.1351,11.5820],16);
 
 
 
 L.tileLayer(
 
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+{
+maxZoom:19
+}
 
 ).addTo(map);
 
 
 
-let currentPos;
+let currentPos=null;
 
-let marker;
+let marker=null;
 
-let routeLine;
+let routeLine=null;
 
-let navigationLine;
+let navigationLine=null;
 
 
 let routing=[];
@@ -239,6 +248,8 @@ let nextInstruction=0;
 
 let navigationStarted=false;
 
+
+let heading=0;
 
 
 let carIcon=L.divIcon({
@@ -253,44 +264,122 @@ iconAnchor:[25,25]
 
 });
 
+// ===============================
+// LIVE GPS TRACKING
+// ===============================
 
 
 navigator.geolocation.watchPosition(
 
-p=>{
+position=>{
 
 
-currentPos=[
-
-p.coords.latitude,
-
-p.coords.longitude
-
-];
+let lat =
+position.coords.latitude;
 
 
+let lon =
+position.coords.longitude;
+
+
+
+currentPos=[lat,lon];
+
+
+
+// Fahrtrichtung aus GPS
+
+if(position.coords.heading !== null &&
+position.coords.heading !== undefined){
+
+
+heading =
+position.coords.heading;
+
+
+
+let car =
+document.querySelector(".car-icon");
+
+
+if(car){
+
+car.style.transform =
+"rotate("
++
+heading
++
+"deg)";
+
+}
+
+
+}
+
+
+
+
+// Auto erstellen
 
 if(!marker){
 
+
 marker=L.marker(
+
 currentPos,
+
 {
 icon:carIcon
 }
+
 )
 .addTo(map);
 
 
-map.setView(currentPos,18);
 
-
-}else{
-
-
-marker.setLatLng(currentPos);
+map.setView(
+currentPos,
+18
+);
 
 
 }
+
+else{
+
+
+marker.setLatLng(
+currentPos
+);
+
+
+}
+
+
+
+
+// Kamera folgt Auto
+
+if(navigationStarted){
+
+
+map.setView(
+
+currentPos,
+
+19,
+
+{
+animate:true,
+duration:0.5
+}
+
+);
+
+
+}
+
+
 
 
 
@@ -305,20 +394,45 @@ checkInstructions();
 },
 
 
-e=>alert("GPS Fehler"),
+
+error=>{
+
+
+document.getElementById("info").innerHTML =
+"GPS Fehler";
+
+
+},
+
 
 
 {
 
-enableHighAccuracy:true
+enableHighAccuracy:true,
+
+maximumAge:1000,
+
+timeout:5000
 
 }
+
+
 
 );
 
 
 
+
+
+
+
+// ===============================
+// ROUTE VORBEREITEN
+// ===============================
+
+
 async function prepareRoute(){
+
 
 document.getElementById("startBtn")
 .style.display="block";
@@ -326,11 +440,16 @@ document.getElementById("startBtn")
 
 await route();
 
+
 }
 
 
 
+
+
+
 function startNavigation(){
+
 
 navigationStarted=true;
 
@@ -342,38 +461,54 @@ speak(
 "Navigation gestartet"
 );
 
+
 }
 
+
+
+
+
+
+
+
+// ===============================
 // ROUTE BERECHNEN
+// ===============================
+
 
 async function route(){
 
 
-let ziel=
+
+let ziel =
 document.getElementById("ziel").value;
 
 
 
-let geo=
+let geo =
 await fetch(
+
 "https://nominatim.openstreetmap.org/search?format=json&q="
 +
 encodeURIComponent(ziel)
+
 );
 
 
 
-let data=await geo.json();
+let data =
+await geo.json();
 
 
 
-if(!data.length){
+if(data.length===0){
 
 alert("Ziel nicht gefunden");
 
 return;
 
 }
+
 
 
 
@@ -387,38 +522,58 @@ parseFloat(data[0].lon)
 
 
 
-let url=
+
+
+
+let url =
 
 "https://router.project-osrm.org/route/v1/driving/"
 +
-currentPos[1]+","+currentPos[0]
+currentPos[1]
++
+","
++
+currentPos[0]
 +
 ";"
 +
-zielPos[1]+","+zielPos[0]
+zielPos[1]
++
+","
++
+zielPos[0]
 +
 "?overview=full&steps=true&geometries=geojson";
 
 
 
-let res=
+
+
+let res =
 await fetch(url);
 
 
 
-let json=
+let json =
 await res.json();
 
 
 
-let r=json.routes[0];
+let r =
+json.routes[0];
 
 
 
-routing=
+
+
+routing =
 r.geometry.coordinates.map(
+
 c=>[c[1],c[0]]
+
 );
+
+
 
 
 
@@ -428,30 +583,45 @@ map.removeLayer(routeLine);
 
 
 
-routeLine=L.polyline(
+routeLine =
+L.polyline(
+
 routing,
+
 {
 color:"blue",
 weight:8
 }
+
 )
 .addTo(map);
 
 
 
-navigationLine=L.polyline(
+
+
+navigationLine =
+L.polyline(
+
 routing,
+
 {
 color:"#006cff",
 weight:8
 }
+
 )
 .addTo(map);
 
 
 
 
-// Abbiegeinformationen
+
+
+
+// ===============================
+// NAVIGATIONS-SCHRITTE
+// ===============================
 
 
 instructions=[];
@@ -461,101 +631,14 @@ instructions=[];
 r.legs[0].steps.forEach(step=>{
 
 
-let text="";
-
-
-switch(step.maneuver.type){
-
-
-case "turn":
-
-
-switch(step.maneuver.modifier){
-
-
-case "slight left":
-
-text="Bleiben Sie links halten";
-break;
-
-
-case "slight right":
-
-text="Bleiben Sie rechts halten";
-break;
-
-
-case "left":
-
-text="Links abbiegen";
-break;
-
-
-case "right":
-
-text="Rechts abbiegen";
-break;
-
-
-case "sharp left":
-
-text="Scharf links abbiegen";
-break;
-
-
-case "sharp right":
-
-text="Scharf rechts abbiegen";
-break;
-
-
-default:
-
-text="Geradeaus weiterfahren";
-
-}
-
-
-break;
-
-
-
-case "roundabout":
-
-text=
-"Kreisverkehr. "
-+
-(step.maneuver.exit||1)
-+
-". Ausfahrt nehmen";
-
-break;
-
-
-
-case "arrive":
-
-text="Ziel erreicht";
-
-break;
-
-
-
-default:
-
-text="Weiterfahren";
-
-}
-
-
-
 instructions.push({
 
-text:text,
+text:createInstruction(step),
 
 distance:step.distance
 
 });
+
 
 
 });
@@ -563,6 +646,7 @@ distance:step.distance
 
 
 nextInstruction=0;
+
 
 
 
@@ -579,40 +663,53 @@ Math.round(r.duration/60)
 " Minuten";
 
 
+
 }
 
 
 
 
 
-// BLAUE LINIE MIT AUTO BEWEGEN
+
+
+
+// ===============================
+// BLAUE LINIE NUR VOR AUTO
+// ===============================
 
 
 function updateNavigationLine(){
 
 
-if(!routing.length || !currentPos)
+if(!navigationLine ||
+!routing.length ||
+!currentPos)
+
 return;
+
 
 
 let index=0;
 
-let min=999999;
+let best=999999;
 
 
 
 routing.forEach((p,i)=>{
 
 
-let d=map.distance(
+let d =
+map.distance(
 currentPos,
 p
 );
 
 
-if(d<min){
 
-min=d;
+if(d<best){
+
+best=d;
+
 index=i;
 
 }
@@ -623,23 +720,359 @@ index=i;
 
 
 navigationLine.setLatLngs(
+
 routing.slice(index)
+
+);
+
+
+}
+
+// ===============================
+// NAVIGATIONSTEXT MIT STRASSENNAME
+// ===============================
+
+
+function createInstruction(step){
+
+
+let road="";
+
+
+if(step.name &&
+step.name.trim()!==""){
+
+
+road =
+" auf "
++
+step.name;
+
+
+}
+
+
+
+let type =
+step.maneuver.type;
+
+
+let modifier =
+step.maneuver.modifier;
+
+
+let text="";
+
+
+
+if(type==="depart"){
+
+
+text =
+"Starten"
++
+road;
+
+
+}
+
+
+
+else if(type==="arrive"){
+
+
+text =
+"Sie haben Ihr Ziel erreicht";
+
+
+}
+
+
+
+else if(type==="roundabout"){
+
+
+let exit =
+step.maneuver.exit || 1;
+
+
+text =
+"Kreisverkehr. "
++
+"Die "
++
+exit
++
+". Ausfahrt nehmen"
++
+road;
+
+
+}
+
+
+
+else if(type==="turn"){
+
+
+
+switch(modifier){
+
+
+case "left":
+
+text =
+"Links abbiegen"
++
+road;
+
+break;
+
+
+
+case "right":
+
+text =
+"Rechts abbiegen"
++
+road;
+
+break;
+
+
+
+case "slight left":
+
+text =
+"Bleiben Sie links halten"
++
+road;
+
+break;
+
+
+
+case "slight right":
+
+text =
+"Bleiben Sie rechts halten"
++
+road;
+
+break;
+
+
+
+case "sharp left":
+
+text =
+"Scharf links abbiegen"
++
+road;
+
+break;
+
+
+
+case "sharp right":
+
+text =
+"Scharf rechts abbiegen"
++
+road;
+
+break;
+
+
+
+case "uturn":
+
+text =
+"Bitte wenden"
++
+road;
+
+break;
+
+
+
+default:
+
+text =
+"Geradeaus weiterfahren"
++
+road;
+
+
+}
+
+
+}
+
+
+
+else{
+
+
+text =
+"Weiterfahren"
++
+road;
+
+
+}
+
+
+
+return text;
+
+
+}
+
+
+
+
+
+
+
+
+// ===============================
+// ABBIEGE-ANSAGEN
+// ===============================
+
+
+let announced300=false;
+
+let announced100=false;
+
+let announced50=false;
+
+let announcedNow=false;
+
+
+
+
+function checkInstructions(){
+
+
+
+if(nextInstruction>=instructions.length)
+
+return;
+
+
+
+
+let inst =
+instructions[nextInstruction];
+
+
+
+let d =
+inst.distance;
+
+
+
+
+
+if(d<300 && !announced300){
+
+
+speak(
+
+"In 300 Metern. "
++
+inst.text
+
+);
+
+
+announced300=true;
+
+
+}
+
+
+
+
+
+if(d<100 && !announced100){
+
+
+speak(
+
+"In 100 Metern. "
++
+inst.text
+
+);
+
+
+announced100=true;
+
+
+}
+
+
+
+
+
+if(d<50 && !announced50){
+
+
+speak(
+
+"In 50 Metern. "
++
+inst.text
+
+);
+
+
+announced50=true;
+
+
+}
+
+
+
+
+
+if(d<15 && !announcedNow){
+
+
+speak(
+
+"Jetzt. "
++
+inst.text
+
 );
 
 
 
-if(navigationStarted){
+document.getElementById("naviText")
+.innerHTML=
 
-map.setView(
-currentPos,
-19,
-{
-animate:true
+"➡️ "
++
+inst.text;
+
+
+
+nextInstruction++;
+
+
+announced300=false;
+
+announced100=false;
+
+announced50=false;
+
+announcedNow=false;
+
+
 }
-);
-
-}
-
 
 
 }
@@ -647,32 +1080,42 @@ animate:true
 
 
 
+
+
+
+// ===============================
 // ROUTE VERLASSEN
+// ===============================
 
 
 function checkRoute(){
 
 
-if(!routing.length)
+
+if(!routing.length ||
+!currentPos)
+
 return;
 
 
 
-let min=9999;
+let min=999999;
 
 
 
 routing.forEach(p=>{
 
 
-let d=
+let d =
 map.distance(
 currentPos,
 p
 );
 
 
+
 if(d<min)
+
 min=d;
 
 
@@ -700,121 +1143,85 @@ route();
 
 
 
-// ABBIEGEANSAGEN
 
 
-let announced300=false;
-
-let announced50=false;
-
-let announcedNow=false;
+// ===============================
+// FESTE DEUTSCHE STIMME
+// ===============================
 
 
-
-function checkInstructions(){
-
-
-if(nextInstruction>=instructions.length)
-return;
-
-
-let i=instructions[nextInstruction];
-
-
-
-let d=i.distance;
-
-
-
-if(d<300 && !announced300){
-
-speak(
-"In 300 Metern. "
-+i.text
-);
-
-announced300=true;
-
-}
-
-
-
-if(d<50 && !announced50){
-
-speak(
-"In 50 Metern. "
-+i.text
-);
-
-announced50=true;
-
-}
-
-
-
-if(d<10 && !announcedNow){
-
-
-speak(
-"Jetzt. "
-+i.text
-);
-
-
-document.getElementById("naviText")
-.innerHTML=
-"➡️ "
-+i.text;
-
-
-nextInstruction++;
-
-
-announced300=false;
-
-announced50=false;
-
-announcedNow=false;
-
-
-}
-
-
-}
-
-
-
-
-
-// GLEICHE NAVI-STIMME
-
-
-let selectedVoice;
+let selectedVoice=null;
 
 
 
 function loadVoice(){
 
 
-let voices=
+
+let voices =
 speechSynthesis.getVoices();
+
+
+
+let bevorzugt=[
+
+"Google Deutsch",
+
+"Microsoft Hedda",
+
+"Anna",
+
+"Helena"
+
+];
+
+
+
+for(let name of bevorzugt){
+
+
+let v =
+voices.find(x=>
+
+x.name.includes(name)
+
+);
+
+
+
+if(v){
+
+selectedVoice=v;
+
+break;
+
+}
+
+
+}
 
 
 
 if(!selectedVoice){
 
-selectedVoice=
+
+selectedVoice =
 voices.find(v=>
+
 v.lang.startsWith("de")
+
 );
 
-}
-
 
 }
 
 
-speechSynthesis.onvoiceschanged=
+
+}
+
+
+
+speechSynthesis.onvoiceschanged =
 loadVoice;
 
 
@@ -822,25 +1229,38 @@ loadVoice();
 
 
 
+
+
+
+
 function speak(text){
+
 
 
 speechSynthesis.cancel();
 
 
-let msg=
+
+let msg =
 new SpeechSynthesisUtterance(text);
 
 
-msg.voice=selectedVoice;
 
 msg.lang="de-DE";
+
+
+if(selectedVoice)
+
+msg.voice=selectedVoice;
+
+
 
 msg.rate=0.9;
 
 msg.pitch=1;
 
 msg.volume=1;
+
 
 
 speechSynthesis.speak(msg);
@@ -851,48 +1271,116 @@ speechSynthesis.speak(msg);
 
 
 
-// VOLLBILD NAVI
 
 
-let full=false;
+
+// ===============================
+// VOLLBILD ANDROID NAVI
+// ===============================
+
+
+let fullscreen=false;
 
 
 
 function toggleNaviMode(){
 
 
-if(!full){
 
+if(!fullscreen){
+
+
+
+if(document.documentElement.requestFullscreen)
 
 document.documentElement.requestFullscreen();
 
 
+
 document.querySelector(".panel")
 .style.display="none";
+
 
 
 document.getElementById("naviInfo")
 .style.display="block";
 
 
-full=true;
+
+fullscreen=true;
 
 
-}else{
 
+}
+
+else{
+
+
+if(document.exitFullscreen)
 
 document.exitFullscreen();
 
 
+
 document.querySelector(".panel")
 .style.display="block";
+
 
 
 document.getElementById("naviInfo")
 .style.display="none";
 
 
-full=false;
+
+fullscreen=false;
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// KOMPASS-DREHUNG
+// ===============================
+
+
+window.addEventListener(
+
+"deviceorientationabsolute",
+
+e=>{
+
+
+if(e.alpha!==null){
+
+
+heading =
+360-e.alpha;
+
+
+
+let car =
+document.querySelector(".car-icon");
+
+
+
+if(car){
+
+
+car.style.transform =
+"rotate("
++
+heading
++
+"deg)";
 
 
 }
@@ -901,8 +1389,11 @@ full=false;
 }
 
 
+}
+
+);
 </script>
 
-
 </body>
+
 </html>
