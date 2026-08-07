@@ -1,32 +1,122 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
+// =====================================
+// GPS Navi
+// server.js
+// Render Server
+// =====================================
+
+
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
 
 
 const app = express();
 
-
 const PORT = process.env.PORT || 3000;
 
 
+
+// Pfade für ES Module
+
+const __filename =
+fileURLToPath(import.meta.url);
+
+
+const __dirname =
+path.dirname(__filename);
+
+
+
+
+// Middleware
+
 app.use(cors());
 
-app.use(express.static(__dirname));
+app.use(express.json());
 
 
-app.get("/", (req,res)=>{
+
+// Webseite bereitstellen
+
+app.use(
+
+express.static(__dirname)
+
+);
+
+
+
+
+// Startseite
+
+app.get(
+
+"/",
+
+(req,res)=>{
 
     res.sendFile(
-        path.join(__dirname,"navigation.html")
+
+        path.join(
+
+            __dirname,
+
+            "index.html"
+
+        )
+
     );
 
-});
+}
+
+);
 
 
-app.listen(PORT, "0.0.0.0", ()=>{
+
+
+// Gesundheitsprüfung für Render
+
+app.get(
+
+"/health",
+
+(req,res)=>{
+
+    res.json({
+
+        status:"ok",
+
+        app:"GPS Navi"
+
+    });
+
+}
+
+);
+
+
+
+
+// Server starten
+
+app.listen(
+
+PORT,
+
+()=>{
 
     console.log(
-        "GPS Navi läuft auf Port " + PORT
+
+        "GPS Navi läuft auf Port "
+
+        +
+
+        PORT
+
     );
 
-});
+}
+
+);
