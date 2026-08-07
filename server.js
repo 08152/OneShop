@@ -1,50 +1,26 @@
+/**
+ * server.js - Node.js Express Server für Render.com Deploys
+ */
+
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
-const JSZip = require('jszip');
-
 const app = express();
+
+// Render setzt dynamisch Umgebungsvariablen für den Port
 const PORT = process.env.PORT || 3000;
 
-// Statische Dateien aus dem aktuellen Ordner ausliefern (index.html, script.js)
-app.use(express.static(__dirname));
+// Statische Dateien direkt aus dem Hauptordner ausliefern
+app.use(express.static(path.join(__dirname, '.')));
 
-// API-Endpunkt für den Server-seitigen ZIP-Download des gesamten Quellcodes
-app.get('/api/download-src', async (req, res) => {
-    try {
-        const zip = new JSZip();
+// Explizite Auslieferung der node_modules für Leaflet-Assets (optional nutzbar)
+app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
-        // Alle relevanten Projektdateien einlesen
-        const filesToPack = ['index.html', 'script.js', 'server.js', 'package.json'];
-
-        filesToPack.forEach(file => {
-            const filePath = path.join(__dirname, file);
-            if (fs.existsSync(filePath)) {
-                const fileContent = fs.readFileSync(filePath, 'utf8');
-                zip.file(file, fileContent);
-            }
-        });
-
-        // ZIP-Archiv als Binär-Stream (Buffer) generieren
-        const content = await zip.generateAsync({ type: 'nodebuffer' });
-
-        // HTTP-Header für den Datei-Download setzen
-        res.setHeader('Content-Type', 'application/zip');
-        res.setHeader('Content-Disposition', 'attachment; filename=live_gps_navigator_server_pack.zip');
-        
-        // ZIP-Datei an den Client senden
-        res.send(content);
-    } catch (error) {
-        console.error('Fehler bei der ZIP-Erstellung:', error);
-        res.status(500).send('Server-Fehler bei der ZIP-Generierung');
-    }
-});
-
-// Fallback für alle anderen Routen (liefert die index.html)
+// Catch-All-Route: Sendet bei unbekannten URLs die index.html zurück (SPA Fallback)
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server läuft erfolgreich auf Port ${PORT}`);
+// Server auf der Host-Schnittstelle 0.0.0.0 starten (wichtig für Render Container)
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Navigations-Server läuft erfolgreich auf Port ${PORT}`);
 });
