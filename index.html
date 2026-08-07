@@ -1,103 +1,95 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Kugel Guys - 3D Plattform (No Shader)</title>
-<style>
-body {
-    margin: 0;
-    overflow: hidden;
-    background: #6ba7e6;
-    font-family: 'Arial Black', sans-serif;
-    user-select: none;
-}
-canvas { display: block; }
-
-/* Fall Guys Style HUD */
-#hud-container {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 30px;
-    box-sizing: border-box;
-    z-index: 10;
-    pointer-events: none;
-}
-.fall-box {
-    background: linear-gradient(135deg, #ff007f, #7f00ff);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 15px;
-    font-size: 20px;
-    box-shadow: 0 6px 0 #4a0080, 0 10px 20px rgba(0,0,0,0.4);
-    border: 3px solid white;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-#timer-box {
-    background: linear-gradient(135deg, #00f0ff, #0072ff);
-    box-shadow: 0 6px 0 #0044aa, 0 10px 20px rgba(0,0,0,0.4);
-}
-
-/* Riesen-Anzeigen in der Mitte */
-#center-display {
-    position: absolute;
-    top: 40%;
-    width: 100%;
-    text-align: center;
-    z-index: 10;
-    pointer-events: none;
-}
-.big-banner {
-    display: inline-block;
-    color: yellow;
-    font-size: 50px;
-    text-transform: uppercase;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 20px 50px;
-    border-radius: 20px;
-    border: 4px solid yellow;
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    text-shadow: 3px 3px 0 #000;
-}
-.show-banner {
-    opacity: 1;
-    transform: scale(1);
-}
-.eliminated {
-    color: #ff0055;
-    border-color: #ff0055;
-    text-shadow: 3px 3px 0 #330011;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Cyber-Matrix Navigator & Game</title>
+    <!-- JSZip für den automatischen Download -->
+    <script src="https://cloudflare.com"></script>
+    <!-- Three.js für echte, hardwarebeschleunigte 3D-Grafik -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #050508; color: #fff; overflow: hidden; }
+        #header { background: #020205; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); z-index: 10; }
+        #header h2 { margin: 0; font-size: 20px; letter-spacing: 2px; color: #00d2ff; text-shadow: 0 0 10px rgba(0,210,255,0.6); }
+        #status { font-weight: bold; padding: 6px 12px; border-radius: 20px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .online { background: rgba(39, 174, 96, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .offline { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+        #btn-download { background: linear-gradient(135deg, #0052d4, #00d2ff); color: white; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 4px; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4); transition: all 0.3s; }
+        #btn-download:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 210, 255, 0.7); }
+        #main-container { flex: 1; position: relative; width: 100%; height: 100%; }
+        #webgl-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        #routing-panel { position: absolute; top: 20px; left: 20px; z-index: 1000; background: rgba(5, 5, 10, 0.85); padding: 25px; border-radius: 12px; border: 1px solid #00d2ff; box-shadow: 0 0 25px rgba(0,210,255,0.2); width: 300px; backdrop-filter: blur(10px); }
+        #routing-panel h3 { margin-top: 0; color: #00d2ff; font-size: 18px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 6px; font-size: 11px; color: #8a99ad; text-transform: uppercase; }
+        .input-group select { width: 100%; padding: 10px; background: #0c0d14; border: 1px solid #00d2ff; border-radius: 6px; color: white; font-size: 14px; }
+        #btn-route { width: 100%; background: linear-gradient(135deg, #0052d4, #4364f7); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(67,100,247,0.4); margin-bottom: 10px; }
+        #btn-route:hover { filter: brightness(1.2); }
+        #results { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,210,255,0.3); display: none; }
+        .result-line { margin-bottom: 10px; font-size: 15px; display: flex; justify-content: space-between; }
+        .result-label { color: #8a99ad; }
+        .result-val { font-weight: bold; color: #00d2ff; text-shadow: 0 0 5px rgba(0,210,255,0.5); }
+        #game-instructions { background: rgba(0, 210, 255, 0.1); border: 1px dashed #00d2ff; padding: 10px; border-radius: 6px; margin-top: 15px; font-size: 12px; display: none; }
+        #game-instructions p { margin: 4px 0; color: #00d2ff; }
+    </style>
 </head>
 <body>
 
-<div id="hud-container">
-    <div class="fall-box" id="controls-box">
-        WASD: Rollen | LEER: Springen
+    <div id="header">
+        <h2>✦ 3D Cyber-Matrix Map & Drive</h2>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div id="status" class="online">3D Online</div>
+            <button id="btn-download" onclick="downloadOfflineZip()">Gesamtes 3D-Paket (ZIP) laden</button>
+        </div>
     </div>
-    <div class="fall-box" id="timer-box">
-        Warten auf Spieler...
+
+    <div id="main-container">
+        <div id="webgl-container"></div>
+
+        <div id="routing-panel">
+            <h3>3D Navigator & Game</h3>
+            <div class="input-group">
+                <label>Start-Metropole:</label>
+                <select id="start-city">
+                    <option value="52.520,13.404,Berlin">Berlin</option>
+                    <option value="48.137,11.575,München">München</option>
+                    <option value="53.551,9.993,Hamburg">Hamburg</option>
+                    <option value="50.110,8.682,Frankfurt">Frankfurt am Main</option>
+                    <option value="48.208,16.373,Wien">Wien</option>
+                    <option value="47.376,8.541,Zürich">Zürich</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Ziel-Metropole:</label>
+                <select id="target-city">
+                    <option value="48.137,11.575,München">München</option>
+                    <option value="52.520,13.404,Berlin">Berlin</option>
+                    <option value="53.551,9.993,Hamburg">Hamburg</option>
+                    <option value="50.110,8.682,Frankfurt">Frankfurt am Main</option>
+                    <option value="48.208,16.373,Wien">Wien</option>
+                    <option value="47.376,8.541,Zürich">Zürich</option>
+                </select>
+            </div>
+            <button id="btn-route" onclick="generate3DRoute()">3D ROUTE GENERIEREN</button>
+
+            <div id="results">
+                <div class="result-line"><span class="result-label">3D-Distanz:</span> <span id="res-km" class="result-val">-</span></div>
+                <div class="result-line"><span class="result-label">Fahrzeit ca.:</span> <span id="res-time" class="result-val">-</span></div>
+                
+                <div id="game-instructions">
+                    <strong>🎮 RENN-MODUS AKTIV!</strong>
+                    <p>• Gas geben: <b>Pfeiltaste oben / W</b></p>
+                    <p>• Lenken: <b>Links & Rechts / A & D</b></p>
+                    <p>• Bremsen: <b>Pfeiltaste unten / S</b></p>
+                    <small style="color:#8a99ad;">Fahre die blaue Strecke ab!</small>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="fall-box" id="status-box">
-        Überlebende: 4 / 4
-    </div>
-</div>
 
-<div id="center-display">
-    <div id="banner" class="big-banner">Runde 1</div>
-</div>
-
-<!-- Three.js laden -->
-<script src="https://jsdelivr.net"></script>
-
-<!-- Lädt jetzt das eine, zusammengefasste Skript ohne Ladefehler -->
-<script src="game.js"></script>
-
+    <!-- Einbindung der getrennten Skript-Dateien -->
+    <script src="script.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
