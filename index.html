@@ -15,7 +15,7 @@ html,body{
 margin:0;
 height:100%;
 overflow:hidden;
-font-family:Arial;
+font-family:Arial,sans-serif;
 }
 
 
@@ -38,9 +38,9 @@ background:white;
 
 padding:12px;
 
-border-radius:18px;
+border-radius:20px;
 
-box-shadow:0 0 15px #555;
+box-shadow:0 5px 20px rgba(0,0,0,.3);
 
 }
 
@@ -60,6 +60,8 @@ border-radius:12px;
 
 border:1px solid #aaa;
 
+box-sizing:border-box;
+
 }
 
 
@@ -70,13 +72,56 @@ background:#006cff;
 
 color:white;
 
+font-weight:bold;
+
 }
+
+
+
+#locationBtn{
+
+position:absolute;
+
+right:15px;
+
+top:70px;
+
+width:60px;
+
+height:60px;
+
+font-size:25px;
+
+z-index:2000;
+
+}
+
+
+
+#fullscreenBtn{
+
+position:absolute;
+
+right:15px;
+
+top:140px;
+
+width:60px;
+
+height:60px;
+
+font-size:25px;
+
+z-index:2000;
+
+}
+
 
 
 
 .car-icon{
 
-font-size:50px;
+font-size:45px;
 
 text-align:center;
 
@@ -96,9 +141,9 @@ left:20px;
 
 right:20px;
 
-z-index:2000;
+z-index:3000;
 
-background:rgba(0,0,0,.75);
+background:rgba(0,0,0,.8);
 
 color:white;
 
@@ -106,9 +151,9 @@ padding:20px;
 
 border-radius:20px;
 
-font-size:24px;
-
 text-align:center;
+
+font-size:24px;
 
 display:none;
 
@@ -118,39 +163,7 @@ display:none;
 
 .arrow{
 
-font-size:90px;
-
-}
-
-
-
-.fullscreenBtn{
-
-position:absolute;
-
-right:15px;
-
-top:15px;
-
-z-index:3000;
-
-width:auto;
-
-}
-
-
-
-.locationBtn{
-
-position:absolute;
-
-right:15px;
-
-top:70px;
-
-z-index:3000;
-
-width:auto;
+font-size:80px;
 
 }
 
@@ -171,8 +184,11 @@ width:auto;
 
 
 <button onclick="prepareRoute()">
+
 🔎 Route suchen
+
 </button>
+
 
 
 <button id="startBtn"
@@ -184,9 +200,10 @@ onclick="startNavigation()">
 </button>
 
 
+
 <div id="info">
 
-GPS wird gesucht...
+📍 Suche GPS...
 
 </div>
 
@@ -195,20 +212,23 @@ GPS wird gesucht...
 
 
 
-<button class="fullscreenBtn"
+
+<button id="locationBtn"
+onclick="centerLocation()">
+
+📍
+
+</button>
+
+
+
+<button id="fullscreenBtn"
 onclick="toggleNaviMode()">
 
 ⛶
 
 </button>
 
-
-<button class="locationBtn"
-onclick="centerLocation()">
-
-📍
-
-</button>
 
 
 
@@ -233,7 +253,10 @@ Navigation
 
 
 
+
 <div id="map"></div>
+
+
 
 
 
@@ -264,26 +287,33 @@ maxZoom:19
 
 
 
+
 let currentPos=null;
 
 let marker=null;
+
 
 let routeLine=null;
 
 let navigationLine=null;
 
 
+
 let routing=[];
 
+
 let instructions=[];
+
 
 let nextInstruction=0;
 
 
-let navigationStarted=false;
-
 
 let followLocation=true;
+
+
+let navigationStarted=false;
+
 
 
 let heading=0;
@@ -308,7 +338,8 @@ iconAnchor:[25,25]
 
 navigator.geolocation.watchPosition(
 
-position=>{
+function(position){
+
 
 
 let lat =
@@ -325,10 +356,29 @@ currentPos=[lat,lon];
 
 
 
-// Fahrtrichtung vom GPS
+// GPS Anzeige
+
+document.getElementById("info").innerHTML =
+
+"📍 "
++
+lat.toFixed(6)
++
+", "
++
+lon.toFixed(6);
+
+
+
+
+
+
+
+// Richtung vom GPS
 
 if(position.coords.heading !== null &&
-position.coords.heading !== undefined){
+position.coords.heading !== undefined &&
+!isNaN(position.coords.heading)){
 
 
 heading =
@@ -361,12 +411,16 @@ heading
 
 
 
-// Auto setzen
-
-if(!marker){
 
 
-marker=L.marker(
+
+// Auto erstellen
+
+if(marker===null){
+
+
+marker =
+L.marker(
 
 currentPos,
 
@@ -380,8 +434,11 @@ icon:carIcon
 
 
 map.setView(
+
 currentPos,
+
 18
+
 );
 
 
@@ -392,7 +449,9 @@ else{
 
 
 marker.setLatLng(
+
 currentPos
+
 );
 
 
@@ -403,9 +462,12 @@ currentPos
 
 
 
-// Karte folgt dem Standort
+
+// Karte folgt Bewegung
+
 
 if(followLocation){
+
 
 
 map.panTo(
@@ -416,19 +478,26 @@ currentPos,
 
 animate:true,
 
-duration:0.5
+duration:1
 
 }
 
 );
 
 
+
 }
 
 
 
 
-// Route aktualisieren
+
+
+// Navigation prüfen
+
+
+if(navigationStarted){
+
 
 updateNavigationLine();
 
@@ -439,6 +508,8 @@ checkRoute();
 checkInstructions();
 
 
+}
+
 
 
 
@@ -446,15 +517,23 @@ checkInstructions();
 
 
 
-error=>{
+
+
+function(error){
+
 
 
 document.getElementById("info").innerHTML=
 
-"GPS Fehler";
+"❌ GPS Fehler: "
++
+error.message;
+
 
 
 },
+
+
 
 
 
@@ -462,15 +541,18 @@ document.getElementById("info").innerHTML=
 
 enableHighAccuracy:true,
 
-maximumAge:1000,
+maximumAge:0,
 
-timeout:5000
+timeout:10000
 
 }
 
 
 
 );
+
+
+
 
 
 
@@ -507,10 +589,14 @@ animate:true
 );
 
 
+
 }
 
 
 }
+
+
+
 
 
 
@@ -518,8 +604,8 @@ animate:true
 
 
 // ===============================
-// MANUELLE KARTENBEWEGUNG
-// STOPPT AUTOMATISCHE FOLGE
+// BENUTZER BEWEGT KARTE
+// DANN NICHT MEHR FOLGEN
 // ===============================
 
 
@@ -527,7 +613,7 @@ map.on(
 
 "dragstart",
 
-()=>{
+function(){
 
 
 followLocation=false;
@@ -543,7 +629,7 @@ map.on(
 
 "zoomstart",
 
-()=>{
+function(){
 
 
 followLocation=false;
@@ -558,8 +644,10 @@ followLocation=false;
 
 
 
+
+
 // ===============================
-// NAVIGATION STARTEN
+// NAVIGATION START
 // ===============================
 
 
@@ -573,7 +661,8 @@ followLocation=true;
 
 
 
-map.setZoom(19);
+document.getElementById("naviInfo")
+.style.display="block";
 
 
 
@@ -590,8 +679,12 @@ speak(
 
 
 
+
+
+
+
 // ===============================
-// ROUTE VORBEREITEN
+// ROUTE SUCHEN
 // ===============================
 
 
@@ -612,6 +705,16 @@ await route();
 
 
 async function route(){
+
+
+if(!currentPos){
+
+alert("GPS noch nicht bereit");
+
+return;
+
+}
+
 
 
 let ziel =
@@ -635,14 +738,13 @@ await geo.json();
 
 
 
-if(data.length===0){
+if(!data.length){
 
 alert("Ziel nicht gefunden");
 
 return;
 
 }
-
 
 
 
@@ -699,7 +801,6 @@ json.routes[0];
 
 
 
-
 routing =
 r.geometry.coordinates.map(
 
@@ -737,7 +838,6 @@ weight:8
 
 
 
-
 navigationLine =
 L.polyline(
 
@@ -753,6 +853,7 @@ weight:8
 
 )
 .addTo(map);
+
 
 
 
@@ -789,7 +890,7 @@ document.getElementById("info").innerHTML=
 +
 (r.distance/1000).toFixed(1)
 +
-" km<br>⏱️ "
+" km | ⏱ "
 +
 Math.round(r.duration/60)
 +
@@ -806,8 +907,9 @@ Math.round(r.duration/60)
 
 
 
+
 // ===============================
-// BLAUE LINIE MIT AUTO BEWEGEN
+// BLAUE LINIE AKTUALISIEREN
 // ===============================
 
 
@@ -815,6 +917,7 @@ function updateNavigationLine(){
 
 
 if(!navigationLine ||
+!routing.length ||
 !currentPos)
 
 return;
@@ -823,7 +926,7 @@ return;
 
 let index=0;
 
-let best=999999;
+let min=999999;
 
 
 
@@ -841,9 +944,9 @@ p
 
 
 
-if(d<best){
+if(d<min){
 
-best=d;
+min=d;
 
 index=i;
 
@@ -869,57 +972,125 @@ routing.slice(index)
 
 
 
+
+
+
 // ===============================
-// STRASSEN-ANSAGEN
+// ANSAGE TEXT
 // ===============================
 
 
 function createInstruction(step){
 
 
-
 let road="";
 
 
-if(step.name &&
-step.name.trim()!==""){
 
+if(step.name){
 
-road =
+road=
 " auf "
 +
 step.name;
 
+}
+
+
+
+let m =
+step.maneuver;
+
+
+
+if(m.type==="arrive"){
+
+return "Sie haben Ihr Ziel erreicht";
 
 }
 
 
 
-let text="";
+if(m.type==="roundabout"){
 
 
+return (
 
-if(step.maneuver.type==="arrive"){
-
-
-text=
-"Sie haben Ihr Ziel erreicht";
-
-
-}
-
-
-else if(step.maneuver.type==="roundabout"){
-
-
-text=
 "Kreisverkehr. "
 +
 "Die "
 +
-(step.maneuver.exit||1)
+(m.exit||1)
 +
 ". Ausfahrt nehmen"
++
+road
+
+);
+
+
+}
+
+
+
+if(m.type==="turn"){
+
+
+
+switch(m.modifier){
+
+
+case "left":
+
+return "Links abbiegen"
++
+road;
+
+
+
+case "right":
+
+return "Rechts abbiegen"
++
+road;
+
+
+
+case "slight left":
+
+return "Links halten"
++
+road;
+
+
+
+case "slight right":
+
+return "Rechts halten"
++
+road;
+
+
+
+case "sharp left":
+
+return "Scharf links abbiegen"
++
+road;
+
+
+
+case "sharp right":
+
+return "Scharf rechts abbiegen"
++
+road;
+
+
+
+case "uturn":
+
+return "Bitte wenden"
 +
 road;
 
@@ -927,87 +1098,18 @@ road;
 }
 
 
-else if(step.maneuver.type==="turn"){
-
-
-switch(step.maneuver.modifier){
-
-
-case "left":
-
-text="Links abbiegen";
-
-break;
-
-
-case "right":
-
-text="Rechts abbiegen";
-
-break;
-
-
-case "slight left":
-
-text="Bleiben Sie links halten";
-
-break;
-
-
-case "slight right":
-
-text="Bleiben Sie rechts halten";
-
-break;
-
-
-case "sharp left":
-
-text="Scharf links abbiegen";
-
-break;
-
-
-case "sharp right":
-
-text="Scharf rechts abbiegen";
-
-break;
-
-
-case "uturn":
-
-text="Bitte wenden";
-
-break;
-
-
-default:
-
-text="Geradeaus weiterfahren";
-
 
 }
 
 
 
-}
-
-
-else{
-
-
-text="Weiterfahren";
+return "Geradeaus weiterfahren"
++
+road;
 
 
 }
 
-
-
-return text + road;
-
-
-}
 
 
 
@@ -1017,18 +1119,19 @@ return text + road;
 
 
 // ===============================
-// ABBIEGE-ANSAGEN
+// ABBIEGEANSAGEN
 // ===============================
 
 
-let a300=false;
-let a100=false;
-let a50=false;
-let aNow=false;
+let said300=false;
+let said100=false;
+let said50=false;
+let saidNow=false;
 
 
 
 function checkInstructions(){
+
 
 
 if(nextInstruction>=instructions.length)
@@ -1047,7 +1150,9 @@ i.distance;
 
 
 
-if(d<300 && !a300){
+
+
+if(d<300 && !said300){
 
 speak(
 "In 300 Metern. "
@@ -1055,13 +1160,13 @@ speak(
 i.text
 );
 
-a300=true;
+said300=true;
 
 }
 
 
 
-if(d<100 && !a100){
+if(d<100 && !said100){
 
 speak(
 "In 100 Metern. "
@@ -1069,13 +1174,14 @@ speak(
 i.text
 );
 
-a100=true;
+said100=true;
 
 }
 
 
 
-if(d<50 && !a50){
+
+if(d<50 && !said50){
 
 speak(
 "In 50 Metern. "
@@ -1083,13 +1189,15 @@ speak(
 i.text
 );
 
-a50=true;
+said50=true;
 
 }
 
 
 
-if(d<15 && !aNow){
+
+if(d<15 && !saidNow){
+
 
 speak(
 "Jetzt. "
@@ -1106,16 +1214,17 @@ document.getElementById("naviText")
 nextInstruction++;
 
 
-a300=false;
-a100=false;
-a50=false;
-aNow=false;
+said300=false;
+said100=false;
+said50=false;
+saidNow=false;
 
 
 }
 
 
 }
+
 
 
 
@@ -1130,6 +1239,7 @@ aNow=false;
 
 
 function checkRoute(){
+
 
 
 if(!routing.length ||
@@ -1148,11 +1258,8 @@ routing.forEach(p=>{
 
 let d =
 map.distance(
-
 currentPos,
-
 p
-
 );
 
 
@@ -1188,8 +1295,10 @@ route();
 
 
 
+
+
 // ===============================
-// SPRACHE
+// SPRACHANSAGE
 // ===============================
 
 
@@ -1207,20 +1316,20 @@ speechSynthesis.getVoices();
 
 selectedVoice =
 voices.find(v=>
-
 v.lang.startsWith("de")
-
 );
-
 
 
 }
 
 
 
-speechSynthesis.onvoiceschanged=loadVoice;
+speechSynthesis.onvoiceschanged =
+loadVoice;
+
 
 loadVoice();
+
 
 
 
@@ -1251,8 +1360,6 @@ msg.rate=0.9;
 
 msg.pitch=1;
 
-msg.volume=1;
-
 
 
 speechSynthesis.speak(msg);
@@ -1266,8 +1373,11 @@ speechSynthesis.speak(msg);
 
 
 
+
+
+
 // ===============================
-// VOLLBILD NAVI
+// VOLLBILD
 // ===============================
 
 
@@ -1280,8 +1390,6 @@ function toggleNaviMode(){
 
 if(!fullscreen){
 
-
-if(document.documentElement.requestFullscreen)
 
 document.documentElement.requestFullscreen();
 
@@ -1300,12 +1408,11 @@ document.getElementById("naviInfo")
 fullscreen=true;
 
 
+
 }
 
 else{
 
-
-if(document.exitFullscreen)
 
 document.exitFullscreen();
 
@@ -1315,8 +1422,10 @@ document.querySelector(".panel")
 .style.display="block";
 
 
+
 document.getElementById("naviInfo")
 .style.display="none";
+
 
 
 fullscreen=false;
@@ -1325,7 +1434,9 @@ fullscreen=false;
 }
 
 
+
 }
+
 
 
 
