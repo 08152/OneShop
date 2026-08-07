@@ -1,14 +1,13 @@
 {
-  "name": "touch-karte-server",
+  "name": "gps-navi-render",
   "version": "1.0.0",
-  "description": "Ein einfacher Node.js Express Server fuer die 2D-Weltkarte",
+  "description": "GPS Navi mit OpenStreetMap",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
-  },
-  "author": "",
-  "license": "ISC"
+    "express": "^5.1.0",
+    "cors": "^2.8.5"
+  }
 }
