@@ -3,33 +3,619 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Open Navigation – Demo</title>
+
+<title>GPS Navigation</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
 <style>
-body{font-family:Arial,sans-serif;margin:2rem}
-#log{white-space:pre-wrap;background:#f3f3f3;padding:1rem;border-radius:8px}
-button{padding:.7rem 1rem}
+
+html,body{
+margin:0;
+height:100%;
+font-family:Arial;
+}
+
+#map{
+height:100%;
+width:100%;
+}
+
+.panel{
+position:absolute;
+top:10px;
+left:10px;
+right:10px;
+z-index:999;
+background:white;
+padding:12px;
+border-radius:15px;
+box-shadow:0 0 15px #555;
+}
+
+input,button{
+
+width:100%;
+padding:12px;
+margin-top:6px;
+border-radius:10px;
+border:1px solid #aaa;
+
+}
+
+button{
+
+background:#006cff;
+color:white;
+font-size:18px;
+
+}
+
+#info{
+
+margin-top:10px;
+font-weight:bold;
+
+}
+
 </style>
+
 </head>
+
+
 <body>
-<h1>Open Navigation – Demo</h1>
-<p>Dies ist eine Demo der Sprachansage. Für vollständige Navigation werden zusätzlich Leaflet, ein Routing-Dienst (z.B. OSRM/GraphHopper) und GPS benötigt.</p>
-<button onclick="demo()">Sprachansage testen</button>
-<div id="log"></div>
+
+
+<div class="panel">
+
+<input id="ziel" placeholder="Ziel eingeben">
+
+<button onclick="route()">
+🚗 Navigation starten
+</button>
+
+
+<div id="info">
+Warte auf GPS...
+</div>
+
+</div>
+
+
+<div id="map"></div>
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
 <script>
+
+
+let map =
+L.map("map")
+.setView([48.1351,11.5820],15);
+
+
+
+L.tileLayer(
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+maxZoom:19
+}
+).addTo(map);
+
+
+
+let marker;
+let routeLine;
+
+let currentPos;
+
+let routing=[];
+
+let instructions=[];
+
+let nextInstruction=0;
+
+
+
+// ================= GPS =================
+
+
+navigator.geolocation.watchPosition(
+
+pos=>{
+
+
+currentPos=[
+
+pos.coords.latitude,
+
+pos.coords.longitude
+
+];
+
+
+
+if(!marker){
+
+marker=L.marker(currentPos)
+.addTo(map)
+.bindPopup("Dein Standort");
+
+
+map.setView(currentPos,16);
+
+}
+
+else{
+
+marker.setLatLng(currentPos);
+
+}
+
+
+
+checkRoute();
+
+checkInstructions();
+
+
+
+},
+
+
+err=>{
+
+alert("GPS konnte nicht gestartet werden");
+
+},
+
+
+{
+
+enableHighAccuracy:true
+
+}
+
+
+
+);
+
+
+
+
+// ================= ROUTE =================
+
+
+async function route(){
+
+
+let ziel =
+document.getElementById("ziel").value;
+
+
+
+let geo =
+await fetch(
+
+"https://nominatim.openstreetmap.org/search?format=json&q="
++
+encodeURIComponent(ziel)
+
+);
+
+
+
+let data =
+await geo.json();
+
+
+
+if(data.length==0){
+
+alert("Ziel nicht gefunden");
+
+return;
+
+}
+
+
+
+let zielPos=[
+
+parseFloat(data[0].lat),
+
+parseFloat(data[0].lon)
+
+];
+
+
+
+
+let url =
+
+"https://router.project-osrm.org/route/v1/driving/"
++
+currentPos[1]
++
+","
++
+currentPos[0]
++
+";"
++
+zielPos[1]
++
+","
++
+zielPos[0]
++
+"?overview=full&steps=true&geometries=geojson";
+
+
+
+
+
+let res =
+await fetch(url);
+
+
+
+let json =
+await res.json();
+
+
+
+let routeData =
+json.routes[0];
+
+
+
+
+routing =
+routeData.geometry.coordinates.map(
+
+c=>[c[1],c[0]]
+
+);
+
+
+
+
+if(routeLine)
+
+map.removeLayer(routeLine);
+
+
+
+routeLine =
+L.polyline(
+
+routing,
+
+{
+
+color:"blue",
+
+weight:7
+
+}
+
+).addTo(map);
+
+
+
+
+map.fitBounds(
+routeLine.getBounds()
+);
+
+
+
+
+// Anweisungen
+
+instructions=[];
+
+
+
+routeData.legs[0].steps.forEach(step=>{
+
+
+let text="";
+
+
+
+switch(step.maneuver.type){
+
+
+case "depart":
+
+text="Starten";
+
+break;
+
+
+
+case "turn":
+
+
+if(step.maneuver.modifier=="left")
+
+text="Links abbiegen";
+
+
+else
+
+text="Rechts abbiegen";
+
+
+break;
+
+
+
+case "roundabout":
+
+text=
+"Kreisverkehr. "
++
+(step.maneuver.exit||1)
++
+". Ausfahrt nehmen";
+
+break;
+
+
+
+case "arrive":
+
+text="Ziel erreicht";
+
+break;
+
+
+
+default:
+
+text="Weiterfahren";
+
+
+}
+
+
+
+instructions.push({
+
+text:text,
+
+distance:step.distance
+
+});
+
+
+});
+
+
+
+nextInstruction=0;
+
+
+
+let km =
+(routeData.distance/1000)
+.toFixed(1);
+
+
+let min =
+Math.round(
+routeData.duration/60
+);
+
+
+
+document.getElementById("info").innerHTML=
+
+"🚗 "
++km+
+" km<br>"
++
+"⏱️ "
++min+
+" Minuten";
+
+
+
+speak(
+"Navigation gestartet"
+);
+
+
+
+}
+
+
+
+
+// ================= ABWEICHUNG =================
+
+
+function checkRoute(){
+
+
+if(!currentPos || routing.length==0)
+return;
+
+
+
+let min=999;
+
+
+
+routing.forEach(p=>{
+
+
+let d=
+map.distance(
+currentPos,
+p
+);
+
+
+
+if(d<min)
+min=d;
+
+
+});
+
+
+
+if(min>80){
+
+speak(
+"Route verlassen. Neue Route wird berechnet."
+);
+
+
+route();
+
+
+}
+
+
+
+}
+
+
+
+
+// ================= ABBIEGEN =================
+
+
+function checkInstructions(){
+
+
+if(nextInstruction>=instructions.length)
+return;
+
+
+
+let inst =
+instructions[nextInstruction];
+
+
+
+if(inst.distance<150){
+
+
+speak(
+
+"In "
++
+Math.round(inst.distance)
++
+" Metern. "
++
+inst.text
+
+);
+
+
+
+nextInstruction++;
+
+
+}
+
+
+
+}
+
+
+
+
+// ================= SPRACHE =================
+
+
+
+let germanVoice;
+
+
+
+function loadVoice(){
+
+
+let voices =
+speechSynthesis.getVoices();
+
+
+
+germanVoice =
+voices.find(v=>
+
+v.lang.includes("de")
+
+);
+
+
+
+}
+
+
+
+speechSynthesis.onvoiceschanged =
+loadVoice;
+
+
+
+loadVoice();
+
+
+
+
 function speak(text){
-  if(!("speechSynthesis" in window)){
-    alert("Sprachausgabe wird nicht unterstützt.");
-    return;
-  }
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  u.lang="de-DE";
-  speechSynthesis.speak(u);
-  document.getElementById("log").textContent=text;
+
+
+speechSynthesis.cancel();
+
+
+
+let msg =
+new SpeechSynthesisUtterance(text);
+
+
+
+msg.lang="de-DE";
+
+
+
+if(germanVoice)
+
+msg.voice=germanVoice;
+
+
+
+msg.rate=0.95;
+
+msg.pitch=1;
+
+msg.volume=1;
+
+
+
+speechSynthesis.speak(msg);
+
+
+
 }
-function demo(){
-  speak("Navigation gestartet. In 200 Metern rechts abbiegen.");
-}
+
+
+
 </script>
+
+
 </body>
 </html>
