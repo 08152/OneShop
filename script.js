@@ -1,138 +1,76 @@
-// ======================
-// FALL GUYS EVENT ENGINE
-// ======================
-const timerUI = document.getElementById("timer-box");
-const statusUI = document.getElementById("status-box");
-const banner = document.getElementById("banner");
+// --- SYSTEMSTATUS PRÜFEN ---
+const isOnline = navigator.onLine && window.location.protocol !== 'file:';
+const statusEl = document.getElementById('status');
+const downloadBtn = document.getElementById('btn-download');
 
-let roundTime = 25; 
-let gameStarted = false;
-let aliveCount = 4;
-const moveSpeed = 0.15;
-let clock = new THREE.Clock();
-
-function showFallGuysBanner(text, type = "") {
-    banner.innerText = text;
-    banner.className = "big-banner show-banner " + type;
-    setTimeout(() => { banner.className = "big-banner " + type; }, 3000);
+if (!isOnline) {
+    statusEl.innerText = "3D Offline (Lokal)";
+    statusEl.className = "offline";
+    downloadBtn.style.display = "none";
 }
 
-// Start-Ablauf beim Laden
-setTimeout(() => { showFallGuysBanner("Überlebe den Stab!"); }, 1000);
+// --- MATHEMATISCHE BERECHNUNGEN (Offline-Navi) ---
+function getDistanceOffline(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Erdradius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c * 1.28; // Aufschlagfaktor für reale Straßenkrümmungen
+}
 
-let gameTimer = setInterval(() => {
-    if (roundTime > 0) {
-        roundTime--;
-        timerUI.innerText = "Zeit: " + roundTime + "s";
-    } else {
-        clearInterval(gameTimer);
-        if (!isDead) {
-            showFallGuysBanner("Qualifiziert!", "");
-            stickRotationSpeed = 0; // Feierabend
-        }
+function trigger3DMapping() {
+    const startData = document.getElementById('start-city').value.split(',');
+    const targetData = document.getElementById('target-city').value.split(',');
+    
+    const lat1 = parseFloat(startData[0]); const lon1 = parseFloat(startData[1]);
+    const lat2 = parseFloat(targetData[0]); const lon2 = parseFloat(targetData[1]);
+
+    // Kilometer und Zeit für das UI kalkulieren
+    const km = getDistanceOffline(lat1, lon1, lat2, lon2);
+    const totalHours = km / 85;
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+
+    document.getElementById('res-km').innerText = km.toFixed(0) + " km";
+    document.getElementById('res-time').innerText = `${hours} Std. ${minutes} Min.`;
+    document.getElementById('results').style.display = "block";
+
+    // Befehl an das 3D-Karten-Skript (map.js) senden, um die Route plastisch zu zeichnen
+    if (typeof draw3DRouteOnMap === "function") {
+        draw3DRouteOnMap(km);
     }
-}, 1000);
+}
 
-// Loop-Verarbeitung
-function updateGame() {
-    slimeUniforms.uTime.value = clock.getElapsedTime() * 2.0;
-    stick.rotation.y += stickRotationSpeed;
-
-    // --- 1. SPIELER-PHYSIK ---
-    let moveX = 0, moveZ = 0;
-    if (!isDead) {
-        if (keys.w) { moveX += Math.sin(ry); moveZ += Math.cos(ry); }
-        if (keys.s) { moveX -= Math.sin(ry); moveZ -= Math.cos(ry); }
-        if (keys.a) { moveX += Math.sin(ry + Math.PI / 2); moveZ += Math.cos(ry + Math.PI / 2); }
-        if (keys.d) { moveX -= Math.sin(ry + Math.PI / 2); moveZ -= Math.cos(ry + Math.PI / 2); }
-    }
-
-    if (moveX !== 0 || moveZ !== 0) {
-        const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
-        velocity.x = (moveX / length) * moveSpeed;
-        velocity.z = (moveZ / length) * moveSpeed;
-        player.rotation.z -= velocity.x / playerRadius;
-        player.rotation.x += velocity.z / playerRadius;
-    } else {
-        velocity.x *= 0.85; velocity.z *= 0.85;
-    }
-
-    if (player.position.y < -23) {
-        externalForce.set(externalForce.x * 0.5, -0.05, externalForce.z * 0.5);
-    } else {
-        externalForce.set(externalForce.x * 0.96, externalForce.y - gravity, externalForce.z * 0.96);
-    }
-
-    player.position.add(velocity).add(externalForce);
-
-    // Plattform-Boden-Check für Spieler
-    if (Math.sqrt(player.position.x**2 + player.position.z**2) <= platformRadius) {
-        if (player.position.y < playerRadius) {
-            player.position.y = playerRadius; externalForce.y = 0; canJump = true;
-        }
-    } else { canJump = false; }
-
-    handleStickCollision(player.position, playerRadius, externalForce);
-
-    // Schleim-Ausscheiden für Spieler
-    if (player.position.y <= -24.5 && !isDead) {
-        isDead = true;
-        aliveCount--;
-        showFallGuysBanner("Ausgeschieden!", "eliminated");
-    }
-
-    // --- 2. NPC KI-PHYSIK (Weichen dem Stab minimal aus, fliegen aber physikalisch mit) ---
-    npcs.forEach(n => {
-        if (n.isOut) return;
-
-        // Simpelste KI-Ausweichbewegung
-        let npcMove = new THREE.Vector3(0, 0, 0);
-        if (Math.random() > 0.5) {
-            npcMove.set(Math.sin(stick.rotation.y) * 0.05, 0, Math.cos(stick.rotation.y) * 0.05);
-            n.mesh.position.add(npcMove);
-        }
-
-        n.extForce.y -= gravity;
-        n.extForce.x *= 0.96; n.extForce.z *= 0.96;
-
-        if (n.mesh.position.y < -23) n.extForce.y = -0.05;
-        n.mesh.position.add(n.extForce);
-
-        // Boden-Check für NPCs
-        if (Math.sqrt(n.mesh.position.x**2 + n.mesh.position.z**2) <= platformRadius) {
-            if (n.mesh.position.y < playerRadius) {
-                n.mesh.position.y = playerRadius; n.extForce.y = 0;
-            }
-        }
-
-        handleStickCollision(n.mesh.position, playerRadius, n.extForce);
-
-        // NPC fällt in Schleim
-        if (n.mesh.position.y <= -24.5) {
-            n.isOut = true;
-            aliveCount--;
-            scene.remove(n.mesh);
-        }
+// --- DER STRUKTURIERTE DOWNLOAD-MANAGER (ZIP-Packer) ---
+function downloadOfflineZip() {
+    const zip = new JSZip();
+    
+    // index.html direkt verpacken
+    zip.file("index.html", document.documentElement.outerHTML);
+    
+    // Beide JS-Dateien vom Server laden und ins ZIP-Archiv einsortieren
+    Promise.all([
+        fetch('script.js').then(res => res.text()),
+        fetch('map.js').then(res => res.text())
+    ]).then(([scriptJs, mapJs]) => {
+        zip.file("script.js", scriptJs);
+        zip.file("map.js", mapJs);
+        return zip.generateAsync({type:"blob"});
+    }).then(content => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        link.download = "3d_cyber_map_system.zip";
+        link.click();
+    }).catch(err => {
+        console.log("Online-Schnittstelle blockiert (Lokaler Testlauf?). Fallback-ZIP gestartet.");
+        zip.generateAsync({type:"blob"}).then(c => {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(c);
+            link.download = "map_system_fallback.zip";
+            link.click();
+        });
     });
-
-    // UI updaten
-    statusUI.innerText = "Überlebende: " + aliveCount + " / 4";
-
-    // --- 3. KAMERA-STEADY-CAM ---
-    const targetCamX = player.position.x + cameraDistance * Math.sin(ry) * Math.cos(rx);
-    const targetCamY = player.position.y - cameraDistance * Math.sin(rx) + 0.5;
-    const targetCamZ = player.position.z + cameraDistance * Math.cos(ry) * Math.cos(rx);
-
-    camera.position.x += (targetCamX - camera.position.x) * 0.12;
-    camera.position.y += (targetCamY - camera.position.y) * 0.12;
-    camera.position.z += (targetCamZ - camera.position.z) * 0.12;
-    camera.lookAt(player.position.x, player.position.y + 2, player.position.z);
 }
-
-function animateGame() {
-    requestAnimationFrame(animateGame);
-    updateGame();
-    if(renderer) renderer.render(scene, camera);
-}
-
-if(renderer) animateGame();
