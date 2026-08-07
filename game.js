@@ -1,52 +1,44 @@
 // ======================
-// 3D ENGINE & PHYSIK
+// 3D ENGINE & PHYSIK (NO SHADER)
 // ======================
 const scene = new THREE.Scene();
-
-// Himmel erstellen aus shader.js
-const skyGeo = new THREE.SphereGeometry(400, 32, 15);
-const skyMat = new THREE.ShaderMaterial({
-    vertexShader: skyVertexShader,
-    fragmentShader: skyFragmentShader,
-    side: THREE.BackSide
-});
-const sky = new THREE.Mesh(skyGeo, skyMat);
-scene.add(sky);
+// Heller, klarer blauer Himmel als Hintergrundfarbe definiert
+scene.background = new THREE.Color(0x6ba7e6);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = false; // Für flüssige Performance ausgeschaltet
 document.body.appendChild(renderer.domElement);
 
+// Beleuchtung aktivieren
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
 const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
 mainLight.position.set(50, 100, 50);
 scene.add(mainLight);
 
-// Rote Plattform
+// Rote Plattform (Echtes Standard-Material)
 const platformRadius = 40;
 const platformGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 2, 64);
-const floorMat = new THREE.ShaderMaterial({
-    vertexShader: floorVertexShader,
-    fragmentShader: floorFragmentShader
-});
-const platform = new THREE.Mesh(platformGeo, floorMat);
+const platformMat = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.6 });
+const platform = new THREE.Mesh(platformGeo, platformMat);
 platform.position.y = -1; 
 scene.add(platform);
 
-// Schleim-Boden
-const slimeGeo = new THREE.PlaneGeometry(800, 800, 2, 2);
-const slimeMat = new THREE.ShaderMaterial({
-    vertexShader: slimeVertexShader,
-    fragmentShader: slimeFragmentShader,
-    uniforms: slimeUniforms
-});
+// Helles Hilfsraster auf der Plattform für besseres Sichtfeld
+const grid = new THREE.GridHelper(platformRadius * 2, 40, 0xffffff, 0x990000);
+grid.position.y = 0.01;
+scene.add(grid);
+
+// Grüner Schleim-Boden im Abgrund (Klassisches Giftgrün)
+const slimeGeo = new THREE.PlaneGeometry(800, 800);
+const slimeMat = new THREE.MeshBasicMaterial({ color: 0x00cc11 });
 const slimeFloor = new THREE.Mesh(slimeGeo, slimeMat);
 slimeFloor.position.y = -25; 
 slimeFloor.rotation.x = -Math.PI / 2; 
 scene.add(slimeFloor);
 
-// Hoher Stab
+// Hoher, rotierender Stab in der Mitte
 const stickLength = platformRadius * 2; 
 const stickWidth = 1.5;
 const stickHeight = 12.0; 
@@ -57,7 +49,7 @@ stick.position.set(0, stickHeight / 2, 0);
 scene.add(stick);
 let stickRotationSpeed = 0.035; 
 
-// Spieler (Kugel)
+// Spieler (Gelbe Kugel)
 const playerRadius = 1.2;
 const playerGeo = new THREE.SphereGeometry(playerRadius, 16, 16); 
 const playerMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.4 });
@@ -72,7 +64,7 @@ let jumpForce = 0.42;
 let canJump = true;
 let isDead = false;
 
-// NPCs als physikalische Kumpels aufbauen
+// NPCs (Blaue Kugeln)
 const npcMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.4 });
 let npcs = [];
 
@@ -90,7 +82,7 @@ spawnNPC(-10, -10);
 spawnNPC(10, -15);
 spawnNPC(-15, 10);
 
-// Steuerung & Kamera-Variablen
+// Tastatur- & Maussteuerung
 let keys = {};
 let rx = -0.4, ry = 0;    
 const cameraDistance = 12;
@@ -117,7 +109,7 @@ window.onresize = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 };
 
-// Kollisionsberechnung für Box vs Kugel
+// Kollisionsabfrage
 function handleStickCollision(targetPos, radius, targetExtForce) {
     if (targetPos.y - radius < stick.position.y + stickHeight / 2 && 
         targetPos.y + radius > stick.position.y - stickHeight / 2) {
