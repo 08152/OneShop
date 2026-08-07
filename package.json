@@ -1,14 +1,14 @@
 {
-  "name": "2d-gps-live-navigator",
+  "name": "2d-online-navigation-app",
   "version": "1.0.0",
-  "description": "2D GPS Live Navigator mit Render-Server-Support",
+  "description": "2D Online-Navigations-System mit Leaflet im Dark-Theme",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "jszip": "^3.10.1"
+    "leaflet": "^1.9.4"
   },
   "engines": {
     "node": ">=18.0.0"
