@@ -1,75 +1,159 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPS Navi</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <link rel="stylesheet" href="style.css">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GPS Navi</title>
+
+
+<!-- Leaflet Karte -->
+<link 
+rel="stylesheet" 
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
+<!-- Eigenes Design -->
+<link 
+rel="stylesheet" 
+href="style.css">
+
 </head>
+
+
 <body>
 
-    <!-- Suchleiste -->
-    <div class="panel">
 
-        <input
-            id="ziel"
-            type="text"
-            placeholder="Ziel eingeben...">
+<!-- Suchbereich -->
 
-        <button id="routeBtn">
-            🔎 Route suchen
-        </button>
+<div class="panel">
 
-        <button
-            id="startBtn"
-            style="display:none;">
-            🚗 Navigation starten
-        </button>
 
-        <div id="info">
-            📍 GPS wird gesucht...
-        </div>
+<input 
+id="ziel"
+type="text"
+placeholder="Ziel eingeben...">
 
-    </div>
 
-    <!-- Standort -->
-    <button id="locationBtn" title="Standort">
-        📍
-    </button>
+<button id="routeBtn">
+🔎 Route suchen
+</button>
 
-    <!-- Vollbild -->
-    <button id="fullscreenBtn" title="Vollbild">
-        ⛶
-    </button>
 
-    <!-- Navi -->
-    <div id="naviInfo">
+<button 
+id="startBtn"
+style="display:none">
 
-        <div id="nextInstruction">
-            Navigation
-        </div>
+🚗 Navigation starten
 
-        <div id="distanceLeft">
-            –
-        </div>
+</button>
 
-        <div id="timeLeft">
-            –
-        </div>
 
-    </div>
 
-    <!-- Karte -->
-    <div id="map"></div>
+<div id="info">
 
-    <!-- Leaflet -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+📍 GPS wird gestartet...
 
-    <!-- Eigene Dateien -->
-    <script src="map.js"></script>
-    <script src="script.js"></script>
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- Standort -->
+
+<button 
+id="locationBtn">
+
+📍
+
+</button>
+
+
+
+
+
+<!-- Vollbild -->
+
+<button 
+id="fullscreenBtn">
+
+⛶
+
+</button>
+
+
+
+
+
+<!-- Navigationsanzeige -->
+
+<div id="naviInfo">
+
+
+<div id="nextInstruction">
+
+Navigation
+
+</div>
+
+
+<div id="distanceLeft">
+
+-
+
+</div>
+
+
+<div id="timeLeft">
+
+-
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- Karte -->
+
+<div id="map"></div>
+
+
+
+
+
+
+
+<!-- Leaflet -->
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+<!-- Eigene Dateien -->
+<!-- Reihenfolge ist wichtig -->
+
+
+<script src="map.js"></script>
+
+<script src="route.js"></script>
+
+<script src="logik.js"></script>
+
+<script src="script.js"></script>
+
+
 
 </body>
+
 </html>
