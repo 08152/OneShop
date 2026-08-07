@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>GPS Navigation</title>
+<title>GPS Navi</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
 
 <style>
 
@@ -14,49 +17,115 @@ html,body{
 margin:0;
 height:100%;
 font-family:Arial;
+overflow:hidden;
 }
+
 
 #map{
 height:100%;
 width:100%;
 }
 
+
 .panel{
+
 position:absolute;
 top:10px;
 left:10px;
 right:10px;
-z-index:999;
+z-index:1000;
+
 background:white;
 padding:12px;
-border-radius:15px;
+
+border-radius:18px;
+
 box-shadow:0 0 15px #555;
+
 }
+
 
 input,button{
 
 width:100%;
-padding:12px;
-margin-top:6px;
-border-radius:10px;
+padding:14px;
+margin-top:8px;
+
+border-radius:12px;
+
 border:1px solid #aaa;
 
+font-size:17px;
+
 }
+
 
 button{
 
 background:#006cff;
 color:white;
-font-size:18px;
 
 }
 
-#info{
 
-margin-top:10px;
-font-weight:bold;
+.car-icon{
+
+font-size:45px;
+text-align:center;
 
 }
+
+
+#naviInfo{
+
+position:absolute;
+
+bottom:20px;
+
+left:20px;
+
+right:20px;
+
+z-index:2000;
+
+background:rgba(0,0,0,.75);
+
+color:white;
+
+padding:20px;
+
+border-radius:20px;
+
+font-size:24px;
+
+text-align:center;
+
+display:none;
+
+}
+
+
+.bigArrow{
+
+font-size:90px;
+
+}
+
+
+.fullscreenBtn{
+
+position:absolute;
+
+right:15px;
+
+top:15px;
+
+z-index:3000;
+
+width:auto;
+
+}
+
 
 </style>
 
@@ -68,18 +137,65 @@ font-weight:bold;
 
 <div class="panel">
 
-<input id="ziel" placeholder="Ziel eingeben">
 
-<button onclick="route()">
+<input id="ziel"
+placeholder="Ziel eingeben">
+
+
+<button onclick="prepareRoute()">
+
+🔎 Route suchen
+
+</button>
+
+
+<button id="startBtn"
+style="display:none"
+onclick="startNavigation()">
+
 🚗 Navigation starten
+
 </button>
 
 
 <div id="info">
+
 Warte auf GPS...
-</div>
 
 </div>
+
+
+</div>
+
+
+
+<button class="fullscreenBtn"
+onclick="toggleNaviMode()">
+
+⛶
+
+</button>
+
+
+
+<div id="naviInfo">
+
+<div class="bigArrow">
+
+⬆️
+
+</div>
+
+
+<div id="naviText">
+
+Navigation
+
+</div>
+
+
+</div>
+
 
 
 <div id="map"></div>
@@ -89,29 +205,30 @@ Warte auf GPS...
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 
-
 <script>
 
 
-let map =
-L.map("map")
-.setView([48.1351,11.5820],15);
+let map=L.map("map")
+.setView([48.1351,11.5820],16);
 
 
 
 L.tileLayer(
-"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-maxZoom:19
-}
+
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+
 ).addTo(map);
 
 
 
+let currentPos;
+
 let marker;
+
 let routeLine;
 
-let currentPos;
+let navigationLine;
+
 
 let routing=[];
 
@@ -120,20 +237,34 @@ let instructions=[];
 let nextInstruction=0;
 
 
+let navigationStarted=false;
 
-// ================= GPS =================
+
+
+let carIcon=L.divIcon({
+
+html:"⬆️",
+
+className:"car-icon",
+
+iconSize:[50,50],
+
+iconAnchor:[25,25]
+
+});
+
 
 
 navigator.geolocation.watchPosition(
 
-pos=>{
+p=>{
 
 
 currentPos=[
 
-pos.coords.latitude,
+p.coords.latitude,
 
-pos.coords.longitude
+p.coords.longitude
 
 ];
 
@@ -141,22 +272,29 @@ pos.coords.longitude
 
 if(!marker){
 
-marker=L.marker(currentPos)
-.addTo(map)
-.bindPopup("Dein Standort");
-
-
-map.setView(currentPos,16);
-
+marker=L.marker(
+currentPos,
+{
+icon:carIcon
 }
+)
+.addTo(map);
 
-else{
+
+map.setView(currentPos,18);
+
+
+}else{
+
 
 marker.setLatLng(currentPos);
 
+
 }
 
 
+
+updateNavigationLine();
 
 checkRoute();
 
@@ -167,11 +305,7 @@ checkInstructions();
 },
 
 
-err=>{
-
-alert("GPS konnte nicht gestartet werden");
-
-},
+e=>alert("GPS Fehler"),
 
 
 {
@@ -180,41 +314,60 @@ enableHighAccuracy:true
 
 }
 
-
-
 );
 
 
 
+async function prepareRoute(){
 
-// ================= ROUTE =================
+document.getElementById("startBtn")
+.style.display="block";
 
+
+await route();
+
+}
+
+
+
+function startNavigation(){
+
+navigationStarted=true;
+
+
+map.setZoom(19);
+
+
+speak(
+"Navigation gestartet"
+);
+
+}
+
+// ROUTE BERECHNEN
 
 async function route(){
 
 
-let ziel =
+let ziel=
 document.getElementById("ziel").value;
 
 
 
-let geo =
+let geo=
 await fetch(
-
 "https://nominatim.openstreetmap.org/search?format=json&q="
 +
 encodeURIComponent(ziel)
-
 );
 
 
 
-let data =
-await geo.json();
+let data=await geo.json();
 
 
 
-if(data.length==0){
+if(!data.length){
 
 alert("Ziel nicht gefunden");
 
@@ -234,54 +387,38 @@ parseFloat(data[0].lon)
 
 
 
-
-let url =
+let url=
 
 "https://router.project-osrm.org/route/v1/driving/"
 +
-currentPos[1]
-+
-","
-+
-currentPos[0]
+currentPos[1]+","+currentPos[0]
 +
 ";"
 +
-zielPos[1]
-+
-","
-+
-zielPos[0]
+zielPos[1]+","+zielPos[0]
 +
 "?overview=full&steps=true&geometries=geojson";
 
 
 
-
-
-let res =
+let res=
 await fetch(url);
 
 
 
-let json =
+let json=
 await res.json();
 
 
 
-let routeData =
-json.routes[0];
+let r=json.routes[0];
 
 
 
-
-routing =
-routeData.geometry.coordinates.map(
-
+routing=
+r.geometry.coordinates.map(
 c=>[c[1],c[0]]
-
 );
-
 
 
 
@@ -291,66 +428,92 @@ map.removeLayer(routeLine);
 
 
 
-routeLine =
-L.polyline(
-
+routeLine=L.polyline(
 routing,
-
 {
-
 color:"blue",
-
-weight:7
-
+weight:8
 }
-
-).addTo(map);
-
-
-
-
-map.fitBounds(
-routeLine.getBounds()
-);
+)
+.addTo(map);
 
 
 
+navigationLine=L.polyline(
+routing,
+{
+color:"#006cff",
+weight:8
+}
+)
+.addTo(map);
 
-// Anweisungen
+
+
+
+// Abbiegeinformationen
+
 
 instructions=[];
 
 
 
-routeData.legs[0].steps.forEach(step=>{
+r.legs[0].steps.forEach(step=>{
 
 
 let text="";
 
 
-
 switch(step.maneuver.type){
-
-
-case "depart":
-
-text="Starten";
-
-break;
-
 
 
 case "turn":
 
 
-if(step.maneuver.modifier=="left")
+switch(step.maneuver.modifier){
+
+
+case "slight left":
+
+text="Bleiben Sie links halten";
+break;
+
+
+case "slight right":
+
+text="Bleiben Sie rechts halten";
+break;
+
+
+case "left":
 
 text="Links abbiegen";
+break;
 
 
-else
+case "right":
 
 text="Rechts abbiegen";
+break;
+
+
+case "sharp left":
+
+text="Scharf links abbiegen";
+break;
+
+
+case "sharp right":
+
+text="Scharf rechts abbiegen";
+break;
+
+
+default:
+
+text="Geradeaus weiterfahren";
+
+}
 
 
 break;
@@ -382,7 +545,6 @@ default:
 
 text="Weiterfahren";
 
-
 }
 
 
@@ -404,33 +566,79 @@ nextInstruction=0;
 
 
 
-let km =
-(routeData.distance/1000)
-.toFixed(1);
-
-
-let min =
-Math.round(
-routeData.duration/60
-);
-
-
-
 document.getElementById("info").innerHTML=
 
 "🚗 "
-+km+
-" km<br>"
 +
-"⏱️ "
-+min+
+(r.distance/1000).toFixed(1)
++
+" km<br>⏱️ "
++
+Math.round(r.duration/60)
++
 " Minuten";
 
 
+}
 
-speak(
-"Navigation gestartet"
+
+
+
+
+// BLAUE LINIE MIT AUTO BEWEGEN
+
+
+function updateNavigationLine(){
+
+
+if(!routing.length || !currentPos)
+return;
+
+
+let index=0;
+
+let min=999999;
+
+
+
+routing.forEach((p,i)=>{
+
+
+let d=map.distance(
+currentPos,
+p
 );
+
+
+if(d<min){
+
+min=d;
+index=i;
+
+}
+
+
+});
+
+
+
+navigationLine.setLatLngs(
+routing.slice(index)
+);
+
+
+
+if(navigationStarted){
+
+map.setView(
+currentPos,
+19,
+{
+animate:true
+}
+);
+
+}
 
 
 
@@ -439,18 +647,18 @@ speak(
 
 
 
-// ================= ABWEICHUNG =================
+// ROUTE VERLASSEN
 
 
 function checkRoute(){
 
 
-if(!currentPos || routing.length==0)
+if(!routing.length)
 return;
 
 
 
-let min=999;
+let min=9999;
 
 
 
@@ -464,7 +672,6 @@ p
 );
 
 
-
 if(d<min)
 min=d;
 
@@ -474,6 +681,7 @@ min=d;
 
 
 if(min>80){
+
 
 speak(
 "Route verlassen. Neue Route wird berechnet."
@@ -486,13 +694,21 @@ route();
 }
 
 
-
 }
 
 
 
 
-// ================= ABBIEGEN =================
+
+// ABBIEGEANSAGEN
+
+
+let announced300=false;
+
+let announced50=false;
+
+let announcedNow=false;
+
 
 
 function checkInstructions(){
@@ -502,77 +718,107 @@ if(nextInstruction>=instructions.length)
 return;
 
 
-
-let inst =
-instructions[nextInstruction];
+let i=instructions[nextInstruction];
 
 
 
-if(inst.distance<150){
+let d=i.distance;
+
+
+
+if(d<300 && !announced300){
+
+speak(
+"In 300 Metern. "
++i.text
+);
+
+announced300=true;
+
+}
+
+
+
+if(d<50 && !announced50){
+
+speak(
+"In 50 Metern. "
++i.text
+);
+
+announced50=true;
+
+}
+
+
+
+if(d<10 && !announcedNow){
 
 
 speak(
-
-"In "
-+
-Math.round(inst.distance)
-+
-" Metern. "
-+
-inst.text
-
+"Jetzt. "
++i.text
 );
 
+
+document.getElementById("naviText")
+.innerHTML=
+"➡️ "
++i.text;
 
 
 nextInstruction++;
 
 
+announced300=false;
+
+announced50=false;
+
+announcedNow=false;
+
+
+}
+
+
 }
 
 
 
-}
 
 
+// GLEICHE NAVI-STIMME
 
 
-// ================= SPRACHE =================
-
-
-
-let germanVoice;
+let selectedVoice;
 
 
 
 function loadVoice(){
 
 
-let voices =
+let voices=
 speechSynthesis.getVoices();
 
 
 
-germanVoice =
+if(!selectedVoice){
+
+selectedVoice=
 voices.find(v=>
-
-v.lang.includes("de")
-
+v.lang.startsWith("de")
 );
 
+}
 
 
 }
 
 
-
-speechSynthesis.onvoiceschanged =
+speechSynthesis.onvoiceschanged=
 loadVoice;
 
 
-
 loadVoice();
-
 
 
 
@@ -582,36 +828,77 @@ function speak(text){
 speechSynthesis.cancel();
 
 
-
-let msg =
+let msg=
 new SpeechSynthesisUtterance(text);
 
 
+msg.voice=selectedVoice;
 
 msg.lang="de-DE";
 
-
-
-if(germanVoice)
-
-msg.voice=germanVoice;
-
-
-
-msg.rate=0.95;
+msg.rate=0.9;
 
 msg.pitch=1;
 
 msg.volume=1;
 
 
-
 speechSynthesis.speak(msg);
-
 
 
 }
 
+
+
+
+// VOLLBILD NAVI
+
+
+let full=false;
+
+
+
+function toggleNaviMode(){
+
+
+if(!full){
+
+
+document.documentElement.requestFullscreen();
+
+
+document.querySelector(".panel")
+.style.display="none";
+
+
+document.getElementById("naviInfo")
+.style.display="block";
+
+
+full=true;
+
+
+}else{
+
+
+document.exitFullscreen();
+
+
+document.querySelector(".panel")
+.style.display="block";
+
+
+document.getElementById("naviInfo")
+.style.display="none";
+
+
+full=false;
+
+
+}
+
+
+}
 
 
 </script>
