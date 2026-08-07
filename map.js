@@ -1,142 +1,508 @@
-/**
- * 2D-Karten-Engine (Leaflet-Kapselung)
- */
+// =====================================
+// map.js
+// Teil 1/2
+// Karte + GPS + Fahrzeugmarker
+// =====================================
 
-let map = null;
-let routeLine = null;
-let currentMarker = null;
-let targetMarker = null;
 
-// Konfiguration Dark Theme (CartoDB Dark Matter)
-const DARK_TILE_URL = 'https://{s}://{z}/{x}/{y}{r}.png';
-const MAP_ATTRIBUTION = '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>';
+// ------------------------------
+// Globale Variablen
+// ------------------------------
 
-/**
- * Initialisiert das Leaflet-Kartensystem auf dem bereitstehenden HTML-Element.
- * Verhindert den "Black-Screen"-Bug bei asynchronem Laden.
- */
-function initLeafletMapSystem(containerId, defaultLat = 52.520008, defaultLng = 13.404954) {
-    if (map) return; // Verhindert Mehrfach-Initialisierung
+let map;
 
-    // Reine 2D-Karte mit Maus-Drag und Scroll-Zoom
-    map = L.map(containerId, {
-        zoomControl: true,
-        boxZoom: true,
-        doubleClickZoom: true,
-        dragging: true,
-        scrollWheelZoom: true,
-        wheelDebounceTime: 40
-    }).setView([defaultLat, defaultLng], 13);
+let currentPos = null;
 
-    L.tileLayer(DARK_TILE_URL, {
-        attribution: MAP_ATTRIBUTION,
-        maxZoom: 19
-    }).addTo(map);
+let marker = null;
 
-    // Initialen Positionsmarker setzen (z. B. Berlin)
-    currentMarker = L.marker([defaultLat, defaultLng]).addTo(map)
-        .bindPopup("Aktueller Standort")
-        .openPopup();
+let heading = 0;
+
+
+// Fahrzeugmarker
+
+const carIcon = L.divIcon({
+
+    className:"",
+
+    html:
+    `
+    <div class="car-marker"></div>
+    `,
+
+    iconSize:[36,36],
+
+    iconAnchor:[18,18]
+
+});
+
+
+
+
+// ------------------------------
+// Karte starten
+// ------------------------------
+
+function initMap(){
+
+    map = L.map("map",{
+
+        zoomControl:false
+
+    }).setView(
+
+        [48.1351,11.5820],
+
+        17
+
+    );
+
+
+
+    L.tileLayer(
+
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+
+        {
+
+            maxZoom:20,
+
+            attribution:
+            "&copy; OpenStreetMap"
+
+        }
+
+    ).addTo(map);
+
 }
 
-/**
- * Aktualisiert die visuelle Position des Benutzers auf der Karte
- */
-function updateMapUserPosition(lat, lng) {
-    if (!map) return;
-    const newPos = [lat, lng];
-    currentMarker.setLatLng(newPos);
-}
 
-/**
- * Zentriert die Ansicht auf den Benutzer
- */
-function centerMapOnUser(lat, lng) {
-    if (map) {
-        map.setView([lat, lng], 15);
+
+
+
+// ------------------------------
+// GPS starten
+// ------------------------------
+
+function initGPS(){
+
+
+    if(!navigator.geolocation){
+
+        showError(
+            "GPS wird nicht unterstützt."
+        );
+
+        return;
+
     }
+
+
+
+    navigator.geolocation.watchPosition(
+
+        gpsSuccess,
+
+        gpsError,
+
+        {
+
+            enableHighAccuracy:true,
+
+            maximumAge:0,
+
+            timeout:10000
+
+        }
+
+    );
+
 }
 
-/**
- * Setzt oder aktualisiert den Ziel-Marker
- */
-function updateMapTargetMarker(lat, lng, label = "Ziel") {
-    if (!map) return;
-    if (targetMarker) {
-        targetMarker.setLatLng([lat, lng]).setPopupContent(label);
-    } else {
-        targetMarker = L.marker([lat, lng], {
-            icon: L.icon({
-                iconUrl: 'https://githubusercontent.com',
-                shadowUrl: 'https://cloudflare.com',
-                iconSize:,
-                iconAnchor:,
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            })
-        }).addTo(map).bindPopup(label);
+
+
+
+
+// ------------------------------
+// GPS Erfolg
+// ------------------------------
+
+function gpsSuccess(position){
+
+
+    const lat =
+    position.coords.latitude;
+
+    const lng =
+    position.coords.longitude;
+
+
+
+    currentPos = [
+
+        lat,
+
+        lng
+
+    ];
+
+
+
+    if(position.coords.heading !== null &&
+       !isNaN(position.coords.heading)){
+
+        heading =
+        position.coords.heading;
+
     }
-    targetMarker.openPopup();
-}
 
-/**
- * Zeichnet eine neue blaue Routenlinie basierend auf einem Array von Geopunkten
- */
-function drawRouteOnMap(pointsArray) {
-    if (!map) return;
-    
-    // Falls alte Linie existiert, entfernen
-    clearRouteFromMap();
 
-    // Erstelle ein Leaflet-kompatibles LatLng-Array
-    const latLngs = pointsArray.map(p => [p.lat, p.lng]);
 
-    routeLine = L.polyline(latLngs, {
-        color: '#3b82f6',
-        weight: 6,
-        opacity: 0.8,
-        lineCap: 'round',
-        lineJoin: 'round'
-    }).addTo(map);
+    if(marker==null){
 
-    // Kartenausschnitt an Route anpassen
-    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-}
+        marker =
 
-/**
- * Entfernt die Routenlinie von der Karte
- */
-function clearRouteFromMap() {
-    if (routeLine && map) {
-        map.removeLayer(routeLine);
-        routeLine = null;
+        L.marker(
+
+            currentPos,
+
+            {
+
+                icon:carIcon
+
+            }
+
+        ).addTo(map);
+
+
+
+        map.setView(
+
+            currentPos,
+
+            19
+
+        );
+
+
+
+        gpsLoaded();
+
     }
+
+    else{
+
+        marker.setLatLng(
+
+            currentPos
+
+        );
+
+    }
+
+
+
+    updateCarRotation();
+
+
+
+    if(followLocation){
+
+        map.panTo(
+
+            currentPos,
+
+            {
+
+                animate:true,
+
+                duration:0.7
+
+            }
+
+        );
+
+    }
+
+
+
+    updateStatus(
+
+        "📍 "
+
+        +
+
+        lat.toFixed(6)
+
+        +
+
+        ", "
+
+        +
+
+        lng.toFixed(6)
+
+    );
+
+
+
 }
 
-/**
- * Aktualisiert die Routenlinie dynamisch (löscht das erste/abgefahrene Teilstück)
- */
-function updateActiveRouteLine(remainingPoints) {
-    if (!routeLine || !map) return;
-    const latLngs = remainingPoints.map(p => [p.lat, p.lng]);
-    routeLine.setLatLngs(latLngs);
+
+
+
+
+
+// ------------------------------
+// GPS Fehler
+// ------------------------------
+
+function gpsError(error){
+
+    showError(
+
+        "GPS Fehler: "
+
+        +
+
+        error.message
+
+    );
+
+}
+// =====================================
+// map.js
+// Teil 2/2
+// Fahrzeug drehen + Zentrierung
+// =====================================
+
+
+// ------------------------------
+// Fahrzeug drehen
+// ------------------------------
+
+function updateCarRotation(){
+
+    if(!marker)
+        return;
+
+
+    const element =
+    marker.getElement();
+
+
+    if(!element)
+        return;
+
+
+    const car =
+    element.querySelector(".car-marker");
+
+
+    if(!car)
+        return;
+
+
+    car.style.transform =
+
+        "rotate("
+
+        +
+
+        heading
+
+        +
+
+        "deg)";
+
 }
 
-/**
- * Mathematische Distanzberechnung zwischen zwei Koordinaten (Haversine-Formel) in Metern.
- * Wichtig für Abweichungsprüfung und Offline-Fallback-Berechnungen.
- */
-function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // Erdradius in Metern
-    const phi1 = lat1 * Math.PI / 180;
-    const phi2 = lat2 * Math.PI / 180;
-    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
-    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
-    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    return R * c;
+
+// ------------------------------
+// Standort zentrieren
+// ------------------------------
+
+function centerLocation(){
+
+    if(!currentPos)
+        return;
+
+
+    followLocation = true;
+
+
+    map.flyTo(
+
+        currentPos,
+
+        19,
+
+        {
+
+            animate:true,
+
+            duration:0.8
+
+        }
+
+    );
+
 }
+
+
+
+
+// ------------------------------
+// Benutzer bewegt Karte
+// ------------------------------
+
+map.on(
+
+"dragstart",
+
+()=>{
+
+    followLocation = false;
+
+}
+
+);
+
+
+map.on(
+
+"zoomstart",
+
+()=>{
+
+    followLocation = false;
+
+}
+
+);
+
+
+
+
+// ------------------------------
+// Kompass (wenn verfügbar)
+// ------------------------------
+
+window.addEventListener(
+
+"deviceorientationabsolute",
+
+e=>{
+
+    if(e.alpha===null)
+        return;
+
+
+    // Nur verwenden, wenn GPS keine Fahrtrichtung liefert
+    if(heading===0){
+
+        heading =
+
+        360 - e.alpha;
+
+
+        updateCarRotation();
+
+    }
+
+}
+
+);
+
+
+
+
+// ------------------------------
+// Marker aktualisieren
+// ------------------------------
+
+function updateMarker(lat,lng){
+
+    currentPos = [lat,lng];
+
+
+    if(marker){
+
+        marker.setLatLng(
+
+            currentPos
+
+        );
+
+    }
+
+
+    if(followLocation){
+
+        map.panTo(
+
+            currentPos,
+
+            {
+
+                animate:true,
+
+                duration:0.5
+
+            }
+
+        );
+
+    }
+
+}
+
+
+
+
+// ------------------------------
+// Karte aktualisieren
+// ------------------------------
+
+function refreshMap(){
+
+    if(map){
+
+        map.invalidateSize();
+
+    }
+
+}
+
+
+
+
+// ------------------------------
+// Fenstergröße geändert
+// ------------------------------
+
+window.addEventListener(
+
+"resize",
+
+()=>{
+
+    refreshMap();
+
+}
+
+);
+
+
+
+
+// ------------------------------
+// Karte fertig
+// ------------------------------
+
+console.log(
+
+"map.js geladen"
+
+);
