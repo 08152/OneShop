@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>3D Cyber-Matrix Map View</title>
+    <title>3D Global Live-Map Navigator</title>
     <!-- JSZip für den automatischen Download aller Projektdateien -->
     <script src="https://cloudflare.com"></script>
     <style>
@@ -11,23 +11,34 @@
         
         #hud {
             position:absolute; top:20px; left:20px; color:white; z-index:10;
-            background: rgba(0,0,0,0.6); padding: 15px; border-radius: 8px; border: 1px solid #00d2ff;
+            background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px; border: 1px solid #00d2ff;
         }
         #routing-panel {
             position: absolute; top: 20px; right: 20px; z-index: 10;
-            background: rgba(5,5,10,0.85); padding: 20px; border-radius: 12px;
-            border: 1px solid #00d2ff; width: 260px; color: white;
+            background: rgba(5,5,10,0.9); padding: 20px; border-radius: 12px;
+            border: 1px solid #00d2ff; width: 300px; color: white; box-shadow: 0 0 20px rgba(0,210,255,0.3);
         }
-        .input-group { margin-bottom: 12px; }
+        .input-group { margin-bottom: 15px; position: relative; }
         .input-group label { display: block; margin-bottom: 4px; font-size: 11px; color: #8a99ad; text-transform: uppercase; }
-        .input-group select { width: 100%; padding: 8px; background: #0c0d14; border: 1px solid #00d2ff; border-radius: 6px; color: white; }
+        .input-group input { width: 93%; padding: 10px; background: #0c0d14; border: 1px solid #00d2ff; border-radius: 6px; color: white; font-size: 14px; }
+        .input-group input:focus { outline: none; box-shadow: 0 0 10px #00d2ff; }
         
-        #btn-route { width: 100%; background: linear-gradient(135deg, #0052d4, #4364f7); color: white; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        #btn-download { width: 100%; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        /* Vorschlagsliste für die 3 Millionen Orte */
+        .suggestions {
+            position: absolute; top: 58px; left: 0; width: 100%; background: #0c0d14;
+            border: 1px solid #313d4f; border-top: none; border-radius: 0 0 6px 6px;
+            max-height: 180px; overflow-y: auto; z-index: 20; display: none;
+        }
+        .suggestion-item { padding: 8px 12px; cursor: pointer; font-size: 13px; color: #ccc; border-bottom: 1px solid #1a2230; }
+        .suggestion-item:hover { background: #0052d4; color: white; }
+        
+        #btn-route { width: 100%; background: linear-gradient(135deg, #0052d4, #4364f7); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        #btn-download { width: 100%; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; font-size: 14px; }
         
         #results { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,210,255,0.3); display: none; }
         .result-line { margin-bottom: 8px; font-size: 14px; display: flex; justify-content: space-between; }
         .result-val { font-weight: bold; color: #00d2ff; }
+        #mode-indicator { font-size: 12px; text-align: center; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -40,34 +51,32 @@
     </div>
 
     <div id="routing-panel">
-        <h3 style="margin-top:0; color:#00d2ff;">3D Navigator</h3>
+        <h3 style="margin-top:0; color:#00d2ff; text-align:center;">Global 3D Live-Navigator</h3>
+        <div id="mode-indicator" style="color: #2ecc71;">🌐 Online-Modus (3 Mio. Orte aktiv)</div>
+        
         <div class="input-group">
-            <label>Start-Ort:</label>
-            <select id="start-city">
-                <option value="52.520,13.404">Berlin</option>
-                <option value="48.137,11.575">München</option>
-                <option value="53.551,9.993">Hamburg</option>
-            </select>
+            <label>Startort (Gemeinde weltweit):</label>
+            <input type="text" id="start-city" placeholder="Tippen zum Suchen..." autocomplete="off">
+            <div id="start-suggestions" class="suggestions"></div>
         </div>
+        
         <div class="input-group">
-            <label>Ziel-Ort:</label>
-            <select id="target-city">
-                <option value="48.137,11.575">München</option>
-                <option value="52.520,13.404">Berlin</option>
-                <option value="53.551,9.993">Hamburg</option>
-            </select>
+            <label>Zielort (Gemeinde weltweit):</label>
+            <input type="text" id="target-city" placeholder="Tippen zum Suchen..." autocomplete="off">
+            <div id="target-suggestions" class="suggestions"></div>
         </div>
+        
         <button id="btn-route" onclick="trigger3DMapping()">ROUTE PLANEN</button>
-        <button id="btn-download" onclick="downloadOfflineZip()">OFFLINE ZIP LADEN</button>
+        <button id="btn-download" onclick="downloadOfflineZip()">RIESIGE ZIP RUNTERLADEN</button>
 
         <div id="results">
-            <div class="result-line"><span>Distanz:</span> <span id="res-km" class="result-val">-</span></div>
-            <div class="result-line"><span>Fahrzeit:</span> <span id="res-time" class="result-val">-</span></div>
+            <div class="result-line"><span>Reale Distanz:</span> <span id="res-km" class="result-val">-</span></div>
+            <div class="result-line"><span>Fahrzeit (Auto):</span> <span id="res-time" class="result-val">-</span></div>
         </div>
     </div>
 
-    <!-- Three.js Einbindung analog zu Ihrem funktionierenden Skript -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <!-- WebGL Rendering Library -->
+    <script src="https://jsdelivr.net"></script>
     <script src="script.js"></script>
     <script src="map.js"></script>
 </body>
