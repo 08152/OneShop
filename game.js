@@ -1,23 +1,22 @@
 // ======================
-// 3D ENGINE & PHYSIK (NO SHADER)
+// 3D ENGINE & WELTBAU
 // ======================
 const scene = new THREE.Scene();
-// Heller, klarer blauer Himmel als Hintergrundfarbe definiert
-scene.background = new THREE.Color(0x6ba7e6);
+scene.background = new THREE.Color(0x6ba7e6); // Hellblauer Himmel
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = false; // Für flüssige Performance ausgeschaltet
+renderer.shadowMap.enabled = false;
 document.body.appendChild(renderer.domElement);
 
-// Beleuchtung aktivieren
+// Helle Beleuchtung
 scene.add(new THREE.AmbientLight(0xffffff, 0.9));
 const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
 mainLight.position.set(50, 100, 50);
 scene.add(mainLight);
 
-// Rote Plattform (Echtes Standard-Material)
+// Große rote Plattform
 const platformRadius = 40;
 const platformGeo = new THREE.CylinderGeometry(platformRadius, platformRadius, 2, 64);
 const platformMat = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.6 });
@@ -25,12 +24,12 @@ const platform = new THREE.Mesh(platformGeo, platformMat);
 platform.position.y = -1; 
 scene.add(platform);
 
-// Helles Hilfsraster auf der Plattform für besseres Sichtfeld
+// Weißes Raster auf der Plattform für die Orientierung
 const grid = new THREE.GridHelper(platformRadius * 2, 40, 0xffffff, 0x990000);
 grid.position.y = 0.01;
 scene.add(grid);
 
-// Grüner Schleim-Boden im Abgrund (Klassisches Giftgrün)
+// Grüner Schleim-Boden weit unten im Abgrund
 const slimeGeo = new THREE.PlaneGeometry(800, 800);
 const slimeMat = new THREE.MeshBasicMaterial({ color: 0x00cc11 });
 const slimeFloor = new THREE.Mesh(slimeGeo, slimeMat);
@@ -38,7 +37,7 @@ slimeFloor.position.y = -25;
 slimeFloor.rotation.x = -Math.PI / 2; 
 scene.add(slimeFloor);
 
-// Hoher, rotierender Stab in der Mitte
+// Hoher, sich drehender Stab im Zentrum
 const stickLength = platformRadius * 2; 
 const stickWidth = 1.5;
 const stickHeight = 12.0; 
@@ -49,7 +48,7 @@ stick.position.set(0, stickHeight / 2, 0);
 scene.add(stick);
 let stickRotationSpeed = 0.035; 
 
-// Spieler (Gelbe Kugel)
+// Spieler (Die goldene Kugel)
 const playerRadius = 1.2;
 const playerGeo = new THREE.SphereGeometry(playerRadius, 16, 16); 
 const playerMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.4 });
@@ -57,6 +56,7 @@ const player = new THREE.Mesh(playerGeo, playerMat);
 player.position.set(0, playerRadius, 20); 
 scene.add(player);
 
+// Physik-Variablen für Kugel und Stangenschubser
 let velocity = new THREE.Vector3(0, 0, 0);
 let externalForce = new THREE.Vector3(0, 0, 0); 
 let gravity = 0.015;
@@ -64,7 +64,7 @@ let jumpForce = 0.42;
 let canJump = true;
 let isDead = false;
 
-// NPCs (Blaue Kugeln)
+// NPCs (Die blauen Gegner-Kugeln)
 const npcMat = new THREE.MeshStandardMaterial({ color: 0x00f0ff, roughness: 0.4 });
 let npcs = [];
 
@@ -82,7 +82,7 @@ spawnNPC(-10, -10);
 spawnNPC(10, -15);
 spawnNPC(-15, 10);
 
-// Tastatur- & Maussteuerung
+// Eingabe & Kamera-Winkel
 let keys = {};
 let rx = -0.4, ry = 0;    
 const cameraDistance = 12;
@@ -96,6 +96,7 @@ window.onkeydown = (e) => {
 };
 window.onkeyup = (e) => { keys[e.key.toLowerCase()] = false; };
 document.body.onclick = () => { document.body.requestPointerLock(); };
+
 window.onmousemove = (e) => {
     if (document.pointerLockElement) {
         ry -= e.movementX * 0.0025;
@@ -103,13 +104,14 @@ window.onmousemove = (e) => {
         rx = Math.max(-0.6, Math.min(0.2, rx));
     }
 };
+
 window.onresize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 };
 
-// Kollisionsabfrage
+// Kollisionsberechnung für den rotierenden Stab
 function handleStickCollision(targetPos, radius, targetExtForce) {
     if (targetPos.y - radius < stick.position.y + stickHeight / 2 && 
         targetPos.y + radius > stick.position.y - stickHeight / 2) {
