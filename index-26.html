@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Navigation – Demo</title>
+<style>
+body{font-family:Arial,sans-serif;margin:2rem}
+#log{white-space:pre-wrap;background:#f3f3f3;padding:1rem;border-radius:8px}
+button{padding:.7rem 1rem}
+</style>
+</head>
+<body>
+<h1>Open Navigation – Demo</h1>
+<p>Dies ist eine Demo der Sprachansage. Für vollständige Navigation werden zusätzlich Leaflet, ein Routing-Dienst (z.B. OSRM/GraphHopper) und GPS benötigt.</p>
+<button onclick="demo()">Sprachansage testen</button>
+<div id="log"></div>
+<script>
+function speak(text){
+  if(!("speechSynthesis" in window)){
+    alert("Sprachausgabe wird nicht unterstützt.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="de-DE";
+  speechSynthesis.speak(u);
+  document.getElementById("log").textContent=text;
+}
+function demo(){
+  speak("Navigation gestartet. In 200 Metern rechts abbiegen.");
+}
+</script>
+</body>
+</html>
