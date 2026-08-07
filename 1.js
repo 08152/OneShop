@@ -1,5 +1,5 @@
 /**
- * 1.js - Core Mapping Engine & Geometrie
+ * 1.js - Core Mapping Engine & Geometrie (Fehlerbereinigt)
  */
 
 let map = null;
@@ -13,7 +13,6 @@ const MAP_ATTRIBUTION = '&copy; <a href="https://openstreetmap.org">OpenStreetMa
 
 /**
  * Initialisiert das Leaflet-Kartensystem auf dem bereitstehenden HTML-Element.
- * Verhindert den "Black-Screen"-Bug bei asynchronem Laden.
  */
 function initLeafletMapSystem(containerId, defaultLat = 52.520008, defaultLng = 13.404954) {
     if (map) return; // Verhindert Mehrfach-Initialisierung
@@ -57,7 +56,7 @@ function centerMapOnUser(lat, lng) {
 }
 
 /**
- * Setzt oder aktualisiert den Ziel-Marker
+ * Setzt oder aktualisiert den Ziel-Marker (Syntaxfehler behoben)
  */
 function updateMapTargetMarker(lat, lng, label = "Ziel") {
     if (!map) return;
