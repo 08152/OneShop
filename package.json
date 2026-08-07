@@ -1,13 +1,18 @@
 {
-  "name": "3d-sphere-game-render",
+  "name": "2d-gps-live-navigator",
   "version": "1.0.0",
-  "description": "3D Third Person Sphere Movement on Render",
+  "description": "2D GPS Live Navigator mit Render-Server-Support",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "socket.io": "^4.7.5"
-  }
+    "jszip": "^3.10.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
