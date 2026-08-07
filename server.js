@@ -1,20 +1,32 @@
-const express = require('express');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+
+
 const app = express();
+
+
 const PORT = process.env.PORT || 3000;
 
-// Stellt alle statischen Dateien (index.html, map-logic.js etc.) im aktuellen Ordner bereit
+
+app.use(cors());
+
 app.use(express.static(__dirname));
 
-// Liefert die index.html aus, wenn die Hauptseite aufgerufen wird
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+
+app.get("/", (req,res)=>{
+
+    res.sendFile(
+        path.join(__dirname,"navigation.html")
+    );
+
 });
 
-// Server starten
-app.listen(PORT, () => {
-    console.log(`==================================================`);
-    console.log(`🚀 Karten-Server erfolgreich gestartet!`);
-    console.log(`📱 Lokal erreichbar unter: http://localhost:${PORT}`);
-    console.log(`==================================================`);
+
+app.listen(PORT, "0.0.0.0", ()=>{
+
+    console.log(
+        "GPS Navi läuft auf Port " + PORT
+    );
+
 });
