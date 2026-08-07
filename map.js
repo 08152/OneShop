@@ -1,62 +1,142 @@
-const mapIsOnline = navigator.onLine && window.location.protocol !== 'file:';
-let leafletMap = null;
-let routeLayerGroup = null;
-let liveUserMarker = null;
+/**
+ * 2D-Karten-Engine (Leaflet-Kapselung)
+ */
 
-document.addEventListener("DOMContentLoaded", () => {
-    const mapView = document.getElementById("map-view");
+let map = null;
+let routeLine = null;
+let currentMarker = null;
+let targetMarker = null;
 
-    if (mapIsOnline) {
-        leafletMap = L.map('map-view', { zoomControl: false }).setView([51.1657, 10.4515], 6);
-        L.control.zoom({ position: 'bottomleft' }).addTo(leafletMap);
-        
-        L.tileLayer('https://{s}://{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap'
-        }).addTo(leafletMap);
+// Konfiguration Dark Theme (CartoDB Dark Matter)
+const DARK_TILE_URL = 'https://{s}://{z}/{x}/{y}{r}.png';
+const MAP_ATTRIBUTION = '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com">CARTO</a>';
 
-        routeLayerGroup = L.layerGroup().addTo(leafletMap);
-        startMapLocationTracking();
+/**
+ * Initialisiert das Leaflet-Kartensystem auf dem bereitstehenden HTML-Element.
+ * Verhindert den "Black-Screen"-Bug bei asynchronem Laden.
+ */
+function initLeafletMapSystem(containerId, defaultLat = 52.520008, defaultLng = 13.404954) {
+    if (map) return; // Verhindert Mehrfach-Initialisierung
+
+    // Reine 2D-Karte mit Maus-Drag und Scroll-Zoom
+    map = L.map(containerId, {
+        zoomControl: true,
+        boxZoom: true,
+        doubleClickZoom: true,
+        dragging: true,
+        scrollWheelZoom: true,
+        wheelDebounceTime: 40
+    }).setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer(DARK_TILE_URL, {
+        attribution: MAP_ATTRIBUTION,
+        maxZoom: 19
+    }).addTo(map);
+
+    // Initialen Positionsmarker setzen (z. B. Berlin)
+    currentMarker = L.marker([defaultLat, defaultLng]).addTo(map)
+        .bindPopup("Aktueller Standort")
+        .openPopup();
+}
+
+/**
+ * Aktualisiert die visuelle Position des Benutzers auf der Karte
+ */
+function updateMapUserPosition(lat, lng) {
+    if (!map) return;
+    const newPos = [lat, lng];
+    currentMarker.setLatLng(newPos);
+}
+
+/**
+ * Zentriert die Ansicht auf den Benutzer
+ */
+function centerMapOnUser(lat, lng) {
+    if (map) {
+        map.setView([lat, lng], 15);
+    }
+}
+
+/**
+ * Setzt oder aktualisiert den Ziel-Marker
+ */
+function updateMapTargetMarker(lat, lng, label = "Ziel") {
+    if (!map) return;
+    if (targetMarker) {
+        targetMarker.setLatLng([lat, lng]).setPopupContent(label);
     } else {
-        mapView.className = "offline-grid-bg";
-        mapView.innerHTML = `<div><h1 style="color:#66fcf1;">Offline Matrix</h1><p>GPS & Sprachhilfe laufen mathematisch offline!</p></div>`;
+        targetMarker = L.marker([lat, lng], {
+            icon: L.icon({
+                iconUrl: 'https://githubusercontent.com',
+                shadowUrl: 'https://cloudflare.com',
+                iconSize:,
+                iconAnchor:,
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).addTo(map).bindPopup(label);
     }
-});
+    targetMarker.openPopup();
+}
 
-function startMapLocationTracking() {
-    if (navigator.geolocation && leafletMap) {
-        navigator.geolocation.watchPosition((position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+/**
+ * Zeichnet eine neue blaue Routenlinie basierend auf einem Array von Geopunkten
+ */
+function drawRouteOnMap(pointsArray) {
+    if (!map) return;
+    
+    // Falls alte Linie existiert, entfernen
+    clearRouteFromMap();
 
-            if (!liveUserMarker) {
-                liveUserMarker = L.circleMarker([lat, lon], {
-                    radius: 9, color: '#ffffff', fillColor: '#00ff00', fillOpacity: 1, weight: 3
-                }).addTo(leafletMap).bindPopup("Aktueller Standort");
-            } else {
-                liveUserMarker.setLatLng([lat, lon]);
-            }
+    // Erstelle ein Leaflet-kompatibles LatLng-Array
+    const latLngs = pointsArray.map(p => [p.lat, p.lng]);
 
-            if (typeof currentRoutePoints !== "undefined" && currentRoutePoints.length > 0) {
-                handleLiveNavigationProgress(lat, lon);
-            }
-        }, (err) => console.log("GPS-Warte-Signal: ", err), { enableHighAccuracy: true });
+    routeLine = L.polyline(latLngs, {
+        color: '#3b82f6',
+        weight: 6,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
+    }).addTo(map);
+
+    // Kartenausschnitt an Route anpassen
+    map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+}
+
+/**
+ * Entfernt die Routenlinie von der Karte
+ */
+function clearRouteFromMap() {
+    if (routeLine && map) {
+        map.removeLayer(routeLine);
+        routeLine = null;
     }
 }
 
-function renderRouteOnMap(coordinates) {
-    if (!leafletMap || !routeLayerGroup) return;
-    routeLayerGroup.clearLayers();
-
-    const mainLine = L.polyline(coordinates, { color: '#00d2ff', weight: 7, opacity: 0.85 }).addTo(routeLayerGroup);
-    L.polyline(coordinates, { color: '#ffffff', weight: 2, opacity: 1 }).addTo(routeLayerGroup);
-
-    leafletMap.fitBounds(mainLine.getBounds(), { padding: [50, 50] });
+/**
+ * Aktualisiert die Routenlinie dynamisch (löscht das erste/abgefahrene Teilstück)
+ */
+function updateActiveRouteLine(remainingPoints) {
+    if (!routeLine || !map) return;
+    const latLngs = remainingPoints.map(p => [p.lat, p.lng]);
+    routeLine.setLatLngs(latLngs);
 }
 
-function clearMapRoute() {
-    if (routeLayerGroup) routeLayerGroup.clearLayers();
-}
+/**
+ * Mathematische Distanzberechnung zwischen zwei Koordinaten (Haversine-Formel) in Metern.
+ * Wichtig für Abweichungsprüfung und Offline-Fallback-Berechnungen.
+ */
+function calculateDistanceInMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // Erdradius in Metern
+    const phi1 = lat1 * Math.PI / 180;
+    const phi2 = lat2 * Math.PI / 180;
+    const deltaPhi = (lat2 - lat1) * Math.PI / 180;
+    const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
-window.addEventListener('resize', () => {
-    if (leafletMap) leafletMap.invalidateSize();
-});
+    const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+              Math.cos(phi1) * Math.cos(phi2) *
+              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+}
