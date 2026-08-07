@@ -1,199 +1,183 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flexible Touch-Karte mit Routing</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://unpkg.com" />
-    
-    <style>
-        /* Verhindert unschöne Scrollbalken auf Chromebooks und Mobilgeräten */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weltkarte mit Navigation</title>
 
-        /* Flexbox-Layout für perfekte Anpassung an jede Bildschirmgröße */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-        }
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
 
-        #map {
-            flex-grow: 1;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
+<style>
+html, body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial, sans-serif;
+}
 
-        /* Bedienfeld: Passt sich automatisch per Media-Queries an */
-        .sidebar {
-            background: white;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            z-index: 1000;
-            box-sizing: border-box;
-        }
+#map{
+    width:100%;
+    height:100%;
+}
 
-        .sidebar h3 { 
-            margin: 0 0 10px 0; 
-            font-size: 16px; 
-            text-align: center;
-        }
+#menu{
+    position:absolute;
+    top:10px;
+    left:10px;
+    z-index:1000;
+    background:white;
+    padding:12px;
+    border-radius:10px;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+    width:260px;
+}
 
-        /* Button-Layout für Touch-Bedienung */
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
+#menu h2{
+    margin:0 0 10px;
+    font-size:18px;
+}
 
-        .input-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
+input{
+    width:100%;
+    box-sizing:border-box;
+    padding:8px;
+    margin-bottom:8px;
+}
 
-        .input-group { 
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .input-group label { 
-            font-size: 11px; 
-            margin-bottom: 3px; 
-            color: #555; 
-            font-weight: bold;
-        }
-        
-        /* Große Eingabefelder für einfaches Tippen auf Touchscreens */
-        .input-group input { 
-            width: 100%; 
-            padding: 10px; 
-            box-sizing: border-box; 
-            border: 2px solid #ccc; 
-            border-radius: 6px; 
-            font-size: 14px;
-        }
-        
-        /* Optimierte Buttons für Fingerbedienung */
-        button {
-            flex: 1;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            touch-action: manipulation;
-        }
-        
-        button:active { background-color: #004085; }
-        
-        #focus-btn { background-color: #28a745; }
-        #focus-btn:active { background-color: #1e7e34; }
-        
-        #route-btn { background-color: #17a2b8; width: 100%; }
-        #route-btn:active { background-color: #117a8b; }
+button{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    cursor:pointer;
+    border:none;
+    border-radius:6px;
+    background:#2d89ef;
+    color:white;
+    font-size:15px;
+}
 
-        /* Infobox für Routendaten */
-        #route-info {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-left: 4px solid #17a2b8;
-            border-radius: 4px;
-            font-size: 14px;
-            display: none;
-        }
-
-        /* 📱 RESPONSIVE DESIGN */
-        @media (max-width: 767px) {
-            .sidebar {
-                width: 100%;
-                max-height: 50%;
-                overflow-y: auto;
-                order: 1;
-            }
-            #map {
-                order: 2;
-            }
-        }
-
-        @media (min-width: 768px) {
-            .app-container {
-                position: relative;
-                flex-direction: row;
-            }
-            .sidebar {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                width: 320px;
-                border-radius: 8px;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-        }
-    </style>
+button:hover{
+    background:#1b5fbf;
+}
+</style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="sidebar">
-            <h3>📍 Touch-Navigation</h3>
-            
-            <div class="button-group">
-                <button id="focus-btn">🚗 Auto</button>
-                <button id="locate-btn">🛰️ GPS Ortung</button>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="start">STARTADRESSE:</label>
-                    <input type="text" id="start" placeholder="z.B. Berlin">
-                </div>
-                <div class="input-group">
-                    <label for="ziel">ZIELADRESSE:</label>
-                    <input type="text" id="ziel" placeholder="z.B. München">
-                </div>
-            </div>
-            
-            <button id="route-btn">🗺️ Route berechnen</button>
+<div id="menu">
+    <h2>🗺 Navigation</h2>
 
-            <div id="route-info">
-                <strong>🗺️ Route geladen:</strong>
-                <div id="distance">Distanz: -</div>
-                <div id="duration">Dauer: -</div>
-            </div>
-        </div>
+    <input id="start" placeholder="Start (z.B. München)">
+    <input id="ziel" placeholder="Ziel (z.B. Berlin)">
 
-        <div id="map"></div>
-    </div>
+    <button onclick="routeBerechnen()">Route berechnen</button>
+    <button onclick="meinStandort()">📍 Mein Standort</button>
+</div>
 
-    <!-- Externe Bibliotheken -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
-    
-    <!-- Deine Logik-Datei verknüpfen -->
-    <script src="map-logic.js"></script>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+
+const map = L.map("map").setView([20,0],2);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    attribution:"© OpenStreetMap"
+}).addTo(map);
+
+let routingControl=null;
+let marker=null;
+
+async function sucheOrt(name){
+
+    const url=`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(name)}`;
+
+    const daten=await fetch(url,{
+        headers:{
+            "Accept":"application/json"
+        }
+    });
+
+    const json=await daten.json();
+
+    if(json.length===0){
+        throw "Ort nicht gefunden.";
+    }
+
+    return L.latLng(json[0].lat,json[0].lon);
+}
+
+async function routeBerechnen(){
+
+    const start=document.getElementById("start").value.trim();
+    const ziel=document.getElementById("ziel").value.trim();
+
+    if(start===""||ziel===""){
+        alert("Bitte Start und Ziel eingeben.");
+        return;
+    }
+
+    try{
+
+        const startPos=await sucheOrt(start);
+        const zielPos=await sucheOrt(ziel);
+
+        if(routingControl){
+            map.removeControl(routingControl);
+        }
+
+        routingControl=L.Routing.control({
+            waypoints:[
+                startPos,
+                zielPos
+            ],
+            routeWhileDragging:true,
+            addWaypoints:true,
+            draggableWaypoints:true,
+            fitSelectedRoutes:true,
+            show:true
+        }).addTo(map);
+
+    }catch(e){
+        alert(e);
+    }
+
+}
+
+function meinStandort(){
+
+    if(!navigator.geolocation){
+        alert("Geolocation wird nicht unterstützt.");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function(pos){
+
+        const lat=pos.coords.latitude;
+        const lon=pos.coords.longitude;
+
+        map.setView([lat,lon],14);
+
+        if(marker){
+            map.removeLayer(marker);
+        }
+
+        marker=L.marker([lat,lon]).addTo(map);
+
+        marker.bindPopup("📍 Dein Standort").openPopup();
+
+        document.getElementById("start").value=lat+","+lon;
+
+    },function(){
+        alert("Standort konnte nicht bestimmt werden.");
+    });
+
+}
+
+</script>
+
 </body>
 </html>
