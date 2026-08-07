@@ -1,24 +1,13 @@
-// --- SYSTEMSTATUS PRÜFEN ---
-const isOnline = navigator.onLine && window.location.protocol !== 'file:';
-const statusEl = document.getElementById('status');
-const downloadBtn = document.getElementById('btn-download');
-
-if (!isOnline) {
-    statusEl.innerText = "3D Offline (Lokal)";
-    statusEl.className = "offline";
-    downloadBtn.style.display = "none";
-}
-
-// --- MATHEMATISCHE BERECHNUNGEN (Offline-Navi) ---
+// --- MATHEMATISCHE ENTFERNUNGSBERECHNUNG ---
 function getDistanceOffline(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Erdradius in km
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
               Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
               Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c * 1.28; // Aufschlagfaktor für reale Straßenkrümmungen
+    return R * c * 1.28;
 }
 
 function trigger3DMapping() {
@@ -28,7 +17,6 @@ function trigger3DMapping() {
     const lat1 = parseFloat(startData[0]); const lon1 = parseFloat(startData[1]);
     const lat2 = parseFloat(targetData[0]); const lon2 = parseFloat(targetData[1]);
 
-    // Kilometer und Zeit für das UI kalkulieren
     const km = getDistanceOffline(lat1, lon1, lat2, lon2);
     const totalHours = km / 85;
     const hours = Math.floor(totalHours);
@@ -38,20 +26,17 @@ function trigger3DMapping() {
     document.getElementById('res-time').innerText = `${hours} Std. ${minutes} Min.`;
     document.getElementById('results').style.display = "block";
 
-    // Befehl an das 3D-Karten-Skript (map.js) senden, um die Route plastisch zu zeichnen
+    // Übergabe an das 3D-Karten-Skript (map.js)
     if (typeof draw3DRouteOnMap === "function") {
-        draw3DRouteOnMap(km);
+        draw3DRouteOnMap();
     }
 }
 
-// --- DER STRUKTURIERTE DOWNLOAD-MANAGER (ZIP-Packer) ---
+// --- ZIP-DOWNLOADER FÜR OFFLINE-BETRIEB ---
 function downloadOfflineZip() {
     const zip = new JSZip();
-    
-    // index.html direkt verpacken
     zip.file("index.html", document.documentElement.outerHTML);
     
-    // Beide JS-Dateien vom Server laden und ins ZIP-Archiv einsortieren
     Promise.all([
         fetch('script.js').then(res => res.text()),
         fetch('map.js').then(res => res.text())
@@ -62,14 +47,14 @@ function downloadOfflineZip() {
     }).then(content => {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(content);
-        link.download = "3d_cyber_map_system.zip";
+        link.download = "3d_matrix_map.zip";
         link.click();
     }).catch(err => {
-        console.log("Online-Schnittstelle blockiert (Lokaler Testlauf?). Fallback-ZIP gestartet.");
+        console.log("Local execution fallback active.");
         zip.generateAsync({type:"blob"}).then(c => {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(c);
-            link.download = "map_system_fallback.zip";
+            link.download = "map_fallback.zip";
             link.click();
         });
     });
