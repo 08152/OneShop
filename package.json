@@ -1,17 +1,13 @@
 {
-  "name": "2d-online-navigation-app",
+  "name": "touch-karte-server",
   "version": "1.0.0",
-  "description": "2D Online-Navigations-System mit Leaflet im Dark-Theme",
+  "description": "Ein einfacher Node.js Express Server fuer die 2D-Weltkarte",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "leaflet": "^1.9.4"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "express": "^4.19.2"
   },
   "author": "",
   "license": "ISC"
