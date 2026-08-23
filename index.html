@@ -1,159 +1,95 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>GPS Navi</title>
-
-
-<!-- Leaflet Karte -->
-<link 
-rel="stylesheet" 
-href="https://unpkg.com/leaflet/dist/leaflet.css">
-
-
-<!-- Eigenes Design -->
-<link 
-rel="stylesheet" 
-href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost 3D Modeler</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
-
-<!-- Suchbereich -->
-
-<div class="panel">
-
-
-<input 
-id="ziel"
-type="text"
-placeholder="Ziel eingeben...">
-
-
-<button id="routeBtn">
-🔎 Route suchen
-</button>
-
-
-<button 
-id="startBtn"
-style="display:none">
-
-🚗 Navigation starten
-
-</button>
-
-
-
-<div id="info">
-
-📍 GPS wird gestartet...
-
-</div>
-
-
-</div>
-
-
-
-
-
-<!-- Standort -->
-
-<button 
-id="locationBtn">
-
-📍
-
-</button>
-
-
-
-
-
-<!-- Vollbild -->
-
-<button 
-id="fullscreenBtn">
-
-⛶
-
-</button>
-
-
-
-
-
-<!-- Navigationsanzeige -->
-
-<div id="naviInfo">
-
-
-<div id="nextInstruction">
-
-Navigation
-
-</div>
-
-
-<div id="distanceLeft">
-
--
-
-</div>
-
-
-<div id="timeLeft">
-
--
-
-</div>
-
-
-</div>
-
-
-
-
-
-<!-- Karte -->
-
-<div id="map"></div>
-
-
-
-
-
-
-
-<!-- Leaflet -->
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-
-
-<!-- Eigene Dateien -->
-<!-- Reihenfolge ist wichtig -->
-
-
-<script src="map.js"></script>
-
-<script src="route.js"></script>
-
-<script src="logik.js"></script>
-
-<script src="script.js"></script>
-
-
-
+    <div id="topbar">
+        <div class="logo">GHOST 3D</div>
+
+        <div class="object-buttons">
+            <button class="object-btn" id="addSphere" title="Kugel">
+                <span class="sphere-icon"></span>
+            </button>
+
+            <button class="object-btn" id="addCube" title="Quadrat / Würfel">
+                <span class="cube-icon"></span>
+            </button>
+
+            <button class="object-btn" id="addCylinder" title="Zylinder">
+                <span class="cylinder-icon"></span>
+            </button>
+        </div>
+
+        <div class="mode-buttons">
+            <button id="moveMode" class="mode active">↔ Bewegen</button>
+            <button id="rotateMode" class="mode">⟳ Drehen</button>
+            <button id="scaleMode" class="mode">↗ Skalieren</button>
+        </div>
+    </div>
+
+    <div id="rightbar">
+        <h3>PINSEL</h3>
+
+        <button class="brush active" data-size="0.15">
+            <span class="brush-dot tiny"></span>
+            Fein
+        </button>
+
+        <button class="brush" data-size="0.45">
+            <span class="brush-dot medium"></span>
+            Kleiner
+        </button>
+
+        <button class="brush" data-size="0.9">
+            <span class="brush-dot large"></span>
+            Groß
+        </button>
+
+        <hr>
+
+        <h3>MODELLIEREN</h3>
+
+        <button id="raiseBrush" class="sculpt">
+            ⬆ Erhöhen
+        </button>
+
+        <button id="lowerBrush" class="sculpt">
+            ⬇ Senken
+        </button>
+
+        <button id="smoothBrush" class="sculpt">
+            ≈ Glätten
+        </button>
+
+        <hr>
+
+        <button id="deleteObject" class="danger">
+            🗑 Löschen
+        </button>
+
+        <button id="clearScene">
+            Szene leeren
+        </button>
+    </div>
+
+    <div id="bottom-info">
+        <span id="selectedInfo">Kein Objekt ausgewählt</span>
+        <span id="vertexInfo">0 Punkte</span>
+    </div>
+
+    <div id="help">
+        <b>Steuerung</b><br>
+        Linksklick = Objekt auswählen<br>
+        Ziehen = aktuelles Werkzeug<br>
+        Rechtsklick = Kamera drehen<br>
+        Mausrad = Zoom
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
-
 </html>
