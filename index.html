@@ -2,1982 +2,1692 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <title>GHOST 3D Modeler</title>
+    <title>Ghost 3D Modeler</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <!-- WICHTIG:
+         Import Map sorgt dafür, dass OrbitControls
+         und GLTFExporter "three" finden können. -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 
 <body>
 
-    <!-- =========================
-         OBERE LEISTE
-    ========================== -->
+<!-- =========================================
+     OBERE LEISTE
+========================================= -->
 
-    <div id="topbar">
+<div id="topbar">
 
-        <div class="logo">
-            GHOST 3D
-        </div>
-
-        <div class="object-buttons">
-
-            <button
-                class="object-btn"
-                id="addSphere"
-                title="Kugel hinzufügen"
-            >
-                <span class="sphere-icon"></span>
-            </button>
-
-            <button
-                class="object-btn"
-                id="addCube"
-                title="Würfel hinzufügen"
-            >
-                <span class="cube-icon"></span>
-            </button>
-
-            <button
-                class="object-btn"
-                id="addCylinder"
-                title="Zylinder hinzufügen"
-            >
-                <span class="cylinder-icon"></span>
-            </button>
-
-        </div>
-
-        <div class="mode-buttons">
-
-            <button
-                id="moveMode"
-                class="mode active"
-            >
-                ↔ Bewegen
-            </button>
-
-            <button
-                id="rotateMode"
-                class="mode"
-            >
-                ⟳ Drehen
-            </button>
-
-            <button
-                id="scaleMode"
-                class="mode"
-            >
-                ↗ Skalieren
-            </button>
-
-        </div>
-
+    <div class="logo">
+        GHOST 3D
     </div>
 
-
-    <!-- =========================
-         RECHTE LEISTE
-    ========================== -->
-
-    <div id="rightbar">
-
-        <h3>PINSEL</h3>
+    <div class="object-buttons">
 
         <button
-            class="brush active"
-            data-size="0.15"
-        >
-            <span class="brush-dot tiny"></span>
-            Fein
+            class="object-btn"
+            id="addSphere"
+            title="Kugel hinzufügen">
+            <span class="sphere-icon"></span>
         </button>
 
         <button
-            class="brush"
-            data-size="0.45"
-        >
-            <span class="brush-dot medium"></span>
-            Kleiner
+            class="object-btn"
+            id="addCube"
+            title="Würfel hinzufügen">
+            <span class="cube-icon"></span>
         </button>
 
         <button
-            class="brush"
-            data-size="0.9"
-        >
-            <span class="brush-dot large"></span>
-            Groß
-        </button>
-
-
-        <hr>
-
-
-        <h3>MODELLIEREN</h3>
-
-        <button
-            id="raiseBrush"
-            class="sculpt"
-        >
-            ⬆ Erhöhen
-        </button>
-
-        <button
-            id="lowerBrush"
-            class="sculpt"
-        >
-            ⬇ Senken
-        </button>
-
-        <button
-            id="smoothBrush"
-            class="sculpt"
-        >
-            ≈ Glätten
-        </button>
-
-
-        <hr>
-
-
-        <h3>MODELL</h3>
-
-        <button
-            id="downloadModel"
-            class="download"
-        >
-            ↓ Modell herunterladen
-        </button>
-
-        <button
-            id="deleteObject"
-            class="danger"
-        >
-            🗑 Löschen
-        </button>
-
-        <button
-            id="clearScene"
-        >
-            Szene leeren
+            class="object-btn"
+            id="addCylinder"
+            title="Zylinder hinzufügen">
+            <span class="cylinder-icon"></span>
         </button>
 
     </div>
 
+    <div class="mode-buttons">
 
-    <!-- =========================
-         MODELL-INFORMATIONEN
-    ========================== -->
+        <button
+            id="moveMode"
+            class="mode active">
+            ↔ Bewegen
+        </button>
 
-    <div id="modelInfo">
+        <button
+            id="rotateMode"
+            class="mode">
+            ⟳ Drehen
+        </button>
 
-        <div class="info-title">
-            MODELL
+        <button
+            id="scaleMode"
+            class="mode">
+            ↗ Skalieren
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     RECHTE LEISTE
+========================================= -->
+
+<div id="rightbar">
+
+    <h3>PINSEL</h3>
+
+    <button
+        class="brush active"
+        data-size="0.15">
+
+        <span class="brush-dot tiny"></span>
+
+        Fein
+
+    </button>
+
+
+    <button
+        class="brush"
+        data-size="0.45">
+
+        <span class="brush-dot medium"></span>
+
+        Kleiner
+
+    </button>
+
+
+    <button
+        class="brush"
+        data-size="0.9">
+
+        <span class="brush-dot large"></span>
+
+        Groß
+
+    </button>
+
+
+    <hr>
+
+
+    <h3>MODELLIEREN</h3>
+
+
+    <button
+        id="raiseBrush"
+        class="sculpt">
+
+        ⬆ Erhöhen
+
+    </button>
+
+
+    <button
+        id="lowerBrush"
+        class="sculpt">
+
+        ⬇ Senken
+
+    </button>
+
+
+    <button
+        id="smoothBrush"
+        class="sculpt">
+
+        ≈ Glätten
+
+    </button>
+
+
+    <hr>
+
+
+    <h3>MODELL</h3>
+
+
+    <button
+        id="downloadModel"
+        class="download">
+
+        ↓ Modell herunterladen
+
+    </button>
+
+
+    <button
+        id="deleteObject"
+        class="danger">
+
+        🗑 Löschen
+
+    </button>
+
+
+    <button
+        id="clearScene">
+
+        Szene leeren
+
+    </button>
+
+</div>
+
+
+<!-- =========================================
+     MODELL INFORMATION
+========================================= -->
+
+<div id="modelInfo">
+
+    <div class="info-title">
+        MODELL
+    </div>
+
+    <div id="selectedInfo">
+        Kein Objekt ausgewählt
+    </div>
+
+    <div class="dimension-box">
+
+        <div>
+            <span>Breite</span>
+            <strong id="widthMM">
+                0 mm
+            </strong>
         </div>
 
-        <div id="selectedInfo">
-            Kein Objekt ausgewählt
+        <div>
+            <span>Höhe</span>
+            <strong id="heightMM">
+                0 mm
+            </strong>
         </div>
 
-        <div class="dimension-box">
-
-            <div>
-                <span>Breite</span>
-                <strong id="widthMM">
-                    0 mm
-                </strong>
-            </div>
-
-            <div>
-                <span>Höhe</span>
-                <strong id="heightMM">
-                    0 mm
-                </strong>
-            </div>
-
-            <div>
-                <span>Tiefe</span>
-                <strong id="depthMM">
-                    0 mm
-                </strong>
-            </div>
-
-        </div>
-
-        <div id="vertexInfo">
-            0 Modellierungspunkte
+        <div>
+            <span>Tiefe</span>
+            <strong id="depthMM">
+                0 mm
+            </strong>
         </div>
 
     </div>
 
-
-    <!-- =========================
-         HILFE
-    ========================== -->
-
-    <div id="help">
-
-        <b>STEUERUNG</b>
-
-        <br>
-
-        Linksklick =
-        Objekt auswählen
-
-        <br>
-
-        Ziehen =
-        aktuelles Werkzeug
-
-        <br>
-
-        Shift + Ziehen =
-        Modellieren
-
-        <br>
-
-        Rechtsklick =
-        Kamera drehen
-
-        <br>
-
-        Mausrad =
-        Zoom
-
+    <div id="vertexInfo">
+        0 Modellierungspunkte
     </div>
 
-
-    <!-- =========================
-         THREE.JS
-    ========================== -->
-
-    <script type="module">
-
-        import * as THREE from
-        "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+</div>
 
 
-        import { OrbitControls } from
-        "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/OrbitControls.js";
+<!-- =========================================
+     HILFE
+========================================= -->
+
+<div id="help">
+
+    <b>STEUERUNG</b>
+
+    <br>
+
+    Linksklick = Objekt auswählen
+
+    <br>
+
+    Ziehen = Werkzeug
+
+    <br>
+
+    Shift + Ziehen = Modellieren
+
+    <br>
+
+    Rechtsklick = Kamera
+
+    <br>
+
+    Mausrad = Zoom
+
+</div>
 
 
-        import { GLTFExporter } from
-        "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/exporters/GLTFExporter.js";
+<!-- =========================================
+     THREE.JS
+========================================= -->
+
+<script type="module">
+
+import * as THREE from "three";
+
+import {
+    OrbitControls
+} from "three/addons/controls/OrbitControls.js";
+
+import {
+    GLTFExporter
+} from "three/addons/exporters/GLTFExporter.js";
 
 
-        /*
-        =====================================================
-        GRUNDLEGENDE VARIABLEN
-        =====================================================
-        */
+/* =========================================
+   VARIABLEN
+========================================= */
 
-        let scene;
+let scene;
+let camera;
+let renderer;
+let controls;
 
-        let camera;
+let raycaster;
+let mouse;
 
-        let renderer;
+let selected = null;
 
-        let controls;
+let currentMode = "move";
 
-        let raycaster;
+let brushSize = 0.15;
 
-        let mouse;
+let sculptMode = "raise";
 
-        let selected = null;
+let dragging = false;
+let sculpting = false;
 
-        let currentMode = "move";
+let lastX = 0;
+let lastY = 0;
 
-        let brushSize = 0.15;
-
-        let sculptMode = "raise";
-
-        let dragging = false;
-
-        let sculpting = false;
-
-        let lastPointerX = 0;
-
-        let lastPointerY = 0;
+const objects = [];
 
 
-        const objects = [];
+/* =========================================
+   MATERIALIEN
+========================================= */
+
+const normalMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color: 0x8b93a3,
+
+        roughness: 0.65,
+
+        metalness: 0.1
+
+    });
 
 
-        /*
-        =====================================================
-        MATERIAL
-        =====================================================
-        */
+const selectedMaterial =
+    new THREE.MeshStandardMaterial({
 
-        const normalMaterial =
-            new THREE.MeshStandardMaterial({
+        color: 0x3485ff,
 
-                color: 0x8b93a3,
+        roughness: 0.6,
 
-                roughness: 0.65,
+        metalness: 0.1
 
-                metalness: 0.1
-
-            });
+    });
 
 
-        const selectedMaterial =
-            new THREE.MeshStandardMaterial({
+/* =========================================
+   START
+========================================= */
 
-                color: 0x4f8cff,
-
-                roughness: 0.65,
-
-                metalness: 0.1
-
-            });
+init();
 
 
-        /*
-        =====================================================
-        START
-        =====================================================
-        */
+function init() {
 
-        init();
+    /* Szene */
 
-        animate();
+    scene = new THREE.Scene();
 
-
-        function init() {
-
-            scene =
-                new THREE.Scene();
+    scene.background =
+        new THREE.Color(0x101216);
 
 
-            scene.background =
-                new THREE.Color(
-                    0x101216
-                );
+    scene.fog =
+        new THREE.Fog(
+            0x101216,
+            15,
+            80
+        );
 
 
-            scene.fog =
-                new THREE.Fog(
-                    0x101216,
-                    15,
-                    80
-                );
+    /* Kamera */
+
+    camera =
+        new THREE.PerspectiveCamera(
+
+            55,
+
+            window.innerWidth /
+            window.innerHeight,
+
+            0.01,
+
+            500
+
+        );
 
 
-            camera =
-                new THREE.PerspectiveCamera(
-
-                    55,
-
-                    window.innerWidth /
-                    window.innerHeight,
-
-                    0.01,
-
-                    500
-
-                );
+    camera.position.set(
+        7,
+        5,
+        9
+    );
 
 
-            camera.position.set(
-                7,
-                6,
-                9
+    /* Renderer */
+
+    renderer =
+        new THREE.WebGLRenderer({
+
+            antialias: true,
+
+            powerPreference:
+                "high-performance"
+
+        });
+
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    renderer.shadowMap.enabled =
+        true;
+
+
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
+
+
+    document.body.appendChild(
+        renderer.domElement
+    );
+
+
+    /* Kamera-Steuerung */
+
+    controls =
+        new OrbitControls(
+            camera,
+            renderer.domElement
+        );
+
+
+    controls.enableDamping =
+        true;
+
+    controls.dampingFactor =
+        0.08;
+
+
+    controls.target.set(
+        0,
+        1,
+        0
+    );
+
+
+    /* Raycaster */
+
+    raycaster =
+        new THREE.Raycaster();
+
+
+    mouse =
+        new THREE.Vector2();
+
+
+    /* Welt */
+
+    createLights();
+
+    createGrid();
+
+    createGround();
+
+
+    /* Bedienung */
+
+    setupButtons();
+
+
+    renderer.domElement.addEventListener(
+        "pointerdown",
+        pointerDown
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointermove",
+        pointerMove
+    );
+
+
+    window.addEventListener(
+        "pointerup",
+        pointerUp
+    );
+
+
+    window.addEventListener(
+        "resize",
+        resize
+    );
+
+
+    renderer.domElement.addEventListener(
+        "contextmenu",
+        event => event.preventDefault()
+    );
+
+
+    animate();
+}
+
+
+/* =========================================
+   LICHT
+========================================= */
+
+function createLights() {
+
+    const ambient =
+        new THREE.HemisphereLight(
+            0xffffff,
+            0x303030,
+            2.5
+        );
+
+    scene.add(ambient);
+
+
+    const light =
+        new THREE.DirectionalLight(
+            0xffffff,
+            3
+        );
+
+
+    light.position.set(
+        8,
+        12,
+        8
+    );
+
+
+    light.castShadow = true;
+
+
+    scene.add(light);
+}
+
+
+/* =========================================
+   BODEN
+========================================= */
+
+function createGround() {
+
+    const geometry =
+        new THREE.PlaneGeometry(
+            40,
+            40
+        );
+
+
+    const material =
+        new THREE.MeshStandardMaterial({
+
+            color: 0x181c22,
+
+            roughness: 0.9
+
+        });
+
+
+    const ground =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    ground.rotation.x =
+        -Math.PI / 2;
+
+
+    ground.position.y =
+        -0.02;
+
+
+    ground.receiveShadow = true;
+
+
+    scene.add(ground);
+
+
+    const grid =
+        new THREE.GridHelper(
+            40,
+            40,
+            0x59616e,
+            0x292e36
+        );
+
+
+    scene.add(grid);
+}
+
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+function setupButtons() {
+
+    document.getElementById(
+        "addSphere"
+    ).addEventListener(
+        "click",
+        addSphere
+    );
+
+
+    document.getElementById(
+        "addCube"
+    ).addEventListener(
+        "click",
+        addCube
+    );
+
+
+    document.getElementById(
+        "addCylinder"
+    ).addEventListener(
+        "click",
+        addCylinder
+    );
+
+
+    document.getElementById(
+        "moveMode"
+    ).addEventListener(
+        "click",
+        () => setMode("move")
+    );
+
+
+    document.getElementById(
+        "rotateMode"
+    ).addEventListener(
+        "click",
+        () => setMode("rotate")
+    );
+
+
+    document.getElementById(
+        "scaleMode"
+    ).addEventListener(
+        "click",
+        () => setMode("scale")
+    );
+
+
+    document.querySelectorAll(
+        ".brush"
+    ).forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    document
+                        .querySelectorAll(
+                            ".brush"
+                        )
+                        .forEach(
+                            b =>
+                            b.classList.remove(
+                                "active"
+                            )
+                        );
+
+
+                    button.classList.add(
+                        "active"
+                    );
+
+
+                    brushSize =
+                        Number(
+                            button.dataset.size
+                        );
+
+                }
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "raiseBrush"
+    ).addEventListener(
+        "click",
+        () => sculptMode = "raise"
+    );
+
+
+    document.getElementById(
+        "lowerBrush"
+    ).addEventListener(
+        "click",
+        () => sculptMode = "lower"
+    );
+
+
+    document.getElementById(
+        "smoothBrush"
+    ).addEventListener(
+        "click",
+        () => sculptMode = "smooth"
+    );
+
+
+    document.getElementById(
+        "deleteObject"
+    ).addEventListener(
+        "click",
+        deleteSelected
+    );
+
+
+    document.getElementById(
+        "clearScene"
+    ).addEventListener(
+        "click",
+        clearScene
+    );
+
+
+    document.getElementById(
+        "downloadModel"
+    ).addEventListener(
+        "click",
+        downloadModel
+    );
+}
+
+
+/* =========================================
+   KUGEL
+========================================= */
+
+function addSphere() {
+
+    const geometry =
+        new THREE.SphereGeometry(
+            1.4,
+            32,
+            32
+        );
+
+
+    createObject(
+        geometry,
+        "Kugel"
+    );
+}
+
+
+/* =========================================
+   WÜRFEL
+========================================= */
+
+function addCube() {
+
+    const geometry =
+        new THREE.BoxGeometry(
+            2,
+            2,
+            2,
+            20,
+            20,
+            20
+        );
+
+
+    createObject(
+        geometry,
+        "Würfel"
+    );
+}
+
+
+/* =========================================
+   ZYLINDER
+========================================= */
+
+function addCylinder() {
+
+    const geometry =
+        new THREE.CylinderGeometry(
+            1.1,
+            1.1,
+            2.5,
+            32,
+            32
+        );
+
+
+    createObject(
+        geometry,
+        "Zylinder"
+    );
+}
+
+
+/* =========================================
+   OBJEKT ERSTELLEN
+========================================= */
+
+function createObject(
+    geometry,
+    type
+) {
+
+    const mesh =
+        new THREE.Mesh(
+            geometry,
+            normalMaterial.clone()
+        );
+
+
+    mesh.position.set(
+        0,
+        1.5,
+        0
+    );
+
+
+    mesh.castShadow = true;
+
+    mesh.receiveShadow = true;
+
+
+    mesh.userData.type =
+        type;
+
+
+    scene.add(mesh);
+
+    objects.push(mesh);
+
+
+    selectObject(mesh);
+}
+
+
+/* =========================================
+   AUSWÄHLEN
+========================================= */
+
+function selectObject(
+    object
+) {
+
+    if (selected) {
+
+        selected.material =
+            normalMaterial;
+
+    }
+
+
+    selected =
+        object;
+
+
+    if (!selected) {
+
+        updateInfo();
+
+        return;
+
+    }
+
+
+    selected.material =
+        selectedMaterial;
+
+
+    updateInfo();
+}
+
+
+/* =========================================
+   MODUS
+========================================= */
+
+function setMode(
+    mode
+) {
+
+    currentMode =
+        mode;
+
+
+    document.querySelectorAll(
+        ".mode"
+    ).forEach(
+        b =>
+        b.classList.remove(
+            "active"
+        )
+    );
+
+
+    const ids = {
+
+        move:
+            "moveMode",
+
+        rotate:
+            "rotateMode",
+
+        scale:
+            "scaleMode"
+
+    };
+
+
+    document.getElementById(
+        ids[mode]
+    ).classList.add(
+        "active"
+    );
+}
+
+
+/* =========================================
+   OBJEKT AUSWÄHLEN
+========================================= */
+
+function pointerDown(
+    event
+) {
+
+    if (
+        event.button !== 0
+    ) return;
+
+
+    lastX =
+        event.clientX;
+
+    lastY =
+        event.clientY;
+
+
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+
+    mouse.x =
+        (
+            (event.clientX -
+             rect.left) /
+            rect.width
+        ) * 2 - 1;
+
+
+    mouse.y =
+        -(
+            (event.clientY -
+             rect.top) /
+            rect.height
+        ) * 2 + 1;
+
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+
+    const hits =
+        raycaster.intersectObjects(
+            objects,
+            false
+        );
+
+
+    if (!hits.length) {
+
+        selectObject(null);
+
+        return;
+
+    }
+
+
+    selectObject(
+        hits[0].object
+    );
+
+
+    if (event.shiftKey) {
+
+        sculpting = true;
+
+        sculpt(event);
+
+    }
+    else {
+
+        dragging = true;
+
+    }
+}
+
+
+/* =========================================
+   ZIEHEN
+========================================= */
+
+function pointerMove(
+    event
+) {
+
+    if (
+        sculpting &&
+        selected
+    ) {
+
+        sculpt(event);
+
+        return;
+    }
+
+
+    if (
+        !dragging ||
+        !selected
+    ) return;
+
+
+    const dx =
+        event.clientX -
+        lastX;
+
+
+    const dy =
+        event.clientY -
+        lastY;
+
+
+    lastX =
+        event.clientX;
+
+
+    lastY =
+        event.clientY;
+
+
+    if (
+        currentMode ===
+        "move"
+    ) {
+
+        selected.position.x +=
+            dx * 0.01;
+
+
+        selected.position.y -=
+            dy * 0.01;
+
+    }
+
+
+    if (
+        currentMode ===
+        "rotate"
+    ) {
+
+        selected.rotation.y +=
+            dx * 0.01;
+
+
+        selected.rotation.x +=
+            dy * 0.01;
+
+    }
+
+
+    if (
+        currentMode ===
+        "scale"
+    ) {
+
+        const factor =
+            THREE.MathUtils.clamp(
+                1 - dy * 0.01,
+                0.85,
+                1.15
             );
 
 
-            renderer =
-                new THREE.WebGLRenderer({
+        selected.scale
+            .multiplyScalar(
+                factor
+            );
 
-                    antialias: true,
-
-                    powerPreference:
-                        "high-performance"
-
-                });
+    }
 
 
-            renderer.setPixelRatio(
+    updateInfo();
+}
 
-                Math.min(
-                    window.devicePixelRatio,
-                    2
-                )
 
+/* =========================================
+   LOSLASSEN
+========================================= */
+
+function pointerUp() {
+
+    dragging = false;
+
+    sculpting = false;
+
+    updateInfo();
+}
+
+
+/* =========================================
+   MODELLIEREN
+========================================= */
+
+function sculpt(
+    event
+) {
+
+    if (!selected)
+        return;
+
+
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+
+    mouse.x =
+        (
+            (event.clientX -
+             rect.left) /
+            rect.width
+        ) * 2 - 1;
+
+
+    mouse.y =
+        -(
+            (event.clientY -
+             rect.top) /
+            rect.height
+        ) * 2 + 1;
+
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+
+    const hits =
+        raycaster.intersectObject(
+            selected,
+            false
+        );
+
+
+    if (!hits.length)
+        return;
+
+
+    const hit =
+        hits[0];
+
+
+    const point =
+        selected.worldToLocal(
+            hit.point.clone()
+        );
+
+
+    const position =
+        selected.geometry
+            .getAttribute(
+                "position"
             );
 
 
-            renderer.setSize(
+    const normal =
+        hit.face.normal.clone();
 
-                window.innerWidth,
-                window.innerHeight
 
+    for (
+        let i = 0;
+        i < position.count;
+        i++
+    ) {
+
+        const vertex =
+            new THREE.Vector3();
+
+
+        vertex.fromBufferAttribute(
+            position,
+            i
+        );
+
+
+        const distance =
+            vertex.distanceTo(
+                point
             );
 
 
-            renderer.shadowMap.enabled =
-                true;
+        if (
+            distance >
+            brushSize
+        ) continue;
+
+
+        const strength =
+            1 -
+            distance /
+            brushSize;
+
+
+        const amount =
+            strength *
+            strength *
+            0.06;
+
+
+        if (
+            sculptMode ===
+            "raise"
+        ) {
+
+            vertex.add(
+                normal.clone()
+                    .multiplyScalar(
+                        amount
+                    )
+            );
+
+        }
+
+
+        if (
+            sculptMode ===
+            "lower"
+        ) {
+
+            vertex.add(
+                normal.clone()
+                    .multiplyScalar(
+                        -amount
+                    )
+            );
+
+        }
+
+
+        if (
+            sculptMode ===
+            "smooth"
+        ) {
+
+            vertex.multiplyScalar(
+                1 - amount * 0.2
+            );
+
+        }
+
+
+        position.setXYZ(
+            i,
+            vertex.x,
+            vertex.y,
+            vertex.z
+        );
+
+    }
+
+
+    position.needsUpdate =
+        true;
+
+
+    selected.geometry
+        .computeVertexNormals();
+
+
+    selected.geometry
+        .computeBoundingSphere();
+
+
+    updateInfo();
+}
+
+
+/* =========================================
+   GRÖSSE IN MM
+========================================= */
+
+function updateInfo() {
+
+    if (!selected) {
+
+        document.getElementById(
+            "selectedInfo"
+        ).textContent =
+            "Kein Objekt ausgewählt";
+
+
+        setText(
+            "widthMM",
+            "0 mm"
+        );
+
+
+        setText(
+            "heightMM",
+            "0 mm"
+        );
+
+
+        setText(
+            "depthMM",
+            "0 mm"
+        );
+
+
+        setText(
+            "vertexInfo",
+            "0 Modellierungspunkte"
+        );
+
+
+        return;
+    }
+
+
+    setText(
+        "selectedInfo",
+        "Ausgewählt: " +
+        selected.userData.type
+    );
+
+
+    selected.updateMatrixWorld(
+        true
+    );
+
+
+    const box =
+        new THREE.Box3()
+            .setFromObject(
+                selected
+            );
+
+
+    const size =
+        new THREE.Vector3();
+
+
+    box.getSize(size);
+
+
+    /*
+       1 Three.js Einheit = 10 mm
+    */
+
+    const MM =
+        10;
+
+
+    setText(
+        "widthMM",
+        formatMM(
+            size.x * MM
+        )
+    );
+
+
+    setText(
+        "heightMM",
+        formatMM(
+            size.y * MM
+        )
+    );
+
+
+    setText(
+        "depthMM",
+        formatMM(
+            size.z * MM
+        )
+    );
+
+
+    const vertices =
+        selected.geometry
+            .getAttribute(
+                "position"
+            )
+            .count;
+
+
+    setText(
+        "vertexInfo",
+
+        vertices.toLocaleString(
+            "de-DE"
+        ) +
+        " Modellierungspunkte"
+    );
+}
+
+
+function setText(
+    id,
+    text
+) {
+
+    document.getElementById(
+        id
+    ).textContent = text;
+}
+
+
+function formatMM(
+    value
+) {
+
+    return value.toFixed(1) +
+        " mm";
+}
+
+
+/* =========================================
+   LÖSCHEN
+========================================= */
+
+function deleteSelected() {
+
+    if (!selected)
+        return;
+
+
+    const index =
+        objects.indexOf(
+            selected
+        );
+
+
+    if (index >= 0) {
+
+        objects.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    scene.remove(
+        selected
+    );
+
+
+    selected.geometry.dispose();
+
+    selected.material.dispose();
+
+
+    selected = null;
+
+
+    updateInfo();
+}
+
+
+/* =========================================
+   SZENE LEEREN
+========================================= */
+
+function clearScene() {
+
+    objects.forEach(
+        object => {
+
+            scene.remove(
+                object
+            );
+
+
+            object.geometry
+                .dispose();
+
+
+            object.material
+                .dispose();
+
+        }
+    );
+
+
+    objects.length = 0;
+
+    selected = null;
+
+
+    updateInfo();
+}
+
+
+/* =========================================
+   GLB DOWNLOAD
+========================================= */
+
+function downloadModel() {
+
+    if (!selected) {
+
+        alert(
+            "Bitte zuerst ein Objekt auswählen."
+        );
+
+        return;
+    }
+
+
+    const exporter =
+        new GLTFExporter();
+
+
+    const exportScene =
+        new THREE.Scene();
+
+
+    const clone =
+        selected.clone(true);
+
+
+    exportScene.add(
+        clone
+    );
+
+
+    exporter.parse(
+
+        exportScene,
+
+        result => {
+
+            const blob =
+                new Blob(
+                    [result],
+                    {
+                        type:
+                            "model/gltf-binary"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                url;
+
+
+            link.download =
+                selected.userData.type
+                .toLowerCase()
+                .replace(
+                    /[^a-z0-9äöüß]/gi,
+                    "_"
+                ) +
+                ".glb";
 
 
             document.body.appendChild(
-                renderer.domElement
+                link
             );
 
 
-            controls =
-                new OrbitControls(
+            link.click();
 
-                    camera,
 
-                    renderer.domElement
+            link.remove();
 
-                );
 
-
-            controls.enableDamping =
-                true;
-
-
-            controls.dampingFactor =
-                0.08;
-
-
-            controls.target.set(
-                0,
-                1,
-                0
-            );
-
-
-            raycaster =
-                new THREE.Raycaster();
-
-
-            mouse =
-                new THREE.Vector2();
-
-
-            createLights();
-
-            createGrid();
-
-            createGround();
-
-            setupUI();
-
-
-            window.addEventListener(
-                "resize",
-                onResize
-            );
-
-
-            renderer.domElement
-                .addEventListener(
-                    "pointerdown",
-                    onPointerDown
-                );
-
-
-            renderer.domElement
-                .addEventListener(
-                    "pointermove",
-                    onPointerMove
-                );
-
-
-            renderer.domElement
-                .addEventListener(
-                    "pointerup",
-                    onPointerUp
-                );
-
-
-            renderer.domElement
-                .addEventListener(
-                    "contextmenu",
-                    event =>
-                        event.preventDefault()
-                );
-
-        }
-
-
-        /*
-        =====================================================
-        LICHT
-        =====================================================
-        */
-
-        function createLights() {
-
-            const ambient =
-                new THREE.HemisphereLight(
-
-                    0xffffff,
-
-                    0x333333,
-
-                    2.5
-
-                );
-
-
-            scene.add(
-                ambient
-            );
-
-
-            const light =
-                new THREE.DirectionalLight(
-
-                    0xffffff,
-
-                    3
-
-                );
-
-
-            light.position.set(
-                6,
-                12,
-                8
-            );
-
-
-            light.castShadow =
-                true;
-
-
-            light.shadow.mapSize.width =
-                2048;
-
-
-            light.shadow.mapSize.height =
-                2048;
-
-
-            scene.add(
-                light
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        GITTER
-        =====================================================
-        */
-
-        function createGrid() {
-
-            const grid =
-                new THREE.GridHelper(
-
-                    40,
-
-                    40,
-
-                    0x4b5260,
-
-                    0x292e36
-
-                );
-
-
-            scene.add(
-                grid
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        BODEN
-        =====================================================
-        */
-
-        function createGround() {
-
-            const geometry =
-                new THREE.PlaneGeometry(
-                    40,
-                    40
-                );
-
-
-            const material =
-                new THREE.MeshStandardMaterial({
-
-                    color: 0x171a20,
-
-                    roughness: 0.9
-
-                });
-
-
-            const ground =
-                new THREE.Mesh(
-
-                    geometry,
-
-                    material
-
-                );
-
-
-            ground.rotation.x =
-                -Math.PI / 2;
-
-
-            ground.position.y =
-                -0.01;
-
-
-            ground.receiveShadow =
-                true;
-
-
-            scene.add(
-                ground
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        KUGEL
-        =====================================================
-        */
-
-        function createSphere() {
-
-            const geometry =
-                new THREE.SphereGeometry(
-
-                    1.4,
-
-                    32,
-
-                    32
-
-                );
-
-
-            createObject(
-                geometry,
-                "Kugel"
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        WÜRFEL
-        =====================================================
-        */
-
-        function createCube() {
-
-            const geometry =
-                new THREE.BoxGeometry(
-
-                    2,
-
-                    2,
-
-                    2,
-
-                    18,
-
-                    18,
-
-                    18
-
-                );
-
-
-            createObject(
-                geometry,
-                "Würfel"
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        ZYLINDER
-        =====================================================
-        */
-
-        function createCylinder() {
-
-            const geometry =
-                new THREE.CylinderGeometry(
-
-                    1.1,
-
-                    1.1,
-
-                    2.5,
-
-                    32,
-
-                    32
-
-                );
-
-
-            createObject(
-                geometry,
-                "Zylinder"
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        OBJEKT ERSTELLEN
-        =====================================================
-        */
-
-        function createObject(
-            geometry,
-            type
-        ) {
-
-            const mesh =
-                new THREE.Mesh(
-
-                    geometry,
-
-                    normalMaterial.clone()
-
-                );
-
-
-            mesh.castShadow =
-                true;
-
-
-            mesh.receiveShadow =
-                true;
-
-
-            mesh.position.set(
-                0,
-                1.5,
-                0
-            );
-
-
-            mesh.userData.type =
-                type;
-
-
-            mesh.userData.originalGeometry =
-                geometry.clone();
-
-
-            scene.add(
-                mesh
-            );
-
-
-            objects.push(
-                mesh
-            );
-
-
-            selectObject(
-                mesh
-            );
-
-        }
-
-
-        /*
-        =====================================================
-        AUSWÄHLEN
-        =====================================================
-        */
-
-        function selectObject(
-            object
-        ) {
-
-            if (selected) {
-
-                selected.material =
-                    normalMaterial;
-
-            }
-
-
-            selected =
-                object;
-
-
-            if (!selected) {
-
-                updateInfo();
-
-                return;
-
-            }
-
-
-            selected.material =
-                selectedMaterial;
-
-
-            updateInfo();
-
-        }
-
-
-        /*
-        =====================================================
-        INFORMATIONEN AKTUALISIEREN
-        =====================================================
-        */
-
-        function updateInfo() {
-
-            if (!selected) {
-
-                document.getElementById(
-                    "selectedInfo"
-                ).textContent =
-                    "Kein Objekt ausgewählt";
-
-
-                document.getElementById(
-                    "widthMM"
-                ).textContent =
-                    "0 mm";
-
-
-                document.getElementById(
-                    "heightMM"
-                ).textContent =
-                    "0 mm";
-
-
-                document.getElementById(
-                    "depthMM"
-                ).textContent =
-                    "0 mm";
-
-
-                document.getElementById(
-                    "vertexInfo"
-                ).textContent =
-                    "0 Modellierungspunkte";
-
-
-                return;
-
-            }
-
-
-            document.getElementById(
-                "selectedInfo"
-            ).textContent =
-                "Ausgewählt: " +
-                selected.userData.type;
-
-
-            /*
-            -----------------------------------------
-            Größe in Welt-Einheiten bestimmen
-            -----------------------------------------
-            */
-
-            selected.updateMatrixWorld(
-                true
-            );
-
-
-            const box =
-                new THREE.Box3()
-                    .setFromObject(
-                        selected
+            setTimeout(
+                () => {
+                    URL.revokeObjectURL(
+                        url
                     );
-
-
-            const size =
-                new THREE.Vector3();
-
-
-            box.getSize(
-                size
-            );
-
-
-            /*
-            -----------------------------------------
-            Umrechnung:
-
-            1 Three.js Einheit = 10 mm
-
-            Dadurch ist ein 2-Einheiten-Würfel
-            beispielsweise 20 × 20 × 20 mm.
-            -----------------------------------------
-            */
-
-            const SCALE_MM =
-                10;
-
-
-            const width =
-                size.x *
-                SCALE_MM;
-
-
-            const height =
-                size.y *
-                SCALE_MM;
-
-
-            const depth =
-                size.z *
-                SCALE_MM;
-
-
-            document.getElementById(
-                "widthMM"
-            ).textContent =
-                formatMM(width);
-
-
-            document.getElementById(
-                "heightMM"
-            ).textContent =
-                formatMM(height);
-
-
-            document.getElementById(
-                "depthMM"
-            ).textContent =
-                formatMM(depth);
-
-
-            /*
-            -----------------------------------------
-            Vertices
-            -----------------------------------------
-            */
-
-            const position =
-                selected.geometry
-                    .getAttribute(
-                        "position"
-                    );
-
-
-            document.getElementById(
-                "vertexInfo"
-            ).textContent =
-
-                position.count
-                    .toLocaleString(
-                        "de-DE"
-                    ) +
-
-                " Modellierungspunkte";
-
-        }
-
-
-        function formatMM(
-            value
-        ) {
-
-            if (value < 1) {
-
-                return value
-                    .toFixed(2)
-                    + " mm";
-
-            }
-
-
-            return value
-                .toFixed(1)
-                + " mm";
-
-        }
-
-
-        /*
-        =====================================================
-        UI
-        =====================================================
-        */
-
-        function setupUI() {
-
-            document.getElementById(
-                "addSphere"
-            ).onclick =
-                createSphere;
-
-
-            document.getElementById(
-                "addCube"
-            ).onclick =
-                createCube;
-
-
-            document.getElementById(
-                "addCylinder"
-            ).onclick =
-                createCylinder;
-
-
-            document.getElementById(
-                "moveMode"
-            ).onclick =
-                () =>
-                    setMode(
-                        "move"
-                    );
-
-
-            document.getElementById(
-                "rotateMode"
-            ).onclick =
-                () =>
-                    setMode(
-                        "rotate"
-                    );
-
-
-            document.getElementById(
-                "scaleMode"
-            ).onclick =
-                () =>
-                    setMode(
-                        "scale"
-                    );
-
-
-            document.querySelectorAll(
-                ".brush"
-            ).forEach(
-                button => {
-
-                    button.onclick =
-                        () => {
-
-                            document
-                                .querySelectorAll(
-                                    ".brush"
-                                )
-                                .forEach(
-                                    b =>
-                                        b.classList
-                                            .remove(
-                                                "active"
-                                            )
-                                );
-
-
-                            button.classList
-                                .add(
-                                    "active"
-                                );
-
-
-                            brushSize =
-                                Number(
-                                    button
-                                        .dataset
-                                        .size
-                                );
-
-                        };
-
-                }
-            );
-
-
-            document.getElementById(
-                "raiseBrush"
-            ).onclick =
-                () =>
-                    sculptMode =
-                        "raise";
-
-
-            document.getElementById(
-                "lowerBrush"
-            ).onclick =
-                () =>
-                    sculptMode =
-                        "lower";
-
-
-            document.getElementById(
-                "smoothBrush"
-            ).onclick =
-                () =>
-                    sculptMode =
-                        "smooth";
-
-
-            document.getElementById(
-                "deleteObject"
-            ).onclick =
-                deleteSelected;
-
-
-            document.getElementById(
-                "clearScene"
-            ).onclick =
-                clearScene;
-
-
-            /*
-            -----------------------------------------
-            NEU:
-            MODELL HERUNTERLADEN
-            -----------------------------------------
-            */
-
-            document.getElementById(
-                "downloadModel"
-            ).onclick =
-                downloadSelectedModel;
-
-        }
-
-
-        /*
-        =====================================================
-        MODUS
-        =====================================================
-        */
-
-        function setMode(
-            mode
-        ) {
-
-            currentMode =
-                mode;
-
-
-            document.querySelectorAll(
-                ".mode"
-            ).forEach(
-                button =>
-                    button.classList
-                        .remove(
-                            "active"
-                        )
-            );
-
-
-            if (
-                mode === "move"
-            ) {
-
-                document.getElementById(
-                    "moveMode"
-                ).classList
-                    .add(
-                        "active"
-                    );
-
-            }
-
-
-            if (
-                mode === "rotate"
-            ) {
-
-                document.getElementById(
-                    "rotateMode"
-                ).classList
-                    .add(
-                        "active"
-                    );
-
-            }
-
-
-            if (
-                mode === "scale"
-            ) {
-
-                document.getElementById(
-                    "scaleMode"
-                ).classList
-                    .add(
-                        "active"
-                    );
-
-            }
-
-        }
-
-
-        /*
-        =====================================================
-        OBJEKT AUSWÄHLEN
-        =====================================================
-        */
-
-        function onPointerDown(
-            event
-        ) {
-
-            if (
-                event.button !== 0
-            ) return;
-
-
-            lastPointerX =
-                event.clientX;
-
-
-            lastPointerY =
-                event.clientY;
-
-
-            const rect =
-                renderer
-                    .domElement
-                    .getBoundingClientRect();
-
-
-            mouse.x =
-                (
-                    (
-                        event.clientX -
-                        rect.left
-                    ) /
-                    rect.width
-                ) * 2 - 1;
-
-
-            mouse.y =
-                -(
-                    (
-                        event.clientY -
-                        rect.top
-                    ) /
-                    rect.height
-                ) * 2 + 1;
-
-
-            raycaster.setFromCamera(
-                mouse,
-                camera
-            );
-
-
-            const hits =
-                raycaster
-                    .intersectObjects(
-                        objects,
-                        false
-                    );
-
-
-            if (
-                hits.length > 0
-            ) {
-
-                selectObject(
-                    hits[0].object
-                );
-
-
-                if (
-                    event.shiftKey
-                ) {
-
-                    sculpting =
-                        true;
-
-                    sculpt(
-                        event
-                    );
-
-                }
-                else {
-
-                    dragging =
-                        true;
-
-                }
-
-
-                renderer
-                    .domElement
-                    .setPointerCapture(
-                        event.pointerId
-                    );
-
-            }
-            else {
-
-                selectObject(
-                    null
-                );
-
-            }
-
-        }
-
-
-        /*
-        =====================================================
-        BEWEGUNG
-        =====================================================
-        */
-
-        function onPointerMove(
-            event
-        ) {
-
-            if (
-                sculpting &&
-                selected
-            ) {
-
-                sculpt(
-                    event
-                );
-
-                return;
-
-            }
-
-
-            if (
-                !dragging ||
-                !selected
-            ) return;
-
-
-            const dx =
-                event.clientX -
-                lastPointerX;
-
-
-            const dy =
-                event.clientY -
-                lastPointerY;
-
-
-            lastPointerX =
-                event.clientX;
-
-
-            lastPointerY =
-                event.clientY;
-
-
-            if (
-                currentMode ===
-                "move"
-            ) {
-
-                selected.position.x +=
-                    dx * 0.01;
-
-
-                selected.position.y -=
-                    dy * 0.01;
-
-            }
-
-
-            if (
-                currentMode ===
-                "rotate"
-            ) {
-
-                selected.rotation.y +=
-                    dx * 0.01;
-
-
-                selected.rotation.x +=
-                    dy * 0.01;
-
-            }
-
-
-            if (
-                currentMode ===
-                "scale"
-            ) {
-
-                const factor =
-                    1 -
-                    dy * 0.01;
-
-
-                const safe =
-                    THREE.MathUtils.clamp(
-                        factor,
-                        0.85,
-                        1.15
-                    );
-
-
-                selected.scale
-                    .multiplyScalar(
-                        safe
-                    );
-
-            }
-
-
-            updateInfo();
-
-        }
-
-
-        function onPointerUp() {
-
-            dragging =
-                false;
-
-            sculpting =
-                false;
-
-            updateInfo();
-
-        }
-
-
-        /*
-        =====================================================
-        MODELLIERPINSEL
-        =====================================================
-        */
-
-        function sculpt(
-            event
-        ) {
-
-            if (!selected)
-                return;
-
-
-            const rect =
-                renderer
-                    .domElement
-                    .getBoundingClientRect();
-
-
-            mouse.x =
-                (
-                    (
-                        event.clientX -
-                        rect.left
-                    ) /
-                    rect.width
-                ) * 2 - 1;
-
-
-            mouse.y =
-                -(
-                    (
-                        event.clientY -
-                        rect.top
-                    ) /
-                    rect.height
-                ) * 2 + 1;
-
-
-            raycaster.setFromCamera(
-                mouse,
-                camera
-            );
-
-
-            const hits =
-                raycaster
-                    .intersectObject(
-                        selected,
-                        false
-                    );
-
-
-            if (
-                hits.length === 0
-            )
-                return;
-
-
-            const hit =
-                hits[0];
-
-
-            const localPoint =
-                selected.worldToLocal(
-                    hit.point.clone()
-                );
-
-
-            const position =
-                selected.geometry
-                    .getAttribute(
-                        "position"
-                    );
-
-
-            const radius =
-                brushSize;
-
-
-            const normal =
-                hit.face.normal.clone();
-
-
-            for (
-                let i = 0;
-                i < position.count;
-                i++
-            ) {
-
-                const vertex =
-                    new THREE.Vector3();
-
-
-                vertex.fromBufferAttribute(
-                    position,
-                    i
-                );
-
-
-                const distance =
-                    vertex.distanceTo(
-                        localPoint
-                    );
-
-
-                if (
-                    distance >
-                    radius
-                )
-                    continue;
-
-
-                const strength =
-                    1 -
-                    distance /
-                    radius;
-
-
-                const amount =
-                    strength *
-                    strength *
-                    0.08;
-
-
-                if (
-                    sculptMode ===
-                    "raise"
-                ) {
-
-                    vertex.add(
-
-                        normal
-                            .clone()
-                            .multiplyScalar(
-                                amount
-                            )
-
-                    );
-
-                }
-
-
-                if (
-                    sculptMode ===
-                    "lower"
-                ) {
-
-                    vertex.add(
-
-                        normal
-                            .clone()
-                            .multiplyScalar(
-                                -amount
-                            )
-
-                    );
-
-                }
-
-
-                position.setXYZ(
-
-                    i,
-
-                    vertex.x,
-
-                    vertex.y,
-
-                    vertex.z
-
-                );
-
-            }
-
-
-            position.needsUpdate =
-                true;
-
-
-            selected.geometry
-                .computeVertexNormals();
-
-
-            selected.geometry
-                .computeBoundingSphere();
-
-
-            updateInfo();
-
-        }
-
-
-        /*
-        =====================================================
-        MODELL LÖSCHEN
-        =====================================================
-        */
-
-        function deleteSelected() {
-
-            if (!selected)
-                return;
-
-
-            const index =
-                objects.indexOf(
-                    selected
-                );
-
-
-            if (
-                index !== -1
-            ) {
-
-                objects.splice(
-                    index,
-                    1
-                );
-
-            }
-
-
-            scene.remove(
-                selected
-            );
-
-
-            selected.geometry.dispose();
-
-            selected.material.dispose();
-
-
-            selected =
-                null;
-
-
-            updateInfo();
-
-        }
-
-
-        /*
-        =====================================================
-        SZENE LEEREN
-        =====================================================
-        */
-
-        function clearScene() {
-
-            for (
-                const object
-                of objects
-            ) {
-
-                scene.remove(
-                    object
-                );
-
-
-                object.geometry
-                    .dispose();
-
-
-                object.material
-                    .dispose();
-
-            }
-
-
-            objects.length =
-                0;
-
-
-            selected =
-                null;
-
-
-            updateInfo();
-
-        }
-
-
-        /*
-        =====================================================
-        GLB DOWNLOAD
-        =====================================================
-        */
-
-        function downloadSelectedModel() {
-
-            if (!selected) {
-
-                alert(
-                    "Bitte zuerst ein Modell auswählen."
-                );
-
-                return;
-
-            }
-
-
-            const exporter =
-                new GLTFExporter();
-
-
-            /*
-            -----------------------------------------
-            Das ausgewählte Objekt wird exportiert.
-            -----------------------------------------
-            */
-
-            const exportScene =
-                new THREE.Scene();
-
-
-            const clone =
-                selected.clone();
-
-
-            /*
-            Material kopieren
-            */
-
-            clone.material =
-                selected.material.clone();
-
-
-            exportScene.add(
-                clone
-            );
-
-
-            exporter.parse(
-
-                exportScene,
-
-                function(result) {
-
-                    let blob;
-
-
-                    /*
-                    GLB = Binärformat
-                    */
-
-                    if (
-                        result instanceof
-                        ArrayBuffer
-                    ) {
-
-                        blob =
-                            new Blob(
-                                [result],
-                                {
-                                    type:
-                                        "model/gltf-binary"
-                                }
-                            );
-
-                    }
-                    else {
-
-                        /*
-                        Falls der Exporter
-                        JSON zurückgibt.
-                        */
-
-                        blob =
-                            new Blob(
-                                [
-                                    JSON.stringify(
-                                        result
-                                    )
-                                ],
-                                {
-                                    type:
-                                        "application/json"
-                                }
-                            );
-
-                    }
-
-
-                    const url =
-                        URL.createObjectURL(
-                            blob
-                        );
-
-
-                    const link =
-                        document.createElement(
-                            "a"
-                        );
-
-
-                    link.href =
-                        url;
-
-
-                    link.download =
-                        (
-                            selected
-                                .userData
-                                .type
-                                .toLowerCase()
-                                .replace(
-                                    /[^a-z0-9äöüß]+/gi,
-                                    "-"
-                                )
-                        ) +
-                        ".glb";
-
-
-                    document.body
-                        .appendChild(
-                            link
-                        );
-
-
-                    link.click();
-
-
-                    document.body
-                        .removeChild(
-                            link
-                        );
-
-
-                    setTimeout(
-                        () =>
-                            URL.revokeObjectURL(
-                                url
-                            ),
-                        1000
-                    );
-
                 },
-
-                function(error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    alert(
-                        "Das Modell konnte nicht exportiert werden."
-                    );
-
-                },
-
-                {
-                    binary: true
-                }
-
+                1000
             );
 
+        },
+
+        error => {
+
+            console.error(
+                "GLB Export Fehler:",
+                error
+            );
+
+
+            alert(
+                "Fehler beim Exportieren des Modells."
+            );
+
+        },
+
+        {
+            binary: true
         }
 
-
-        /*
-        =====================================================
-        RESIZE
-        =====================================================
-        */
-
-        function onResize() {
-
-            camera.aspect =
-                window.innerWidth /
-                window.innerHeight;
+    );
+}
 
 
-            camera.updateProjectionMatrix();
+/* =========================================
+   FENSTERGRÖSSE
+========================================= */
+
+function resize() {
+
+    camera.aspect =
+        window.innerWidth /
+        window.innerHeight;
 
 
-            renderer.setSize(
-
-                window.innerWidth,
-
-                window.innerHeight
-
-            );
-
-        }
+    camera.updateProjectionMatrix();
 
 
-        /*
-        =====================================================
-        RENDER
-        =====================================================
-        */
-
-        function animate() {
-
-            requestAnimationFrame(
-                animate
-            );
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+}
 
 
-            controls.update();
+/* =========================================
+   RENDER LOOP
+========================================= */
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
 
 
-            renderer.render(
-                scene,
-                camera
-            );
+    controls.update();
 
-        }
 
-    </script>
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+</script>
 
 </body>
 </html>
