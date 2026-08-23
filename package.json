@@ -1,17 +1,15 @@
 {
-  "name": "gps-navi",
+  "name": "ghost-3d-modeler",
   "version": "1.0.0",
-  "description": "Kostenlose GPS Navigation mit OpenStreetMap, Live Standort und Sprachansagen",
+  "description": "Echter browserbasierter 3D-Modellierer mit Three.js",
   "main": "server.js",
-  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
-  "dependencies": {
-    "express": "^5.1.0",
-    "cors": "^2.8.5"
-  },
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
   }
 }
