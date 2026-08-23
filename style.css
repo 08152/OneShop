@@ -1,321 +1,288 @@
-/* =========================
-   Allgemein
-========================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#ffffff;
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #101216;
+    color: white;
 }
 
-#map{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:1;
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
-/* =========================
-   Suchfeld
-========================= */
+#topbar {
+    position: fixed;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
 
-.panel{
+    display: flex;
+    align-items: center;
+    gap: 20px;
 
-    position:absolute;
+    padding: 10px 18px;
 
-    top:10px;
-    left:10px;
-    right:10px;
-
-    z-index:1000;
-
-    background:white;
-
-    padding:15px;
-
-    border-radius:18px;
-
-    box-shadow:0 8px 20px rgba(0,0,0,.25);
-
-    transition:.3s;
-
+    background: rgba(17, 19, 24, 0.94);
+    border-bottom: 1px solid #30343c;
+    backdrop-filter: blur(10px);
 }
 
-#ziel{
-
-    width:100%;
-
-    padding:14px;
-
-    border-radius:12px;
-
-    border:1px solid #bbb;
-
-    font-size:17px;
-
-    outline:none;
-
+.logo {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #fff;
+    min-width: 120px;
 }
 
-#ziel:focus{
-
-    border-color:#1976ff;
-
+.object-buttons {
+    display: flex;
+    gap: 8px;
 }
 
-/* =========================
-   Buttons
-========================= */
-
-button{
-
-    width:100%;
-
-    margin-top:10px;
-
-    padding:14px;
-
-    border:none;
-
-    border-radius:12px;
-
-    font-size:17px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    background:#1976ff;
-
-    color:white;
-
-    transition:.2s;
-
+.object-btn,
+.mode,
+.brush,
+.sculpt,
+#deleteObject,
+#clearScene {
+    border: 1px solid #383d46;
+    background: #1c2027;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.15s;
 }
 
-button:hover{
-
-    transform:scale(1.02);
-
+.object-btn:hover,
+.mode:hover,
+.brush:hover,
+.sculpt:hover,
+#clearScene:hover {
+    background: #292e37;
+    border-color: #646b78;
 }
 
-button:active{
+.object-btn {
+    width: 50px;
+    height: 50px;
 
-    transform:scale(.98);
-
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* =========================
-   GPS
-========================= */
-
-#info{
-
-    margin-top:10px;
-
-    font-size:15px;
-
-    color:#333;
-
-    text-align:center;
-
+.object-btn:active {
+    transform: scale(0.94);
 }
 
-/* =========================
-   Standortbutton
-========================= */
-
-#locationBtn{
-
-    position:absolute;
-
-    right:15px;
-
-    bottom:170px;
-
-    width:65px;
-
-    height:65px;
-
-    border-radius:50%;
-
-    z-index:3000;
-
-    font-size:30px;
-
-    padding:0;
-
+.sphere-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #eeeeee, #777);
+    box-shadow:
+        inset -6px -5px 8px rgba(0,0,0,.4),
+        inset 5px 4px 7px rgba(255,255,255,.5);
 }
 
-/* =========================
-   Vollbildbutton
-========================= */
-
-#fullscreenBtn{
-
-    position:absolute;
-
-    right:15px;
-
-    bottom:95px;
-
-    width:65px;
-
-    height:65px;
-
-    border-radius:50%;
-
-    z-index:3000;
-
-    font-size:28px;
-
-    padding:0;
-
+.cube-icon {
+    width: 25px;
+    height: 25px;
+    background: linear-gradient(135deg, #eee, #777);
+    transform: rotate(0deg);
+    box-shadow: inset -6px -6px 8px rgba(0,0,0,.4);
 }
 
-/* =========================
-   Navi
-========================= */
-
-#naviInfo{
-
-    position:absolute;
-
-    left:15px;
-
-    right:15px;
-
-    bottom:15px;
-
-    z-index:2500;
-
-    background:rgba(20,20,20,.90);
-
-    color:white;
-
-    border-radius:20px;
-
-    padding:18px;
-
-    display:none;
-
-    text-align:center;
-
-    backdrop-filter:blur(12px);
-
+.cylinder-icon {
+    width: 24px;
+    height: 28px;
+    border-radius: 50% / 12%;
+    background: linear-gradient(90deg, #777, #eee, #777);
+    box-shadow: inset -5px 0 6px rgba(0,0,0,.35);
 }
 
-#nextInstruction{
-
-    font-size:24px;
-
-    font-weight:bold;
-
+.mode-buttons {
+    display: flex;
+    gap: 7px;
+    margin-left: 10px;
 }
 
-#distanceLeft{
-
-    margin-top:10px;
-
-    font-size:18px;
-
+.mode {
+    padding: 11px 15px;
+    font-size: 13px;
 }
 
-#timeLeft{
-
-    margin-top:6px;
-
-    font-size:17px;
-
-    color:#d8d8d8;
-
+.mode.active {
+    background: #2563eb;
+    border-color: #4f83ff;
 }
 
-/* =========================
-   Fahrzeugmarker
-========================= */
+#rightbar {
+    position: fixed;
+    z-index: 20;
+    top: 72px;
+    right: 0;
+    bottom: 0;
 
-.car-marker{
+    width: 180px;
 
-    width:36px;
+    padding: 18px 12px;
 
-    height:36px;
-
-    background:#1976ff;
-
-    border-radius:50%;
-
-    border:4px solid white;
-
-    box-shadow:0 0 12px rgba(0,0,0,.4);
-
-    position:relative;
-
-    transform-origin:center center;
-
+    background: rgba(17, 19, 24, .95);
+    border-left: 1px solid #30343c;
+    backdrop-filter: blur(10px);
 }
 
-.car-marker::after{
-
-    content:"";
-
-    position:absolute;
-
-    left:50%;
-
-    top:-10px;
-
-    transform:translateX(-50%);
-
-    width:0;
-
-    height:0;
-
-    border-left:8px solid transparent;
-
-    border-right:8px solid transparent;
-
-    border-bottom:14px solid #1976ff;
-
+#rightbar h3 {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: #9098a8;
+    margin: 4px 4px 10px;
 }
 
-/* =========================
-   Handy
-========================= */
-
-@media (max-width:700px){
-
-.panel{
-
-    left:8px;
-    right:8px;
-    top:8px;
-
+.brush,
+.sculpt,
+#deleteObject,
+#clearScene {
+    width: 100%;
+    min-height: 42px;
+    margin-bottom: 7px;
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 13px;
 }
 
-#locationBtn,
-#fullscreenBtn{
-
-    width:58px;
-    height:58px;
-    font-size:26px;
-
+.brush {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#nextInstruction{
-
-    font-size:20px;
-
+.brush.active {
+    background: #2563eb;
+    border-color: #4f83ff;
 }
 
+.brush-dot {
+    display: inline-block;
+    border-radius: 50%;
+    background: white;
+    flex-shrink: 0;
+}
+
+.tiny {
+    width: 7px;
+    height: 7px;
+}
+
+.medium {
+    width: 14px;
+    height: 14px;
+}
+
+.large {
+    width: 23px;
+    height: 23px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #30343c;
+    margin: 15px 0;
+}
+
+.sculpt {
+    background: #20242c;
+}
+
+.danger {
+    background: #5d2024 !important;
+    border-color: #863239 !important;
+}
+
+#bottom-info {
+    position: fixed;
+    z-index: 21;
+    left: 15px;
+    bottom: 15px;
+
+    display: flex;
+    gap: 12px;
+
+    pointer-events: none;
+}
+
+#bottom-info span {
+    background: rgba(15,17,21,.9);
+    border: 1px solid #353a44;
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-size: 12px;
+}
+
+#help {
+    position: fixed;
+    z-index: 20;
+    left: 15px;
+    top: 90px;
+
+    padding: 12px;
+
+    background: rgba(15,17,21,.82);
+    border: 1px solid #353a44;
+    border-radius: 8px;
+
+    color: #aeb5c1;
+    font-size: 11px;
+    line-height: 1.7;
+
+    pointer-events: none;
+}
+
+#help b {
+    color: white;
+}
+
+@media (max-width: 800px) {
+    #topbar {
+        gap: 5px;
+        padding: 7px;
+        height: 64px;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .mode {
+        padding: 8px;
+        font-size: 11px;
+    }
+
+    #rightbar {
+        width: 145px;
+        top: 64px;
+    }
+
+    #help {
+        display: none;
+    }
+
+    .object-btn {
+        width: 42px;
+        height: 42px;
+    }
 }
