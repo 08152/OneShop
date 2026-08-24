@@ -1,7 +1,7 @@
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html,
@@ -10,7 +10,7 @@ body {
     height: 100%;
     overflow: hidden;
 
-    background: #101216;
+    background: #101318;
 
     color: white;
 
@@ -20,350 +20,217 @@ body {
         sans-serif;
 }
 
-
-/* =====================================================
-   CANVAS
-===================================================== */
-
 canvas {
     display: block;
-
     width: 100%;
     height: 100%;
 }
 
 
 /* =====================================================
-   TOPBAR
+   TOP
 ===================================================== */
 
 #topbar {
-
     position: fixed;
-
     z-index: 100;
 
     left: 0;
     top: 0;
     right: 0;
 
-    height: 72px;
+    height: 70px;
 
     display: flex;
-
     align-items: center;
 
-    gap: 20px;
+    gap: 8px;
 
-    padding:
-        10px 16px;
+    padding: 8px 12px;
 
     background:
-        rgba(
-            15,
-            17,
-            22,
-            .95
-        );
+        rgba(12,15,20,.96);
 
     border-bottom:
-        1px solid
-        #343944;
+        1px solid #343b46;
 
     backdrop-filter:
-        blur(12px);
+        blur(10px);
 
+    overflow-x: auto;
 }
 
-
-/* =====================================================
-   LOGO
-===================================================== */
-
-#logo {
-
-    font-size: 18px;
-
+.logo {
+    font-size: 17px;
     font-weight: 900;
 
     letter-spacing: 2px;
 
-    min-width: 115px;
+    margin-right: 8px;
 
+    white-space: nowrap;
 }
 
-
-/* =====================================================
-   OBJECT MENU
-===================================================== */
-
-#objectMenu {
-
+.shape-menu,
+.transform-menu {
     display: flex;
-
     align-items: center;
-
-    gap: 7px;
-
+    gap: 5px;
 }
 
+.shape-btn,
+.mode-btn,
+.normal-btn,
+.plate-btn,
+.download-btn {
+    height: 45px;
 
-.objectButton {
+    border-radius: 7px;
 
-    width: 48px;
+    border: 1px solid #3b424d;
 
-    height: 48px;
+    background: #1b2027;
 
-    border:
-        1px solid
-        #3a404c;
-
-    border-radius: 8px;
-
-    background:
-        #1c2027;
+    color: white;
 
     cursor: pointer;
 
+    white-space: nowrap;
+}
+
+.shape-btn {
+    min-width: 64px;
+
     display: flex;
-
+    flex-direction: column;
     align-items: center;
-
     justify-content: center;
 
-    transition:
-        .15s;
+    gap: 3px;
 
+    font-size: 9px;
 }
 
-
-.objectButton:hover {
-
-    background:
-        #2a303a;
-
-    border-color:
-        #697280;
-
+.shape-btn:hover,
+.mode-btn:hover,
+.normal-btn:hover {
+    background: #292f38;
 }
 
+.shape-btn.negative {
+    border-color: #63313c;
+}
 
-.objectButton:active {
+.separator {
+    width: 1px;
+    height: 36px;
 
-    transform:
-        scale(.93);
+    margin: 0 3px;
 
+    background: #4b525d;
+}
+
+.mode-btn {
+    padding: 0 12px;
+
+    font-size: 11px;
+}
+
+.mode-btn.active {
+    background: #1769e8;
+    border-color: #5c9cff;
+}
+
+.normal-btn,
+.plate-btn,
+.download-btn {
+    padding: 0 13px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.plate-btn {
+    background: #236044;
+    border-color: #438f68;
+}
+
+.download-btn {
+    background: #1769c7;
+    border-color: #579cff;
 }
 
 
 /* =====================================================
-   POSITIVE ICONS
+   ICONS
 ===================================================== */
 
-.sphereIcon {
+.icon {
+    display: block;
+}
 
-    width: 25px;
-
-    height: 25px;
-
+.sphere {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
 
     background:
         linear-gradient(
             135deg,
             #ffffff,
-            #707782
+            #697684
         );
-
-    box-shadow:
-        inset
-        -6px -6px 9px
-        rgba(0,0,0,.4);
-
 }
 
-
-.cubeIcon {
-
-    width: 25px;
-
-    height: 25px;
+.cube {
+    width: 20px;
+    height: 20px;
 
     background:
         linear-gradient(
             135deg,
             #ffffff,
-            #777e88
+            #687482
         );
-
-    box-shadow:
-        inset
-        -6px -6px 9px
-        rgba(0,0,0,.4);
-
 }
 
+.cylinder {
+    width: 20px;
+    height: 21px;
 
-.cylinderIcon {
-
-    width: 25px;
-
-    height: 28px;
-
-    border-radius:
-        50% / 15%;
+    border-radius: 50% / 15%;
 
     background:
         linear-gradient(
             90deg,
-            #666d77,
+            #66727f,
             #ffffff,
-            #666d77
+            #66727f
         );
-
 }
 
+.negative-sphere {
+    width: 20px;
+    height: 20px;
 
-/* =====================================================
-   SEPARATOR
-===================================================== */
-
-.separator {
-
-    width: 1px;
-
-    height: 38px;
-
-    background:
-        #464c57;
-
-    margin:
-        0 5px;
-
-}
-
-
-/* =====================================================
-   NEGATIVE ICONS
-===================================================== */
-
-.negativeButton {
-
-    border-color:
-        #71313d;
-
-}
-
-
-.negativeButton:hover {
-
-    border-color:
-        #ff5068;
-
-    background:
-        #351b22;
-
-}
-
-
-.negativeSphereIcon {
-
-    width: 25px;
-
-    height: 25px;
+    border: 2px dashed #ff5369;
 
     border-radius: 50%;
-
-    border:
-        3px dashed
-        #ff5068;
-
 }
 
+.negative-cube {
+    width: 20px;
+    height: 20px;
 
-.negativeCubeIcon {
-
-    width: 25px;
-
-    height: 25px;
-
-    border:
-        3px dashed
-        #ff5068;
-
+    border: 2px dashed #ff5369;
 }
 
+.negative-cylinder {
+    width: 20px;
+    height: 21px;
 
-.negativeCylinderIcon {
+    border: 2px dashed #ff5369;
 
-    width: 25px;
-
-    height: 28px;
-
-    border:
-        3px dashed
-        #ff5068;
-
-    border-radius:
-        50% / 15%;
-
-}
-
-
-/* =====================================================
-   TRANSFORM MENU
-===================================================== */
-
-#transformMenu {
-
-    display: flex;
-
-    gap: 6px;
-
-}
-
-
-.toolButton {
-
-    height: 40px;
-
-    padding:
-        0 13px;
-
-    border:
-        1px solid
-        #3b414c;
-
-    background:
-        #1c2027;
-
-    color: white;
-
-    border-radius: 7px;
-
-    cursor: pointer;
-
-    font-size: 12px;
-
-}
-
-
-.toolButton:hover {
-
-    background:
-        #2b3039;
-
-}
-
-
-.toolButton.active {
-
-    background:
-        #246ff2;
-
-    border-color:
-        #5791ff;
-
+    border-radius: 50% / 15%;
 }
 
 
@@ -372,357 +239,289 @@ canvas {
 ===================================================== */
 
 #rightbar {
-
     position: fixed;
-
     z-index: 100;
 
+    top: 70px;
     right: 0;
-
-    top: 72px;
-
     bottom: 0;
 
-    width: 185px;
+    width: 190px;
 
-    padding:
-        17px 12px;
+    padding: 14px 11px;
 
     background:
-        rgba(
-            15,
-            17,
-            22,
-            .96
-        );
+        rgba(12,15,20,.96);
 
     border-left:
-        1px solid
-        #343944;
+        1px solid #343b46;
 
-    backdrop-filter:
-        blur(12px);
-
+    overflow-y: auto;
 }
 
-
-.panelTitle {
+#rightbar h3 {
+    color: #8e97a5;
 
     font-size: 10px;
 
-    font-weight: bold;
-
     letter-spacing: 1.5px;
 
-    color:
-        #8e96a5;
-
     margin:
-        4px 3px
-        10px;
-
+        3px 2px 9px;
 }
 
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
-.brushButton,
-.actionButton {
-
+.brush,
+.tool-btn,
+.plate-list {
     width: 100%;
 
-    min-height: 41px;
+    min-height: 39px;
 
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 
-    border:
-        1px solid
-        #393f4a;
+    border-radius: 6px;
 
-    background:
-        #1c2027;
+    border: 1px solid #39414c;
+
+    background: #1b2027;
 
     color: white;
-
-    border-radius: 7px;
 
     cursor: pointer;
 
     text-align: left;
 
-    padding:
-        7px 10px;
+    padding: 7px 10px;
 
-    font-size: 12px;
-
+    font-size: 11px;
 }
 
-
-.brushButton:hover,
-.actionButton:hover {
-
-    background:
-        #2a3039;
-
+.brush:hover,
+.tool-btn:hover,
+.plate-list:hover {
+    background: #292f38;
 }
 
-
-.brushButton.active {
-
-    background:
-        #246ff2;
-
-    border-color:
-        #5791ff;
-
+.brush.active {
+    background: #1769e8;
+    border-color: #579cff;
 }
 
-
-/* =====================================================
-   PINSEL
-===================================================== */
-
-.brushButton {
-
+.brush {
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
 }
 
-
-.brushDot {
-
-    display: inline-block;
-
-    background:
-        white;
+.brush-dot {
+    display: block;
 
     border-radius: 50%;
 
+    background: white;
 }
-
 
 .tiny {
-
     width: 6px;
-
     height: 6px;
-
 }
 
-
-.medium {
-
-    width: 13px;
-
-    height: 13px;
-
+.small {
+    width: 12px;
+    height: 12px;
 }
 
-
-.big {
-
-    width: 22px;
-
-    height: 22px;
-
+.large {
+    width: 21px;
+    height: 21px;
 }
 
-
-/* =====================================================
-   TRENNLINIE
-===================================================== */
-
-.line {
-
+.separator-line {
     height: 1px;
 
-    background:
-        #343944;
+    background: #343b46;
 
     margin:
-        15px 0;
+        14px 0;
+}
 
+.hint {
+    color: #747e8c;
+
+    font-size: 9px;
+
+    line-height: 1.5;
+
+    margin-top: 8px;
+}
+
+.danger {
+    border-color: #68303c;
+}
+
+.danger:hover {
+    background: #391e25;
+}
+
+#plates {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.plate-list.active {
+    background: #236044;
+    border-color: #4d9b70;
 }
 
 
 /* =====================================================
-   INFO PANEL
+   INFO
 ===================================================== */
 
-#infoPanel {
-
+#dimensions {
     position: fixed;
-
     z-index: 90;
 
-    left: 15px;
+    left: 12px;
+    bottom: 12px;
 
-    bottom: 15px;
-
-    width: 360px;
+    width: 350px;
 
     padding: 12px;
 
     background:
-        rgba(
-            12,
-            14,
-            18,
-            .92
-        );
+        rgba(9,12,16,.94);
 
     border:
-        1px solid
-        #3b414c;
+        1px solid #3b424d;
 
     border-radius: 8px;
-
 }
 
-
-#selectedObject {
-
+#objectName {
     font-size: 13px;
-
     font-weight: bold;
-
-    margin-bottom: 10px;
-
 }
 
+#plateName {
+    margin-top: 3px;
 
-/* =====================================================
-   DIMENSIONS
-===================================================== */
+    color: #5ea2ff;
 
-#dimensions {
+    font-size: 10px;
+}
 
+.size-row {
     display: flex;
 
-    gap: 7px;
+    gap: 5px;
 
+    margin-top: 10px;
 }
 
-
-.dimension {
-
+.size-row > div {
     flex: 1;
 
     padding: 7px;
 
-    background:
-        #1c2027;
+    background: #1a1f26;
 
-    border-radius: 6px;
-
+    border-radius: 5px;
 }
 
-
-.dimension span {
-
+.size-row small {
     display: block;
+
+    color: #7f8997;
 
     font-size: 8px;
 
-    color:
-        #89919e;
-
     margin-bottom: 3px;
-
 }
 
-
-.dimension strong {
-
-    font-size: 13px;
-
+.size-row strong {
+    font-size: 11px;
 }
 
-
-/* =====================================================
-   VERTICES
-===================================================== */
-
-#vertices {
-
+#pointCount {
     margin-top: 8px;
 
-    font-size: 10px;
+    color: #87909d;
 
-    color:
-        #969eac;
-
+    font-size: 9px;
 }
 
 
 /* =====================================================
-   HELP
+   STATUS
 ===================================================== */
 
-#help {
-
+#status {
     position: fixed;
 
     z-index: 90;
 
-    left: 15px;
+    left: 50%;
+    top: 84px;
 
-    top: 90px;
+    transform: translateX(-50%);
 
-    padding: 12px;
+    padding: 7px 12px;
+
+    border-radius: 20px;
 
     background:
-        rgba(
-            12,
-            14,
-            18,
-            .84
-        );
+        rgba(10,13,18,.85);
 
     border:
-        1px solid
-        #3b414c;
+        1px solid #39414c;
 
-    border-radius: 8px;
+    color: #aeb7c4;
 
     font-size: 10px;
 
-    line-height: 1.6;
-
-    color:
-        #aab2bf;
-
+    pointer-events: none;
 }
 
 
-#help strong {
+/* =====================================================
+   BLAUER POINTER-LOCK-KREIS
+===================================================== */
 
-    color: white;
+#mouseCircle {
+    position: fixed;
 
-    letter-spacing: 1px;
+    z-index: 1000;
 
+    left: 50%;
+    top: 50%;
+
+    width: 20px;
+    height: 20px;
+
+    transform:
+        translate(-50%,-50%);
+
+    border:
+        2px solid #2388ff;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 10px #2388ff,
+        inset 0 0 5px #2388ff;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition:
+        opacity .15s;
 }
 
-
-.positiveText {
-
-    color:
-        #65a5ff;
-
-}
-
-
-.negativeText {
-
-    color:
-        #ff526b;
-
+#mouseCircle.visible {
+    opacity: 1;
 }
 
 
@@ -730,106 +529,50 @@ canvas {
    MOBILE / CHROMEBOOK
 ===================================================== */
 
-@media (
-    max-width: 850px
-) {
-
-    #logo {
-
-        display: none;
-
-    }
-
+@media (max-width: 900px) {
 
     #topbar {
-
-        gap: 6px;
-
-        padding:
-            7px;
-
-        height: 64px;
-
+        height: 62px;
+        padding: 6px;
     }
 
-
-    .objectButton {
-
-        width: 40px;
-
-        height: 40px;
-
+    .logo {
+        display: none;
     }
-
-
-    #transformMenu {
-
-        gap: 3px;
-
-    }
-
-
-    .toolButton {
-
-        padding:
-            0 7px;
-
-        font-size: 10px;
-
-    }
-
 
     #rightbar {
-
-        top: 64px;
-
-        width: 150px;
-
+        top: 62px;
+        width: 155px;
     }
 
-
-    #help {
-
-        display: none;
-
+    .shape-btn {
+        min-width: 52px;
     }
 
-
-    #infoPanel {
-
-        width: 300px;
-
-        bottom: 8px;
-
-        left: 8px;
-
+    .normal-btn,
+    .plate-btn,
+    .download-btn {
+        padding: 0 9px;
     }
 
+    #dimensions {
+        width: 290px;
+        left: 6px;
+        bottom: 6px;
+    }
 }
 
-
-@media (
-    max-width: 600px
-) {
+@media (max-width: 600px) {
 
     #rightbar {
-
-        width: 135px;
-
+        width: 140px;
     }
 
+    #dimensions {
+        width: 250px;
+    }
 
-    .toolButton {
-
+    .size-row strong {
         font-size: 9px;
-
     }
-
-
-    #infoPanel {
-
-        width: 260px;
-
-    }
-
 }
