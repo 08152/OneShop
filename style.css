@@ -1,7 +1,7 @@
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html,
@@ -9,280 +9,827 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: Arial, Helvetica, sans-serif;
+
     background: #101216;
+
     color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
+
+
+/* =====================================================
+   CANVAS
+===================================================== */
 
 canvas {
     display: block;
+
     width: 100%;
     height: 100%;
 }
 
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
 #topbar {
+
     position: fixed;
-    z-index: 20;
-    top: 0;
+
+    z-index: 100;
+
     left: 0;
+    top: 0;
     right: 0;
+
     height: 72px;
 
     display: flex;
+
     align-items: center;
+
     gap: 20px;
 
-    padding: 10px 18px;
+    padding:
+        10px 16px;
 
-    background: rgba(17, 19, 24, 0.94);
-    border-bottom: 1px solid #30343c;
-    backdrop-filter: blur(10px);
+    background:
+        rgba(
+            15,
+            17,
+            22,
+            .95
+        );
+
+    border-bottom:
+        1px solid
+        #343944;
+
+    backdrop-filter:
+        blur(12px);
+
 }
 
-.logo {
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+#logo {
+
     font-size: 18px;
+
     font-weight: 900;
+
     letter-spacing: 2px;
-    color: #fff;
-    min-width: 120px;
+
+    min-width: 115px;
+
 }
 
-.object-buttons {
-    display: flex;
-    gap: 8px;
-}
 
-.object-btn,
-.mode,
-.brush,
-.sculpt,
-#deleteObject,
-#clearScene {
-    border: 1px solid #383d46;
-    background: #1c2027;
-    color: white;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: 0.15s;
-}
+/* =====================================================
+   OBJECT MENU
+===================================================== */
 
-.object-btn:hover,
-.mode:hover,
-.brush:hover,
-.sculpt:hover,
-#clearScene:hover {
-    background: #292e37;
-    border-color: #646b78;
-}
-
-.object-btn {
-    width: 50px;
-    height: 50px;
+#objectMenu {
 
     display: flex;
+
     align-items: center;
-    justify-content: center;
-}
 
-.object-btn:active {
-    transform: scale(0.94);
-}
-
-.sphere-icon {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #eeeeee, #777);
-    box-shadow:
-        inset -6px -5px 8px rgba(0,0,0,.4),
-        inset 5px 4px 7px rgba(255,255,255,.5);
-}
-
-.cube-icon {
-    width: 25px;
-    height: 25px;
-    background: linear-gradient(135deg, #eee, #777);
-    transform: rotate(0deg);
-    box-shadow: inset -6px -6px 8px rgba(0,0,0,.4);
-}
-
-.cylinder-icon {
-    width: 24px;
-    height: 28px;
-    border-radius: 50% / 12%;
-    background: linear-gradient(90deg, #777, #eee, #777);
-    box-shadow: inset -5px 0 6px rgba(0,0,0,.35);
-}
-
-.mode-buttons {
-    display: flex;
     gap: 7px;
-    margin-left: 10px;
+
 }
 
-.mode {
-    padding: 11px 15px;
-    font-size: 13px;
+
+.objectButton {
+
+    width: 48px;
+
+    height: 48px;
+
+    border:
+        1px solid
+        #3a404c;
+
+    border-radius: 8px;
+
+    background:
+        #1c2027;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition:
+        .15s;
+
 }
 
-.mode.active {
-    background: #2563eb;
-    border-color: #4f83ff;
+
+.objectButton:hover {
+
+    background:
+        #2a303a;
+
+    border-color:
+        #697280;
+
 }
+
+
+.objectButton:active {
+
+    transform:
+        scale(.93);
+
+}
+
+
+/* =====================================================
+   POSITIVE ICONS
+===================================================== */
+
+.sphereIcon {
+
+    width: 25px;
+
+    height: 25px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #707782
+        );
+
+    box-shadow:
+        inset
+        -6px -6px 9px
+        rgba(0,0,0,.4);
+
+}
+
+
+.cubeIcon {
+
+    width: 25px;
+
+    height: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #777e88
+        );
+
+    box-shadow:
+        inset
+        -6px -6px 9px
+        rgba(0,0,0,.4);
+
+}
+
+
+.cylinderIcon {
+
+    width: 25px;
+
+    height: 28px;
+
+    border-radius:
+        50% / 15%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #666d77,
+            #ffffff,
+            #666d77
+        );
+
+}
+
+
+/* =====================================================
+   SEPARATOR
+===================================================== */
+
+.separator {
+
+    width: 1px;
+
+    height: 38px;
+
+    background:
+        #464c57;
+
+    margin:
+        0 5px;
+
+}
+
+
+/* =====================================================
+   NEGATIVE ICONS
+===================================================== */
+
+.negativeButton {
+
+    border-color:
+        #71313d;
+
+}
+
+
+.negativeButton:hover {
+
+    border-color:
+        #ff5068;
+
+    background:
+        #351b22;
+
+}
+
+
+.negativeSphereIcon {
+
+    width: 25px;
+
+    height: 25px;
+
+    border-radius: 50%;
+
+    border:
+        3px dashed
+        #ff5068;
+
+}
+
+
+.negativeCubeIcon {
+
+    width: 25px;
+
+    height: 25px;
+
+    border:
+        3px dashed
+        #ff5068;
+
+}
+
+
+.negativeCylinderIcon {
+
+    width: 25px;
+
+    height: 28px;
+
+    border:
+        3px dashed
+        #ff5068;
+
+    border-radius:
+        50% / 15%;
+
+}
+
+
+/* =====================================================
+   TRANSFORM MENU
+===================================================== */
+
+#transformMenu {
+
+    display: flex;
+
+    gap: 6px;
+
+}
+
+
+.toolButton {
+
+    height: 40px;
+
+    padding:
+        0 13px;
+
+    border:
+        1px solid
+        #3b414c;
+
+    background:
+        #1c2027;
+
+    color: white;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 12px;
+
+}
+
+
+.toolButton:hover {
+
+    background:
+        #2b3039;
+
+}
+
+
+.toolButton.active {
+
+    background:
+        #246ff2;
+
+    border-color:
+        #5791ff;
+
+}
+
+
+/* =====================================================
+   RIGHT BAR
+===================================================== */
 
 #rightbar {
+
     position: fixed;
-    z-index: 20;
-    top: 72px;
+
+    z-index: 100;
+
     right: 0;
+
+    top: 72px;
+
     bottom: 0;
 
-    width: 180px;
+    width: 185px;
 
-    padding: 18px 12px;
+    padding:
+        17px 12px;
 
-    background: rgba(17, 19, 24, .95);
-    border-left: 1px solid #30343c;
-    backdrop-filter: blur(10px);
+    background:
+        rgba(
+            15,
+            17,
+            22,
+            .96
+        );
+
+    border-left:
+        1px solid
+        #343944;
+
+    backdrop-filter:
+        blur(12px);
+
 }
 
-#rightbar h3 {
-    font-size: 11px;
+
+.panelTitle {
+
+    font-size: 10px;
+
+    font-weight: bold;
+
     letter-spacing: 1.5px;
-    color: #9098a8;
-    margin: 4px 4px 10px;
+
+    color:
+        #8e96a5;
+
+    margin:
+        4px 3px
+        10px;
+
 }
 
-.brush,
-.sculpt,
-#deleteObject,
-#clearScene {
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.brushButton,
+.actionButton {
+
     width: 100%;
-    min-height: 42px;
+
+    min-height: 41px;
+
     margin-bottom: 7px;
+
+    border:
+        1px solid
+        #393f4a;
+
+    background:
+        #1c2027;
+
+    color: white;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
     text-align: left;
-    padding: 8px 10px;
-    font-size: 13px;
+
+    padding:
+        7px 10px;
+
+    font-size: 12px;
+
 }
 
-.brush {
+
+.brushButton:hover,
+.actionButton:hover {
+
+    background:
+        #2a3039;
+
+}
+
+
+.brushButton.active {
+
+    background:
+        #246ff2;
+
+    border-color:
+        #5791ff;
+
+}
+
+
+/* =====================================================
+   PINSEL
+===================================================== */
+
+.brushButton {
+
     display: flex;
+
     align-items: center;
+
     gap: 10px;
+
 }
 
-.brush.active {
-    background: #2563eb;
-    border-color: #4f83ff;
-}
 
-.brush-dot {
+.brushDot {
+
     display: inline-block;
+
+    background:
+        white;
+
     border-radius: 50%;
-    background: white;
-    flex-shrink: 0;
+
 }
+
 
 .tiny {
-    width: 7px;
-    height: 7px;
+
+    width: 6px;
+
+    height: 6px;
+
 }
+
 
 .medium {
-    width: 14px;
-    height: 14px;
+
+    width: 13px;
+
+    height: 13px;
+
 }
 
-.large {
-    width: 23px;
-    height: 23px;
+
+.big {
+
+    width: 22px;
+
+    height: 22px;
+
 }
 
-hr {
-    border: 0;
-    border-top: 1px solid #30343c;
-    margin: 15px 0;
+
+/* =====================================================
+   TRENNLINIE
+===================================================== */
+
+.line {
+
+    height: 1px;
+
+    background:
+        #343944;
+
+    margin:
+        15px 0;
+
 }
 
-.sculpt {
-    background: #20242c;
-}
 
-.danger {
-    background: #5d2024 !important;
-    border-color: #863239 !important;
-}
+/* =====================================================
+   INFO PANEL
+===================================================== */
 
-#bottom-info {
+#infoPanel {
+
     position: fixed;
-    z-index: 21;
+
+    z-index: 90;
+
     left: 15px;
+
     bottom: 15px;
 
+    width: 360px;
+
+    padding: 12px;
+
+    background:
+        rgba(
+            12,
+            14,
+            18,
+            .92
+        );
+
+    border:
+        1px solid
+        #3b414c;
+
+    border-radius: 8px;
+
+}
+
+
+#selectedObject {
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    margin-bottom: 10px;
+
+}
+
+
+/* =====================================================
+   DIMENSIONS
+===================================================== */
+
+#dimensions {
+
     display: flex;
-    gap: 12px;
 
-    pointer-events: none;
+    gap: 7px;
+
 }
 
-#bottom-info span {
-    background: rgba(15,17,21,.9);
-    border: 1px solid #353a44;
-    border-radius: 7px;
-    padding: 8px 11px;
-    font-size: 12px;
+
+.dimension {
+
+    flex: 1;
+
+    padding: 7px;
+
+    background:
+        #1c2027;
+
+    border-radius: 6px;
+
 }
+
+
+.dimension span {
+
+    display: block;
+
+    font-size: 8px;
+
+    color:
+        #89919e;
+
+    margin-bottom: 3px;
+
+}
+
+
+.dimension strong {
+
+    font-size: 13px;
+
+}
+
+
+/* =====================================================
+   VERTICES
+===================================================== */
+
+#vertices {
+
+    margin-top: 8px;
+
+    font-size: 10px;
+
+    color:
+        #969eac;
+
+}
+
+
+/* =====================================================
+   HELP
+===================================================== */
 
 #help {
+
     position: fixed;
-    z-index: 20;
+
+    z-index: 90;
+
     left: 15px;
+
     top: 90px;
 
     padding: 12px;
 
-    background: rgba(15,17,21,.82);
-    border: 1px solid #353a44;
+    background:
+        rgba(
+            12,
+            14,
+            18,
+            .84
+        );
+
+    border:
+        1px solid
+        #3b414c;
+
     border-radius: 8px;
 
-    color: #aeb5c1;
-    font-size: 11px;
-    line-height: 1.7;
+    font-size: 10px;
 
-    pointer-events: none;
+    line-height: 1.6;
+
+    color:
+        #aab2bf;
+
 }
 
-#help b {
+
+#help strong {
+
     color: white;
+
+    letter-spacing: 1px;
+
 }
 
-@media (max-width: 800px) {
-    #topbar {
-        gap: 5px;
-        padding: 7px;
-        height: 64px;
-    }
 
-    .logo {
+.positiveText {
+
+    color:
+        #65a5ff;
+
+}
+
+
+.negativeText {
+
+    color:
+        #ff526b;
+
+}
+
+
+/* =====================================================
+   MOBILE / CHROMEBOOK
+===================================================== */
+
+@media (
+    max-width: 850px
+) {
+
+    #logo {
+
         display: none;
+
     }
 
-    .mode {
-        padding: 8px;
-        font-size: 11px;
+
+    #topbar {
+
+        gap: 6px;
+
+        padding:
+            7px;
+
+        height: 64px;
+
     }
+
+
+    .objectButton {
+
+        width: 40px;
+
+        height: 40px;
+
+    }
+
+
+    #transformMenu {
+
+        gap: 3px;
+
+    }
+
+
+    .toolButton {
+
+        padding:
+            0 7px;
+
+        font-size: 10px;
+
+    }
+
 
     #rightbar {
-        width: 145px;
+
         top: 64px;
+
+        width: 150px;
+
     }
+
 
     #help {
+
         display: none;
+
     }
 
-    .object-btn {
-        width: 42px;
-        height: 42px;
+
+    #infoPanel {
+
+        width: 300px;
+
+        bottom: 8px;
+
+        left: 8px;
+
     }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    #rightbar {
+
+        width: 135px;
+
+    }
+
+
+    .toolButton {
+
+        font-size: 9px;
+
+    }
+
+
+    #infoPanel {
+
+        width: 260px;
+
+    }
+
 }
