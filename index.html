@@ -1,58 +1,405 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>Ghost 3D Editor</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-        }
+<title>Ghost 3D Editor</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:#101318;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+/* =====================================================
+   THREE.JS
+===================================================== */
+
+canvas{
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:0;
+}
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+#topbar{
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:70px;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    padding:10px 14px;
+
+    background:rgba(15,18,24,.96);
+    border-bottom:1px solid #303640;
+
+    z-index:1000;
+    pointer-events:auto;
+}
+
+.logo{
+    color:white;
+    font-weight:bold;
+    font-size:19px;
+    margin-right:15px;
+    white-space:nowrap;
+}
+
+.shape-menu,
+.transform-menu{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+button{
+    font-family:inherit;
+    cursor:pointer;
+    user-select:none;
+}
+
+.shape-btn,
+.mode-btn,
+.normal-btn,
+.plate-btn,
+.download-btn{
+    border:1px solid #3b424d;
+    background:#20252d;
+    color:#e8edf5;
+
+    padding:9px 11px;
+    border-radius:7px;
+
+    transition:.15s;
+}
+
+.shape-btn:hover,
+.mode-btn:hover,
+.normal-btn:hover,
+.plate-btn:hover,
+.download-btn:hover{
+    background:#303742;
+    border-color:#667080;
+}
+
+.mode-btn.active{
+    background:#315e93;
+    border-color:#4b8fd9;
+}
+
+.negative{
+    color:#ff6b7c;
+}
+
+.separator{
+    width:1px;
+    height:34px;
+    background:#3b424d;
+    margin:0 4px;
+}
+
+.plate-btn{
+    margin-left:auto;
+    background:#284c70;
+}
+
+.download-btn{
+    background:#255b3b;
+}
+
+/* =====================================================
+   RIGHTBAR
+===================================================== */
+
+#rightbar{
+    position:fixed;
+
+    right:0;
+    top:70px;
+    bottom:0;
+
+    width:245px;
+
+    padding:18px;
+
+    background:rgba(18,22,28,.97);
+    border-left:1px solid #303640;
+
+    color:white;
+
+    z-index:1000;
+    overflow-y:auto;
+    pointer-events:auto;
+}
+
+#rightbar h3{
+    margin:3px 0 10px;
+    font-size:12px;
+    color:#9da8b7;
+    letter-spacing:1px;
+}
+
+.brush,
+.tool-btn,
+.plate-list{
+    width:100%;
+
+    margin-bottom:7px;
+
+    border:1px solid #3a414b;
+    border-radius:7px;
+
+    padding:10px;
+
+    background:#20252d;
+    color:white;
+
+    text-align:left;
+}
+
+.brush:hover,
+.tool-btn:hover,
+.plate-list:hover{
+    background:#303742;
+}
+
+.brush.active,
+.plate-list.active{
+    background:#315e93;
+    border-color:#5797df;
+}
+
+.tool-btn.danger{
+    color:#ff6978;
+}
+
+.separator-line{
+    height:1px;
+    background:#353b45;
+    margin:16px 0;
+}
+
+.hint{
+    color:#8f99a7;
+    font-size:12px;
+    line-height:1.5;
+}
+
+/* =====================================================
+   DIMENSIONS
+===================================================== */
+
+#dimensions{
+    position:fixed;
+
+    left:15px;
+    bottom:15px;
+
+    min-width:300px;
+
+    padding:13px;
+
+    background:rgba(15,18,24,.94);
+    border:1px solid #343b45;
+    border-radius:9px;
+
+    color:white;
+
+    z-index:1000;
+    pointer-events:none;
+}
+
+#objectName{
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+#plateName{
+    color:#8e9aaa;
+    font-size:12px;
+    margin-bottom:12px;
+}
+
+.size-row{
+    display:flex;
+    gap:25px;
+}
+
+.size-row small{
+    display:block;
+    color:#7f8998;
+    font-size:9px;
+}
+
+.size-row strong{
+    display:block;
+    margin-top:3px;
+    font-size:13px;
+}
+
+#pointCount{
+    margin-top:10px;
+    color:#7f8998;
+    font-size:11px;
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+#status{
+    position:fixed;
+
+    left:50%;
+    top:82px;
+
+    transform:translateX(-50%);
+
+    padding:8px 14px;
+
+    color:white;
+
+    background:rgba(0,0,0,.65);
+
+    border-radius:20px;
+
+    font-size:12px;
+
+    z-index:1000;
+    pointer-events:none;
+}
+
+/* =====================================================
+   MOUSE CIRCLE
+===================================================== */
+
+#mouseCircle{
+    position:fixed;
+
+    width:22px;
+    height:22px;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    border:2px solid #2495ff;
+    border-radius:50%;
+
+    display:none;
+
+    z-index:2000;
+
+    pointer-events:none;
+}
+
+#mouseCircle.visible{
+    display:block;
+}
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+#error{
+    position:fixed;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:min(600px,90%);
+
+    padding:20px;
+
+    background:#28151a;
+    border:1px solid #d34b5b;
+    border-radius:10px;
+
+    color:#ffb7bf;
+
+    z-index:99999;
+
+    display:none;
+
+    white-space:pre-wrap;
+}
+
+</style>
+
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
     }
-    </script>
+}
+</script>
+
 </head>
 
 <body>
 
+<!-- =====================================================
+     TOPBAR
+===================================================== -->
+
 <div id="topbar">
 
-    <div class="logo">GHOST 3D</div>
+    <div class="logo">
+        GHOST 3D
+    </div>
 
     <div class="shape-menu">
 
         <button id="addSphere" class="shape-btn">
-            <span class="icon sphere"></span>
-            Kugel
+            ⚪ Kugel
         </button>
 
         <button id="addCube" class="shape-btn">
-            <span class="icon cube"></span>
-            Würfel
+            ■ Würfel
         </button>
 
         <button id="addCylinder" class="shape-btn">
-            <span class="icon cylinder"></span>
-            Zylinder
+            🛢 Zylinder
         </button>
 
         <div class="separator"></div>
 
         <button id="addNegativeSphere" class="shape-btn negative">
-            <span class="icon negative-sphere"></span>
             − Kugel
         </button>
 
         <button id="addNegativeCube" class="shape-btn negative">
-            <span class="icon negative-cube"></span>
             − Würfel
         </button>
 
         <button id="addNegativeCylinder" class="shape-btn negative">
-            <span class="icon negative-cylinder"></span>
             − Zylinder
         </button>
 
@@ -89,23 +436,24 @@
 </div>
 
 
+<!-- =====================================================
+     RIGHTBAR
+===================================================== -->
+
 <div id="rightbar">
 
     <h3>PINSEL</h3>
 
     <button class="brush active" data-size="0.08">
-        <span class="brush-dot tiny"></span>
-        Fein
+        • Fein
     </button>
 
     <button class="brush" data-size="0.25">
-        <span class="brush-dot small"></span>
-        Kleiner
+        ● Kleiner
     </button>
 
     <button class="brush" data-size="0.60">
-        <span class="brush-dot large"></span>
-        Groß
+        ● Groß
     </button>
 
     <div class="separator-line"></div>
@@ -125,8 +473,8 @@
     </button>
 
     <p class="hint">
-        Beim Modellieren bleibt<br>
-        das Objekt an seiner Position.
+        Objekt auswählen und danach<br>
+        Shift gedrückt halten + Maus bewegen.
     </p>
 
     <div class="separator-line"></div>
@@ -138,15 +486,19 @@
     <div class="separator-line"></div>
 
     <button id="deleteObject" class="tool-btn danger">
-        Objekt löschen
+        🗑 Objekt löschen
     </button>
 
     <button id="deletePlate" class="tool-btn danger">
-        Platte löschen
+        🗑 Platte löschen
     </button>
 
 </div>
 
+
+<!-- =====================================================
+     INFO
+===================================================== -->
 
 <div id="dimensions">
 
@@ -186,10 +538,11 @@
 
 <div id="mouseCircle"></div>
 
-
 <div id="status">
     Objekt auswählen
 </div>
+
+<div id="error"></div>
 
 
 <script type="module">
@@ -210,7 +563,7 @@ import {
 
 
 /* =====================================================
-   GRUNDVARIABLEN
+   VARIABLEN
 ===================================================== */
 
 let scene;
@@ -232,53 +585,52 @@ let brushSize = 0.08;
 let sculptMode = "raise";
 
 let sculpting = false;
-let pointerLocked = false;
 
 const objects = [];
 const plates = [];
 
 
 /* =====================================================
-   MATERIALIEN
+   AUSWAHLRING
 ===================================================== */
 
-const normalMaterial =
-    new THREE.MeshStandardMaterial({
-        color: 0x6d7d91,
-        roughness: 0.55,
-        metalness: 0.12
-    });
-
-
-const negativeMaterial =
-    new THREE.MeshStandardMaterial({
-        color: 0xff425b,
-        transparent: true,
-        opacity: 0.42,
-        roughness: 0.45
-    });
-
-
-const plateMaterial =
-    new THREE.MeshStandardMaterial({
-        color: 0x252a31,
-        roughness: 0.8
-    });
+let selectionHelper = null;
 
 
 /* =====================================================
    START
 ===================================================== */
 
-init();
+try{
+
+    init();
+
+}
+catch(error){
+
+    console.error(error);
+
+    showError(
+        "Der 3D-Editor konnte nicht gestartet werden.\n\n"
+        + error.message
+    );
+
+}
 
 
-function init() {
+/* =====================================================
+   INIT
+===================================================== */
 
-    scene = new THREE.Scene();
+function init(){
+
+    scene =
+        new THREE.Scene();
 
     scene.background =
-        new THREE.Color(0x101318);
+        new THREE.Color(
+            0x101318
+        );
 
     scene.fog =
         new THREE.Fog(
@@ -297,20 +649,23 @@ function init() {
         );
 
     camera.position.set(
-        8,
+        9,
         7,
-        9
+        10
     );
 
 
     renderer =
         new THREE.WebGLRenderer({
-            antialias: true,
-            powerPreference: "high-performance"
+            antialias:true,
+            powerPreference:"high-performance"
         });
 
     renderer.setPixelRatio(
-        Math.min(devicePixelRatio, 2)
+        Math.min(
+            devicePixelRatio,
+            2
+        )
     );
 
     renderer.setSize(
@@ -320,10 +675,16 @@ function init() {
 
     renderer.shadowMap.enabled = true;
 
+    renderer.domElement.style.zIndex = "0";
+
     document.body.appendChild(
         renderer.domElement
     );
 
+
+    /* =================================================
+       ORBIT CONTROLS
+    ================================================= */
 
     orbit =
         new OrbitControls(
@@ -337,12 +698,18 @@ function init() {
 
     orbit.enablePan = true;
 
-    orbit.zoomSpeed = 0.35;
+    orbit.enableZoom = true;
+
+    orbit.zoomSpeed = 0.5;
 
     orbit.minDistance = 2;
 
     orbit.maxDistance = 60;
 
+
+    /* =================================================
+       TRANSFORM CONTROLS
+    ================================================= */
 
     transform =
         new TransformControls(
@@ -350,9 +717,13 @@ function init() {
             renderer.domElement
         );
 
-    transform.setMode("translate");
+    transform.setMode(
+        "translate"
+    );
 
-    transform.setSize(1.15);
+    transform.setSize(
+        1.15
+    );
 
     scene.add(
         transform.getHelper()
@@ -361,24 +732,33 @@ function init() {
 
     transform.addEventListener(
         "mouseDown",
-        () => {
+        function(){
+
             orbit.enabled = false;
+
         }
     );
 
 
     transform.addEventListener(
         "mouseUp",
-        () => {
+        function(){
+
             orbit.enabled = true;
+
             updateInfo();
+
         }
     );
 
 
     transform.addEventListener(
         "objectChange",
-        updateInfo
+        function(){
+
+            updateInfo();
+
+        }
     );
 
 
@@ -399,23 +779,19 @@ function init() {
     setupUI();
 
 
+    /* =================================================
+       MOUSE
+    ================================================= */
+
     renderer.domElement.addEventListener(
         "pointerdown",
-        selectFromMouse
+        onCanvasPointerDown
     );
-
 
     renderer.domElement.addEventListener(
         "pointermove",
         sculptMove
     );
-
-
-    renderer.domElement.addEventListener(
-        "pointerdown",
-        startSculpt
-    );
-
 
     window.addEventListener(
         "pointerup",
@@ -438,7 +814,7 @@ function init() {
    LICHT
 ===================================================== */
 
-function createLights() {
+function createLights(){
 
     const ambient =
         new THREE.HemisphereLight(
@@ -447,7 +823,9 @@ function createLights() {
             2.4
         );
 
-    scene.add(ambient);
+    scene.add(
+        ambient
+    );
 
 
     const sun =
@@ -464,7 +842,9 @@ function createLights() {
 
     sun.castShadow = true;
 
-    scene.add(sun);
+    scene.add(
+        sun
+    );
 
 }
 
@@ -473,7 +853,7 @@ function createLights() {
    BODEN
 ===================================================== */
 
-function createGround() {
+function createGround(){
 
     const ground =
         new THREE.Mesh(
@@ -484,12 +864,11 @@ function createGround() {
             ),
 
             new THREE.MeshStandardMaterial({
-                color: 0x11151b,
-                roughness: 1
+                color:0x11151b,
+                roughness:1
             })
 
         );
-
 
     ground.rotation.x =
         -Math.PI / 2;
@@ -497,7 +876,11 @@ function createGround() {
     ground.position.y =
         -0.15;
 
-    scene.add(ground);
+    ground.userData.isGround = true;
+
+    scene.add(
+        ground
+    );
 
 
     const grid =
@@ -511,7 +894,9 @@ function createGround() {
     grid.position.y =
         -0.14;
 
-    scene.add(grid);
+    scene.add(
+        grid
+    );
 
 }
 
@@ -520,7 +905,7 @@ function createGround() {
    PLATTE
 ===================================================== */
 
-function createPlate() {
+function createPlate(){
 
     const plate =
         new THREE.Mesh(
@@ -531,7 +916,10 @@ function createPlate() {
                 8
             ),
 
-            plateMaterial.clone()
+            new THREE.MeshStandardMaterial({
+                color:0x252a31,
+                roughness:0.8
+            })
 
         );
 
@@ -555,11 +943,20 @@ function createPlate() {
     plate.userData.objects = [];
 
 
-    scene.add(plate);
+    plate.receiveShadow = true;
 
-    plates.push(plate);
+    scene.add(
+        plate
+    );
 
-    selectPlate(plate);
+    plates.push(
+        plate
+    );
+
+
+    selectPlate(
+        plate
+    );
 
     updatePlateList();
 
@@ -567,34 +964,37 @@ function createPlate() {
 
 
 /* =====================================================
-   OBJEKTE
+   OBJEKT ERSTELLEN
 ===================================================== */
 
 function addObject(
     type,
-    negative = false
-) {
+    negative=false
+){
 
-    if (!selectedPlate)
+    if(!selectedPlate){
+
         createPlate();
+
+    }
 
 
     let geometry;
 
 
-    if (type === "sphere") {
+    if(type === "sphere"){
 
         geometry =
             new THREE.SphereGeometry(
                 1.3,
                 32,
-                32
+                24
             );
 
     }
 
 
-    if (type === "cube") {
+    if(type === "cube"){
 
         geometry =
             new THREE.BoxGeometry(
@@ -609,7 +1009,7 @@ function addObject(
     }
 
 
-    if (type === "cylinder") {
+    if(type === "cylinder"){
 
         geometry =
             new THREE.CylinderGeometry(
@@ -617,18 +1017,38 @@ function addObject(
                 1.1,
                 2.5,
                 32,
-                32
+                20
             );
 
     }
 
 
+    const material =
+        new THREE.MeshStandardMaterial({
+
+            color:
+                negative
+                ? 0xff425b
+                : 0x6d7d91,
+
+            roughness:0.55,
+
+            metalness:0.12,
+
+            transparent:negative,
+
+            opacity:
+                negative
+                ? 0.55
+                : 1
+
+        });
+
+
     const mesh =
         new THREE.Mesh(
             geometry,
-            negative
-                ? negativeMaterial.clone()
-                : normalMaterial.clone()
+            material
         );
 
 
@@ -652,18 +1072,74 @@ function addObject(
 
     mesh.userData.name =
         negative
-            ? "Negativ " + type
-            : type;
+        ? "Negativ " + type
+        : type;
 
 
-    scene.add(mesh);
+    scene.add(
+        mesh
+    );
 
-    objects.push(mesh);
+    objects.push(
+        mesh
+    );
 
-    selectedPlate.userData.objects.push(mesh);
+    selectedPlate
+        .userData
+        .objects
+        .push(
+            mesh
+        );
 
 
-    selectObject(mesh);
+    selectObject(
+        mesh
+    );
+
+
+    setStatus(
+        "Objekt erstellt"
+    );
+
+}
+
+
+/* =====================================================
+   CANVAS MOUSE
+===================================================== */
+
+function onCanvasPointerDown(event){
+
+    if(
+        event.button !== 0
+    )
+        return;
+
+
+    if(
+        sculpting ||
+        transform.dragging
+    )
+        return;
+
+
+    if(
+        event.shiftKey &&
+        selectedObject
+    ){
+
+        startSculpt(
+            event
+        );
+
+        return;
+
+    }
+
+
+    selectFromMouse(
+        event
+    );
 
 }
 
@@ -672,27 +1148,27 @@ function addObject(
    AUSWAHL
 ===================================================== */
 
-function selectFromMouse(event) {
-
-    if (
-        sculpting ||
-        transform.dragging
-    )
-        return;
-
+function selectFromMouse(event){
 
     const rect =
-        renderer.domElement.getBoundingClientRect();
+        renderer.domElement
+            .getBoundingClientRect();
 
 
     mouse.x =
-        ((event.clientX - rect.left) /
-        rect.width) * 2 - 1;
+        (
+            (event.clientX - rect.left)
+            /
+            rect.width
+        ) * 2 - 1;
 
 
     mouse.y =
-        -((event.clientY - rect.top) /
-        rect.height) * 2 + 1;
+        -(
+            (event.clientY - rect.top)
+            /
+            rect.height
+        ) * 2 + 1;
 
 
     raycaster.setFromCamera(
@@ -708,18 +1184,22 @@ function selectFromMouse(event) {
         );
 
 
-    if (hits.length) {
+    if(hits.length){
 
         const object =
             hits[0].object;
+
 
         selectPlate(
             object.userData.plate
         );
 
-        selectObject(object);
+        selectObject(
+            object
+        );
 
         return;
+
     }
 
 
@@ -730,22 +1210,33 @@ function selectFromMouse(event) {
         );
 
 
-    if (plateHits.length) {
+    if(plateHits.length){
 
         selectPlate(
             plateHits[0].object
         );
 
+        selectObject(
+            null
+        );
+
         return;
+
     }
 
 
-    selectObject(null);
+    selectObject(
+        null
+    );
 
 }
 
 
-function selectObject(object) {
+/* =====================================================
+   OBJEKT AUSWÄHLEN
+===================================================== */
+
+function selectObject(object){
 
     selectedObject =
         object || null;
@@ -754,7 +1245,18 @@ function selectObject(object) {
     transform.detach();
 
 
-    if (selectedObject) {
+    if(selectionHelper){
+
+        scene.remove(
+            selectionHelper
+        );
+
+        selectionHelper = null;
+
+    }
+
+
+    if(selectedObject){
 
         transform.attach(
             selectedObject
@@ -764,12 +1266,30 @@ function selectObject(object) {
             mode
         );
 
+
+        /*
+           Gelbe Auswahlumrandung
+        */
+
+        selectionHelper =
+            new THREE.BoxHelper(
+                selectedObject,
+                0xffff00
+            );
+
+        selectionHelper.material.linewidth = 3;
+
+        scene.add(
+            selectionHelper
+        );
+
+
         setStatus(
             "Objekt ausgewählt"
         );
 
     }
-    else {
+    else{
 
         setStatus(
             "Objekt auswählen"
@@ -787,19 +1307,21 @@ function selectObject(object) {
    PLATTE AUSWÄHLEN
 ===================================================== */
 
-function selectPlate(plate) {
+function selectPlate(plate){
 
-    if (!plate)
+    if(!plate)
         return;
 
 
     plates.forEach(
-        p => {
+        function(p){
+
             p.material.color.set(
                 p === plate
-                    ? 0x315e93
-                    : 0x252a31
+                ? 0x315e93
+                : 0x252a31
             );
+
         }
     );
 
@@ -819,36 +1341,80 @@ function selectPlate(plate) {
    UI
 ===================================================== */
 
-function setupUI() {
+function setupUI(){
 
     addButton(
         "addSphere",
-        () => addObject("sphere")
+        function(){
+
+            addObject(
+                "sphere"
+            );
+
+        }
     );
+
 
     addButton(
         "addCube",
-        () => addObject("cube")
+        function(){
+
+            addObject(
+                "cube"
+            );
+
+        }
     );
+
 
     addButton(
         "addCylinder",
-        () => addObject("cylinder")
+        function(){
+
+            addObject(
+                "cylinder"
+            );
+
+        }
     );
+
 
     addButton(
         "addNegativeSphere",
-        () => addObject("sphere", true)
+        function(){
+
+            addObject(
+                "sphere",
+                true
+            );
+
+        }
     );
+
 
     addButton(
         "addNegativeCube",
-        () => addObject("cube", true)
+        function(){
+
+            addObject(
+                "cube",
+                true
+            );
+
+        }
     );
+
 
     addButton(
         "addNegativeCylinder",
-        () => addObject("cylinder", true)
+        function(){
+
+            addObject(
+                "cylinder",
+                true
+            );
+
+        }
     );
 
 
@@ -860,17 +1426,37 @@ function setupUI() {
 
     addButton(
         "moveMode",
-        () => setTransformMode("translate")
+        function(){
+
+            setTransformMode(
+                "translate"
+            );
+
+        }
     );
+
 
     addButton(
         "rotateMode",
-        () => setTransformMode("rotate")
+        function(){
+
+            setTransformMode(
+                "rotate"
+            );
+
+        }
     );
+
 
     addButton(
         "scaleMode",
-        () => setTransformMode("scale")
+        function(){
+
+            setTransformMode(
+                "scale"
+            );
+
+        }
     );
 
 
@@ -888,17 +1474,46 @@ function setupUI() {
 
     addButton(
         "raiseBtn",
-        () => sculptMode = "raise"
+        function(){
+
+            sculptMode =
+                "raise";
+
+            setStatus(
+                "Modellieren: Erhöhen"
+            );
+
+        }
     );
+
 
     addButton(
         "lowerBtn",
-        () => sculptMode = "lower"
+        function(){
+
+            sculptMode =
+                "lower";
+
+            setStatus(
+                "Modellieren: Senken"
+            );
+
+        }
     );
+
 
     addButton(
         "smoothBtn",
-        () => sculptMode = "smooth"
+        function(){
+
+            sculptMode =
+                "smooth";
+
+            setStatus(
+                "Modellieren: Glätten"
+            );
+
+        }
     );
 
 
@@ -907,6 +1522,7 @@ function setupUI() {
         deleteObject
     );
 
+
     addButton(
         "deletePlate",
         deletePlate
@@ -914,83 +1530,94 @@ function setupUI() {
 
 
     document
-        .querySelectorAll(".brush")
-        .forEach(button => {
+        .querySelectorAll(
+            ".brush"
+        )
+        .forEach(
+            function(button){
 
-            button.addEventListener(
-                "click",
-                () => {
+                button.addEventListener(
+                    "click",
+                    function(){
 
-                    document
-                        .querySelectorAll(".brush")
-                        .forEach(
-                            b =>
-                                b.classList.remove(
-                                    "active"
-                                )
+                        document
+                            .querySelectorAll(
+                                ".brush"
+                            )
+                            .forEach(
+                                function(b){
+
+                                    b.classList
+                                        .remove(
+                                            "active"
+                                        );
+
+                                }
+                            );
+
+
+                        button.classList.add(
+                            "active"
                         );
 
-                    button.classList.add(
-                        "active"
-                    );
 
-                    brushSize =
-                        Number(
-                            button.dataset.size
+                        brushSize =
+                            Number(
+                                button.dataset.size
+                            );
+
+
+                        setStatus(
+                            "Pinselgröße: "
+                            + brushSize
                         );
 
-                }
-            );
-
-        });
-
-
-    /*
-       Pointer Lock:
-       Doppelklick in die Szene aktiviert
-       den blauen Maus-Kreis.
-    */
-
-    renderer.domElement.addEventListener(
-        "dblclick",
-        () => {
-
-            renderer.domElement
-                .requestPointerLock();
-
-        }
-    );
-
-
-    document.addEventListener(
-        "pointerlockchange",
-        () => {
-
-            pointerLocked =
-                document.pointerLockElement ===
-                renderer.domElement;
-
-            document
-                .getElementById("mouseCircle")
-                .classList.toggle(
-                    "visible",
-                    pointerLocked
+                    }
                 );
 
-        }
-    );
+            }
+        );
 
 }
 
 
-function addButton(id, fn) {
+/* =====================================================
+   BUTTON HELPER
+===================================================== */
 
-    document
-        .getElementById(id)
-        .addEventListener(
-            "click",
-            fn
+function addButton(
+    id,
+    fn
+){
+
+    const element =
+        document.getElementById(
+            id
         );
+
+
+    if(!element){
+
+        console.error(
+            "Button nicht gefunden:",
+            id
+        );
+
+        return;
+
+    }
+
+
+    element.addEventListener(
+        "click",
+        function(event){
+
+            event.stopPropagation();
+
+            fn();
+
+        }
+    );
 
 }
 
@@ -999,7 +1626,9 @@ function addButton(id, fn) {
    TRANSFORM
 ===================================================== */
 
-function setTransformMode(newMode) {
+function setTransformMode(
+    newMode
+){
 
     mode =
         newMode;
@@ -1011,31 +1640,66 @@ function setTransformMode(newMode) {
 
 
     document
-        .querySelectorAll(".mode-btn")
+        .querySelectorAll(
+            ".mode-btn"
+        )
         .forEach(
-            b =>
-                b.classList.remove(
+            function(button){
+
+                button.classList.remove(
                     "active"
-                )
+                );
+
+            }
         );
 
 
-    if (newMode === "translate")
+    if(
+        newMode ===
+        "translate"
+    ){
+
         document
-            .getElementById("moveMode")
-            .classList.add("active");
+            .getElementById(
+                "moveMode"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
 
 
-    if (newMode === "rotate")
+    if(
+        newMode ===
+        "rotate"
+    ){
+
         document
-            .getElementById("rotateMode")
-            .classList.add("active");
+            .getElementById(
+                "rotateMode"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
 
 
-    if (newMode === "scale")
+    if(
+        newMode ===
+        "scale"
+    ){
+
         document
-            .getElementById("scaleMode")
-            .classList.add("active");
+            .getElementById(
+                "scaleMode"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
 
 }
 
@@ -1044,64 +1708,90 @@ function setTransformMode(newMode) {
    MODELLIEREN
 ===================================================== */
 
-function startSculpt(event) {
+function startSculpt(
+    event
+){
 
-    if (
+    if(
         !selectedObject ||
         transform.dragging
     )
         return;
 
 
-    if (
+    if(
         !event.shiftKey
     )
         return;
 
 
-    sculpting = true;
+    sculpting =
+        true;
 
-    orbit.enabled = false;
+
+    orbit.enabled =
+        false;
+
 
     transform.detach();
 
-    sculptAt(event);
+
+    sculptAt(
+        event
+    );
 
 }
 
 
-function stopSculpt() {
+function stopSculpt(){
 
-    if (!sculpting)
+    if(
+        !sculpting
+    )
         return;
 
 
-    sculpting = false;
+    sculpting =
+        false;
 
-    orbit.enabled = true;
 
-    if (selectedObject)
+    orbit.enabled =
+        true;
+
+
+    if(selectedObject){
+
         transform.attach(
             selectedObject
         );
 
+    }
+
 }
 
 
-function sculptMove(event) {
+function sculptMove(
+    event
+){
 
-    if (!sculpting)
+    if(
+        !sculpting
+    )
         return;
 
 
-    sculptAt(event);
+    sculptAt(
+        event
+    );
 
 }
 
 
-function sculptAt(event) {
+function sculptAt(
+    event
+){
 
-    if (!selectedObject)
+    if(!selectedObject)
         return;
 
 
@@ -1111,13 +1801,19 @@ function sculptAt(event) {
 
 
     mouse.x =
-        ((event.clientX - rect.left) /
-        rect.width) * 2 - 1;
+        (
+            (event.clientX - rect.left)
+            /
+            rect.width
+        ) * 2 - 1;
 
 
     mouse.y =
-        -((event.clientY - rect.top) /
-        rect.height) * 2 + 1;
+        -(
+            (event.clientY - rect.top)
+            /
+            rect.height
+        ) * 2 + 1;
 
 
     raycaster.setFromCamera(
@@ -1133,7 +1829,7 @@ function sculptAt(event) {
         );
 
 
-    if (!hit.length)
+    if(!hit.length)
         return;
 
 
@@ -1144,22 +1840,29 @@ function sculptAt(event) {
 
 
     const position =
-        selectedObject.geometry
-            .getAttribute("position");
+        selectedObject
+            .geometry
+            .getAttribute(
+                "position"
+            );
 
 
     const normal =
-        hit[0].face.normal.clone();
+        hit[0]
+            .face
+            .normal
+            .clone();
 
 
-    for (
+    for(
         let i = 0;
         i < position.count;
         i++
-    ) {
+    ){
 
         const vertex =
             new THREE.Vector3();
+
 
         vertex.fromBufferAttribute(
             position,
@@ -1173,7 +1876,7 @@ function sculptAt(event) {
             );
 
 
-        if (
+        if(
             distance >
             brushSize
         )
@@ -1182,7 +1885,8 @@ function sculptAt(event) {
 
         const strength =
             1 -
-            distance / brushSize;
+            distance /
+            brushSize;
 
 
         const amount =
@@ -1191,39 +1895,47 @@ function sculptAt(event) {
             0.025;
 
 
-        if (
+        if(
             sculptMode ===
             "raise"
-        ) {
+        ){
 
             vertex.add(
-                normal.clone()
-                    .multiplyScalar(amount)
+                normal
+                    .clone()
+                    .multiplyScalar(
+                        amount
+                    )
             );
 
         }
 
 
-        if (
+        if(
             sculptMode ===
             "lower"
-        ) {
+        ){
 
             vertex.add(
-                normal.clone()
-                    .multiplyScalar(-amount)
+                normal
+                    .clone()
+                    .multiplyScalar(
+                        -amount
+                    )
             );
 
         }
 
 
-        if (
+        if(
             sculptMode ===
             "smooth"
-        ) {
+        ){
 
             vertex.multiplyScalar(
-                1 - amount * 0.2
+                1 -
+                amount *
+                0.2
             );
 
         }
@@ -1239,13 +1951,26 @@ function sculptAt(event) {
     }
 
 
-    position.needsUpdate = true;
+    position.needsUpdate =
+        true;
 
-    selectedObject.geometry
+
+    selectedObject
+        .geometry
         .computeVertexNormals();
 
-    selectedObject.geometry
+
+    selectedObject
+        .geometry
         .computeBoundingSphere();
+
+
+    if(selectionHelper){
+
+        selectionHelper
+            .update();
+
+    }
 
 
     updateInfo();
@@ -1257,12 +1982,12 @@ function sculptAt(event) {
    HOME
 ===================================================== */
 
-function focusSelected() {
+function focusSelected(){
 
     let target;
 
 
-    if (selectedObject) {
+    if(selectedObject){
 
         const box =
             new THREE.Box3()
@@ -1270,19 +1995,22 @@ function focusSelected() {
                     selectedObject
                 );
 
+
         target =
             box.getCenter(
                 new THREE.Vector3()
             );
 
     }
-    else if (selectedPlate) {
+    else if(selectedPlate){
 
         target =
-            selectedPlate.position.clone();
+            selectedPlate
+                .position
+                .clone();
 
     }
-    else {
+    else{
 
         target =
             new THREE.Vector3();
@@ -1299,13 +2027,14 @@ function focusSelected() {
 
 
     camera.position.copy(
-        target.clone().add(
-            direction.multiplyScalar(
-                selectedObject
+        target.clone()
+            .add(
+                direction.multiplyScalar(
+                    selectedObject
                     ? 5
                     : 9
+                )
             )
-        )
     );
 
 
@@ -1313,53 +2042,60 @@ function focusSelected() {
         target
     );
 
+
     orbit.update();
 
 }
 
 
 /* =====================================================
-   INFO / MM
+   INFO
 ===================================================== */
 
-function updateInfo() {
+function updateInfo(){
 
     document.getElementById(
         "plateName"
     ).textContent =
         selectedPlate
-            ? selectedPlate.userData.name
-            : "Keine Platte";
+        ? selectedPlate.userData.name
+        : "Keine Platte";
 
 
-    if (!selectedObject) {
+    if(!selectedObject){
 
         document.getElementById(
             "objectName"
         ).textContent =
             "Kein Objekt ausgewählt";
 
+
         document.getElementById(
             "width"
         ).textContent =
             "0 mm";
+
 
         document.getElementById(
             "height"
         ).textContent =
             "0 mm";
 
+
         document.getElementById(
             "depth"
         ).textContent =
             "0 mm";
+
 
         document.getElementById(
             "pointCount"
         ).textContent =
             "0 Punkte";
 
+
         return;
+
     }
 
 
@@ -1381,11 +2117,8 @@ function updateInfo() {
         );
 
 
-    /*
-       1 Three.js Einheit = 10 mm.
-    */
-
-    const mm = 10;
+    const mm =
+        10;
 
 
     document.getElementById(
@@ -1397,29 +2130,41 @@ function updateInfo() {
     document.getElementById(
         "width"
     ).textContent =
-        (size.x * mm).toFixed(1)
+        (
+            size.x *
+            mm
+        ).toFixed(1)
         + " mm";
 
 
     document.getElementById(
         "height"
     ).textContent =
-        (size.y * mm).toFixed(1)
+        (
+            size.y *
+            mm
+        ).toFixed(1)
         + " mm";
 
 
     document.getElementById(
         "depth"
     ).textContent =
-        (size.z * mm).toFixed(1)
+        (
+            size.z *
+            mm
+        ).toFixed(1)
         + " mm";
 
 
     document.getElementById(
         "pointCount"
     ).textContent =
-        selectedObject.geometry
-            .getAttribute("position")
+        selectedObject
+            .geometry
+            .getAttribute(
+                "position"
+            )
             .count
         + " Punkte";
 
@@ -1430,7 +2175,7 @@ function updateInfo() {
    PLATTENLISTE
 ===================================================== */
 
-function updatePlateList() {
+function updatePlateList(){
 
     const list =
         document.getElementById(
@@ -1442,7 +2187,7 @@ function updatePlateList() {
 
 
     plates.forEach(
-        plate => {
+        function(plate){
 
             const button =
                 document.createElement(
@@ -1454,28 +2199,40 @@ function updatePlateList() {
                 "plate-list";
 
 
-            if (
-                plate === selectedPlate
-            )
+            if(
+                plate ===
+                selectedPlate
+            ){
+
                 button.classList.add(
                     "active"
                 );
+
+            }
 
 
             button.textContent =
                 plate.userData.name;
 
 
-            button.onclick =
-                () => {
+            button.addEventListener(
+                "click",
+                function(event){
+
+                    event.stopPropagation();
 
                     selectPlate(
                         plate
                     );
 
+                    selectObject(
+                        null
+                    );
+
                     focusSelected();
 
-                };
+                }
+            );
 
 
             list.appendChild(
@@ -1489,12 +2246,12 @@ function updatePlateList() {
 
 
 /* =====================================================
-   LÖSCHEN
+   OBJEKT LÖSCHEN
 ===================================================== */
 
-function deleteObject() {
+function deleteObject(){
 
-    if (!selectedObject)
+    if(!selectedObject)
         return;
 
 
@@ -1508,50 +2265,84 @@ function deleteObject() {
         );
 
 
-    if (index >= 0)
+    if(index >= 0){
+
         objects.splice(
             index,
             1
         );
 
+    }
+
 
     const list =
-        object.userData
+        object
+            .userData
             .plate
             .userData
             .objects;
 
 
     const objectIndex =
-        list.indexOf(object);
+        list.indexOf(
+            object
+        );
 
 
-    if (objectIndex >= 0)
+    if(objectIndex >= 0){
+
         list.splice(
             objectIndex,
             1
         );
 
+    }
+
 
     transform.detach();
 
-    scene.remove(object);
+
+    if(selectionHelper){
+
+        scene.remove(
+            selectionHelper
+        );
+
+        selectionHelper = null;
+
+    }
+
+
+    scene.remove(
+        object
+    );
+
 
     object.geometry.dispose();
 
     object.material.dispose();
 
 
-    selectedObject = null;
+    selectedObject =
+        null;
+
 
     updateInfo();
+
+    setStatus(
+        "Objekt gelöscht"
+    );
 
 }
 
 
-function deletePlate() {
+/* =====================================================
+   PLATTE LÖSCHEN
+===================================================== */
 
-    if (
+function deletePlate(){
+
+    if(
         !selectedPlate ||
         plates.length <= 1
     )
@@ -1563,22 +2354,28 @@ function deletePlate() {
         .objects
         .slice()
         .forEach(
-            object => {
+            function(object){
 
                 const index =
                     objects.indexOf(
                         object
                     );
 
-                if (index >= 0)
+
+                if(index >= 0){
+
                     objects.splice(
                         index,
                         1
                     );
 
+                }
+
+
                 scene.remove(
                     object
                 );
+
 
                 object.geometry.dispose();
 
@@ -1594,16 +2391,20 @@ function deletePlate() {
         );
 
 
-    if (index >= 0)
+    if(index >= 0){
+
         plates.splice(
             index,
             1
         );
 
+    }
+
 
     scene.remove(
         selectedPlate
     );
+
 
     selectedPlate.geometry.dispose();
 
@@ -1618,18 +2419,26 @@ function deletePlate() {
         selectedPlate
     );
 
-    selectObject(null);
+
+    selectObject(
+        null
+    );
+
+
+    setStatus(
+        "Platte gelöscht"
+    );
 
 }
 
 
 /* =====================================================
-   GLB
+   GLB EXPORT
 ===================================================== */
 
-async function downloadPlate() {
+async function downloadPlate(){
 
-    if (!selectedPlate) {
+    if(!selectedPlate){
 
         alert(
             "Bitte zuerst eine Platte auswählen."
@@ -1652,68 +2461,75 @@ async function downloadPlate() {
         selectedPlate.userData.name;
 
 
-    /*
-       Nur die gewählte Platte.
-    */
-
     const plate =
-        selectedPlate.clone(true);
+        selectedPlate.clone(
+            true
+        );
 
 
     plate.material =
         new THREE.MeshStandardMaterial({
-            color: 0x777777,
-            roughness: 0.8
+            color:0x777777,
+            roughness:0.8
         });
 
 
-    group.add(plate);
+    group.add(
+        plate
+    );
 
 
-    /*
-       Nur deren Objekte.
-    */
+    selectedPlate
+        .userData
+        .objects
+        .forEach(
+            function(object){
 
-    selectedPlate.userData.objects
-        .forEach(object => {
+                const clone =
+                    object.clone(
+                        true
+                    );
 
-            const clone =
-                object.clone(true);
 
+                clone.material =
+                    new THREE.MeshStandardMaterial({
 
-            clone.material =
-                new THREE.MeshStandardMaterial({
-
-                    color:
-                        object.userData.negative
+                        color:
+                            object.userData
+                                .negative
                             ? 0xff4055
                             : 0x7188aa,
 
-                    roughness: 0.55
+                        roughness:0.55
 
-                });
-
-
-            group.add(clone);
-
-        });
+                    });
 
 
-    exportScene.add(group);
+                group.add(
+                    clone
+                );
+
+            }
+        );
+
+
+    exportScene.add(
+        group
+    );
 
 
     const exporter =
         new GLTFExporter();
 
 
-    try {
+    try{
 
         const data =
             await exporter.parseAsync(
                 exportScene,
                 {
-                    binary: true,
-                    onlyVisible: true
+                    binary:true,
+                    onlyVisible:true
                 }
             );
 
@@ -1740,18 +2556,25 @@ async function downloadPlate() {
             );
 
 
-        a.href = url;
+        a.href =
+            url;
+
 
         a.download =
-            selectedPlate.userData.name
-            .replace(
-                /[^a-z0-9]/gi,
-                "_"
-            )
+            selectedPlate
+                .userData
+                .name
+                .replace(
+                    /[^a-z0-9]/gi,
+                    "_"
+                )
             + ".glb";
 
 
-        document.body.appendChild(a);
+        document.body.appendChild(
+            a
+        );
+
 
         a.click();
 
@@ -1759,17 +2582,28 @@ async function downloadPlate() {
 
 
         setTimeout(
-            () =>
+            function(){
+
                 URL.revokeObjectURL(
                     url
-                ),
+                );
+
+            },
             1000
         );
 
-    }
-    catch(error) {
 
-        console.error(error);
+        setStatus(
+            "GLB wurde exportiert"
+        );
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
 
         alert(
             "GLB-Export konnte nicht erstellt werden."
@@ -1784,12 +2618,15 @@ async function downloadPlate() {
    RESIZE
 ===================================================== */
 
-function resize() {
+function resize(){
 
     camera.aspect =
-        innerWidth / innerHeight;
+        innerWidth /
+        innerHeight;
+
 
     camera.updateProjectionMatrix();
+
 
     renderer.setSize(
         innerWidth,
@@ -1803,7 +2640,9 @@ function resize() {
    STATUS
 ===================================================== */
 
-function setStatus(text) {
+function setStatus(
+    text
+){
 
     document.getElementById(
         "status"
@@ -1814,16 +2653,49 @@ function setStatus(text) {
 
 
 /* =====================================================
+   ERROR
+===================================================== */
+
+function showError(
+    text
+){
+
+    const error =
+        document.getElementById(
+            "error"
+        );
+
+
+    error.textContent =
+        text;
+
+
+    error.style.display =
+        "block";
+
+}
+
+
+/* =====================================================
    LOOP
 ===================================================== */
 
-function animate() {
+function animate(){
 
     requestAnimationFrame(
         animate
     );
 
+
     orbit.update();
+
+
+    if(selectionHelper){
+
+        selectionHelper.update();
+
+    }
+
 
     renderer.render(
         scene,
