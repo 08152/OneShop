@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
@@ -13,8 +12,7 @@
     box-sizing:border-box;
 }
 
-html,
-body{
+html,body{
     width:100%;
     height:100%;
     margin:0;
@@ -30,439 +28,289 @@ canvas{
     z-index:0;
 }
 
-/* =====================================================
-   TOPBAR
-===================================================== */
+/* ================= TOPBAR ================= */
 
 #topbar{
-
     position:fixed;
-    left:0;
     top:0;
-
+    left:0;
     width:100%;
-    min-height:68px;
-
+    min-height:66px;
     display:flex;
     align-items:center;
-    gap:7px;
-
-    padding:8px 12px;
-
-    background:rgba(15,18,24,.97);
+    gap:6px;
+    padding:8px;
+    background:rgba(13,16,21,.97);
     border-bottom:1px solid #343b45;
-
     z-index:1000;
-
     overflow-x:auto;
 }
 
 .logo{
-
     color:white;
     font-size:18px;
     font-weight:bold;
-
-    white-space:nowrap;
     margin-right:8px;
+    white-space:nowrap;
 }
 
 button{
-
     font-family:inherit;
     cursor:pointer;
     user-select:none;
 }
 
 .btn{
-
-    border:1px solid #3b424d;
-    background:#20252d;
-    color:#e8edf5;
-
-    padding:9px 11px;
-
+    border:1px solid #3d4652;
+    background:#202630;
+    color:#e9eef5;
     border-radius:7px;
-
+    padding:8px 10px;
     white-space:nowrap;
 }
 
 .btn:hover{
-    background:#303742;
-    border-color:#697586;
+    background:#303844;
 }
 
 .btn.active{
+    background:#315f96;
+    border-color:#64a7f2;
+}
 
+.btn.negative{
+    color:#ff7382;
+}
+
+.btn.green{
+    background:#225b3c;
+}
+
+.btn.center{
     background:#315e93;
-    border-color:#62a8f3;
 }
 
-.negative{
-    color:#ff6979;
-}
-
-.separator{
-
+.sep{
     width:1px;
-    height:34px;
-    background:#3b424d;
+    height:35px;
+    background:#3c424c;
     margin:0 3px;
 }
 
-#plateAdd{
-    margin-left:auto;
-    background:#284c70;
-}
-
-#exportBtn{
-    background:#255b3b;
-}
-
-/* =====================================================
-   RIGHT PANEL
-===================================================== */
+/* ================= RIGHT ================= */
 
 #rightbar{
-
     position:fixed;
-
     right:0;
-    top:68px;
+    top:66px;
     bottom:0;
-
     width:285px;
-
     padding:15px;
-
     background:rgba(18,22,28,.97);
-
     border-left:1px solid #343b45;
-
     color:white;
-
     z-index:1000;
-
     overflow-y:auto;
 }
 
-h3{
-
-    color:#9da8b7;
-
+#rightbar h3{
+    color:#a4afbe;
     font-size:11px;
-
     letter-spacing:1px;
-
     margin:4px 0 9px;
 }
 
-.panelButton{
-
+.tool{
     width:100%;
-
-    padding:10px;
-
+    padding:9px;
     margin-bottom:6px;
-
+    border:1px solid #3b424d;
     background:#20252d;
-
-    border:1px solid #3a414b;
-
     color:white;
-
     border-radius:7px;
-
     text-align:left;
 }
 
-.panelButton:hover{
+.tool:hover{
     background:#303742;
 }
 
-.panelButton.danger{
-    color:#ff6978;
+.tool.danger{
+    color:#ff6878;
+}
+
+.tool.green{
+    color:#72f0a6;
 }
 
 .line{
-
     height:1px;
-    background:#353b45;
-    margin:14px 0;
+    background:#363d47;
+    margin:15px 0;
 }
 
-/* =====================================================
-   OBJECT INFO
-===================================================== */
+.hint{
+    color:#8994a3;
+    font-size:11px;
+    line-height:1.5;
+}
+
+/* ================= INFO ================= */
 
 #dimensions{
-
     position:fixed;
-
-    left:14px;
-    bottom:14px;
-
-    width:390px;
-    max-width:calc(100vw - 320px);
-
-    padding:14px;
-
-    background:rgba(15,18,24,.95);
-
-    border:1px solid #363d48;
-
-    border-radius:10px;
-
+    left:12px;
+    bottom:12px;
+    width:350px;
+    max-width:calc(100vw - 310px);
+    padding:12px;
+    background:rgba(12,15,20,.94);
+    border:1px solid #39414d;
+    border-radius:9px;
     color:white;
-
     z-index:1000;
 }
 
 #objectName{
-
     font-weight:bold;
-    font-size:15px;
     margin-bottom:3px;
 }
 
 #plateName{
-
-    color:#8f9baa;
+    color:#8d99a8;
     font-size:11px;
-    margin-bottom:12px;
+    margin-bottom:10px;
 }
 
-.sizeRow{
-
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
+.size-row{
+    display:flex;
+    gap:25px;
 }
 
-.label{
-
-    color:#7f8998;
+.smalllabel{
+    color:#7d8897;
     font-size:9px;
 }
 
 .value{
-
     margin-top:3px;
     font-size:13px;
-    font-weight:bold;
 }
 
-.positionTitle,
-.roundTitle{
-
-    margin-top:13px;
-
+.position-title{
     color:#9da8b7;
-
     font-size:10px;
-
-    letter-spacing:1px;
+    margin-top:12px;
+    margin-bottom:5px;
 }
 
-.positionRow{
-
+.position-row{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
-
-    gap:7px;
-
-    margin-top:6px;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:6px;
 }
 
-.positionInput{
-
+.position-input{
     width:100%;
-
-    padding:7px;
-
     background:#171b21;
-
-    color:#fff;
-
-    border:1px solid #424b57;
-
+    border:1px solid #414955;
     border-radius:5px;
-
-    outline:none;
+    color:#fff;
+    padding:6px;
+    font-size:12px;
 }
 
-.positionInput:focus{
-
-    border-color:#58a5ef;
-    box-shadow:0 0 0 2px rgba(70,150,230,.15);
-}
-
-.roundRow{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-    margin-top:6px;
+.round-title{
+    color:#9da8b7;
+    font-size:10px;
+    margin-top:11px;
+    margin-bottom:4px;
 }
 
 #rounding{
-
     width:100%;
 }
 
-#roundingValue{
-
-    min-width:35px;
-
-    padding:5px 8px;
-
-    background:#20252d;
-
-    border:1px solid #3b424d;
-
-    border-radius:5px;
-
-    text-align:center;
-
+#roundValue{
+    color:#64a7f2;
     font-weight:bold;
 }
 
 #pointCount{
-
-    margin-top:10px;
-
-    color:#778291;
-
+    margin-top:8px;
+    color:#7d8897;
     font-size:10px;
 }
 
-/* =====================================================
-   PLATES
-===================================================== */
+/* ================= STATUS ================= */
 
-.plateItem{
-
-    width:100%;
-
-    padding:9px;
-
-    margin-bottom:6px;
-
-    border-radius:6px;
-
-    background:#20252d;
-
-    border:1px solid #3a414b;
-
+#status{
+    position:fixed;
+    top:78px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:7px 14px;
+    border-radius:20px;
+    background:rgba(0,0,0,.65);
     color:white;
+    font-size:12px;
+    z-index:1500;
+    pointer-events:none;
+}
 
+/* ================= SELECTION RECT ================= */
+
+#selectionBox{
+    position:fixed;
+    border:1px solid #ffd400;
+    background:rgba(255,212,0,.10);
+    display:none;
+    z-index:2000;
+    pointer-events:none;
+}
+
+/* ================= PLATES ================= */
+
+.plate-button{
+    width:100%;
+    padding:9px;
+    margin-bottom:6px;
+    background:#20252d;
+    border:1px solid #3b424d;
+    color:white;
+    border-radius:7px;
     text-align:left;
 }
 
-.plateItem.active{
-
+.plate-button.active{
     background:#315e93;
-    border-color:#5797df;
+    border-color:#64a7f2;
 }
 
-/* =====================================================
-   STATUS
-===================================================== */
+/* ================= ERROR ================= */
 
-#status{
-
+#error{
     position:fixed;
-
-    top:82px;
     left:50%;
-
-    transform:translateX(-50%);
-
-    padding:7px 13px;
-
-    color:white;
-
-    background:rgba(0,0,0,.65);
-
-    border-radius:18px;
-
-    font-size:12px;
-
-    z-index:1500;
-
-    pointer-events:none;
-}
-
-/* =====================================================
-   SELECT RECTANGLE
-===================================================== */
-
-#selectionRect{
-
-    position:fixed;
-
-    display:none;
-
-    border:1px solid #50a8ff;
-
-    background:rgba(50,150,255,.12);
-
-    z-index:2000;
-
-    pointer-events:none;
-}
-
-/* =====================================================
-   HELP
-===================================================== */
-
-.help{
-
-    color:#87919f;
-
-    font-size:11px;
-
-    line-height:1.5;
-}
-
-/* =====================================================
-   LOADING
-===================================================== */
-
-#loading{
-
-    position:fixed;
-
-    inset:0;
-
-    background:#101318;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    color:white;
-
-    font-size:25px;
-
-    font-weight:bold;
-
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:min(700px,90%);
+    padding:20px;
+    background:#29161a;
+    border:1px solid #d34b5b;
+    border-radius:10px;
+    color:#ffb9c0;
     z-index:99999;
+    display:none;
+    white-space:pre-wrap;
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+/* ================= MOBILE ================= */
 
 @media(max-width:900px){
 
     #rightbar{
-        width:220px;
+        width:225px;
     }
 
     #dimensions{
@@ -473,7 +321,6 @@ h3{
     .logo{
         display:none;
     }
-
 }
 
 </style>
@@ -481,13 +328,9 @@ h3{
 <script type="importmap">
 {
     "imports":{
-
-        "three":
-        "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-
-        "three/addons/":
-        "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-
+        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+        "three-bvh-csg":"https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/+esm"
     }
 }
 </script>
@@ -496,14 +339,7 @@ h3{
 
 <body>
 
-<div id="loading">
-    GHOST 3D EDITOR
-</div>
-
-
-<!-- =====================================================
-     TOPBAR
-===================================================== -->
+<!-- ================= TOP ================= -->
 
 <div id="topbar">
 
@@ -511,131 +347,150 @@ h3{
         GHOST 3D
     </div>
 
-    <button class="btn" id="sphereBtn">
+    <button class="btn" id="addSphere">
         ⚪ Kugel
     </button>
 
-    <button class="btn" id="cubeBtn">
+    <button class="btn" id="addCube">
         ■ Würfel
     </button>
 
-    <button class="btn" id="cylinderBtn">
+    <button class="btn" id="addCylinder">
         🛢 Zylinder
     </button>
 
-    <div class="separator"></div>
+    <div class="sep"></div>
 
-    <button class="btn negative" id="negativeSphereBtn">
+    <button class="btn negative" id="addNegativeSphere">
         − Kugel
     </button>
 
-    <button class="btn negative" id="negativeCubeBtn">
+    <button class="btn negative" id="addNegativeCube">
         − Würfel
     </button>
 
-    <button class="btn negative" id="negativeCylinderBtn">
+    <button class="btn negative" id="addNegativeCylinder">
         − Zylinder
     </button>
 
-    <div class="separator"></div>
+    <div class="sep"></div>
 
-    <button class="btn active" id="moveBtn">
+    <button class="btn active" id="moveMode">
         ↔ Move
     </button>
 
-    <button class="btn" id="rotateBtn">
+    <button class="btn" id="rotateMode">
         ↻ Rotate
     </button>
 
-    <button class="btn" id="scaleBtn">
+    <button class="btn" id="scaleMode">
         ▣ Größe
     </button>
 
-    <button class="btn" id="plateAdd">
+    <button class="btn center" id="centerButton">
+        ◎ Zentrieren
+    </button>
+
+    <button class="btn" id="newPlate">
         + Platte
     </button>
 
-    <button class="btn" id="exportBtn">
+    <button class="btn green" id="download">
         ↓ GLB
     </button>
 
 </div>
 
 
-<!-- =====================================================
-     RIGHTBAR
-===================================================== -->
+<!-- ================= RIGHT ================= -->
 
 <div id="rightbar">
 
-    <h3>MODELLIEREN</h3>
+    <h3>PLATTEN</h3>
 
-    <button class="panelButton" id="raiseBtn">
-        ▲ Erhöhen
-    </button>
-
-    <button class="panelButton" id="lowerBtn">
-        ▼ Senken
-    </button>
-
-    <button class="panelButton" id="smoothBtn">
-        ≈ Glätten
-    </button>
+    <div id="plates"></div>
 
     <div class="line"></div>
 
-    <h3>PINSSELGRÖSSE</h3>
+    <h3>MODELLIEREN</h3>
 
-    <button class="panelButton brush active" data-size="0.08">
+    <button class="tool" id="raise">
+        ▲ Erhöhen
+    </button>
+
+    <button class="tool" id="lower">
+        ▼ Senken
+    </button>
+
+    <button class="tool" id="smooth">
+        ≈ Glätten
+    </button>
+
+    <h3>PINSEL</h3>
+
+    <button class="tool brush active" data-size="0.10">
         • Fein
     </button>
 
-    <button class="panelButton brush" data-size="0.25">
+    <button class="tool brush" data-size="0.30">
         ● Kleiner
     </button>
 
-    <button class="panelButton brush" data-size="0.60">
+    <button class="tool brush" data-size="0.70">
         ● Groß
     </button>
 
     <div class="line"></div>
 
-    <h3>PLATTEN</h3>
+    <h3>BOOLEAN</h3>
 
-    <div id="plateList"></div>
+    <button class="tool green" id="booleanButton">
+        🔗 Verbinden / Ausschneiden
+    </button>
 
     <div class="line"></div>
 
-    <button class="panelButton danger" id="deleteObjectBtn">
+    <button class="tool danger" id="deleteObject">
         🗑 Objekt löschen
     </button>
 
-    <button class="panelButton danger" id="deletePlateBtn">
+    <button class="tool danger" id="deletePlate">
         🗑 Platte löschen
     </button>
 
     <div class="line"></div>
 
-    <h3>BEDIENUNG</h3>
+    <p class="hint">
 
-    <div class="help">
+        Linksklick:
+        Objekt auswählen
 
-        Linksklick = Objekt auswählen<br>
-        Strg + Linksklick = mehrere auswählen<br>
-        Maus ziehen = Mehrfachauswahl<br>
-        Mausrad = Zoom<br>
-        Mittlere Maustaste = Kamera<br>
-        SHIFT + Linksklick = Modellieren<br>
-        STRG + SHIFT + Y = Boolean verbinden
+        <br><br>
 
-    </div>
+        Linke Maustaste ziehen:
+        Kamera drehen
+
+        <br><br>
+
+        STRG + Linke Maustaste ziehen:
+        mehrere Objekte auswählen
+
+        <br><br>
+
+        STRG + SHIFT + Y:
+        negative Formen ausschneiden
+
+        <br><br>
+
+        Mausrad:
+        Zoom
+
+    </p>
 
 </div>
 
 
-<!-- =====================================================
-     INFORMATION
-===================================================== -->
+<!-- ================= INFO ================= -->
 
 <div id="dimensions">
 
@@ -647,89 +502,61 @@ h3{
         Keine Platte
     </div>
 
-    <div class="sizeRow">
+    <div class="size-row">
 
         <div>
-            <div class="label">BREITE</div>
+            <div class="smalllabel">BREITE</div>
             <div class="value" id="width">0 mm</div>
         </div>
 
         <div>
-            <div class="label">HÖHE</div>
+            <div class="smalllabel">HÖHE</div>
             <div class="value" id="height">0 mm</div>
         </div>
 
         <div>
-            <div class="label">TIEFE</div>
+            <div class="smalllabel">TIEFE</div>
             <div class="value" id="depth">0 mm</div>
         </div>
 
     </div>
 
-    <div class="positionTitle">
+    <div class="position-title">
         POSITION AUF DER PLATTE
     </div>
 
-    <div class="positionRow">
+    <div class="position-row">
 
-        <input
-            class="positionInput"
-            id="posX"
-            type="number"
-            step="0.01"
-            value="0"
-        >
+        <div>
+            <div class="smalllabel">X</div>
+            <input class="position-input" id="posX" type="number" step="0.01">
+        </div>
 
-        <input
-            class="positionInput"
-            id="posY"
-            type="number"
-            step="0.01"
-            value="0"
-        >
+        <div>
+            <div class="smalllabel">Y</div>
+            <input class="position-input" id="posY" type="number" step="0.01">
+        </div>
 
-        <input
-            class="positionInput"
-            id="posZ"
-            type="number"
-            step="0.01"
-            value="0"
-        >
-
-    </div>
-
-    <div class="positionRow">
-
-        <div class="label">X</div>
-        <div class="label">Y</div>
-        <div class="label">Z</div>
-
-    </div>
-
-    <div class="roundTitle">
-        ABRUNDUNG
-    </div>
-
-    <div class="roundRow">
-
-        <input
-            id="rounding"
-            type="range"
-            min="0"
-            max="10"
-            step="0.05"
-            value="0"
-        >
-
-        <div id="roundingValue">
-            0
+        <div>
+            <div class="smalllabel">Z</div>
+            <input class="position-input" id="posZ" type="number" step="0.01">
         </div>
 
     </div>
 
-    <div class="label">
-        0 = scharfe Kanten · 200 Schritte
+    <div class="round-title">
+        ABRUNDUNG:
+        <span id="roundValue">0</span>
     </div>
+
+    <input
+        id="rounding"
+        type="range"
+        min="0"
+        max="10"
+        step="0.05"
+        value="0"
+    >
 
     <div id="pointCount">
         0 Punkte
@@ -738,16 +565,14 @@ h3{
 </div>
 
 
-<div id="selectionRect"></div>
+<div id="selectionBox"></div>
 
 <div id="status">
-    3D wird geladen...
+    Bereit
 </div>
 
+<div id="error"></div>
 
-<!-- =====================================================
-     THREE.JS
-===================================================== -->
 
 <script type="module">
 
@@ -777,184 +602,137 @@ import {
 from
 "three/addons/geometries/RoundedBoxGeometry.js";
 
-
-/*
-    ECHTES BOOLEAN-CSG
-
-    SUBTRACTION:
-    A - B
-*/
-
 import {
-    Brush,
     Evaluator,
+    Brush,
     SUBTRACTION
 }
 from
-"https://esm.sh/three-bvh-csg@0.0.18?external=three";
+"three-bvh-csg";
 
 
 /* =====================================================
-   VARIABLEN
+   GRUNDVARIABLEN
 ===================================================== */
 
 let scene;
 let camera;
 let renderer;
-
 let orbit;
 let transform;
-
 let raycaster;
-let mouse;
 
-let selectedPlate = null;
+let selectedObject = null;
 
 let selectedObjects = [];
+
+let selectedPlate = null;
 
 let selectionHelper = null;
 
 let transformMode = "translate";
 
-let sculpting = false;
-
 let sculptMode = "raise";
 
-let brushSize = 0.08;
+let brushSize = 0.1;
 
-let selectionDragging = false;
+let sculpting = false;
 
-let selectionStart = {
-    x:0,
-    y:0
-};
+let pointerDown = false;
+
+let pointerStartX = 0;
+let pointerStartY = 0;
+
+let rectangleSelecting = false;
+
+let plates = [];
+let objects = [];
 
 let plateCounter = 0;
-
 let objectCounter = 0;
 
-const plates = [];
+const SCALE_MM = 10;
 
-const objects = [];
-
-const evaluator =
-    new Evaluator();
+const evaluator = new Evaluator();
 
 
 /* =====================================================
-   MATERIALIEN
+   START
 ===================================================== */
 
-const normalMaterial =
-    new THREE.MeshStandardMaterial({
+try{
 
-        color:0x7188aa,
+    init();
 
-        roughness:.55,
+}
+catch(error){
 
-        metalness:.08
+    showError(error.stack || error);
 
-    });
-
-
-const negativeMaterial =
-    new THREE.MeshStandardMaterial({
-
-        color:0xff4055,
-
-        roughness:.5,
-
-        transparent:true,
-
-        opacity:.48
-
-    });
+}
 
 
 /* =====================================================
    INIT
 ===================================================== */
 
-init();
-
-
 function init(){
 
-    scene =
-        new THREE.Scene();
+    scene = new THREE.Scene();
 
     scene.background =
-        new THREE.Color(
-            0x101318
-        );
+        new THREE.Color(0x101318);
 
     scene.fog =
         new THREE.Fog(
             0x101318,
-            20,
-            120
+            18,
+            80
         );
 
 
     camera =
         new THREE.PerspectiveCamera(
-
             55,
-
-            innerWidth /
-            innerHeight,
-
-            .01,
-
+            innerWidth / innerHeight,
+            0.01,
             500
-
         );
 
-
     camera.position.set(
-        11,
         9,
-        12
+        7,
+        10
     );
 
 
     renderer =
         new THREE.WebGLRenderer({
-
             antialias:true,
-
-            powerPreference:
-                "high-performance"
-
+            powerPreference:"high-performance"
         });
 
-
     renderer.setPixelRatio(
-        Math.min(
-            devicePixelRatio,
-            2
-        )
+        Math.min(devicePixelRatio,2)
     );
-
 
     renderer.setSize(
         innerWidth,
         innerHeight
     );
 
+    renderer.shadowMap.enabled = true;
 
-    renderer.shadowMap.enabled =
-        true;
-
-
-    renderer.shadowMap.type =
-        THREE.PCFSoftShadowMap;
-
+    renderer.domElement.style.zIndex = "0";
 
     document.body.appendChild(
         renderer.domElement
     );
 
+
+    /* =================================================
+       KAMERA
+    ================================================= */
 
     orbit =
         new OrbitControls(
@@ -962,22 +740,39 @@ function init(){
             renderer.domElement
         );
 
+    orbit.enableDamping = true;
 
-    orbit.enableDamping =
-        true;
+    orbit.dampingFactor = 0.08;
 
-    orbit.dampingFactor =
-        .08;
+    orbit.enableZoom = true;
 
-    orbit.zoomSpeed =
-        .6;
+    orbit.zoomSpeed = 0.55;
 
-    orbit.minDistance =
-        2;
+    orbit.minDistance = 2;
 
-    orbit.maxDistance =
-        100;
+    orbit.maxDistance = 80;
 
+    /*
+       WICHTIG:
+
+       Linke Maustaste wird von uns selbst
+       für Auswahl / Kamera behandelt.
+       Orbit bekommt daher rechte und mittlere
+       Maustaste für Kameraaktionen.
+    */
+
+    orbit.mouseButtons.LEFT = null;
+
+    orbit.mouseButtons.RIGHT =
+        THREE.MOUSE.ROTATE;
+
+    orbit.mouseButtons.MIDDLE =
+        THREE.MOUSE.PAN;
+
+
+    /* =================================================
+       TRANSFORM
+    ================================================= */
 
     transform =
         new TransformControls(
@@ -985,28 +780,21 @@ function init(){
             renderer.domElement
         );
 
-
     transform.setMode(
         transformMode
     );
 
-    transform.setSize(
-        1.15
-    );
-
+    transform.setSize(1.15);
 
     scene.add(
-        transform
+        transform.getHelper()
     );
 
 
     transform.addEventListener(
         "mouseDown",
         () => {
-
-            orbit.enabled =
-                false;
-
+            orbit.enabled = false;
         }
     );
 
@@ -1014,12 +802,9 @@ function init(){
     transform.addEventListener(
         "mouseUp",
         () => {
-
-            orbit.enabled =
-                true;
-
+            orbit.enabled = true;
             updateInfo();
-
+            updateSelectionHelper();
         }
     );
 
@@ -1027,13 +812,9 @@ function init(){
     transform.addEventListener(
         "objectChange",
         () => {
-
+            keepOnPlate();
             updateInfo();
-
-            if(selectionHelper){
-                selectionHelper.update();
-            }
-
+            updateSelectionHelper();
         }
     );
 
@@ -1042,38 +823,15 @@ function init(){
         new THREE.Raycaster();
 
 
-    mouse =
-        new THREE.Vector2();
-
-
     createLights();
 
     createGround();
 
     createPlate();
 
-
     setupUI();
 
     setupMouse();
-
-
-    window.addEventListener(
-        "resize",
-        resize
-    );
-
-
-    document.getElementById(
-        "loading"
-    ).style.display =
-        "none";
-
-
-    setStatus(
-        "Bereit"
-    );
-
 
     animate();
 
@@ -1086,18 +844,14 @@ function init(){
 
 function createLights(){
 
-    const ambient =
+    const hemi =
         new THREE.HemisphereLight(
-
             0xffffff,
-            0x333333,
+            0x303030,
             2.5
-
         );
 
-    scene.add(
-        ambient
-    );
+    scene.add(hemi);
 
 
     const sun =
@@ -1106,21 +860,15 @@ function createLights(){
             3
         );
 
-
     sun.position.set(
-        10,
-        15,
+        8,
+        14,
         8
     );
 
+    sun.castShadow = true;
 
-    sun.castShadow =
-        true;
-
-
-    scene.add(
-        sun
-    );
+    scene.add(sun);
 
 }
 
@@ -1133,53 +881,37 @@ function createGround(){
 
     const ground =
         new THREE.Mesh(
-
             new THREE.PlaneGeometry(
-                120,
-                120
+                150,
+                150
             ),
-
             new THREE.MeshStandardMaterial({
-
                 color:0x11151b,
-
                 roughness:1
-
             })
-
         );
-
 
     ground.rotation.x =
         -Math.PI / 2;
 
-    ground.position.y =
-        -.15;
+    ground.position.y = -0.15;
 
+    ground.receiveShadow = true;
 
-    scene.add(
-        ground
-    );
+    scene.add(ground);
 
 
     const grid =
         new THREE.GridHelper(
-
-            120,
-            120,
+            150,
+            150,
             0x555b64,
             0x292e35
-
         );
 
+    grid.position.y = -0.14;
 
-    grid.position.y =
-        -.14;
-
-
-    scene.add(
-        grid
-    );
+    scene.add(grid);
 
 }
 
@@ -1192,192 +924,51 @@ function createPlate(){
 
     plateCounter++;
 
-
     const plate =
         new THREE.Mesh(
-
             new THREE.BoxGeometry(
-                10,
-                .3,
-                10
+                8,
+                0.2,
+                8
             ),
-
             new THREE.MeshStandardMaterial({
-
                 color:0x252a31,
-
-                roughness:.8
-
+                roughness:0.8
             })
-
         );
 
-
     plate.position.set(
-
-        ((plateCounter - 1) % 3) * 13 - 13,
-
+        ((plateCounter - 1) % 3) * 10 - 10,
         0,
-
-        Math.floor(
-            (plateCounter - 1) / 3
-        ) * 13
-
+        Math.floor((plateCounter - 1) / 3) * 10
     );
 
-
-    plate.userData.isPlate =
-        true;
+    plate.userData.isPlate = true;
 
     plate.userData.name =
-        "Platte " +
-        plateCounter;
+        "Platte " + plateCounter;
 
-    plate.userData.objects =
-        [];
+    plate.userData.objects = [];
 
+    plate.receiveShadow = true;
 
-    plate.receiveShadow =
-        true;
+    scene.add(plate);
 
+    plates.push(plate);
 
-    scene.add(
-        plate
-    );
-
-
-    plates.push(
-        plate
-    );
-
-
-    selectPlate(
-        plate
-    );
-
+    selectPlate(plate);
 
     updatePlateList();
 
-
     setStatus(
-        plate.userData.name +
-        " erstellt"
+        plate.userData.name + " erstellt"
     );
 
 }
 
 
 /* =====================================================
-   GEOMETRIE
-===================================================== */
-
-function createGeometry(
-    type,
-    rounding = 0
-){
-
-    let geometry;
-
-
-    if(type === "sphere"){
-
-        geometry =
-            new THREE.SphereGeometry(
-                1,
-                40,
-                28
-            );
-
-    }
-
-
-    else if(type === "cube"){
-
-        /*
-            0 = normale Box
-            0.05 - 10 = RoundedBox
-
-            200 mögliche Schritte
-        */
-
-        if(rounding <= 0){
-
-            geometry =
-                new THREE.BoxGeometry(
-                    2,
-                    2,
-                    2,
-                    20,
-                    20,
-                    20
-                );
-
-        }
-        else{
-
-            const radius =
-                Math.min(
-                    rounding / 10 * .9,
-                    .9
-                );
-
-            const segments =
-                Math.max(
-                    2,
-                    Math.round(
-                        2 +
-                        rounding *
-                        1.5
-                    )
-                );
-
-            geometry =
-                new RoundedBoxGeometry(
-
-                    2,
-                    2,
-                    2,
-
-                    segments,
-
-                    radius
-
-                );
-
-        }
-
-    }
-
-
-    else if(type === "cylinder"){
-
-        geometry =
-            new THREE.CylinderGeometry(
-
-                1,
-
-                1,
-
-                2,
-
-                48,
-
-                12
-
-            );
-
-    }
-
-
-    geometry.computeVertexNormals();
-
-    return geometry;
-
-}
-
-
-/* =====================================================
-   OBJEKT ERSTELLEN
+   OBJEKT
 ===================================================== */
 
 function addObject(
@@ -1392,113 +983,154 @@ function addObject(
     }
 
 
-    objectCounter++;
+    let geometry;
 
 
-    const geometry =
-        createGeometry(
-            type,
-            0
-        );
+    if(type === "sphere"){
+
+        geometry =
+            new THREE.SphereGeometry(
+                1.2,
+                32,
+                24
+            );
+
+    }
+
+
+    if(type === "cube"){
+
+        geometry =
+            new THREE.BoxGeometry(
+                2,
+                2,
+                2,
+                12,
+                12,
+                12
+            );
+
+    }
+
+
+    if(type === "cylinder"){
+
+        geometry =
+            new THREE.CylinderGeometry(
+                1.1,
+                1.1,
+                2.4,
+                32,
+                12
+            );
+
+    }
+
+
+    const material =
+        new THREE.MeshStandardMaterial({
+
+            color:
+                negative
+                ?
+                0xff4057
+                :
+                0x7188a5,
+
+            roughness:0.55,
+
+            metalness:0.1,
+
+            transparent:negative,
+
+            opacity:
+                negative
+                ?
+                0.52
+                :
+                1
+
+        });
 
 
     const mesh =
         new THREE.Mesh(
-
             geometry,
-
-            negative
-            ?
-            negativeMaterial.clone()
-            :
-            normalMaterial.clone()
-
+            material
         );
-
-
-    mesh.castShadow =
-        true;
-
-    mesh.receiveShadow =
-        true;
-
-
-    mesh.userData.type =
-        type;
-
-    mesh.userData.negative =
-        negative;
-
-    mesh.userData.rounding =
-        0;
-
-    mesh.userData.name =
-
-        negative
-        ?
-        "Negativ " +
-        type +
-        " " +
-        objectCounter
-        :
-        type +
-        " " +
-        objectCounter;
-
-
-    mesh.userData.plate =
-        selectedPlate;
 
 
     /*
-       WICHTIG:
-
        X/Z = Mitte der Platte
-
-       Y = Abstand der Unterseite
-           von der Plattenoberseite
-
-       Deshalb ist 0/0/0:
-
-       Mitte der Platte
-       + Unterseite auf Platte
+       Y = Oberseite + halbe Objekt-Höhe
     */
 
+    const plateTop =
+        selectedPlate.position.y + 0.1;
+
+
+    geometry.computeBoundingBox();
+
+    const height =
+        geometry.boundingBox.max.y -
+        geometry.boundingBox.min.y;
+
+
     mesh.position.set(
-
         selectedPlate.position.x,
-
-        selectedPlate.position.y +
-        .15 +
-        1,
-
+        plateTop + height / 2,
         selectedPlate.position.z
-
     );
 
 
-    scene.add(
-        mesh
-    );
+    mesh.castShadow = true;
+
+    mesh.receiveShadow = true;
 
 
-    objects.push(
-        mesh
-    );
+    objectCounter++;
 
 
-    selectedPlate
-        .userData
-        .objects
-        .push(
-            mesh
+    mesh.userData.name =
+        (
+            negative
+            ?
+            "Negativ "
+            :
+            ""
+        )
+        +
+        type
+        +
+        " "
+        +
+        objectCounter;
+
+
+    mesh.userData.type = type;
+
+    mesh.userData.negative = negative;
+
+    mesh.userData.plate = selectedPlate;
+
+    mesh.userData.rounding = 0;
+
+    mesh.userData.baseSize =
+        new THREE.Vector3(
+            2,
+            2,
+            2
         );
 
 
-    selectObjects(
-        [mesh]
-    );
+    scene.add(mesh);
 
+    objects.push(mesh);
+
+    selectedPlate.userData.objects.push(mesh);
+
+
+    selectObject(mesh);
 
     setStatus(
         mesh.userData.name +
@@ -1509,173 +1141,42 @@ function addObject(
 
 
 /* =====================================================
-   AUSWAHL
-===================================================== */
-
-function selectObjects(
-    list
-){
-
-    selectedObjects =
-        [...new Set(
-            list.filter(Boolean)
-        )];
-
-
-    transform.detach();
-
-
-    if(selectionHelper){
-
-        scene.remove(
-            selectionHelper
-        );
-
-        selectionHelper =
-            null;
-
-    }
-
-
-    if(selectedObjects.length === 1){
-
-        const object =
-            selectedObjects[0];
-
-
-        transform.attach(
-            object
-        );
-
-
-        transform.setMode(
-            transformMode
-        );
-
-
-        selectionHelper =
-            new THREE.BoxHelper(
-                object,
-                0xffff00
-            );
-
-
-        scene.add(
-            selectionHelper
-        );
-
-
-        selectPlate(
-            object.userData.plate
-        );
-
-    }
-
-
-    else if(
-        selectedObjects.length > 1
-    ){
-
-        /*
-           Für mehrere Objekte wird
-           nur die Auswahl markiert.
-        */
-
-        selectedObjects.forEach(
-            object => {
-
-                object.userData.selected =
-                    true;
-
-            }
-        );
-
-        setStatus(
-            selectedObjects.length +
-            " Objekte ausgewählt"
-        );
-
-    }
-
-
-    updateInfo();
-
-}
-
-
-/* =====================================================
-   PLATTE AUSWÄHLEN
-===================================================== */
-
-function selectPlate(
-    plate
-){
-
-    if(!plate)
-        return;
-
-
-    selectedPlate =
-        plate;
-
-
-    plates.forEach(
-        p => {
-
-            p.material.color.set(
-
-                p === plate
-                ?
-                0x315e93
-                :
-                0x252a31
-
-            );
-
-        }
-    );
-
-
-    updatePlateList();
-
-    updateInfo();
-
-}
-
-
-/* =====================================================
-   MOUSE
+   MAUSSTEUERUNG
 ===================================================== */
 
 function setupMouse(){
 
-    renderer.domElement.addEventListener(
+    const canvas =
+        renderer.domElement;
+
+
+    canvas.addEventListener(
         "pointerdown",
-        pointerDown
+        pointerDownHandler
     );
 
 
-    renderer.domElement.addEventListener(
+    window.addEventListener(
         "pointermove",
-        pointerMove
+        pointerMoveHandler
     );
 
 
     window.addEventListener(
         "pointerup",
-        pointerUp
+        pointerUpHandler
+    );
+
+
+    canvas.addEventListener(
+        "contextmenu",
+        event => event.preventDefault()
     );
 
 }
 
 
-/* =====================================================
-   MOUSE DOWN
-===================================================== */
-
-function pointerDown(
-    event
-){
+function pointerDownHandler(event){
 
     if(event.button !== 0)
         return;
@@ -1685,40 +1186,192 @@ function pointerDown(
         return;
 
 
+    pointerDown = true;
+
+    pointerStartX = event.clientX;
+
+    pointerStartY = event.clientY;
+
+
     /*
-       SHIFT = Modellieren
+       STRG = ausschließlich Mehrfachauswahl.
+       Kamera wird dabei NICHT bewegt.
     */
 
-    if(
-        event.shiftKey &&
-        selectedObjects.length === 1
-    ){
+    if(event.ctrlKey){
 
-        sculpting =
-            true;
+        rectangleSelecting = true;
 
-        orbit.enabled =
-            false;
+        orbit.enabled = false;
 
-        transform.detach();
-
-        sculptAt(
-            event
+        showSelectionBox(
+            event.clientX,
+            event.clientY,
+            event.clientX,
+            event.clientY
         );
 
         return;
-
     }
 
 
     /*
-       Wenn Strg gedrückt wird,
-       kann Auswahl erweitert werden.
+       Normale linke Maustaste:
+       erst nach Bewegung wird Kamera gedreht.
     */
 
-    setMouse(
-        event
-    );
+    orbit.enabled = false;
+
+}
+
+
+function pointerMoveHandler(event){
+
+    if(!pointerDown)
+        return;
+
+
+    if(rectangleSelecting){
+
+        showSelectionBox(
+            pointerStartX,
+            pointerStartY,
+            event.clientX,
+            event.clientY
+        );
+
+        return;
+    }
+
+
+    if(event.ctrlKey){
+
+        return;
+    }
+
+
+    const dx =
+        event.clientX -
+        pointerStartX;
+
+    const dy =
+        event.clientY -
+        pointerStartY;
+
+
+    if(
+        Math.abs(dx) > 3 ||
+        Math.abs(dy) > 3
+    ){
+
+        /*
+           Kamera drehen:
+           Orbit wird für die aktuelle
+           Mausbewegung aktiviert.
+        */
+
+        orbit.enabled = true;
+
+        orbit.rotateLeft(
+            -dx * 0.004
+        );
+
+        orbit.rotateUp(
+            -dy * 0.004
+        );
+
+        orbit.update();
+
+
+        pointerStartX = event.clientX;
+        pointerStartY = event.clientY;
+
+    }
+
+}
+
+
+function pointerUpHandler(event){
+
+    if(event.button !== 0)
+        return;
+
+
+    if(rectangleSelecting){
+
+        rectangleSelecting = false;
+
+        pointerDown = false;
+
+        orbit.enabled = true;
+
+        hideSelectionBox();
+
+        selectObjectsInRectangle();
+
+        return;
+    }
+
+
+    const dx =
+        event.clientX -
+        pointerStartX;
+
+    const dy =
+        event.clientY -
+        pointerStartY;
+
+
+    /*
+       Wenn kaum bewegt wurde:
+       normaler Klick = Objekt auswählen.
+    */
+
+    if(
+        Math.abs(dx) < 5 &&
+        Math.abs(dy) < 5
+    ){
+
+        selectFromMouse(event);
+
+    }
+
+
+    pointerDown = false;
+
+    orbit.enabled = true;
+
+}
+
+
+/* =====================================================
+   EINZELAUSWAHL
+===================================================== */
+
+function selectFromMouse(event){
+
+    const rect =
+        renderer.domElement.getBoundingClientRect();
+
+
+    const mouse =
+        new THREE.Vector2(
+
+            (
+                event.clientX -
+                rect.left
+            ) /
+            rect.width * 2 - 1,
+
+            -(
+                (
+                    event.clientY -
+                    rect.top
+                ) /
+                rect.height
+            ) * 2 + 1
+
+        );
 
 
     raycaster.setFromCamera(
@@ -1729,438 +1382,562 @@ function pointerDown(
 
     const hits =
         raycaster.intersectObjects(
-            objects,
+            objects.filter(
+                o =>
+                    o.userData.plate ===
+                    selectedPlate
+            ),
             false
         );
 
 
     if(hits.length){
 
-        const object =
-            hits[0].object;
-
-
-        if(event.ctrlKey){
-
-            if(
-                selectedObjects.includes(
-                    object
-                )
-            ){
-
-                selectObjects(
-                    selectedObjects.filter(
-                        x =>
-                            x !== object
-                    )
-                );
-
-            }
-            else{
-
-                selectObjects(
-                    [
-                        ...selectedObjects,
-                        object
-                    ]
-                );
-
-            }
-
-        }
-        else{
-
-            selectObjects(
-                [object]
-            );
-
-        }
-
+        selectObject(
+            hits[0].object
+        );
 
         return;
 
     }
 
 
-    /*
-       Sonst Rechteckauswahl starten
-    */
-
-    selectionDragging =
-        true;
-
-
-    selectionStart.x =
-        event.clientX;
-
-    selectionStart.y =
-        event.clientY;
-
-
-    const rect =
-        document.getElementById(
-            "selectionRect"
+    const plateHits =
+        raycaster.intersectObjects(
+            plates,
+            false
         );
 
 
-    rect.style.display =
-        "block";
+    if(plateHits.length){
 
+        selectPlate(
+            plateHits[0].object
+        );
 
-    rect.style.left =
-        event.clientX +
-        "px";
+        selectObject(null);
 
+        return;
 
-    rect.style.top =
-        event.clientY +
-        "px";
-
-
-    rect.style.width =
-        "0px";
-
-
-    rect.style.height =
-        "0px";
+    }
 
 }
 
 
 /* =====================================================
-   MOUSE MOVE
+   RECHTECK-AUSWAHL
 ===================================================== */
 
-function pointerMove(
-    event
+function showSelectionBox(
+    x1,
+    y1,
+    x2,
+    y2
 ){
 
-    if(sculpting){
-
-        sculptAt(
-            event
+    const box =
+        document.getElementById(
+            "selectionBox"
         );
 
-        return;
 
-    }
+    const left =
+        Math.min(x1,x2);
 
-
-    if(!selectionDragging)
-        return;
-
-
-    const x =
-        Math.min(
-            selectionStart.x,
-            event.clientX
-        );
-
-    const y =
-        Math.min(
-            selectionStart.y,
-            event.clientY
-        );
-
+    const top =
+        Math.min(y1,y2);
 
     const width =
-        Math.abs(
-            event.clientX -
-            selectionStart.x
-        );
-
+        Math.abs(x2-x1);
 
     const height =
-        Math.abs(
-            event.clientY -
-            selectionStart.y
-        );
+        Math.abs(y2-y1);
 
 
-    const rect =
-        document.getElementById(
-            "selectionRect"
-        );
+    box.style.display = "block";
 
+    box.style.left =
+        left + "px";
 
-    rect.style.left =
-        x + "px";
+    box.style.top =
+        top + "px";
 
-    rect.style.top =
-        y + "px";
-
-    rect.style.width =
+    box.style.width =
         width + "px";
 
-    rect.style.height =
+    box.style.height =
         height + "px";
 
 }
 
 
+function hideSelectionBox(){
+
+    document.getElementById(
+        "selectionBox"
+    ).style.display = "none";
+
+}
+
+
+function selectObjectsInRectangle(){
+
+    const box =
+        document.getElementById(
+            "selectionBox"
+        );
+
+    const rect =
+        box.getBoundingClientRect();
+
+
+    const newlySelected = [];
+
+
+    for(const object of objects){
+
+        if(
+            object.userData.plate !==
+            selectedPlate
+        )
+            continue;
+
+
+        object.updateMatrixWorld(true);
+
+
+        const center =
+            new THREE.Vector3();
+
+        new THREE.Box3()
+            .setFromObject(object)
+            .getCenter(center);
+
+
+        center.project(camera);
+
+
+        const sx =
+            (center.x * .5 + .5) *
+            innerWidth;
+
+        const sy =
+            (-center.y * .5 + .5) *
+            innerHeight;
+
+
+        if(
+            sx >= rect.left &&
+            sx <= rect.right &&
+            sy >= rect.top &&
+            sy <= rect.bottom
+        ){
+
+            newlySelected.push(object);
+
+        }
+
+    }
+
+
+    if(newlySelected.length){
+
+        selectedObjects =
+            newlySelected;
+
+        selectedObject =
+            newlySelected[0];
+
+        attachTransform();
+
+        updateSelectionHelper();
+
+        updateInfo();
+
+        setStatus(
+            newlySelected.length +
+            " Objekte ausgewählt"
+        );
+
+    }
+
+}
+
+
 /* =====================================================
-   MOUSE UP
+   OBJEKT AUSWÄHLEN
 ===================================================== */
 
-function pointerUp(
-    event
-){
+function selectObject(object){
 
-    if(sculpting){
+    selectedObjects = [];
 
-        sculpting =
-            false;
+    selectedObject =
+        object || null;
 
-        orbit.enabled =
-            true;
 
-        if(selectedObjects.length === 1){
+    if(object){
 
-            transform.attach(
-                selectedObjects[0]
+        selectedObjects.push(object);
+
+        if(object.userData.plate){
+
+            selectPlate(
+                object.userData.plate,
+                false
             );
 
         }
 
-        return;
+        attachTransform();
+
+        setStatus(
+            "Objekt ausgewählt"
+        );
+
+    }
+    else{
+
+        transform.detach();
+
+        removeSelectionHelper();
+
+        setStatus(
+            "Objekt auswählen"
+        );
 
     }
 
 
-    if(!selectionDragging)
-        return;
+    updateInfo();
+
+}
 
 
-    selectionDragging =
-        false;
+function attachTransform(){
 
+    transform.detach();
 
-    const rectElement =
-        document.getElementById(
-            "selectionRect"
+    if(selectedObject){
+
+        transform.setMode(
+            transformMode
         );
 
-
-    rectElement.style.display =
-        "none";
-
-
-    const minX =
-        Math.min(
-            selectionStart.x,
-            event.clientX
+        transform.attach(
+            selectedObject
         );
-
-    const maxX =
-        Math.max(
-            selectionStart.x,
-            event.clientX
-        );
-
-    const minY =
-        Math.min(
-            selectionStart.y,
-            event.clientY
-        );
-
-    const maxY =
-        Math.max(
-            selectionStart.y,
-            event.clientY
-        );
-
-
-    /*
-       Nur wenn wirklich gezogen wurde
-    */
-
-    if(
-        Math.abs(
-            event.clientX -
-            selectionStart.x
-        ) < 5 &&
-        Math.abs(
-            event.clientY -
-            selectionStart.y
-        ) < 5
-    ){
-
-        selectObjects([]);
-
-        return;
 
     }
 
+    updateSelectionHelper();
 
-    const selected = [];
-
-
-    objects.forEach(
-        object => {
-
-            const projected =
-                object.position
-                    .clone()
-                    .project(camera);
+}
 
 
-            const sx =
-                (
-                    projected.x *
-                    .5 +
-                    .5
-                )
-                *
-                innerWidth;
+/* =====================================================
+   GELBE AUSWAHL
+===================================================== */
+
+function updateSelectionHelper(){
+
+    removeSelectionHelper();
 
 
-            const sy =
-                (
-                    -
-                    projected.y *
-                    .5 +
-                    .5
-                )
-                *
-                innerHeight;
+    if(!selectedObjects.length)
+        return;
 
 
-            if(
-                sx >= minX &&
-                sx <= maxX &&
-                sy >= minY &&
-                sy <= maxY
-            ){
+    for(const object of selectedObjects){
 
-                selected.push(
-                    object
-                );
+        const helper =
+            new THREE.BoxHelper(
+                object,
+                0xffff00
+            );
 
-            }
+        scene.add(helper);
+
+        object.userData.selectionHelper =
+            helper;
+
+    }
+
+}
+
+
+function removeSelectionHelper(){
+
+    for(const object of objects){
+
+        if(
+            object.userData.selectionHelper
+        ){
+
+            scene.remove(
+                object.userData.selectionHelper
+            );
+
+            object.userData.selectionHelper =
+                null;
 
         }
-    );
 
-
-    selectObjects(
-        selected
-    );
+    }
 
 }
 
 
 /* =====================================================
-   MOUSE KOORDINATEN
+   PLATTE
 ===================================================== */
 
-function setMouse(
-    event
+function selectPlate(
+    plate,
+    clearSelection = true
 ){
 
-    const rect =
-        renderer
-            .domElement
-            .getBoundingClientRect();
+    if(!plate)
+        return;
 
 
-    mouse.x =
-        (
-            event.clientX -
-            rect.left
-        )
-        /
-        rect.width
-        *
-        2
-        - 1;
+    selectedPlate = plate;
 
 
-    mouse.y =
-        -(
-            (
-                event.clientY -
-                rect.top
-            )
-            /
-            rect.height
-        )
-        *
-        2
-        + 1;
+    for(const p of plates){
+
+        p.material.color.set(
+            p === plate
+            ?
+            0x315e93
+            :
+            0x252a31
+        );
+
+    }
+
+
+    if(clearSelection){
+
+        selectedObjects = [];
+
+        selectedObject = null;
+
+        transform.detach();
+
+        removeSelectionHelper();
+
+    }
+
+
+    updatePlateList();
+
+    updateInfo();
+
+}
+
+
+function updatePlateList(){
+
+    const container =
+        document.getElementById(
+            "plates"
+        );
+
+
+    container.innerHTML = "";
+
+
+    for(const plate of plates){
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.className =
+            "plate-button";
+
+
+        if(plate === selectedPlate){
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+
+        button.textContent =
+            plate.userData.name;
+
+
+        button.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                selectPlate(plate);
+
+                focusSelected();
+
+            }
+        );
+
+
+        container.appendChild(button);
+
+    }
 
 }
 
 
 /* =====================================================
-   TRANSFORM
+   TRANSFORM-MODI
 ===================================================== */
 
-function setTransformMode(
-    mode
-){
+function setTransformMode(mode){
 
-    transformMode =
-        mode;
+    transformMode = mode;
 
-
-    transform.setMode(
-        mode
-    );
-
+    transform.setMode(mode);
 
     document
         .querySelectorAll(
-            ".btn"
+            "#topbar .btn"
         )
         .forEach(
-            button => {
-
+            b => {
                 if(
                     [
-                        "moveBtn",
-                        "rotateBtn",
-                        "scaleBtn"
-                    ].includes(
-                        button.id
-                    )
+                        "moveMode",
+                        "rotateMode",
+                        "scaleMode"
+                    ].includes(b.id)
                 ){
-
-                    button.classList.remove(
+                    b.classList.remove(
                         "active"
                     );
-
                 }
-
             }
         );
 
 
-    const id =
-        mode === "translate"
-        ?
-        "moveBtn"
-        :
-        mode === "rotate"
-        ?
-        "rotateBtn"
-        :
-        "scaleBtn";
+    if(mode === "translate")
+        document.getElementById("moveMode")
+            .classList.add("active");
+
+    if(mode === "rotate")
+        document.getElementById("rotateMode")
+            .classList.add("active");
+
+    if(mode === "scale")
+        document.getElementById("scaleMode")
+            .classList.add("active");
 
 
-    document
-        .getElementById(id)
-        .classList.add(
-            "active"
+    if(selectedObject)
+        transform.attach(selectedObject);
+
+}
+
+
+/* =====================================================
+   AUF PLATTE HALTEN
+===================================================== */
+
+function keepOnPlate(){
+
+    if(!selectedObject)
+        return;
+
+
+    if(transformMode !== "translate")
+        return;
+
+
+    const box =
+        new THREE.Box3()
+            .setFromObject(
+                selectedObject
+            );
+
+
+    const plateTop =
+        selectedPlate.position.y +
+        0.1;
+
+
+    const difference =
+        plateTop -
+        box.min.y;
+
+
+    if(Math.abs(difference) < 0.0001)
+        return;
+
+
+    selectedObject.position.y +=
+        difference;
+
+}
+
+
+/* =====================================================
+   ZENTRIEREN
+===================================================== */
+
+function centerSelected(){
+
+    if(!selectedObject){
+
+        setStatus(
+            "Kein Objekt ausgewählt"
         );
 
-
-    if(selectedObjects.length === 1){
-
-        transform.attach(
-            selectedObjects[0]
-        );
+        return;
 
     }
+
+
+    const plate =
+        selectedObject.userData.plate;
+
+
+    if(!plate)
+        return;
+
+
+    selectedObject.position.x =
+        plate.position.x;
+
+    selectedObject.position.z =
+        plate.position.z;
+
+
+    const box =
+        new THREE.Box3()
+            .setFromObject(
+                selectedObject
+            );
+
+
+    const plateTop =
+        plate.position.y + 0.1;
+
+
+    selectedObject.position.y +=
+        plateTop - box.min.y;
+
+
+    updateInfo();
+
+    updateSelectionHelper();
+
+    setStatus(
+        "Objekt zentriert"
+    );
 
 }
 
@@ -2171,31 +1948,35 @@ function setTransformMode(
 
 function updateInfo(){
 
-    const object =
-        selectedObjects.length === 1
-        ?
-        selectedObjects[0]
-        :
-        null;
-
-
-    document.getElementById(
-        "plateName"
-    ).textContent =
-
-        selectedPlate
-        ?
-        selectedPlate.userData.name
-        :
-        "Keine Platte";
-
-
-    if(!object){
-
+    const objectName =
         document.getElementById(
             "objectName"
-        ).textContent =
+        );
 
+
+    const plateName =
+        document.getElementById(
+            "plateName"
+        );
+
+
+    if(selectedPlate){
+
+        plateName.textContent =
+            selectedPlate.userData.name;
+
+    }
+    else{
+
+        plateName.textContent =
+            "Keine Platte";
+
+    }
+
+
+    if(!selectedObject){
+
+        objectName.textContent =
             selectedObjects.length
             ?
             selectedObjects.length +
@@ -2204,36 +1985,58 @@ function updateInfo(){
             "Kein Objekt ausgewählt";
 
 
-        [
+        setText(
             "width",
-            "height",
-            "depth"
-        ].forEach(
-            id => {
-
-                document.getElementById(
-                    id
-                ).textContent =
-                    "0 mm";
-
-            }
+            "0 mm"
         );
 
+        setText(
+            "height",
+            "0 mm"
+        );
+
+        setText(
+            "depth",
+            "0 mm"
+        );
+
+        document.getElementById(
+            "posX"
+        ).value = "";
+
+        document.getElementById(
+            "posY"
+        ).value = "";
+
+        document.getElementById(
+            "posZ"
+        ).value = "";
+
+        document.getElementById(
+            "rounding"
+        ).value = 0;
+
+        document.getElementById(
+            "roundValue"
+        ).textContent = "0";
+
+        setText(
+            "pointCount",
+            "0 Punkte"
+        );
 
         return;
 
     }
 
 
-    object.updateMatrixWorld(
-        true
-    );
+    selectedObject.updateMatrixWorld(true);
 
 
     const box =
         new THREE.Box3()
             .setFromObject(
-                object
+                selectedObject
             );
 
 
@@ -2243,111 +2046,72 @@ function updateInfo(){
         );
 
 
-    /*
-       1 THREE UNIT = 10 mm
-    */
-
-    document.getElementById(
-        "objectName"
-    ).textContent =
-        object.userData.name;
+    setText(
+        "objectName",
+        selectedObject.userData.name
+    );
 
 
-    document.getElementById(
-        "width"
-    ).textContent =
-        (
-            size.x * 10
-        ).toFixed(2) +
-        " mm";
+    setText(
+        "width",
+        (size.x * SCALE_MM).toFixed(1)
+        + " mm"
+    );
 
 
-    document.getElementById(
-        "height"
-    ).textContent =
-        (
-            size.y * 10
-        ).toFixed(2) +
-        " mm";
+    setText(
+        "height",
+        (size.y * SCALE_MM).toFixed(1)
+        + " mm"
+    );
 
 
-    document.getElementById(
-        "depth"
-    ).textContent =
-        (
-            size.z * 10
-        ).toFixed(2) +
-        " mm";
+    setText(
+        "depth",
+        (size.z * SCALE_MM).toFixed(1)
+        + " mm"
+    );
 
-
-    /*
-       Position relativ zur Platte.
-
-       X = links/rechts
-       Z = vorne/hinten
-       Y = Unterseite über Platte
-
-       0/0/0 =
-       zentriert + Boden berührt Platte
-    */
 
     const plate =
-        object.userData.plate;
+        selectedObject.userData.plate;
 
 
-    const plateTop =
-        plate.position.y +
-        .15;
+    const px =
+        selectedObject.position.x -
+        plate.position.x;
 
 
-    const x =
-        (
-            object.position.x -
-            plate.position.x
-        )
-        * 10;
+    const py =
+        selectedObject.position.y -
+        plate.position.y;
 
 
-    const z =
-        (
-            object.position.z -
-            plate.position.z
-        )
-        * 10;
-
-
-    const objectBottom =
-        box.min.y;
-
-
-    const y =
-        (
-            objectBottom -
-            plateTop
-        )
-        * 10;
+    const pz =
+        selectedObject.position.z -
+        plate.position.z;
 
 
     document.getElementById(
         "posX"
     ).value =
-        x.toFixed(2);
+        px.toFixed(2);
 
 
     document.getElementById(
         "posY"
     ).value =
-        y.toFixed(2);
+        py.toFixed(2);
 
 
     document.getElementById(
         "posZ"
     ).value =
-        z.toFixed(2);
+        pz.toFixed(2);
 
 
     const rounding =
-        object.userData.rounding || 0;
+        selectedObject.userData.rounding || 0;
 
 
     document.getElementById(
@@ -2357,116 +2121,102 @@ function updateInfo(){
 
 
     document.getElementById(
-        "roundingValue"
+        "roundValue"
     ).textContent =
         Number(rounding).toFixed(2);
 
 
-    const positionAttribute =
-        object.geometry
-            .getAttribute(
-                "position"
-            );
+    const position =
+        selectedObject.geometry
+            .getAttribute("position");
 
 
-    document.getElementById(
-        "pointCount"
-    ).textContent =
-        positionAttribute.count +
-        " Punkte";
+    setText(
+        "pointCount",
+        position
+        ?
+        position.count + " Punkte"
+        :
+        "0 Punkte"
+    );
+
+}
+
+
+function setText(id,text){
+
+    document.getElementById(id)
+        .textContent = text;
 
 }
 
 
 /* =====================================================
-   POSITION ÄNDERN
+   POSITION INPUTS
 ===================================================== */
 
-function applyPosition(){
+function setupPositionInputs(){
 
-    if(selectedObjects.length !== 1)
-        return;
+    ["X","Y","Z"].forEach(axis => {
 
-
-    const object =
-        selectedObjects[0];
-
-
-    const plate =
-        object.userData.plate;
-
-
-    const x =
-        Number(
+        const input =
             document.getElementById(
-                "posX"
-            ).value
-        ) || 0;
-
-
-    const y =
-        Number(
-            document.getElementById(
-                "posY"
-            ).value
-        ) || 0;
-
-
-    const z =
-        Number(
-            document.getElementById(
-                "posZ"
-            ).value
-        ) || 0;
-
-
-    object.position.x =
-        plate.position.x +
-        x / 10;
-
-
-    object.position.z =
-        plate.position.z +
-        z / 10;
-
-
-    /*
-       Y wird so berechnet,
-       dass die Unterseite bei
-       Y = 0 die Platte berührt.
-    */
-
-    object.updateMatrixWorld(
-        true
-    );
-
-
-    const box =
-        new THREE.Box3()
-            .setFromObject(
-                object
+                "pos" + axis
             );
 
 
-    const plateTop =
-        plate.position.y +
-        .15;
+        input.addEventListener(
+            "change",
+            () => {
+
+                if(!selectedObject)
+                    return;
 
 
-    const currentBottom =
-        box.min.y;
+                const value =
+                    Number(input.value);
 
 
-    object.position.y +=
-        (
-            plateTop +
-            y / 10
-            -
-            currentBottom
+                if(!Number.isFinite(value))
+                    return;
+
+
+                const plate =
+                    selectedObject.userData.plate;
+
+
+                const worldValue =
+                    value / SCALE_MM;
+
+
+                if(axis === "X")
+                    selectedObject.position.x =
+                        plate.position.x +
+                        worldValue;
+
+
+                if(axis === "Y")
+                    selectedObject.position.y =
+                        plate.position.y +
+                        worldValue;
+
+
+                if(axis === "Z")
+                    selectedObject.position.z =
+                        plate.position.z +
+                        worldValue;
+
+
+                keepOnPlate();
+
+                updateInfo();
+
+                updateSelectionHelper();
+
+            }
         );
 
-
-    updateInfo();
+    });
 
 }
 
@@ -2475,144 +2225,140 @@ function applyPosition(){
    ABRUNDUNG
 ===================================================== */
 
-function applyRounding(){
+function setRounding(value){
 
-    if(selectedObjects.length !== 1)
+    if(!selectedObject)
         return;
 
 
-    const object =
-        selectedObjects[0];
-
-
-    const value =
-        Number(
-            document.getElementById(
-                "rounding"
-            ).value
+    value =
+        Math.max(
+            0,
+            Math.min(
+                10,
+                Number(value)
+            )
         );
 
 
-    object.userData.rounding =
+    selectedObject.userData.rounding =
         value;
 
 
-    document.getElementById(
-        "roundingValue"
-    ).textContent =
-        value.toFixed(2);
-
-
     /*
-       Sphere ist bereits rund.
+       Nur Würfel erhalten echte
+       abgerundete Kanten.
+       Die 0-10 Skala wird auf die
+       geometrisch mögliche Rundung
+       umgerechnet.
     */
 
     if(
-        object.userData.type ===
-        "sphere"
+        selectedObject.userData.type ===
+        "cube"
     ){
 
-        updateInfo();
-
-        return;
-
-    }
-
-
-    const oldPosition =
-        object.position.clone();
-
-
-    const oldRotation =
-        object.rotation.clone();
-
-
-    const oldScale =
-        object.scale.clone();
-
-
-    const oldGeometry =
-        object.geometry;
-
-
-    object.geometry =
-        createGeometry(
-            object.userData.type,
+        rebuildCube(
+            selectedObject,
             value
         );
-
-
-    object.position.copy(
-        oldPosition
-    );
-
-    object.rotation.copy(
-        oldRotation
-    );
-
-    object.scale.copy(
-        oldScale
-    );
-
-
-    oldGeometry.dispose();
-
-
-    /*
-       Position nach Geometrieänderung
-       wieder auf gewünschte
-       Plattenposition bringen.
-    */
-
-    const savedX =
-        Number(
-            document.getElementById(
-                "posX"
-            ).value
-        ) || 0;
-
-    const savedY =
-        Number(
-            document.getElementById(
-                "posY"
-            ).value
-        ) || 0;
-
-    const savedZ =
-        Number(
-            document.getElementById(
-                "posZ"
-            ).value
-        ) || 0;
-
-
-    document.getElementById(
-        "posX"
-    ).value =
-        savedX;
-
-    document.getElementById(
-        "posY"
-    ).value =
-        savedY;
-
-    document.getElementById(
-        "posZ"
-    ).value =
-        savedZ;
-
-
-    applyPosition();
-
-
-    if(selectionHelper){
-
-        selectionHelper.update();
 
     }
 
 
     updateInfo();
+
+    updateSelectionHelper();
+
+}
+
+
+function rebuildCube(
+    mesh,
+    value
+){
+
+    const oldPosition =
+        mesh.position.clone();
+
+
+    const oldScale =
+        mesh.scale.clone();
+
+
+    const oldRotation =
+        mesh.rotation.clone();
+
+
+    const oldGeometry =
+        mesh.geometry;
+
+
+    let geometry;
+
+
+    if(value <= 0){
+
+        geometry =
+            new THREE.BoxGeometry(
+                2,
+                2,
+                2,
+                12,
+                12,
+                12
+            );
+
+    }
+    else{
+
+        /*
+           200 mögliche Werte:
+           0.00 bis 10.00 in 0.05er Schritten.
+        */
+
+        const radius =
+            Math.min(
+                0.9,
+                0.05 +
+                value *
+                0.085
+            );
+
+
+        geometry =
+            new RoundedBoxGeometry(
+                2,
+                2,
+                2,
+                Math.min(
+                    radius,
+                    0.95
+                ),
+                8
+            );
+
+    }
+
+
+    mesh.geometry =
+        geometry;
+
+
+    mesh.position.copy(
+        oldPosition
+    );
+
+    mesh.scale.copy(
+        oldScale
+    );
+
+    mesh.rotation.copy(
+        oldRotation
+    );
+
+
+    oldGeometry.dispose();
 
 }
 
@@ -2621,21 +2367,63 @@ function applyRounding(){
    SCULPTING
 ===================================================== */
 
-function sculptAt(
-    event
-){
+function startSculpt(){
 
-    if(selectedObjects.length !== 1)
+    if(!selectedObject)
         return;
 
 
-    const object =
-        selectedObjects[0];
+    sculpting = true;
+
+    transform.detach();
+
+}
 
 
-    setMouse(
-        event
-    );
+function stopSculpt(){
+
+    if(!sculpting)
+        return;
+
+
+    sculpting = false;
+
+
+    if(selectedObject)
+        transform.attach(selectedObject);
+
+}
+
+
+function sculptAt(event){
+
+    if(!selectedObject)
+        return;
+
+
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+
+    const mouse =
+        new THREE.Vector2(
+
+            (
+                event.clientX -
+                rect.left
+            ) /
+            rect.width * 2 - 1,
+
+            -(
+                (
+                    event.clientY -
+                    rect.top
+                ) /
+                rect.height
+            ) * 2 + 1
+
+        );
 
 
     raycaster.setFromCamera(
@@ -2644,45 +2432,33 @@ function sculptAt(
     );
 
 
-    const hits =
+    const hit =
         raycaster.intersectObject(
-            object,
+            selectedObject,
             false
         );
 
 
-    if(!hits.length)
+    if(!hit.length)
         return;
 
 
-    const hit =
-        hits[0];
-
-
     const localPoint =
-        object.worldToLocal(
-            hit.point.clone()
+        selectedObject.worldToLocal(
+            hit[0].point.clone()
         );
 
 
     const position =
-        object.geometry
-            .getAttribute(
-                "position"
-            );
+        selectedObject.geometry
+            .getAttribute("position");
 
 
     const normal =
-        hit.face
-            .normal
-            .clone();
+        hit[0].face.normal.clone();
 
 
-    for(
-        let i = 0;
-        i < position.count;
-        i++
-    ){
+    for(let i=0;i<position.count;i++){
 
         const vertex =
             new THREE.Vector3()
@@ -2698,10 +2474,7 @@ function sculptAt(
             );
 
 
-        if(
-            distance >
-            brushSize
-        )
+        if(distance > brushSize)
             continue;
 
 
@@ -2714,107 +2487,79 @@ function sculptAt(
         const amount =
             strength *
             strength *
-            .025;
+            0.02;
 
 
-        if(
-            sculptMode ===
-            "raise"
-        ){
+        if(sculptMode === "raise"){
 
             vertex.add(
-                normal
-                    .clone()
-                    .multiplyScalar(
-                        amount
-                    )
+                normal.clone()
+                    .multiplyScalar(amount)
             );
 
         }
 
 
-        else if(
-            sculptMode ===
-            "lower"
-        ){
+        if(sculptMode === "lower"){
 
             vertex.add(
-                normal
-                    .clone()
-                    .multiplyScalar(
-                        -amount
-                    )
+                normal.clone()
+                    .multiplyScalar(-amount)
             );
 
         }
 
 
-        else if(
-            sculptMode ===
-            "smooth"
-        ){
+        if(sculptMode === "smooth"){
 
             vertex.multiplyScalar(
                 1 -
-                amount *
-                .2
+                amount * 0.2
             );
 
         }
 
 
         position.setXYZ(
-
             i,
-
             vertex.x,
             vertex.y,
             vertex.z
-
         );
 
     }
 
 
-    position.needsUpdate =
-        true;
+    position.needsUpdate = true;
 
+    selectedObject.geometry
+        .computeVertexNormals();
 
-    object.geometry.computeVertexNormals();
+    selectedObject.geometry
+        .computeBoundingBox();
 
-    object.geometry.computeBoundingBox();
-
-    object.geometry.computeBoundingSphere();
+    selectedObject.geometry
+        .computeBoundingSphere();
 
 
     /*
-       Wichtig:
-
-       Sculpting verändert NICHT
-       die Position des Objekts.
+       Position wird NICHT verändert.
     */
 
-    if(selectionHelper){
-
-        selectionHelper.update();
-
-    }
-
-
     updateInfo();
+
+    updateSelectionHelper();
 
 }
 
 
 /* =====================================================
-   BOOLEAN VERBINDEN
+   BOOLEAN
 ===================================================== */
 
-async function booleanCombine(){
+function booleanCombine(){
 
-    if(
-        selectedObjects.length < 2
-    ){
+    if(selectedObjects.length < 2){
 
         setStatus(
             "Mindestens 2 Objekte auswählen"
@@ -2825,27 +2570,25 @@ async function booleanCombine(){
     }
 
 
-    const positives =
+    const normals =
         selectedObjects.filter(
-            object =>
-                !object.userData.negative
+            o => !o.userData.negative
         );
 
 
     const negatives =
         selectedObjects.filter(
-            object =>
-                object.userData.negative
+            o => o.userData.negative
         );
 
 
     if(
-        positives.length !== 1 ||
+        normals.length !== 1 ||
         negatives.length < 1
     ){
 
         setStatus(
-            "Bitte genau eine normale Form und mindestens eine negative Form auswählen"
+            "Wähle genau eine normale Form und mindestens eine negative Form"
         );
 
         return;
@@ -2853,96 +2596,142 @@ async function booleanCombine(){
     }
 
 
-    let result =
-        positives[0];
+    const base =
+        normals[0];
+
+
+    if(
+        base.userData.plate !==
+        selectedPlate
+    ){
+
+        setStatus(
+            "Objekte müssen auf derselben Platte sein"
+        );
+
+        return;
+
+    }
 
 
     try{
 
-        /*
-           Jede negative Form wird
-           tatsächlich herausgeschnitten.
-        */
-
-        for(
-            const negative of negatives
-        ){
-
-            result =
-                performSubtraction(
-                    result,
-                    negative
-                );
-
-        }
+        base.updateMatrixWorld(true);
 
 
-        /*
-           Negative Objekte entfernen
-        */
-
-        negatives.forEach(
-            removeObject
-        );
-
-
-        /*
-           Altes positives Objekt entfernen
-        */
-
-        const old =
-            positives[0];
-
-
-        const plate =
-            old.userData.plate;
-
-
-        const index =
-            objects.indexOf(
-                old
+        let current =
+            new Brush(
+                base.geometry.clone()
             );
 
 
-        if(index >= 0){
-
-            objects.splice(
-                index,
-                1
-            );
-
-        }
-
-
-        const plateIndex =
-            plate.userData.objects
-                .indexOf(
-                    old
-                );
-
-
-        if(plateIndex >= 0){
-
-            plate.userData.objects
-                .splice(
-                    plateIndex,
-                    1
-                );
-
-        }
-
-
-        scene.remove(
-            old
+        current.position.copy(
+            base.position
         );
 
+        current.rotation.copy(
+            base.rotation
+        );
 
-        old.geometry.dispose();
+        current.scale.copy(
+            base.scale
+        );
+
+        current.updateMatrixWorld(true);
+
+
+        for(const negative of negatives){
+
+            if(
+                negative.userData.plate !==
+                base.userData.plate
+            )
+                continue;
+
+
+            negative.updateMatrixWorld(true);
+
+
+            const cutter =
+                new Brush(
+                    negative.geometry.clone()
+                );
+
+
+            cutter.position.copy(
+                negative.position
+            );
+
+            cutter.rotation.copy(
+                negative.rotation
+            );
+
+            cutter.scale.copy(
+                negative.scale
+            );
+
+            cutter.updateMatrixWorld(true);
+
+
+            current =
+                evaluator.evaluate(
+                    current,
+                    cutter,
+                    SUBTRACTION
+                );
+
+        }
 
 
         /*
-           Ergebnis als neues Objekt
+           Resultat in ein normales Mesh
+           umwandeln.
         */
+
+        const result =
+            new THREE.Mesh(
+                current.geometry,
+                base.material.clone()
+            );
+
+
+        result.position.set(0,0,0);
+
+        result.rotation.set(0,0,0);
+
+        result.scale.set(1,1,1);
+
+
+        /*
+           CSG-Geometrie liegt in Weltkoordinaten.
+           Daher Mittelpunkt berechnen und zurück
+           in lokale Geometrie verschieben.
+        */
+
+        result.geometry.computeBoundingBox();
+
+
+        const center =
+            result.geometry.boundingBox
+                .getCenter(
+                    new THREE.Vector3()
+                );
+
+
+        result.geometry.translate(
+            -center.x,
+            -center.y,
+            -center.z
+        );
+
+
+        result.position.copy(center);
+
+
+        result.userData.name =
+            base.userData.name +
+            " + Loch";
+
 
         result.userData.type =
             "boolean";
@@ -2952,39 +2741,58 @@ async function booleanCombine(){
             false;
 
 
-        result.userData.name =
-            "Boolean Form";
-
-
         result.userData.plate =
-            plate;
+            base.userData.plate;
 
 
-        result.castShadow =
-            true;
-
-        result.receiveShadow =
-            true;
+        result.userData.rounding =
+            base.userData.rounding || 0;
 
 
-        scene.add(
-            result
+        result.castShadow = true;
+
+        result.receiveShadow = true;
+
+
+        /*
+           Alte Objekte entfernen.
+        */
+
+        for(const object of selectedObjects){
+
+            removeObjectFromScene(
+                object
+            );
+
+        }
+
+
+        scene.add(result);
+
+        objects.push(result);
+
+        base.userData.plate
+            .userData
+            .objects
+            .push(result);
+
+
+        selectedObject = result;
+
+        selectedObjects = [result];
+
+
+        selectPlate(
+            result.userData.plate,
+            false
         );
 
 
-        objects.push(
-            result
-        );
+        attachTransform();
 
+        updateInfo();
 
-        plate.userData.objects.push(
-            result
-        );
-
-
-        selectObjects(
-            [result]
-        );
+        updateSelectionHelper();
 
 
         setStatus(
@@ -2994,107 +2802,13 @@ async function booleanCombine(){
     }
     catch(error){
 
-        console.error(
-            error
-        );
+        console.error(error);
 
         setStatus(
-            "Boolean konnte nicht berechnet werden"
+            "Boolean fehlgeschlagen"
         );
 
     }
-
-}
-
-
-/* =====================================================
-   CSG
-===================================================== */
-
-function performSubtraction(
-    positive,
-    negative
-){
-
-    positive.updateMatrixWorld(
-        true
-    );
-
-    negative.updateMatrixWorld(
-        true
-    );
-
-
-    const brushA =
-        new Brush(
-            positive.geometry.clone()
-        );
-
-
-    const brushB =
-        new Brush(
-            negative.geometry.clone()
-        );
-
-
-    brushA.matrixWorld.copy(
-        positive.matrixWorld
-    );
-
-
-    brushB.matrixWorld.copy(
-        negative.matrixWorld
-    );
-
-
-    brushA.updateMatrixWorld(
-        true
-    );
-
-    brushB.updateMatrixWorld(
-        true
-    );
-
-
-    const result =
-        evaluator.evaluate(
-            brushA,
-            brushB,
-            SUBTRACTION
-        );
-
-
-    result.material =
-        positive.material.clone();
-
-
-    result.position.set(
-        0,
-        0,
-        0
-    );
-
-    result.rotation.set(
-        0,
-        0,
-        0
-    );
-
-    result.scale.set(
-        1,
-        1,
-        1
-    );
-
-
-    /*
-       Ergebnis ist bereits in Weltkoordinaten.
-    */
-
-    result.matrixWorld.identity();
-
-
-    return result;
 
 }
 
@@ -3103,24 +2817,14 @@ function performSubtraction(
    OBJEKT ENTFERNEN
 ===================================================== */
 
-function removeObject(
-    object
-){
+function removeObjectFromScene(object){
 
     const index =
-        objects.indexOf(
-            object
-        );
+        objects.indexOf(object);
 
 
-    if(index >= 0){
-
-        objects.splice(
-            index,
-            1
-        );
-
-    }
+    if(index >= 0)
+        objects.splice(index,1);
 
 
     const plate =
@@ -3129,57 +2833,39 @@ function removeObject(
 
     if(plate){
 
-        const i =
+        const index2 =
             plate.userData.objects
-                .indexOf(
-                    object
-                );
+                .indexOf(object);
 
 
-        if(i >= 0){
+        if(index2 >= 0){
 
             plate.userData.objects
-                .splice(
-                    i,
-                    1
-                );
+                .splice(index2,1);
 
         }
 
     }
 
 
-    scene.remove(
-        object
-    );
+    if(object.userData.selectionHelper){
+
+        scene.remove(
+            object.userData.selectionHelper
+        );
+
+    }
 
 
-    if(object.geometry){
+    scene.remove(object);
 
+
+    if(object.geometry)
         object.geometry.dispose();
 
-    }
 
-
-    if(object.material){
-
-        if(Array.isArray(
-            object.material
-        )){
-
-            object.material.forEach(
-                m =>
-                    m.dispose()
-            );
-
-        }
-        else{
-
-            object.material.dispose();
-
-        }
-
-    }
+    if(object.material)
+        object.material.dispose();
 
 }
 
@@ -3188,24 +2874,38 @@ function removeObject(
    OBJEKT LÖSCHEN
 ===================================================== */
 
-function deleteSelectedObjects(){
+function deleteObject(){
 
-    if(
-        !selectedObjects.length
-    )
+    if(!selectedObjects.length){
+
+        setStatus(
+            "Kein Objekt ausgewählt"
+        );
+
         return;
 
-
-    selectedObjects.forEach(
-        removeObject
-    );
+    }
 
 
-    selectObjects([]);
+    for(const object of [...selectedObjects]){
 
+        removeObjectFromScene(object);
+
+    }
+
+
+    selectedObjects = [];
+
+    selectedObject = null;
+
+    transform.detach();
+
+    removeSelectionHelper();
+
+    updateInfo();
 
     setStatus(
-        "Objekte gelöscht"
+        "Objekt(e) gelöscht"
     );
 
 }
@@ -3215,17 +2915,13 @@ function deleteSelectedObjects(){
    PLATTE LÖSCHEN
 ===================================================== */
 
-function deleteSelectedPlate(){
+function deletePlate(){
 
-    if(
-        !selectedPlate
-    )
+    if(!selectedPlate)
         return;
 
 
-    if(
-        plates.length <= 1
-    ){
+    if(plates.length <= 1){
 
         setStatus(
             "Mindestens eine Platte muss bleiben"
@@ -3236,11 +2932,14 @@ function deleteSelectedPlate(){
     }
 
 
-    selectedPlate.userData.objects
-        .slice()
-        .forEach(
-            removeObject
-        );
+    for(
+        const object of
+        [...selectedPlate.userData.objects]
+    ){
+
+        removeObjectFromScene(object);
+
+    }
 
 
     const index =
@@ -3249,14 +2948,8 @@ function deleteSelectedPlate(){
         );
 
 
-    if(index >= 0){
-
-        plates.splice(
-            index,
-            1
-        );
-
-    }
+    if(index >= 0)
+        plates.splice(index,1);
 
 
     scene.remove(
@@ -3273,15 +2966,18 @@ function deleteSelectedPlate(){
         plates[0];
 
 
-    selectObjects([]);
+    selectedObjects = [];
+
+    selectedObject = null;
+
+    transform.detach();
+
+    removeSelectionHelper();
 
 
     selectPlate(
         selectedPlate
     );
-
-
-    updatePlateList();
 
 
     setStatus(
@@ -3292,329 +2988,65 @@ function deleteSelectedPlate(){
 
 
 /* =====================================================
-   PLATTENLISTE
+   FOKUS
 ===================================================== */
 
-function updatePlateList(){
+function focusSelected(){
 
-    const list =
-        document.getElementById(
-            "plateList"
-        );
+    let target;
 
 
-    list.innerHTML =
-        "";
+    if(selectedObject){
 
-
-    plates.forEach(
-        plate => {
-
-            const button =
-                document.createElement(
-                    "button"
+        target =
+            new THREE.Box3()
+                .setFromObject(
+                    selectedObject
+                )
+                .getCenter(
+                    new THREE.Vector3()
                 );
 
-
-            button.className =
-                "plateItem";
-
-
-            if(
-                plate ===
-                selectedPlate
-            ){
-
-                button.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            button.textContent =
-                plate.userData.name;
-
-
-            button.onclick =
-                () => {
-
-                    selectPlate(
-                        plate
-                    );
-
-                    selectObjects([]);
-
-                };
-
-
-            list.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   UI
-===================================================== */
-
-function setupUI(){
-
-    document.getElementById(
-        "sphereBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "sphere"
-            );
-
-
-    document.getElementById(
-        "cubeBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "cube"
-            );
-
-
-    document.getElementById(
-        "cylinderBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "cylinder"
-            );
-
-
-    document.getElementById(
-        "negativeSphereBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "sphere",
-                true
-            );
-
-
-    document.getElementById(
-        "negativeCubeBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "cube",
-                true
-            );
-
-
-    document.getElementById(
-        "negativeCylinderBtn"
-    ).onclick =
-        () =>
-            addObject(
-                "cylinder",
-                true
-            );
-
-
-    document.getElementById(
-        "plateAdd"
-    ).onclick =
-        createPlate;
-
-
-    document.getElementById(
-        "moveBtn"
-    ).onclick =
-        () =>
-            setTransformMode(
-                "translate"
-            );
-
-
-    document.getElementById(
-        "rotateBtn"
-    ).onclick =
-        () =>
-            setTransformMode(
-                "rotate"
-            );
-
-
-    document.getElementById(
-        "scaleBtn"
-    ).onclick =
-        () =>
-            setTransformMode(
-                "scale"
-            );
-
-
-    document.getElementById(
-        "deleteObjectBtn"
-    ).onclick =
-        deleteSelectedObjects;
-
-
-    document.getElementById(
-        "deletePlateBtn"
-    ).onclick =
-        deleteSelectedPlate;
-
-
-    document.getElementById(
-        "raiseBtn"
-    ).onclick =
-        () => {
-
-            sculptMode =
-                "raise";
-
-            setStatus(
-                "Erhöhen aktiv"
-            );
-
-        };
-
-
-    document.getElementById(
-        "lowerBtn"
-    ).onclick =
-        () => {
-
-            sculptMode =
-                "lower";
-
-            setStatus(
-                "Senken aktiv"
-            );
-
-        };
-
-
-    document.getElementById(
-        "smoothBtn"
-    ).onclick =
-        () => {
-
-            sculptMode =
-                "smooth";
-
-            setStatus(
-                "Glätten aktiv"
-            );
-
-        };
-
-
-    document
-        .querySelectorAll(
-            ".brush"
-        )
-        .forEach(
-            button => {
-
-                button.onclick =
-                    () => {
-
-                        document
-                            .querySelectorAll(
-                                ".brush"
-                            )
-                            .forEach(
-                                b =>
-                                    b.classList
-                                        .remove(
-                                            "active"
-                                        )
-                            );
-
-
-                        button.classList.add(
-                            "active"
-                        );
-
-
-                        brushSize =
-                            Number(
-                                button.dataset.size
-                            );
-
-                    };
-
-            }
-        );
-
-
-    /*
-       Position-Felder
-    */
-
-    [
-        "posX",
-        "posY",
-        "posZ"
-    ].forEach(
-        id => {
-
-            document.getElementById(
-                id
-            ).addEventListener(
-                "change",
-                applyPosition
-            );
-
-        }
+    }
+    else if(selectedPlate){
+
+        target =
+            selectedPlate.position.clone();
+
+    }
+    else{
+
+        target =
+            new THREE.Vector3();
+
+    }
+
+
+    const direction =
+        new THREE.Vector3(
+            1,
+            0.7,
+            1
+        ).normalize();
+
+
+    camera.position.copy(
+        target.clone()
+            .add(
+                direction.multiplyScalar(
+                    selectedObject
+                    ?
+                    5
+                    :
+                    9
+                )
+            )
     );
 
 
-    /*
-       200 Schritte:
+    orbit.target.copy(target);
 
-       0.00
-       0.05
-       0.10
-       ...
-       10.00
-
-       = 200 Schritte
-    */
-
-    document.getElementById(
-        "rounding"
-    ).addEventListener(
-        "input",
-        applyRounding
-    );
-
-
-    /*
-       Boolean:
-       STRG + SHIFT + Y
-    */
-
-    window.addEventListener(
-        "keydown",
-        event => {
-
-            if(
-                event.ctrlKey &&
-                event.shiftKey &&
-                event.code === "KeyY"
-            ){
-
-                event.preventDefault();
-
-                booleanCombine();
-
-            }
-
-        }
-    );
+    orbit.update();
 
 }
 
@@ -3623,7 +3055,7 @@ function setupUI(){
    GLB EXPORT
 ===================================================== */
 
-async function exportGLB(){
+async function downloadGLB(){
 
     if(!selectedPlate){
 
@@ -3649,70 +3081,53 @@ async function exportGLB(){
 
 
     /*
-       Platte
+       NUR DIE AKTUELLE PLATTE
     */
 
     const plate =
-        selectedPlate.clone(
-            true
-        );
+        selectedPlate.clone(true);
 
 
     plate.material =
         new THREE.MeshStandardMaterial({
-
             color:0x777777,
-
-            roughness:.8
-
+            roughness:0.8
         });
 
 
-    group.add(
-        plate
-    );
+    group.add(plate);
 
 
-    /*
-       Modelle der Platte
-    */
+    for(
+        const object of
+        selectedPlate.userData.objects
+    ){
 
-    selectedPlate.userData.objects
-        .forEach(
-            object => {
-
-                const clone =
-                    object.clone(
-                        true
-                    );
+        const clone =
+            object.clone(true);
 
 
-                clone.material =
-                    new THREE.MeshStandardMaterial({
+        clone.material =
+            new THREE.MeshStandardMaterial({
 
-                        color:0x7188aa,
+                color:
+                    object.userData.negative
+                    ?
+                    0xff4055
+                    :
+                    0x7188aa,
 
-                        roughness:.55
+                roughness:0.55
 
-                    });
-
-
-                group.add(
-                    clone
-                );
-
-            }
-        );
+            });
 
 
-    exportScene.add(
-        group
-    );
+        group.add(clone);
+
+    }
 
 
-    exportScene.updateMatrixWorld(
-        true
-    );
+    exportScene.add(group);
 
 
     const exporter =
@@ -3723,13 +3138,11 @@ async function exportGLB(){
 
         const data =
             await exporter.parseAsync(
-
                 exportScene,
-
                 {
-                    binary:true
+                    binary:true,
+                    onlyVisible:true
                 }
-
             );
 
 
@@ -3738,28 +3151,23 @@ async function exportGLB(){
                 [data],
                 {
                     type:
-                        "model/gltf-binary"
+                    "model/gltf-binary"
                 }
             );
 
 
         const url =
-            URL.createObjectURL(
-                blob
-            );
+            URL.createObjectURL(blob);
 
 
-        const link =
-            document.createElement(
-                "a"
-            );
+        const a =
+            document.createElement("a");
 
 
-        link.href =
-            url;
+        a.href = url;
 
 
-        link.download =
+        a.download =
             selectedPlate.userData.name
                 .replace(
                     /[^a-z0-9]/gi,
@@ -3769,27 +3177,31 @@ async function exportGLB(){
             ".glb";
 
 
-        link.click();
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
 
 
-        URL.revokeObjectURL(
-            url
+        setTimeout(
+            () => URL.revokeObjectURL(url),
+            1000
         );
 
 
         setStatus(
-            "GLB exportiert"
+            selectedPlate.userData.name +
+            " als GLB exportiert"
         );
 
     }
     catch(error){
 
-        console.error(
-            error
-        );
+        console.error(error);
 
         setStatus(
-            "GLB Export fehlgeschlagen"
+            "GLB-Export fehlgeschlagen"
         );
 
     }
@@ -3797,24 +3209,286 @@ async function exportGLB(){
 }
 
 
-document.getElementById(
-    "exportBtn"
-).onclick =
-    exportGLB;
+/* =====================================================
+   UI
+===================================================== */
+
+function setupUI(){
+
+    document.getElementById("addSphere")
+        .onclick =
+        () => addObject("sphere");
+
+
+    document.getElementById("addCube")
+        .onclick =
+        () => addObject("cube");
+
+
+    document.getElementById("addCylinder")
+        .onclick =
+        () => addObject("cylinder");
+
+
+    document.getElementById("addNegativeSphere")
+        .onclick =
+        () => addObject("sphere",true);
+
+
+    document.getElementById("addNegativeCube")
+        .onclick =
+        () => addObject("cube",true);
+
+
+    document.getElementById("addNegativeCylinder")
+        .onclick =
+        () => addObject("cylinder",true);
+
+
+    document.getElementById("newPlate")
+        .onclick =
+        createPlate;
+
+
+    document.getElementById("centerButton")
+        .onclick =
+        centerSelected;
+
+
+    document.getElementById("moveMode")
+        .onclick =
+        () => setTransformMode("translate");
+
+
+    document.getElementById("rotateMode")
+        .onclick =
+        () => setTransformMode("rotate");
+
+
+    document.getElementById("scaleMode")
+        .onclick =
+        () => setTransformMode("scale");
+
+
+    document.getElementById("deleteObject")
+        .onclick =
+        deleteObject;
+
+
+    document.getElementById("deletePlate")
+        .onclick =
+        deletePlate;
+
+
+    document.getElementById("download")
+        .onclick =
+        downloadGLB;
+
+
+    document.getElementById("booleanButton")
+        .onclick =
+        booleanCombine;
+
+
+    document.getElementById("raise")
+        .onclick =
+        () => {
+
+            sculptMode = "raise";
+
+            setStatus(
+                "Erhöhen aktiv"
+            );
+
+        };
+
+
+    document.getElementById("lower")
+        .onclick =
+        () => {
+
+            sculptMode = "lower";
+
+            setStatus(
+                "Senken aktiv"
+            );
+
+        };
+
+
+    document.getElementById("smooth")
+        .onclick =
+        () => {
+
+            sculptMode = "smooth";
+
+            setStatus(
+                "Glätten aktiv"
+            );
+
+        };
+
+
+    document
+        .querySelectorAll(".brush")
+        .forEach(button => {
+
+            button.onclick = () => {
+
+                document
+                    .querySelectorAll(".brush")
+                    .forEach(
+                        b =>
+                        b.classList.remove("active")
+                    );
+
+
+                button.classList.add("active");
+
+
+                brushSize =
+                    Number(
+                        button.dataset.size
+                    );
+
+
+                setStatus(
+                    "Pinselgröße: " +
+                    brushSize
+                );
+
+            };
+
+        });
+
+
+    document.getElementById("rounding")
+        .addEventListener(
+            "input",
+            event => {
+
+                const value =
+                    Number(event.target.value);
+
+
+                document.getElementById(
+                    "roundValue"
+                ).textContent =
+                    value.toFixed(2);
+
+
+                setRounding(value);
+
+            }
+        );
+
+
+    setupPositionInputs();
+
+
+    /*
+       STRG + SHIFT + Y
+    */
+
+    window.addEventListener(
+        "keydown",
+        event => {
+
+            if(
+                event.ctrlKey &&
+                event.shiftKey &&
+                event.key.toLowerCase() === "y"
+            ){
+
+                event.preventDefault();
+
+                booleanCombine();
+
+            }
+
+        }
+    );
+
+
+    /*
+       Modellieren mit SHIFT + linker Maustaste
+    */
+
+    renderer.domElement.addEventListener(
+        "pointerdown",
+        event => {
+
+            if(
+                event.button === 0 &&
+                event.shiftKey &&
+                selectedObject &&
+                !event.ctrlKey
+            ){
+
+                startSculpt();
+
+            }
+
+        },
+        true
+    );
+
+
+    renderer.domElement.addEventListener(
+        "pointermove",
+        event => {
+
+            if(sculpting)
+                sculptAt(event);
+
+        }
+    );
+
+
+    window.addEventListener(
+        "pointerup",
+        () => {
+
+            if(sculpting)
+                stopSculpt();
+
+        }
+    );
+
+}
 
 
 /* =====================================================
    STATUS
 ===================================================== */
 
-function setStatus(
-    text
-){
+function setStatus(text){
 
     document.getElementById(
         "status"
-    ).textContent =
-        text;
+    ).textContent = text;
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+function showError(error){
+
+    const element =
+        document.getElementById(
+            "error"
+        );
+
+
+    element.textContent =
+        String(error);
+
+
+    element.style.display =
+        "block";
 
 }
 
@@ -3823,22 +3497,23 @@ function setStatus(
    RESIZE
 ===================================================== */
 
-function resize(){
+window.addEventListener(
+    "resize",
+    () => {
 
-    camera.aspect =
-        innerWidth /
-        innerHeight;
+        camera.aspect =
+            innerWidth /
+            innerHeight;
 
+        camera.updateProjectionMatrix();
 
-    camera.updateProjectionMatrix();
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
 
-
-    renderer.setSize(
-        innerWidth,
-        innerHeight
-    );
-
-}
+    }
+);
 
 
 /* =====================================================
@@ -3855,9 +3530,14 @@ function animate(){
     orbit.update();
 
 
-    if(selectionHelper){
+    for(const object of objects){
 
-        selectionHelper.update();
+        if(object.userData.selectionHelper){
+
+            object.userData.selectionHelper
+                .update();
+
+        }
 
     }
 
