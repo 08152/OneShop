@@ -3,4613 +3,1141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Ghost Mini Blender – 3D Model Editor</title>
+
+<title>GHOST Feder 3D</title>
 
 <style>
-:root{
-  --bg:#15171b;
-  --bg2:#1d2026;
-  --bg3:#252931;
-  --panel:#202329;
-  --line:#343943;
-  --text:#e8eaed;
-  --muted:#9da3ad;
-  --accent:#4da3ff;
-  --accent2:#7bc0ff;
-  --danger:#ff4d58;
-  --ok:#49d98b;
-  --yellow:#ffe066;
+*{
+    box-sizing:border-box;
 }
-
-*{box-sizing:border-box;margin:0;padding:0}
 
 html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,Arial,Helvetica,sans-serif;
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#101318;
+    color:white;
+    font-family:Arial,sans-serif;
 }
 
-button,input,select{font:inherit}
+body{
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    height:64px;
+    background:#181d24;
+    border-bottom:1px solid #303741;
+    display:flex;
+    align-items:center;
+    padding:0 18px;
+    font-size:21px;
+    font-weight:bold;
+}
+
+.logo{
+    color:#ffd400;
+}
+
+.container{
+    flex:1;
+    display:flex;
+    min-height:0;
+}
+
+.preview{
+    flex:1;
+    position:relative;
+    background:
+        radial-gradient(circle at center,#202833 0%,#0c1015 70%);
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+    cursor:grab;
+}
+
+canvas:active{
+    cursor:grabbing;
+}
+
+.panel{
+    width:310px;
+    background:#181d24;
+    border-left:1px solid #303741;
+    padding:18px;
+    overflow:auto;
+}
+
+h2{
+    margin:0 0 18px;
+    font-size:20px;
+}
+
+label{
+    display:block;
+    margin-top:16px;
+    margin-bottom:7px;
+    color:#bfc6cf;
+}
+
+input{
+    width:100%;
+    background:#0e1217;
+    border:1px solid #39424d;
+    border-radius:8px;
+    color:white;
+    padding:11px;
+    font-size:15px;
+}
 
 button{
-  border:1px solid var(--line);
-  background:#2a2e36;
-  color:var(--text);
-  border-radius:6px;
-  padding:7px 9px;
-  cursor:pointer;
-  transition:.15s ease;
+    width:100%;
+    margin-top:20px;
+    padding:14px;
+    border:0;
+    border-radius:10px;
+    background:#ffd400;
+    color:#111;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
 }
 
 button:hover{
-  background:#353b46;
-  border-color:#4b5361;
+    background:#ffe45c;
 }
 
-button:active{transform:translateY(1px)}
-
-button.active{
-  background:#1468ad;
-  border-color:#4da3ff;
+.info{
+    margin-top:20px;
+    padding:13px;
+    background:#10151b;
+    border-radius:10px;
+    line-height:1.7;
+    color:#cbd2da;
+    font-size:14px;
 }
 
-button.danger{
-  background:#52242a;
-  border-color:#7d3037;
+.status{
+    margin-top:14px;
+    color:#78e08f;
+    font-size:13px;
 }
 
-button.success{
-  background:#214a38;
-  border-color:#3f8e68;
-}
+@media(max-width:700px){
 
-button.small{
-  padding:5px 7px;
-  font-size:12px;
-}
+    .container{
+        flex-direction:column;
+    }
 
-button:disabled{
-  opacity:.4;
-  cursor:not-allowed;
-}
+    .preview{
+        height:55%;
+        flex:none;
+    }
 
-input,select{
-  width:100%;
-  min-width:0;
-  border:1px solid var(--line);
-  background:#171a1f;
-  color:var(--text);
-  border-radius:5px;
-  padding:6px 7px;
-  outline:none;
-}
-
-input:focus,select:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 1px rgba(77,163,255,.22);
-}
-
-#app{
-  position:fixed;
-  inset:0;
-  display:grid;
-  grid-template-rows:54px 1fr 27px;
-  grid-template-columns:280px minmax(0,1fr) 310px;
-}
-
-#topbar{
-  grid-column:1 / 4;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:7px 9px;
-  background:#121417;
-  border-bottom:1px solid #30343b;
-  overflow-x:auto;
-  white-space:nowrap;
-  z-index:20;
-}
-
-.brand{
-  font-weight:800;
-  letter-spacing:.4px;
-  margin-right:8px;
-  color:#f2f5f8;
-  font-size:14px;
-}
-
-.top-separator{
-  width:1px;
-  height:26px;
-  background:#353942;
-  margin:0 2px;
-}
-
-#leftPanel,#rightPanel{
-  min-height:0;
-  overflow:auto;
-  background:var(--panel);
-  border-right:1px solid #343841;
-}
-
-#rightPanel{
-  border-right:0;
-  border-left:1px solid #343841;
-}
-
-.panel-scroll{padding:9px}
-
-#viewport{
-  min-width:0;
-  min-height:0;
-  position:relative;
-  background:#090b0f;
-  overflow:hidden;
-}
-
-#viewport canvas{
-  position:absolute;
-  inset:0;
-  display:block;
-  width:100%;
-  height:100%;
-}
-
-#loading{
-  position:absolute;
-  inset:0;
-  background:#0e1013;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:14px;
-  z-index:99999;
-  color:#fff;
-  transition:opacity .2s ease;
-}
-
-#loading.hidden{
-  opacity:0;
-  pointer-events:none;
-}
-
-.loading-title{
-  font-size:25px;
-  font-weight:800;
-}
-
-.loading-sub{
-  color:#aeb4bd;
-  font-size:13px;
-}
-
-.spinner{
-  width:28px;
-  height:28px;
-  border:3px solid #2f343c;
-  border-top-color:#4da3ff;
-  border-radius:50%;
-  animation:spin .8s linear infinite;
-}
-
-@keyframes spin{
-  to{transform:rotate(360deg)}
-}
-
-#debug{
-  position:absolute;
-  right:9px;
-  top:9px;
-  width:min(420px,50%);
-  max-height:180px;
-  overflow:auto;
-  padding:9px;
-  color:#c5ffcd;
-  background:rgba(7,9,11,.86);
-  border:1px solid #2b3830;
-  border-radius:7px;
-  font:11px/1.45 monospace;
-  z-index:25;
-  pointer-events:none;
-  white-space:pre-wrap;
-}
-
-#viewportInfo{
-  position:absolute;
-  left:10px;
-  bottom:10px;
-  padding:7px 9px;
-  border-radius:6px;
-  background:rgba(12,14,18,.82);
-  border:1px solid #303640;
-  color:#d8dce2;
-  font-size:11px;
-  z-index:15;
-  pointer-events:none;
-}
-
-#selectionBox{
-  position:absolute;
-  display:none;
-  z-index:40;
-  pointer-events:none;
-  border:1px solid #4da3ff;
-  background:rgba(77,163,255,.12);
-}
-
-#statusBar{
-  grid-column:1 / 4;
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:4px 10px;
-  background:#111317;
-  border-top:1px solid #333740;
-  color:#bbc0c8;
-  font-size:11px;
-  overflow:hidden;
-  white-space:nowrap;
-}
-
-#statusMessage{color:#dfe4e9}
-
-.panel{
-  border:1px solid var(--line);
-  border-radius:7px;
-  background:#1a1d22;
-  margin-bottom:8px;
-  overflow:hidden;
-}
-
-.panel-title{
-  background:#23272f;
-  padding:8px 9px;
-  font-size:12px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid var(--line);
-}
-
-.panel-body{padding:8px}
-
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-bottom:6px;
-}
-
-.row.three{grid-template-columns:1fr 1fr 1fr}
-
-.row:last-child{margin-bottom:0}
-
-.field-label{
-  display:block;
-  color:var(--muted);
-  font-size:10px;
-  margin-bottom:3px;
-}
-
-.full{grid-column:1 / -1}
-
-.button-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:5px;
-}
-
-.button-grid.three{
-  grid-template-columns:repeat(3,minmax(0,1fr));
-}
-
-.button-grid.four{
-  grid-template-columns:repeat(4,minmax(0,1fr));
-}
-
-.object-list{
-  max-height:290px;
-  overflow:auto;
-  border:1px solid var(--line);
-  border-radius:5px;
-  background:#15171b;
-}
-
-.object-item{
-  display:grid;
-  grid-template-columns:26px 1fr 27px;
-  gap:4px;
-  align-items:center;
-  padding:5px;
-  border-bottom:1px solid #292d34;
-  cursor:pointer;
-  user-select:none;
-}
-
-.object-item:last-child{border-bottom:0}
-
-.object-item.selected{background:#17334d}
-
-.object-item.negative{color:#ff9ca4}
-
-.object-icon{
-  text-align:center;
-  font-size:13px;
-}
-
-.object-name{
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:12px;
-}
-
-.object-eye{
-  font-size:13px;
-  color:#c9ced6;
-  text-align:center;
-}
-
-.muted{
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.45;
-}
-
-.help{
-  padding:7px 8px;
-  border:1px dashed #424956;
-  border-radius:6px;
-  background:#171a1f;
-  color:#aeb4be;
-  font-size:10px;
-  line-height:1.5;
-  margin-top:6px;
-}
-
-.color-input{
-  width:100%;
-  height:36px;
-  padding:3px;
-  cursor:pointer;
-}
-
-.checkbox-row{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-size:11px;
-  color:#c8cdd5;
-}
-
-.checkbox-row input{width:auto}
-
-#modal{
-  position:absolute;
-  inset:0;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:100000;
-  background:rgba(0,0,0,.62);
-}
-
-#modal.show{display:flex}
-
-.modal-card{
-  width:min(550px,90vw);
-  border:1px solid #49515e;
-  border-radius:10px;
-  background:#20242a;
-  box-shadow:0 25px 80px rgba(0,0,0,.5);
-  padding:16px;
-}
-
-.modal-card h2{
-  font-size:16px;
-  margin-bottom:8px;
-}
-
-.modal-card p{
-  color:#c6cbd2;
-  font-size:12px;
-  line-height:1.55;
-  white-space:pre-wrap;
-}
-
-.modal-actions{
-  margin-top:14px;
-  display:flex;
-  justify-content:flex-end;
-  gap:7px;
-}
-
-.notice{
-  padding:8px;
-  border-radius:6px;
-  font-size:10px;
-  line-height:1.45;
-  margin-bottom:6px;
-}
-
-.notice.info{
-  background:#17283b;
-  border:1px solid #28537d;
-  color:#bcdcff;
-}
-
-#fatalError{
-  display:none;
-  position:absolute;
-  inset:20px;
-  z-index:100001;
-  padding:18px;
-  overflow:auto;
-  border:2px solid #982f39;
-  border-radius:10px;
-  background:#260f13;
-  color:#ffd9dc;
-  white-space:pre-wrap;
-  font:12px/1.55 monospace;
+    .panel{
+        width:100%;
+        height:45%;
+        border-left:0;
+        border-top:1px solid #303741;
+    }
 }
 </style>
-
-<script type="importmap">
-{
-  "imports":{
-    "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
 </head>
 
 <body>
 
-<div id="app">
+<header>
+    <span class="logo">GHOST</span>&nbsp; 3D Feder
+</header>
 
-<div id="topbar">
-<div class="brand">GHOST MINI BLENDER · 3D MODELLIEREDITOR</div>
+<div class="container">
 
-<button id="addCubeBtn">■ Würfel</button>
-<button id="addSphereBtn">● Kugel</button>
-<button id="addCylinderBtn">⬢ Zylinder</button>
-<button id="addSpringBtn">〰 Feder</button>
+    <div class="preview">
+        <canvas id="canvas"></canvas>
+    </div>
 
-<div class="top-separator"></div>
+    <div class="panel">
 
-<button id="addNegCubeBtn">− Würfel</button>
-<button id="addNegSphereBtn">− Kugel</button>
-<button id="addNegCylinderBtn">− Zylinder</button>
+        <h2>Feder erstellen</h2>
 
-<div class="top-separator"></div>
+        <label>Außendurchmesser (mm)</label>
+        <input id="diameter" type="number" value="20" min="4" max="100" step="1">
 
-<button id="moveToolBtn">↔ Verschieben</button>
-<button id="rotateToolBtn">🔄 Drehen</button>
-<button id="scaleToolBtn">📐 Skalieren</button>
+        <label>Höhe (mm)</label>
+        <input id="height" type="number" value="30" min="5" max="200" step="1">
 
-<div class="top-separator"></div>
+        <label>Windungen</label>
+        <input id="turns" type="number" value="8" min="1" max="50" step="0.5">
 
-<button id="duplicateBtn">Duplizieren</button>
-<button id="deleteBtn" class="danger">Löschen</button>
-<button id="undoBtn">↩ Undo</button>
-<button id="redoBtn">↪ Redo</button>
+        <label>Drahtdurchmesser (mm)</label>
+        <input id="wire" type="number" value="2" min="0.3" max="10" step="0.1">
 
-<div class="top-separator"></div>
+        <label>Auflösung</label>
+        <input id="resolution" type="number" value="20" min="8" max="50" step="1">
 
-<button id="saveBtn">💾 Speichern</button>
-<button id="loadBtn">📂 Laden</button>
-<button id="exportStlBtn">STL</button>
-<button id="exportGlbBtn">GLB</button>
-</div>
+        <button id="update">
+            🔄 Vorschau aktualisieren
+        </button>
 
-<aside id="leftPanel">
-<div class="panel-scroll">
+        <button id="download">
+            ⬇ STL herunterladen
+        </button>
 
-<div class="panel">
-<div class="panel-title">📋 Objektverwaltung</div>
-<div class="panel-body">
+        <div class="info">
 
-<div class="button-grid">
-<button id="selectAllBtn">Alle auswählen</button>
-<button id="deselectAllBtn">Auswahl aufheben</button>
-</div>
+            <b>Bambu Studio</b>
 
-<div style="height:6px"></div>
-<div id="objectList" class="object-list"></div>
-<div style="height:6px"></div>
+            <br><br>
 
-<div class="button-grid">
-<button id="renameBtn">Umbenennen</button>
-<button id="focusBtn">Fokus</button>
-</div>
+            Die heruntergeladene Datei ist eine normale
+            <b>STL-Datei</b>.
 
-<div style="height:6px"></div>
-<button id="visibilityBtn" style="width:100%">👁 Sichtbarkeit ein/aus</button>
+            <br><br>
 
-</div>
-</div>
+            Öffne sie anschließend in Bambu Studio.
 
-<div class="panel">
-<div class="panel-title">🖨️ 3D-Druck</div>
-<div class="panel-body">
+            <br><br>
 
-<div class="row three">
-<div><span class="field-label">Platte X</span><input id="bedX" type="number" value="220" min="1" step="1"></div>
-<div><span class="field-label">Platte Y</span><input id="bedY" type="number" value="220" min="1" step="1"></div>
-<div><span class="field-label">Platte Z</span><input id="bedZ" type="number" value="5" min="0.1" step=".5"></div>
-</div>
+            Dort kannst du unter den
+            <b>Druckeinstellungen</b> den gewünschten
+            <b>Infill</b> einstellen.
 
-<div class="button-grid">
-<button id="applyBedBtn">Druckbereich anwenden</button>
-<button id="checkBedBtn">Druckbereich prüfen</button>
-</div>
+            <br><br>
 
-<div class="help">
-Die sichtbare Platte entspricht dem eingestellten Druckbereich.
-„Massiv“ bedeutet hier: Das Mesh selbst ist geschlossen. Tatsächliches
-Infill wird vom Slicer festgelegt.
-</div>
+            Beispiele:
+            <br>
+            • 10 % Infill
+            <br>
+            • 20 % Infill
+            <br>
+            • 50 % Infill
+            <br>
+            • 100 % Infill
+
+        </div>
+
+        <div id="status" class="status">
+            Feder bereit
+        </div>
+
+    </div>
 
 </div>
-</div>
 
-<div class="panel">
-<div class="panel-title">👁️ Ansicht</div>
-<div class="panel-body">
+<script>
 
-<div class="button-grid three">
-<button data-view="front">Vorderseite</button>
-<button data-view="back">Rückseite</button>
-<button data-view="left">Links</button>
-<button data-view="right">Rechts</button>
-<button data-view="top">Oben</button>
-<button data-view="perspective">Perspektive</button>
-</div>
+/* =========================================================
+   GHOST 3D FEDER
+   ========================================================= */
 
-<div style="height:6px"></div>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-<div class="button-grid">
-<button id="gridToggleBtn">Raster an/aus</button>
-<button id="resetSceneBtn">Szene zurücksetzen</button>
-</div>
+let width = 0;
+let height = 0;
 
-</div>
-</div>
+let rotationX = -0.45;
+let rotationY = 0.65;
 
-</div>
-</aside>
+let zoom = 1;
 
-<main id="viewport">
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
 
-<div id="loading">
-<div class="spinner"></div>
-<div class="loading-title">3D-Editor wird gestartet …</div>
-<div class="loading-sub">Three.js · OrbitControls · TransformControls</div>
-</div>
+let spring = null;
 
-<div id="fatalError"></div>
 
-<div id="selectionBox"></div>
-
-<div id="debug">Initialisierung …</div>
-
-<div id="viewportInfo">
-Linksklick: Auswahl · Strg+Ziehen: Mehrfachauswahl · Shift+Ziehen: Sculpt · MMB: Orbit · Shift+MMB: Pan · Mausrad: Zoom
-</div>
-
-</main>
-
-<aside id="rightPanel">
-<div class="panel-scroll">
-
-<div class="panel">
-<div class="panel-title">🔧 Transform</div>
-<div class="panel-body">
-
-<div class="row">
-<div><span class="field-label">Position X</span><input id="posX" type="number" step=".1"></div>
-<div><span class="field-label">Position Y</span><input id="posY" type="number" step=".1"></div>
-</div>
-
-<div class="row">
-<div><span class="field-label">Position Z</span><input id="posZ" type="number" step=".1"></div>
-<div><span class="field-label">Größe X</span><input id="scaleX" type="number" step=".01" min=".01"></div>
-</div>
-
-<div class="row">
-<div><span class="field-label">Größe Y</span><input id="scaleY" type="number" step=".01" min=".01"></div>
-<div><span class="field-label">Größe Z</span><input id="scaleZ" type="number" step=".01" min=".01"></div>
-</div>
-
-<div class="row">
-<div><span class="field-label">Drehung X °</span><input id="rotX" type="number" step="1"></div>
-<div><span class="field-label">Drehung Y °</span><input id="rotY" type="number" step="1"></div>
-</div>
-
-<div class="row">
-<div><span class="field-label">Drehung Z °</span><input id="rotZ" type="number" step="1"></div>
-<div></div>
-</div>
-
-<div class="button-grid">
-<button id="placeOnBedBtn">Z auf Druckplatte setzen</button>
-<button id="centerXZBtn">X/Z auf Mitte setzen</button>
-</div>
-
-<div style="height:6px"></div>
-<button id="applyTransformBtn" style="width:100%">Transformationswerte anwenden</button>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">🎨 Material / Farbe</div>
-<div class="panel-body">
-<input id="colorPicker" class="color-input" type="color" value="#4da3ff">
-<div style="height:6px"></div>
-<button id="applyColorBtn" class="success" style="width:100%">Farbe anwenden</button>
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">🧱 Würfel abrunden</div>
-<div class="panel-body">
-
-<div class="row">
-<div><span class="field-label">Radius</span><input id="roundRadius" type="number" value="0.15" min="0" step=".01"></div>
-<div><span class="field-label">Segmente</span><input id="roundSegments" type="number" value="4" min="1" max="24" step="1"></div>
-</div>
-
-<button id="applyRoundBtn" style="width:100%">Abrundung anwenden</button>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">🌀 Massive Feder</div>
-<div class="panel-body">
-
-<div class="row">
-<div><span class="field-label">Windungen</span><input id="springTurns" type="number" value="8" min="1" max="80" step="1"></div>
-<div><span class="field-label">Radius</span><input id="springRadius" type="number" value="8" min=".2" step=".1"></div>
-</div>
-
-<div class="row">
-<div><span class="field-label">Höhe</span><input id="springHeight" type="number" value="24" min=".5" step=".5"></div>
-<div><span class="field-label">Drahtstärke</span><input id="springTube" type="number" value="1.5" min=".05" step=".05"></div>
-</div>
-
-<button id="rebuildSpringBtn" style="width:100%">Feder neu erstellen</button>
-
-<div class="help">
-Die Feder wird als echte TubeGeometry entlang einer Helix erzeugt.
-Der Drahtquerschnitt ist geschlossen und damit geometrisch massiv.
-</div>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">✏️ Sculpting / Mesh</div>
-<div class="panel-body">
-
-<div class="row">
-<div><span class="field-label">Stärke</span><input id="sculptStrength" type="number" value="0.15" min=".001" step=".01"></div>
-<div><span class="field-label">Radius</span><input id="sculptRadius" type="number" value="4" min=".1" step=".1"></div>
-</div>
-
-<div class="button-grid three">
-<button id="sculptUpBtn">Sculpt Auf</button>
-<button id="sculptDownBtn">Sculpt Ab</button>
-<button id="sculptSmoothBtn">Glätten</button>
-</div>
-
-<div class="help">
-Shift + Ziehen auf dem ausgewählten Mesh aktiviert das Bearbeiten.
-Sculpting wirkt nur auf ausgewählte positive Meshes.
-</div>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">🔗 Boolean</div>
-<div class="panel-body">
-
-<div class="button-grid">
-<button id="unionBtn">Vereinigung</button>
-<button id="subtractBtn">Mit Negativen ausschneiden</button>
-</div>
-
-<div style="height:6px"></div>
-
-<button id="joinBtn" style="width:100%">Objekte verbinden</button>
-
-<div class="notice info">
-Der Editor verwendet absichtlich kein three-bvh-csg. Robuste echte
-volumetrische Boolean-Berechnung wird nicht vorgetäuscht. Die Join-Funktion
-verbindet ausgewählte Meshes geometrisch.
-</div>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panel-title">🛠 Werkzeuge</div>
-<div class="panel-body">
-
-<div class="button-grid four">
-<button id="selectToolBtn" class="active">Auswahl</button>
-<button id="moveToolPanelBtn">Verschieben</button>
-<button id="rotateToolPanelBtn">Drehen</button>
-<button id="scaleToolPanelBtn">Skalieren</button>
-</div>
-
-<div style="height:6px"></div>
-<button id="sculptToolBtn" style="width:100%">Sculpting</button>
-
-<div style="height:6px"></div>
-<button id="focusToolBtn" style="width:100%">Fokus</button>
-
-</div>
-</div>
-
-</div>
-</aside>
-
-<div id="statusBar">
-<span id="statusMessage">Editor wird initialisiert …</span>
-<span id="selectionStatus">Keine Auswahl</span>
-</div>
-
-</div>
-
-<div id="modal">
-<div class="modal-card">
-<h2 id="modalTitle">Meldung</h2>
-<p id="modalText"></p>
-<div class="modal-actions">
-<button id="modalCloseBtn">OK</button>
-</div>
-</div>
-</div>
-
-<script type="module">
-(async function(){
-
-const loading=document.getElementById("loading");
-const fatalError=document.getElementById("fatalError");
-const debugEl=document.getElementById("debug");
-const statusMessage=document.getElementById("statusMessage");
-const selectionStatus=document.getElementById("selectionStatus");
-
-const modal=document.getElementById("modal");
-const modalTitle=document.getElementById("modalTitle");
-const modalText=document.getElementById("modalText");
-
-const selectionBox=document.getElementById("selectionBox");
-
-let THREE;
-let OrbitControls;
-let TransformControls;
-let STLExporter;
-let GLTFExporter;
-let RoundedBoxGeometry;
-
-let renderer;
-let scene;
-let camera;
-let orbit;
-let transform;
-let raycaster;
-let pointer;
-
-let bedMesh;
-let bedGrid;
-
-let selection=[];
-let selectionOutlines=[];
-
-let transformGroup=null;
-let activeTool="select";
-let sculptMode="up";
-let sculptDragging=false;
-
-let nextId=1;
-
-let history=[];
-let historyIndex=-1;
-let applyingHistory=false;
-
-let bed={x:220,y:220,z:5};
-
-let boxSelecting=false;
-let boxStartX=0;
-let boxStartY=0;
-
-function log(message,error=false){
-  const now=new Date().toLocaleTimeString();
-  debugEl.textContent=
-    `[${now}] ${message}\n`+
-    debugEl.textContent.slice(0,5000);
-
-  if(error){
-    debugEl.style.color="#ffb3b8";
-    debugEl.style.borderColor="#74323a";
-  }
-}
-
-function setStatus(message){
-  statusMessage.textContent=message;
-}
-
-function showModal(title,text){
-  modalTitle.textContent=title;
-  modalText.textContent=text;
-  modal.classList.add("show");
-}
-
-document.getElementById("modalCloseBtn").onclick=()=>{
-  modal.classList.remove("show");
-};
-
-function runtimeFailure(text){
-  log(text,true);
-  setStatus("Fehler: "+text);
-  fatalError.style.display="block";
-  fatalError.textContent=
-    "3D-EDITOR FEHLERMELDUNG\n\n"+text;
-}
-
-try{
-
-  const imports=await Promise.all([
-    import("three"),
-    import("three/addons/controls/OrbitControls.js"),
-    import("three/addons/controls/TransformControls.js"),
-    import("three/addons/exporters/STLExporter.js"),
-    import("three/addons/exporters/GLTFExporter.js"),
-    import("three/addons/geometries/RoundedBoxGeometry.js")
-  ]);
-
-  THREE=imports[0];
-  OrbitControls=imports[1].OrbitControls;
-  TransformControls=imports[2].TransformControls;
-  STLExporter=imports[3].STLExporter;
-  GLTFExporter=imports[4].GLTFExporter;
-  RoundedBoxGeometry=imports[5].RoundedBoxGeometry;
-
-  initialize();
-
-}catch(err){
-
-  loading.classList.add("hidden");
-
-  runtimeFailure(
-    "Three.js oder ein Addon konnte nicht geladen werden.\n\n"+
-    String(err?.stack||err)
-  );
-
-  return;
-}
-
-function initialize(){
-
-try{
-
-scene=new THREE.Scene();
-scene.background=new THREE.Color(0x101318);
-
-camera=new THREE.PerspectiveCamera(50,1,.1,5000);
-camera.position.set(180,150,180);
-camera.lookAt(0,20,0);
-
-renderer=new THREE.WebGLRenderer({
-  antialias:true,
-  alpha:false
-});
-
-renderer.setPixelRatio(
-  Math.min(window.devicePixelRatio||1,2)
-);
-
-renderer.setSize(100,100,false);
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-
-document.getElementById("viewport")
-  .appendChild(renderer.domElement);
-
-orbit=new OrbitControls(
-  camera,
-  renderer.domElement
-);
-
-orbit.enableDamping=true;
-orbit.dampingFactor=.08;
-orbit.target.set(0,15,0);
-orbit.minDistance=10;
-orbit.maxDistance=1500;
-orbit.enablePan=true;
-orbit.screenSpacePanning=true;
-
-orbit.mouseButtons={
-  LEFT:null,
-  MIDDLE:THREE.MOUSE.ROTATE,
-  RIGHT:THREE.MOUSE.PAN
-};
-
-orbit.touches={
-  ONE:THREE.TOUCH.ROTATE,
-  TWO:THREE.TOUCH.DOLLY_PAN
-};
-
-transform=new TransformControls(
-  camera,
-  renderer.domElement
-);
-
-transform.setMode("translate");
-transform.setSize(.8);
-transform.visible=false;
-
-scene.add(transform);
-
-transform.addEventListener(
-  "dragging-changed",
-  e=>{
-    orbit.enabled=!e.value;
-  }
-);
-
-transform.addEventListener(
-  "objectChange",
-  ()=>{
-    syncTransformInputs();
-    updateOutlines();
-    updateSelectionStatus();
-  }
-);
-
-raycaster=new THREE.Raycaster();
-pointer=new THREE.Vector2();
-
-addLights();
-createBed();
-createGrid();
-createInitialObject();
-
-setupPointerEvents();
-setupResize();
-setupUI();
-
-loading.classList.add("hidden");
-
-setStatus("Bereit · 3D-Editor aktiv");
-log("Editor erfolgreich initialisiert.");
-
-saveHistory();
-
-animate();
-
-}catch(err){
-
-loading.classList.add("hidden");
-
-runtimeFailure(
-  "Der Editor konnte nicht vollständig initialisiert werden.\n\n"+
-  String(err?.stack||err)
-);
-
-}
-
-}
-
-function addLights(){
-
-const hemi=new THREE.HemisphereLight(
-  0xffffff,
-  0x3a4050,
-  2.3
-);
-
-scene.add(hemi);
-
-const key=new THREE.DirectionalLight(
-  0xffffff,
-  2.5
-);
-
-key.position.set(120,220,100);
-key.castShadow=true;
-key.shadow.mapSize.set(2048,2048);
-key.shadow.camera.left=-300;
-key.shadow.camera.right=300;
-key.shadow.camera.top=300;
-key.shadow.camera.bottom=-300;
-
-scene.add(key);
-
-const fill=new THREE.DirectionalLight(
-  0x78aefc,
-  .7
-);
-
-fill.position.set(-150,100,-120);
-scene.add(fill);
-
-}
-
-function createBed(){
-
-if(bedMesh){
-  scene.remove(bedMesh);
-}
-
-const g=new THREE.BoxGeometry(
-  bed.x,
-  bed.z,
-  bed.y
-);
-
-const m=new THREE.MeshStandardMaterial({
-  color:0x252a31,
-  roughness:.88,
-  metalness:.08
-});
-
-bedMesh=new THREE.Mesh(g,m);
-
-bedMesh.position.y=-bed.z/2;
-bedMesh.receiveShadow=true;
-bedMesh.userData.isBed=true;
-
-scene.add(bedMesh);
-
-const edge=new THREE.LineSegments(
-  new THREE.EdgesGeometry(g),
-  new THREE.LineBasicMaterial({
-    color:0x7b8796,
-    transparent:true,
-    opacity:.75
-  })
-);
-
-edge.userData.isHelper=true;
-
-bedMesh.add(edge);
-
-createGrid();
-
-}
-
-function createGrid(){
-
-if(bedGrid){
-  scene.remove(bedGrid);
-}
-
-bedGrid=new THREE.GridHelper(
-  Math.max(bed.x,bed.y),
-  Math.round(Math.max(bed.x,bed.y)/10),
-  0x606b79,
-  0x303741
-);
-
-bedGrid.position.y=.005;
-
-bedGrid.scale.set(
-  bed.x/Math.max(bed.x,bed.y),
-  1,
-  bed.y/Math.max(bed.x,bed.y)
-);
-
-bedGrid.userData.isHelper=true;
-
-scene.add(bedGrid);
-
-}
-
-function createInitialObject(){
-
-const cube=createPrimitive(
-  "cube",
-  false,
-  {
-    position:new THREE.Vector3(0,10,0),
-    scale:new THREE.Vector3(20,20,20),
-    color:0x4da3ff,
-    name:"Würfel"
-  }
-);
-
-selectObjects([cube]);
-focusSelection();
-
-}
-
-function materialFor(
-  type,
-  negative=false,
-  color=0x4da3ff
-){
-
-let base=negative?0xc43d52:color;
-
-return new THREE.MeshStandardMaterial({
-  color:base,
-  roughness:.48,
-  metalness:.05,
-  side:THREE.DoubleSide,
-  emissive:negative?0x34050a:0x000000,
-  emissiveIntensity:negative?.35:0
-});
-
-}
-
-function createPrimitive(
-  type,
-  negative=false,
-  options={}
-){
-
-let geometry;
-
-if(type==="cube"){
-
-  geometry=new THREE.BoxGeometry(
-    20,20,20,1,1,1
-  );
-
-}else if(type==="sphere"){
-
-  geometry=new THREE.SphereGeometry(
-    10,48,32
-  );
-
-}else if(type==="cylinder"){
-
-  geometry=new THREE.CylinderGeometry(
-    10,10,20,48,1,false
-  );
-
-}else if(type==="spring"){
-
-  geometry=buildSpringGeometry(
-    options.turns??8,
-    options.radius??8,
-    options.height??24,
-    options.tube??1.5
-  );
-
-}else{
-
-  throw new Error(
-    "Unbekannter Objekttyp: "+type
-  );
-
-}
-
-geometry.computeBoundingBox();
-geometry.computeBoundingSphere();
-
-if(!geometry.getAttribute("normal")){
-  geometry.computeVertexNormals();
-}
-
-const object=new THREE.Mesh(
-  geometry,
-  materialFor(
-    type,
-    negative,
-    options.color??0x4da3ff
-  )
-);
-
-object.castShadow=true;
-object.receiveShadow=true;
-
-object.position.copy(
-  options.position||
-  new THREE.Vector3(0,10,0)
-);
-
-object.scale.copy(
-  options.scale||
-  new THREE.Vector3(1,1,1)
-);
-
-object.rotation.set(0,0,0);
-
-object.name=
-  options.name||
-  (negative?"Negativer ":"")+
-  ({
-    cube:"Würfel",
-    sphere:"Kugel",
-    cylinder:"Zylinder",
-    spring:"Massive Feder"
-  }[type]||"Objekt");
-
-object.userData.type=type;
-object.userData.negative=!!negative;
-object.userData.id=nextId++;
-object.userData.color=
-  "#"+object.material.color.getHexString();
-
-object.userData.params={
-  turns:options.turns??8,
-  radius:options.radius??8,
-  height:options.height??24,
-  tube:options.tube??1.5,
-  roundRadius:options.roundRadius??0,
-  roundSegments:options.roundSegments??4
-};
-
-object.userData.booleanConsumed=false;
-
-scene.add(object);
-
-return object;
-
-}
-
-function buildSpringGeometry(
-  turns,
-  radius,
-  height,
-  tube
-){
-
-const count=Math.max(
-  8,
-  turns*24+1
-);
-
-const points=[];
-
-for(let i=0;i<count;i++){
-
-  const t=i/(count-1);
-  const angle=t*turns*Math.PI*2;
-
-  points.push(
-    new THREE.Vector3(
-      Math.cos(angle)*radius,
-      -height/2+t*height,
-      Math.sin(angle)*radius
-    )
-  );
-
-}
-
-const curve=new THREE.CatmullRomCurve3(
-  points,
-  false,
-  "centripetal"
-);
-
-return new THREE.TubeGeometry(
-  curve,
-  Math.max(96,turns*32),
-  tube,
-  12,
-  false
-);
-
-}
-
-function setupResize(){
+/* =========================================================
+   RESIZE
+   ========================================================= */
 
 function resize(){
 
-  const c=document.getElementById("viewport");
+    const rect = canvas.getBoundingClientRect();
 
-  const w=Math.max(1,c.clientWidth);
-  const h=Math.max(1,c.clientHeight);
+    width = rect.width;
+    height = rect.height;
 
-  camera.aspect=w/h;
-  camera.updateProjectionMatrix();
+    const dpr = window.devicePixelRatio || 1;
 
-  renderer.setSize(w,h,false);
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
 
+    ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 
 window.addEventListener("resize",resize);
+
 resize();
 
+
+/* =========================================================
+   FEDER PARAMETER
+   ========================================================= */
+
+function getSettings(){
+
+    return {
+
+        diameter:
+            Number(document.getElementById("diameter").value),
+
+        height:
+            Number(document.getElementById("height").value),
+
+        turns:
+            Number(document.getElementById("turns").value),
+
+        wire:
+            Number(document.getElementById("wire").value),
+
+        resolution:
+            Number(document.getElementById("resolution").value)
+
+    };
 }
 
-function setupPointerEvents(){
 
-const canvas=renderer.domElement;
+/* =========================================================
+   3D PUNKT
+   ========================================================= */
 
-let panState=null;
+function rotatePoint(p){
 
-canvas.addEventListener(
-  "pointerdown",
-  event=>{
+    let x = p.x;
+    let y = p.y;
+    let z = p.z;
 
-    if(event.button===1 && event.shiftKey){
+    const cx = Math.cos(rotationX);
+    const sx = Math.sin(rotationX);
 
-      orbit.enabled=false;
+    const cy = Math.cos(rotationY);
+    const sy = Math.sin(rotationY);
 
-      panState={
-        x:event.clientX,
-        y:event.clientY,
-        cameraPosition:camera.position.clone(),
-        target:orbit.target.clone()
-      };
+    let y1 = y * cx - z * sx;
+    let z1 = y * sx + z * cx;
 
-      event.preventDefault();
-      return;
+    let x2 = x * cy + z1 * sy;
+    let z2 = -x * sy + z1 * cy;
+
+    return {
+        x:x2,
+        y:y1,
+        z:z2
+    };
+}
+
+
+/* =========================================================
+   PROJEKTION
+   ========================================================= */
+
+function project(p){
+
+    const r = rotatePoint(p);
+
+    const scale =
+        Math.min(width,height) /
+        45 *
+        zoom;
+
+    const perspective =
+        1 /
+        (1 + r.z / 120);
+
+    return {
+
+        x:
+            width / 2 +
+            r.x * scale * perspective,
+
+        y:
+            height / 2 -
+            r.y * scale * perspective,
+
+        z:r.z
+
+    };
+}
+
+
+/* =========================================================
+   FEDER ERZEUGEN
+   ========================================================= */
+
+function createSpring(){
+
+    const s = getSettings();
+
+    const radius =
+        s.diameter / 2 -
+        s.wire / 2;
+
+    const rings =
+        Math.max(
+            20,
+            Math.floor(
+                s.turns * s.resolution
+            )
+        );
+
+    const points = [];
+
+    for(let i=0;i<=rings;i++){
+
+        const t = i / rings;
+
+        const angle =
+            t *
+            Math.PI *
+            2 *
+            s.turns;
+
+        points.push({
+
+            x:
+                radius *
+                Math.cos(angle),
+
+            y:
+                radius *
+                Math.sin(angle),
+
+            z:
+                t *
+                s.height -
+                s.height / 2
+
+        });
 
     }
 
-    if(event.button!==0)return;
+    spring = {
+        points,
+        settings:s
+    };
 
-    /*
-      SHIFT + LINKSZIEHEN = SCULPT
-    */
+    document.getElementById("status").textContent =
+        "Feder aktualisiert";
+}
 
-    if(event.shiftKey){
 
-      if(selection.length===0){
-        setStatus("Shift-Sculpt: zuerst ein Mesh auswählen");
+/* =========================================================
+   3D VORSCHAU
+   ========================================================= */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    if(!spring){
+
+        requestAnimationFrame(draw);
+
         return;
-      }
-
-      sculptDragging=true;
-      sculptMode=
-        sculptMode==="none"?"up":sculptMode;
-
-      performSculpt(event);
-
-      return;
     }
+
+    const projected =
+        spring.points.map(project);
 
     /*
-      CTRL + LINKSZIEHEN = AUSWAHLRAHMEN
+       Schatten
     */
 
-    if(event.ctrlKey || event.metaKey){
+    ctx.beginPath();
 
-      boxSelecting=true;
+    ctx.ellipse(
+        width/2,
+        height/2 + 170 * zoom,
+        100 * zoom,
+        20 * zoom,
+        0,
+        0,
+        Math.PI*2
+    );
 
-      const rect=canvas.getBoundingClientRect();
+    ctx.fillStyle =
+        "rgba(0,0,0,0.35)";
 
-      boxStartX=event.clientX-rect.left;
-      boxStartY=event.clientY-rect.top;
+    ctx.fill();
 
-      selectionBox.style.display="block";
-      selectionBox.style.left=boxStartX+"px";
-      selectionBox.style.top=boxStartY+"px";
-      selectionBox.style.width="0px";
-      selectionBox.style.height="0px";
-
-      orbit.enabled=false;
-
-      event.preventDefault();
-
-      return;
-    }
 
     /*
-      NORMALER LINKSKLICK = EINZELNE AUSWAHL
+       Feder
     */
 
-    if(transform.dragging)return;
+    ctx.beginPath();
 
-    const rect=canvas.getBoundingClientRect();
+    for(let i=0;i<projected.length;i++){
 
-    pointer.x=
-      ((event.clientX-rect.left)/rect.width)*2-1;
+        const p = projected[i];
 
-    pointer.y=
-      -((event.clientY-rect.top)/rect.height)*2+1;
+        if(i===0){
 
-    raycaster.setFromCamera(
-      pointer,
-      camera
-    );
+            ctx.moveTo(
+                p.x,
+                p.y
+            );
 
-    const candidates=getSelectableObjects();
+        }else{
 
-    const hits=raycaster.intersectObjects(
-      candidates,
-      false
-    );
-
-    if(hits.length){
-
-      const selected=hits[0].object;
-
-      selectObjects([selected]);
-
-      syncTransformInputs();
-      updateSelectionStatus();
-      renderObjectList();
-
-    }else{
-
-      clearSelection();
-
+            ctx.lineTo(
+                p.x,
+                p.y
+            );
+        }
     }
 
-  },
-  true
-);
-
-canvas.addEventListener(
-  "pointermove",
-  event=>{
-
-    if(panState){
-
-      const dx=event.clientX-panState.x;
-      const dy=event.clientY-panState.y;
-
-      const right=new THREE.Vector3();
-      const up=new THREE.Vector3();
-
-      camera.matrixWorld.extractBasis(
-        right,
-        up,
-        new THREE.Vector3()
-      );
-
-      const distance=
-        camera.position.distanceTo(
-          orbit.target
+    ctx.lineWidth =
+        Math.max(
+            2,
+            spring.settings.wire *
+            Math.min(width,height) /
+            45 *
+            zoom
         );
 
-      const scale=distance*.0018;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
-      const delta=new THREE.Vector3()
-        .addScaledVector(
-          right,
-          -dx*scale
-        )
-        .addScaledVector(
-          up,
-          dy*scale
+    ctx.strokeStyle =
+        "#d9dde2";
+
+    ctx.stroke();
+
+
+    /*
+       Highlight
+    */
+
+    ctx.beginPath();
+
+    for(let i=0;i<projected.length;i++){
+
+        const p = projected[i];
+
+        if(i===0)
+            ctx.moveTo(p.x,p.y);
+        else
+            ctx.lineTo(p.x,p.y);
+    }
+
+    ctx.lineWidth =
+        Math.max(
+            0.6,
+            spring.settings.wire *
+            Math.min(width,height) /
+            45 *
+            zoom *
+            0.35
         );
 
-      camera.position.copy(
-        panState.cameraPosition
-          .clone()
-          .add(delta)
-      );
+    ctx.strokeStyle =
+        "#ffffff";
 
-      orbit.target.copy(
-        panState.target.clone().add(delta)
-      );
+    ctx.stroke();
 
-      camera.lookAt(orbit.target);
 
-      return;
-    }
+    requestAnimationFrame(draw);
+}
 
-    if(boxSelecting){
 
-      updateSelectionBox(
-        event.clientX,
-        event.clientY
-      );
-
-      return;
-    }
-
-    if(sculptDragging){
-
-      performSculpt(event);
-
-    }
-
-  },
-  true
-);
-
-window.addEventListener(
-  "pointerup",
-  event=>{
-
-    if(event.button===1 && panState){
-
-      panState=null;
-      orbit.enabled=true;
-
-    }
-
-    if(event.button===0){
-
-      if(boxSelecting){
-
-        finishBoxSelection();
-
-      }
-
-      if(sculptDragging){
-
-        sculptDragging=false;
-        saveHistory();
-
-      }
-
-    }
-
-  },
-  true
-);
+/* =========================================================
+   MAUS
+   ========================================================= */
 
 canvas.addEventListener(
-  "wheel",
-  ()=>{
-    if(!orbit.enabled){
-      orbit.enabled=true;
+    "pointerdown",
+    e=>{
+
+        dragging = true;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        canvas.setPointerCapture(
+            e.pointerId
+        );
     }
-  },
-  {passive:true}
 );
+
 
 canvas.addEventListener(
-  "contextmenu",
-  e=>e.preventDefault()
-);
-
-}
-
-function updateSelectionBox(
-  clientX,
-  clientY
-){
-
-const rect=renderer.domElement
-  .getBoundingClientRect();
-
-const x=clientX-rect.left;
-const y=clientY-rect.top;
-
-const left=Math.min(boxStartX,x);
-const top=Math.min(boxStartY,y);
-
-const width=Math.abs(x-boxStartX);
-const height=Math.abs(y-boxStartY);
-
-selectionBox.style.left=left+"px";
-selectionBox.style.top=top+"px";
-selectionBox.style.width=width+"px";
-selectionBox.style.height=height+"px";
-
-}
-
-function finishBoxSelection(){
-
-boxSelecting=false;
-
-selectionBox.style.display="none";
-
-orbit.enabled=true;
-
-const rect=renderer.domElement
-  .getBoundingClientRect();
-
-const endX=parseFloat(
-  selectionBox.style.left||boxStartX
-);
-
-const endY=parseFloat(
-  selectionBox.style.top||boxStartY
-);
-
-const currentWidth=
-  parseFloat(selectionBox.style.width)||0;
-
-const currentHeight=
-  parseFloat(selectionBox.style.height)||0;
-
-const left=Math.min(
-  boxStartX,
-  endX
-);
-
-const top=Math.min(
-  boxStartY,
-  endY
-);
-
-const right=Math.max(
-  boxStartX,
-  endX
-);
-
-const bottom=Math.max(
-  boxStartY,
-  endY
-);
-
-const found=[];
-
-getSelectableObjects()
-  .filter(obj=>obj.visible)
-  .forEach(obj=>{
-
-    const p=new THREE.Vector3();
-
-    obj.updateWorldMatrix(true,false);
-    obj.getWorldPosition(p);
-
-    p.project(camera);
-
-    const sx=
-      (p.x*.5+.5)*rect.width;
-
-    const sy=
-      (-p.y*.5+.5)*rect.height;
-
-    if(
-      sx>=left &&
-      sx<=right &&
-      sy>=top &&
-      sy<=bottom
-    ){
-      found.push(obj);
+    "pointerup",
+    ()=>{
+        dragging = false;
     }
+);
 
-  });
 
-if(found.length){
+canvas.addEventListener(
+    "pointermove",
+    e=>{
 
-  selectObjects(found);
+        if(!dragging)
+            return;
 
-  setStatus(
-    `${found.length} Objekt(e) ausgewählt`
-  );
+        const dx =
+            e.clientX - lastX;
 
-}else{
+        const dy =
+            e.clientY - lastY;
 
-  clearSelection();
-  setStatus("Keine Objekte im Auswahlrahmen");
+        rotationY += dx * 0.008;
+        rotationX += dy * 0.008;
 
-}
+        lastX = e.clientX;
+        lastY = e.clientY;
+    }
+);
 
-}
 
-function getSelectableObjects(){
+canvas.addEventListener(
+    "wheel",
+    e=>{
 
-const result=[];
+        e.preventDefault();
 
-scene.traverse(obj=>{
+        if(e.deltaY < 0)
+            zoom *= 1.08;
+        else
+            zoom *= 0.92;
 
-  if(
-    obj.isMesh &&
-    !obj.userData.isBed &&
-    !obj.userData.isOutline &&
-    !obj.userData.isHelper &&
-    obj!==bedMesh &&
-    obj!==transformGroup
-  ){
+        zoom =
+            Math.max(
+                0.3,
+                Math.min(3,zoom)
+            );
+    },
+    {passive:false}
+);
 
-    result.push(obj);
 
-  }
-
-});
-
-return result;
-
-}
-
-function selectObjects(objects){
-
-releaseTransformGroup();
-
-clearOutlines();
-
-selection=[
-  ...new Set(
-    objects.filter(
-      obj=>
-        obj &&
-        obj.isMesh &&
-        !obj.userData.isBed &&
-        !obj.userData.isOutline
-    )
-  )
-];
-
-if(selection.length){
-
-  attachTransform();
-
-}
-
-buildOutlines();
-
-syncTransformInputs();
-renderObjectList();
-updateSelectionStatus();
-
-}
-
-function toggleSelection(object){
-
-if(selection.includes(object)){
-
-  selection=selection.filter(
-    o=>o!==object
-  );
-
-}else{
-
-  selection.push(object);
-
-}
-
-releaseTransformGroup();
-attachTransform();
-
-clearOutlines();
-buildOutlines();
-
-syncTransformInputs();
-renderObjectList();
-updateSelectionStatus();
-
-}
-
-function attachTransform(){
-
-try{
-  transform.detach();
-}catch(e){}
-
-if(transformGroup){
-
-  scene.remove(transformGroup);
-  transformGroup=null;
-
-}
-
-if(selection.length===0){
-
-  transform.visible=false;
-  return;
-
-}
-
-if(selection.length===1){
-
-  /*
-    WICHTIG:
-    Einzelnes Objekt bleibt direkt in scene.
-  */
-
-  transform.attach(selection[0]);
-
-  transform.visible=
-    activeTool!=="select";
-
-  return;
-
-}
+/* =========================================================
+   STL GENERIERUNG
+   ========================================================= */
 
 /*
-  Mehrere Objekte:
-  temporäre Gruppe.
+   Die Feder wird als Rohr entlang der Helix gebaut.
 */
 
-transformGroup=new THREE.Group();
-transformGroup.name="__SelectionTransformGroup";
+function generateSTL(){
 
-scene.add(transformGroup);
+    const s = getSettings();
 
-const center=getSelectionCenter();
+    const radius =
+        s.diameter / 2 -
+        s.wire / 2;
 
-transformGroup.position.copy(center);
+    const pathSegments =
+        Math.max(
+            32,
+            Math.floor(
+                s.turns *
+                s.resolution
+            )
+        );
 
-selection.forEach(obj=>{
+    const tubeSegments =
+        16;
 
-  transformGroup.attach(obj);
+    const vertices = [];
 
-});
+    const triangles = [];
 
-transform.attach(transformGroup);
 
-transform.visible=
-  activeTool!=="select";
+    /*
+       Centerline + Tube
+    */
 
-}
+    for(let i=0;i<=pathSegments;i++){
 
-function releaseTransformGroup(){
+        const t =
+            i/pathSegments;
 
-try{
-  transform.detach();
-}catch(e){}
+        const angle =
+            t *
+            Math.PI *
+            2 *
+            s.turns;
 
-if(transformGroup){
+        const x =
+            radius *
+            Math.cos(angle);
 
-  const objects=[
-    ...transformGroup.children
-  ];
+        const y =
+            radius *
+            Math.sin(angle);
 
-  objects.forEach(obj=>{
+        const z =
+            t*s.height -
+            s.height/2;
 
-    scene.attach(obj);
 
-  });
+        /*
+           Tangente
+        */
 
-  scene.remove(transformGroup);
-  transformGroup=null;
+        let tx =
+            -radius *
+            Math.sin(angle) *
+            Math.PI *
+            2 *
+            s.turns;
 
-}
+        let ty =
+            radius *
+            Math.cos(angle) *
+            Math.PI *
+            2 *
+            s.turns;
 
-transform.visible=false;
+        let tz =
+            s.height;
 
-}
+        let tl =
+            Math.sqrt(
+                tx*tx+
+                ty*ty+
+                tz*tz
+            );
 
-function clearSelection(){
+        tx/=tl;
+        ty/=tl;
+        tz/=tl;
 
-releaseTransformGroup();
 
-selection=[];
+        /*
+           Radialer Vektor
+        */
 
-clearOutlines();
+        let nx =
+            Math.cos(angle);
 
-syncTransformInputs();
-renderObjectList();
-updateSelectionStatus();
+        let ny =
+            Math.sin(angle);
 
-}
+        let nz = 0;
 
-function getSelectionCenter(){
 
-if(selection.length===1){
-
-  const p=new THREE.Vector3();
-
-  selection[0].updateWorldMatrix(
-    true,
-    false
-  );
-
-  selection[0].getWorldPosition(p);
-
-  return p;
-
-}
-
-const box=new THREE.Box3();
-
-selection.forEach(obj=>{
-  box.expandByObject(obj);
-});
-
-if(box.isEmpty()){
-  return new THREE.Vector3();
-}
-
-return box.getCenter(
-  new THREE.Vector3()
-);
-
-}
-
-function buildOutlines(){
-
-clearOutlines();
-
-selection.forEach(obj=>{
-
-if(!obj.isMesh)return;
-
-const edgeGeometry=
-  new THREE.EdgesGeometry(
-    obj.geometry,
-    1
-  );
-
-const line=new THREE.LineSegments(
-  edgeGeometry,
-  new THREE.LineBasicMaterial({
-    color:0xffe066,
-    transparent:true,
-    opacity:1,
-    depthTest:false
-  })
-);
-
-line.userData.isOutline=true;
-line.renderOrder=999;
-
-line.scale.setScalar(1.003);
-
-obj.add(line);
-
-selectionOutlines.push({
-  object:obj,
-  outline:line
-});
-
-});
-
-}
-
-function clearOutlines(){
-
-selectionOutlines.forEach(item=>{
-
-if(item.outline?.parent){
-  item.outline.parent.remove(
-    item.outline
-  );
-}
-
-item.outline.geometry.dispose();
-item.outline.material.dispose();
-
-});
-
-selectionOutlines=[];
-
-}
-
-function updateOutlines(){
-
-selectionOutlines.forEach(item=>{
-
-if(
-  item.object &&
-  item.outline &&
-  item.object.geometry
-){
-
-  item.outline.geometry.dispose();
-
-  item.outline.geometry=
-    new THREE.EdgesGeometry(
-      item.object.geometry,
-      1
-    );
-
-}
-
-});
-
-}
-
-function renderObjectList(){
-
-const list=
-  document.getElementById("objectList");
-
-list.innerHTML="";
-
-getSelectableObjects().forEach(obj=>{
-
-const item=document.createElement("div");
-
-item.className=
-  "object-item"+
-  (
-    selection.includes(obj)
-      ?" selected"
-      :""
-  )+
-  (
-    obj.userData.negative
-      ?" negative"
-      :""
-  );
-
-const icon=document.createElement("div");
-
-icon.className="object-icon";
-
-icon.textContent=
-  objectIcon(
-    obj.userData.type,
-    obj.userData.negative
-  );
-
-const name=document.createElement("div");
-
-name.className="object-name";
-name.textContent=obj.name;
-
-const eye=document.createElement("button");
-
-eye.className="object-eye small";
-eye.textContent=
-  obj.visible?"👁":"◌";
-
-eye.addEventListener(
-  "click",
-  event=>{
-
-    event.stopPropagation();
-
-    obj.visible=!obj.visible;
-
-    renderObjectList();
-
-  }
-);
-
-item.addEventListener(
-  "click",
-  event=>{
-
-    if(event.target===eye)return;
-
-    selectObjects([obj]);
-
-  }
-);
-
-item.appendChild(icon);
-item.appendChild(name);
-item.appendChild(eye);
-
-list.appendChild(item);
-
-});
-
-}
-
-function objectIcon(type,negative){
-
-if(negative){
-  if(type==="cube")return"−";
-  if(type==="sphere")return"−";
-  if(type==="cylinder")return"−";
-}
-
-if(type==="cube")return"■";
-if(type==="sphere")return"●";
-if(type==="cylinder")return"⬢";
-if(type==="spring")return"〰";
-
-return"□";
-
-}
-
-function updateSelectionStatus(){
-
-selectionStatus.textContent=
-  selection.length===0
-    ?"Keine Auswahl"
-    :`${selection.length} Objekt${
-        selection.length===1?"":"e"
-      } ausgewählt`;
-
-}
-
-function syncTransformInputs(){
-
-if(selection.length===0){
-
-[
-"posX","posY","posZ",
-"scaleX","scaleY","scaleZ",
-"rotX","rotY","rotZ"
-].forEach(id=>{
-  document.getElementById(id).value="";
-});
-
-return;
-
-}
-
-let target=
-  selection.length>1 && transformGroup
-    ?transformGroup
-    :selection[0];
-
-document.getElementById("posX").value=
-  round(target.position.x);
-
-document.getElementById("posY").value=
-  round(target.position.y);
-
-document.getElementById("posZ").value=
-  round(target.position.z);
-
-document.getElementById("scaleX").value=
-  round(target.scale.x);
-
-document.getElementById("scaleY").value=
-  round(target.scale.y);
-
-document.getElementById("scaleZ").value=
-  round(target.scale.z);
-
-document.getElementById("rotX").value=
-  round(
-    THREE.MathUtils.radToDeg(
-      target.rotation.x
-    )
-  );
-
-document.getElementById("rotY").value=
-  round(
-    THREE.MathUtils.radToDeg(
-      target.rotation.y
-    )
-  );
-
-document.getElementById("rotZ").value=
-  round(
-    THREE.MathUtils.radToDeg(
-      target.rotation.z
-    )
-  );
-
-const colorTarget=selection[0];
-
-if(
-  colorTarget.material &&
-  colorTarget.material.color
-){
-
-document.getElementById(
-  "colorPicker"
-).value=
-  "#"+
-  colorTarget.material.color
-    .getHexString();
-
-}
-
-refreshSpringInputs();
-
-}
-
-function round(v){
-return Math.round(v*1000)/1000;
-}
-
-function readNumber(id,fallback=0){
-
-const n=parseFloat(
-  document.getElementById(id).value
-);
-
-return Number.isFinite(n)?n:fallback;
-
-}
-
-function applyTransformFields(){
-
-if(selection.length===0)return;
-
-const target=
-  transformGroup||selection[0];
-
-target.position.set(
-  readNumber("posX",target.position.x),
-  readNumber("posY",target.position.y),
-  readNumber("posZ",target.position.z)
-);
-
-target.scale.set(
-  Math.max(
-    .01,
-    readNumber("scaleX",target.scale.x)
-  ),
-  Math.max(
-    .01,
-    readNumber("scaleY",target.scale.y)
-  ),
-  Math.max(
-    .01,
-    readNumber("scaleZ",target.scale.z)
-  )
-);
-
-target.rotation.set(
-  THREE.MathUtils.degToRad(
-    readNumber(
-      "rotX",
-      THREE.MathUtils.radToDeg(
-        target.rotation.x
-      )
-    )
-  ),
-  THREE.MathUtils.degToRad(
-    readNumber(
-      "rotY",
-      THREE.MathUtils.radToDeg(
-        target.rotation.y
-      )
-    )
-  ),
-  THREE.MathUtils.degToRad(
-    readNumber(
-      "rotZ",
-      THREE.MathUtils.radToDeg(
-        target.rotation.z
-      )
-    )
-  )
-);
-
-target.updateMatrixWorld(true);
-
-syncTransformInputs();
-updateOutlines();
-
-if(!applyingHistory){
-  saveHistory();
-}
-
-}
-
-function setTool(tool){
-
-activeTool=tool;
-
-document.querySelectorAll(
-"#selectToolBtn,#moveToolBtn,#moveToolPanelBtn,#rotateToolBtn,#rotateToolPanelBtn,#scaleToolBtn,#scaleToolPanelBtn,#sculptToolBtn"
-).forEach(btn=>{
-  btn.classList.remove("active");
-});
-
-if(tool==="select"){
-
-document.getElementById(
-  "selectToolBtn"
-).classList.add("active");
-
-transform.setMode("translate");
-transform.visible=false;
-sculptMode="none";
-
-}else if(tool==="translate"){
-
-document.getElementById(
-  "moveToolBtn"
-).classList.add("active");
-
-document.getElementById(
-  "moveToolPanelBtn"
-).classList.add("active");
-
-transform.setMode("translate");
-transform.visible=selection.length>0;
-sculptMode="none";
-
-}else if(tool==="rotate"){
-
-document.getElementById(
-  "rotateToolBtn"
-).classList.add("active");
-
-document.getElementById(
-  "rotateToolPanelBtn"
-).classList.add("active");
-
-transform.setMode("rotate");
-transform.visible=selection.length>0;
-sculptMode="none";
-
-}else if(tool==="scale"){
-
-document.getElementById(
-  "scaleToolBtn"
-).classList.add("active");
-
-document.getElementById(
-  "scaleToolPanelBtn"
-).classList.add("active");
-
-transform.setMode("scale");
-transform.visible=selection.length>0;
-sculptMode="none";
-
-}else if(tool==="sculpt"){
-
-document.getElementById(
-  "sculptToolBtn"
-).classList.add("active");
-
-transform.visible=false;
-sculptMode="up";
-
-}
-
-setStatus(
-  "Werkzeug: "+
-  ({
-    select:"Auswahl",
-    translate:"Verschieben",
-    rotate:"Drehen",
-    scale:"Skalieren",
-    sculpt:"Sculpting"
-  }[tool]||tool)
-);
-
-}
-
-function performSculpt(event){
-
-if(selection.length===0)return;
-
-const target=selection.find(
-  o=>
-    o.isMesh &&
-    !o.userData.negative
-);
-
-if(!target)return;
-
-const positionAttr=
-  target.geometry.getAttribute(
-    "position"
-  );
-
-if(
-  !positionAttr ||
-  positionAttr.count===0
-)return;
-
-try{
-
-const rect=
-  renderer.domElement
-    .getBoundingClientRect();
-
-pointer.x=
-  ((event.clientX-rect.left)/
-    rect.width)*2-1;
-
-pointer.y=
-  -((event.clientY-rect.top)/
-    rect.height)*2+1;
-
-raycaster.setFromCamera(
-  pointer,
-  camera
-);
-
-const hit=
-  raycaster
-    .intersectObject(
-      target,
-      false
-    )[0];
-
-if(!hit)return;
-
-target.updateWorldMatrix(
-  true,
-  false
-);
-
-const localHit=
-  target.worldToLocal(
-    hit.point.clone()
-  );
-
-const radius=
-  readNumber(
-    "sculptRadius",
-    4
-  );
-
-const strength=
-  readNumber(
-    "sculptStrength",
-    .15
-  );
-
-if(
-  !target.geometry.getAttribute("normal")
-){
-  target.geometry.computeVertexNormals();
-}
-
-const normalAttr=
-  target.geometry.getAttribute(
-    "normal"
-  );
-
-for(
-  let i=0;
-  i<positionAttr.count;
-  i++
-){
-
-const vx=positionAttr.getX(i);
-const vy=positionAttr.getY(i);
-const vz=positionAttr.getZ(i);
-
-const dx=vx-localHit.x;
-const dy=vy-localHit.y;
-const dz=vz-localHit.z;
-
-const distance=
-  Math.sqrt(
-    dx*dx+
-    dy*dy+
-    dz*dz
-  );
-
-if(distance>radius)continue;
-
-const influence=
-  1-Math.min(
-    1,
-    distance/radius
-  );
-
-const smooth=
-  influence*
-  influence*
-  (3-2*influence);
-
-const nx=normalAttr.getX(i);
-const ny=normalAttr.getY(i);
-const nz=normalAttr.getZ(i);
-
-const direction=
-  sculptMode==="down"?-1:1;
-
-if(
-  sculptMode==="up" ||
-  sculptMode==="down"
-){
-
-positionAttr.setX(
-  i,
-  vx+
-  nx*
-  strength*
-  smooth*
-  direction
-);
-
-positionAttr.setY(
-  i,
-  vy+
-  ny*
-  strength*
-  smooth*
-  direction
-);
-
-positionAttr.setZ(
-  i,
-  vz+
-  nz*
-  strength*
-  smooth*
-  direction
-);
-
-}
-
-}
-
-positionAttr.needsUpdate=true;
-
-target.geometry.computeVertexNormals();
-target.geometry.computeBoundingBox();
-target.geometry.computeBoundingSphere();
-
-updateOutlines();
-
-}catch(err){
-
-log(
-  "Sculpting abgefangen: "+err,
-  true
-);
-
-}
-
-}
-
-function duplicateSelection(){
-
-if(selection.length===0){
-
-showModal(
-  "Duplizieren",
-  "Bitte zuerst mindestens ein Objekt auswählen."
-);
-
-return;
-
-}
-
-const clones=[];
-
-selection.forEach(source=>{
-
-const clone=source.clone();
-
-clone.geometry=
-  source.geometry.clone();
-
-clone.material=
-  source.material.clone();
-
-clone.position.copy(
-  source.position
-);
-
-clone.rotation.copy(
-  source.rotation
-);
-
-clone.scale.copy(
-  source.scale
-);
-
-clone.position.x+=8;
-clone.position.z+=8;
-
-clone.name=
-  source.name+" Kopie";
-
-clone.userData={
-  ...source.userData,
-  id:nextId++,
-  booleanConsumed:false
-};
-
-scene.add(clone);
-
-clones.push(clone);
-
-});
-
-selectObjects(clones);
-
-saveHistory();
-
-}
-
-function deleteSelection(){
-
-if(selection.length===0)return;
-
-const deleted=[...selection];
-
-clearSelection();
-
-deleted.forEach(
-  disposeObject
-);
-
-saveHistory();
-
-}
-
-function disposeObject(obj){
-
-if(!obj)return;
-
-if(obj.parent){
-  obj.parent.remove(obj);
-}
-
-if(obj.geometry){
-  obj.geometry.dispose();
-}
-
-if(Array.isArray(obj.material)){
-
-obj.material.forEach(
-  m=>m.dispose()
-);
-
-}else if(obj.material){
-
-obj.material.dispose();
-
-}
-
-}
-
-function renameSelected(){
-
-if(selection.length!==1){
-
-showModal(
-  "Umbenennen",
-  "Bitte genau ein Objekt auswählen."
-);
-
-return;
-
-}
-
-const current=selection[0].name;
-
-const value=window.prompt(
-  "Neuer Objektname:",
-  current
-);
-
-if(value&&value.trim()){
-
-selection[0].name=
-  value.trim();
-
-renderObjectList();
-saveHistory();
-
-}
-
-}
-
-function toggleVisibility(){
-
-if(selection.length===0)return;
-
-selection.forEach(
-  obj=>obj.visible=!obj.visible
-);
-
-renderObjectList();
-
-}
-
-function applyColor(){
-
-if(selection.length===0)return;
-
-const hex=
-  document.getElementById(
-    "colorPicker"
-  ).value;
-
-selection.forEach(obj=>{
-
-if(
-  obj.material &&
-  obj.material.color
-){
-
-obj.material.color.set(hex);
-obj.userData.color=hex;
-
-}
-
-});
-
-saveHistory();
-
-}
-
-function setOnBed(){
-
-if(selection.length===0)return;
-
-selection.forEach(obj=>{
-
-const box=
-  new THREE.Box3()
-    .setFromObject(obj);
-
-obj.position.y+=-box.min.y;
-
-});
-
-syncTransformInputs();
-updateOutlines();
-saveHistory();
-
-}
-
-function centerXZ(){
-
-if(selection.length===0)return;
-
-const box=new THREE.Box3();
-
-selection.forEach(
-  obj=>box.expandByObject(obj)
-);
-
-if(box.isEmpty())return;
-
-const center=
-  box.getCenter(
-    new THREE.Vector3()
-  );
-
-selection.forEach(obj=>{
-
-obj.position.x+=-center.x;
-obj.position.z+=-center.z;
-
-});
-
-syncTransformInputs();
-updateOutlines();
-saveHistory();
-
-}
-
-function applyRoundCube(){
-
-if(selection.length!==1){
-
-showModal(
-  "Würfel abrunden",
-  "Bitte genau einen Würfel auswählen."
-);
-
-return;
-
-}
-
-const obj=selection[0];
-
-if(obj.userData.type!=="cube"){
-
-showModal(
-  "Würfel abrunden",
-  "Die Abrundung ist nur für Würfel vorgesehen."
-);
-
-return;
-
-}
-
-const radius=Math.max(
-  0,
-  readNumber(
-    "roundRadius",
-    .15
-  )
-);
-
-const segments=Math.max(
-  1,
-  Math.min(
-    24,
-    Math.round(
-      readNumber(
-        "roundSegments",
-        4
-      )
-    )
-  )
-);
-
-try{
-
-const old=obj.geometry;
-
-const maxRadius=Math.min(
-  9.999,
-  radius*20
-);
-
-obj.geometry=
-  new RoundedBoxGeometry(
-    20,
-    20,
-    20,
-    segments,
-    maxRadius
-  );
-
-obj.geometry.computeVertexNormals();
-obj.geometry.computeBoundingBox();
-obj.geometry.computeBoundingSphere();
-
-old.dispose();
-
-obj.userData.params.roundRadius=radius;
-obj.userData.params.roundSegments=segments;
-
-updateOutlines();
-saveHistory();
-
-}catch(err){
-
-showModal(
-  "Abrundung fehlgeschlagen",
-  String(err)
-);
-
-}
-
-}
-
-function rebuildSpring(){
-
-if(selection.length!==1){
-
-showModal(
-  "Feder neu erstellen",
-  "Bitte genau eine Feder auswählen."
-);
-
-return;
-
-}
-
-const obj=selection[0];
-
-if(obj.userData.type!=="spring"){
-
-showModal(
-  "Feder neu erstellen",
-  "Das ausgewählte Objekt ist keine Feder."
-);
-
-return;
-
-}
-
-const params={
-  turns:Math.max(
-    1,
-    Math.round(
-      readNumber("springTurns",8)
-    )
-  ),
-  radius:Math.max(
-    .2,
-    readNumber("springRadius",8)
-  ),
-  height:Math.max(
-    .5,
-    readNumber("springHeight",24)
-  ),
-  tube:Math.max(
-    .05,
-    readNumber("springTube",1.5)
-  )
-};
-
-const old=obj.geometry;
-
-obj.geometry=
-  buildSpringGeometry(
-    params.turns,
-    params.radius,
-    params.height,
-    params.tube
-  );
-
-obj.geometry.computeVertexNormals();
-obj.geometry.computeBoundingBox();
-obj.geometry.computeBoundingSphere();
-
-old.dispose();
-
-Object.assign(
-  obj.userData.params,
-  params
-);
-
-updateOutlines();
-saveHistory();
-
-}
-
-function refreshSpringInputs(){
-
-if(selection.length!==1)return;
-
-const obj=selection[0];
-
-if(obj.userData.type!=="spring")return;
-
-const p=
-  obj.userData.params||{};
-
-document.getElementById(
-  "springTurns"
-).value=p.turns??8;
-
-document.getElementById(
-  "springRadius"
-).value=p.radius??8;
-
-document.getElementById(
-  "springHeight"
-).value=p.height??24;
-
-document.getElementById(
-  "springTube"
-).value=p.tube??1.5;
-
-}
-
-function selectedPositiveMeshes(){
-
-return selection.filter(
-  obj=>
-    obj.isMesh &&
-    !obj.userData.negative &&
-    !obj.userData.booleanConsumed &&
-    obj.visible
-);
-
-}
-
-function selectedNegativeMeshes(){
-
-return selection.filter(
-  obj=>
-    obj.isMesh &&
-    obj.userData.negative
-);
-
-}
-
-function mergeSelectedMeshes(){
-
-const meshes=
-  selectedPositiveMeshes();
-
-if(meshes.length<2){
-
-showModal(
-  "Objekte verbinden",
-  "Bitte mindestens zwei positive Meshes auswählen."
-);
-
-return;
-
-}
-
-try{
-
-const first=meshes[0];
-
-let vertexOffset=0;
-const data=[];
-
-meshes.forEach(mesh=>{
-
-mesh.updateMatrixWorld(true);
-
-const position=
-  mesh.geometry.getAttribute(
-    "position"
-  );
-
-if(!position){
-  throw new Error(
-    "Mesh besitzt keine Positionen."
-  );
-}
-
-const normal=
-  mesh.geometry.getAttribute(
-    "normal"
-  );
-
-const index=
-  mesh.geometry.getIndex();
-
-const vertices=[];
-const normals=[];
-const indices=[];
-
-const normalMatrix=
-  new THREE.Matrix3()
-    .getNormalMatrix(
-      mesh.matrixWorld
-    );
-
-for(
-  let i=0;
-  i<position.count;
-  i++
-){
-
-const v=new THREE.Vector3(
-  position.getX(i),
-  position.getY(i),
-  position.getZ(i)
-);
-
-v.applyMatrix4(
-  mesh.matrixWorld
-);
-
-vertices.push(
-  v.x,v.y,v.z
-);
-
-let n=new THREE.Vector3(
-  0,1,0
-);
-
-if(normal){
-
-n.set(
-  normal.getX(i),
-  normal.getY(i),
-  normal.getZ(i)
-);
-
-}
-
-n.applyNormalMatrix(
-  normalMatrix
-).normalize();
-
-normals.push(
-  n.x,n.y,n.z
-);
-
-}
-
-if(index){
-
-for(
-  let i=0;
-  i<index.count;
-  i++
-){
-
-indices.push(
-  index.getX(i)+vertexOffset
-);
-
-}
-
-}else{
-
-for(
-  let i=0;
-  i<position.count;
-  i++
-){
-
-indices.push(
-  i+vertexOffset
-);
-
-}
-
-}
-
-data.push({
-  vertices,
-  normals,
-  indices
-});
-
-vertexOffset+=position.count;
-
-});
-
-const positions=[];
-const normals=[];
-const indices=[];
-
-data.forEach(d=>{
-
-positions.push(...d.vertices);
-normals.push(...d.normals);
-indices.push(...d.indices);
-
-});
-
-const geometry=
-  new THREE.BufferGeometry();
-
-geometry.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute(
-    positions,
-    3
-  )
-);
-
-geometry.setAttribute(
-  "normal",
-  new THREE.Float32BufferAttribute(
-    normals,
-    3
-  )
-);
-
-geometry.setIndex(indices);
-
-geometry.computeVertexNormals();
-geometry.computeBoundingBox();
-geometry.computeBoundingSphere();
-
-const material=
-  first.material.clone();
-
-const merged=
-  new THREE.Mesh(
-    geometry,
-    material
-  );
-
-merged.name="Verbundene Objekte";
-
-merged.castShadow=true;
-merged.receiveShadow=true;
-
-merged.userData={
-  type:"joined",
-  negative:false,
-  id:nextId++,
-  color:"#"+
-    material.color.getHexString(),
-  params:{},
-  booleanConsumed:false
-};
-
-scene.add(merged);
-
-meshes.forEach(
-  disposeObject
-);
-
-selectObjects([merged]);
-
-saveHistory();
-
-showModal(
-  "Objekte verbunden",
-  "Die ausgewählten Meshes wurden zu einem gemeinsamen Mesh verbunden."
-);
-
-}catch(err){
-
-showModal(
-  "Verbinden fehlgeschlagen",
-  String(err)
-);
-
-}
-
-}
-
-function booleanUnion(){
-
-const meshes=
-  selectedPositiveMeshes();
-
-if(meshes.length<2){
-
-showModal(
-  "Vereinigung",
-  "Bitte mindestens zwei positive Objekte auswählen."
-);
-
-return;
-
-}
-
-showModal(
-  "Vereinigung ohne CSG-Engine",
-  "Eine echte volumetrische Union wird in dieser Version nicht ausgeführt. Verwende „Objekte verbinden“ für einen stabilen geometrischen Join."
-);
-
-}
-
-function booleanSubtract(){
-
-const negatives=
-  selectedNegativeMeshes();
-
-if(negatives.length===0){
-
-showModal(
-  "Mit Negativen ausschneiden",
-  "Wähle mindestens einen negativen Ausschneidekörper aus."
-);
-
-return;
-
-}
-
-showModal(
-  "Boolean-Ausschneiden nicht verfügbar",
-  "Der Editor verwendet kein three-bvh-csg. Negative Objekte bleiben erhalten und werden beim Export ausgeschlossen."
-);
-
-}
-
-function applyBedSettings(){
-
-bed.x=Math.max(
-  1,
-  readNumber("bedX",220)
-);
-
-bed.y=Math.max(
-  1,
-  readNumber("bedY",220)
-);
-
-bed.z=Math.max(
-  .1,
-  readNumber("bedZ",5)
-);
-
-createBed();
-
-setStatus(
-  `Druckplatte: ${bed.x} × ${bed.y} × ${bed.z} mm`
-);
-
-saveHistory();
-
-}
-
-function checkBed(){
-
-const problems=[];
-
-getSelectableObjects()
-.filter(
-  obj=>
-    obj.visible &&
-    !obj.userData.negative
-)
-.forEach(obj=>{
-
-const box=
-  new THREE.Box3()
-    .setFromObject(obj);
-
-const halfX=bed.x/2;
-const halfZ=bed.y/2;
-
-const outsideX=
-  box.min.x<-halfX||
-  box.max.x>halfX;
-
-const outsideZ=
-  box.min.z<-halfZ||
-  box.max.z>halfZ;
-
-const below=
-  box.min.y<-.01;
-
-if(outsideX||outsideZ||below){
-
-const reasons=[];
-
-if(outsideX)reasons.push("außerhalb X");
-if(outsideZ)reasons.push("außerhalb Z");
-if(below)reasons.push("unter Druckplatte");
-
-problems.push(
-  `${obj.name}: ${reasons.join(", ")}`
-);
-
-}
-
-});
-
-if(problems.length===0){
-
-showModal(
-  "Druckbereich prüfen",
-  "Alle sichtbaren positiven Objekte liegen innerhalb des Druckbereichs."
-);
-
-setStatus("Druckbereich OK");
-
-}else{
-
-showModal(
-  "Druckbereich prüfen",
-  problems.join("\n")
-);
-
-setStatus(
-  `${problems.length} Objekt(e) außerhalb`
-);
-
-}
-
-}
-
-function focusSelection(){
-
-if(selection.length===0){
-
-showModal(
-  "Fokus",
-  "Bitte zuerst ein Objekt auswählen."
-);
-
-return;
-
-}
-
-const box=new THREE.Box3();
-
-selection.forEach(
-  obj=>box.expandByObject(obj)
-);
-
-if(box.isEmpty())return;
-
-const center=
-  box.getCenter(
-    new THREE.Vector3()
-  );
-
-const sphere=
-  box.getBoundingSphere(
-    new THREE.Sphere()
-  );
-
-const radius=
-  Math.max(
-    1,
-    sphere.radius
-  );
-
-orbit.target.copy(center);
-
-const direction=
-  new THREE.Vector3()
-    .subVectors(
-      camera.position,
-      center
-    )
-    .normalize();
-
-const distance=Math.max(
-  radius*3,
-  radius*1.5/
-    Math.tan(
-      THREE.MathUtils.degToRad(
-        camera.fov/2
-      )
-    )
-);
-
-camera.position.copy(
-  center.clone().add(
-    direction.multiplyScalar(
-      distance
-    )
-  )
-);
-
-camera.lookAt(center);
-
-}
-
-function setView(type){
-
-const center=
-  selection.length
-    ?getSelectionCenter()
-    :new THREE.Vector3(0,10,0);
-
-const distance=220;
-
-if(type==="front"){
-  camera.position.set(
-    center.x,
-    center.y,
-    center.z+distance
-  );
-}else if(type==="back"){
-  camera.position.set(
-    center.x,
-    center.y,
-    center.z-distance
-  );
-}else if(type==="left"){
-  camera.position.set(
-    center.x-distance,
-    center.y,
-    center.z
-  );
-}else if(type==="right"){
-  camera.position.set(
-    center.x+distance,
-    center.y,
-    center.z
-  );
-}else if(type==="top"){
-  camera.position.set(
-    center.x,
-    center.y+distance,
-    center.z+.001
-  );
-}else{
-  camera.position.set(
-    center.x+distance*.75,
-    center.y+distance*.65,
-    center.z+distance*.75
-  );
-}
-
-orbit.target.copy(center);
-camera.lookAt(center);
-
-}
-
-function resetScene(){
-
-getSelectableObjects()
-.forEach(
-  disposeObject
-);
-
-clearSelection();
-
-bed={
-  x:220,
-  y:220,
-  z:5
-};
-
-document.getElementById("bedX").value=220;
-document.getElementById("bedY").value=220;
-document.getElementById("bedZ").value=5;
-
-createBed();
-
-createInitialObject();
-
-history=[];
-historyIndex=-1;
-
-saveHistory();
-
-setStatus("Szene zurückgesetzt");
-
-}
-
-function serializeGeometry(geometry){
-
-const result={};
-
-const pos=
-  geometry.getAttribute("position");
-
-if(pos){
-
-result.position=
-  Array.from(pos.array);
-
-result.positionItemSize=
-  pos.itemSize;
-
-}
-
-const normal=
-  geometry.getAttribute("normal");
-
-if(normal){
-
-result.normal=
-  Array.from(normal.array);
-
-result.normalItemSize=
-  normal.itemSize;
-
-}
-
-const index=
-  geometry.getIndex();
-
-if(index){
-
-result.index=
-  Array.from(index.array);
-
-result.indexArrayType=
-  index.array.constructor.name;
-
-}
-
-return result;
-
-}
-
-function deserializeGeometry(data){
-
-const geometry=
-  new THREE.BufferGeometry();
-
-if(data.position){
-
-geometry.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute(
-    data.position,
-    data.positionItemSize||3
-  )
-);
-
-}
-
-if(data.normal){
-
-geometry.setAttribute(
-  "normal",
-  new THREE.Float32BufferAttribute(
-    data.normal,
-    data.normalItemSize||3
-  )
-);
-
-}
-
-if(data.index){
-
-let array;
-
-if(data.indexArrayType==="Uint32Array"){
-  array=new Uint32Array(data.index);
-}else{
-  array=new Uint16Array(data.index);
-}
-
-geometry.setIndex(
-  new THREE.BufferAttribute(
-    array,
-    1
-  )
-);
-
-}
-
-if(
-  !geometry.getAttribute("normal")
-){
-  geometry.computeVertexNormals();
-}
-
-geometry.computeBoundingBox();
-geometry.computeBoundingSphere();
-
-return geometry;
-
-}
-
-function projectData(){
-
-const objects=
-  getSelectableObjects()
-  .map(obj=>({
-
-    name:obj.name,
-
-    userData:{
-      type:obj.userData.type,
-      negative:!!obj.userData.negative,
-      id:obj.userData.id,
-      color:obj.userData.color,
-      params:{
-        ...(obj.userData.params||{})
-      },
-      booleanConsumed:
-        !!obj.userData.booleanConsumed
-    },
-
-    visible:obj.visible,
-
-    position:{
-      x:obj.position.x,
-      y:obj.position.y,
-      z:obj.position.z
-    },
-
-    rotation:{
-      x:obj.rotation.x,
-      y:obj.rotation.y,
-      z:obj.rotation.z
-    },
-
-    scale:{
-      x:obj.scale.x,
-      y:obj.scale.y,
-      z:obj.scale.z
-    },
-
-    geometry:
-      serializeGeometry(
-        obj.geometry
-      ),
-
-    material:{
-      color:
-        obj.material?.color
-          ?"#"+
-            obj.material.color
-              .getHexString()
-          :"#4da3ff"
+        /*
+           Binormal
+        */
+
+        let bx =
+            ty*nz -
+            tz*ny;
+
+        let by =
+            tz*nx -
+            tx*nz;
+
+        let bz =
+            tx*ny -
+            ty*nx;
+
+        let bl =
+            Math.sqrt(
+                bx*bx+
+                by*by+
+                bz*bz
+            );
+
+        bx/=bl;
+        by/=bl;
+        bz/=bl;
+
+
+        for(let j=0;j<tubeSegments;j++){
+
+            const q =
+                j/tubeSegments *
+                Math.PI*2;
+
+            const cq =
+                Math.cos(q);
+
+            const sq =
+                Math.sin(q);
+
+            vertices.push({
+
+                x:
+                    x +
+                    s.wire/2 *
+                    (
+                        cq*nx+
+                        sq*bx
+                    ),
+
+                y:
+                    y +
+                    s.wire/2 *
+                    (
+                        cq*ny+
+                        sq*by
+                    ),
+
+                z:
+                    z +
+                    s.wire/2 *
+                    (
+                        cq*nz+
+                        sq*bz
+                    )
+            });
+        }
     }
 
-  }));
 
-return{
-  version:2,
-  bed:{...bed},
-  nextId,
-  objects
-};
+    /*
+       Seitenflächen
+    */
 
-}
+    for(
+        let i=0;
+        i<pathSegments;
+        i++
+    ){
 
-function restoreProject(data){
+        for(
+            let j=0;
+            j<tubeSegments;
+            j++
+        ){
 
-if(
-  !data||
-  !Array.isArray(data.objects)
-){
+            const a =
+                i*tubeSegments+j;
 
-throw new Error(
-  "Ungültige Projektdatei."
-);
+            const b =
+                i*tubeSegments+
+                ((j+1)%tubeSegments);
 
-}
+            const c =
+                (i+1)*tubeSegments+
+                ((j+1)%tubeSegments);
 
-clearSelection();
+            const d =
+                (i+1)*tubeSegments+j;
 
-getSelectableObjects()
-.forEach(
-  disposeObject
-);
 
-bed={
-  x:Number(data.bed?.x)||220,
-  y:Number(data.bed?.y)||220,
-  z:Number(data.bed?.z)||5
-};
-
-document.getElementById("bedX").value=bed.x;
-document.getElementById("bedY").value=bed.y;
-document.getElementById("bedZ").value=bed.z;
-
-createBed();
-
-nextId=
-  Number(data.nextId)||1;
-
-const restored=[];
-
-data.objects.forEach(saved=>{
-
-const geometry=
-  deserializeGeometry(
-    saved.geometry
-  );
-
-const color=
-  new THREE.Color(
-    saved.material?.color||
-    "#4da3ff"
-  ).getHex();
-
-const material=
-  materialFor(
-    saved.userData?.type||"cube",
-    !!saved.userData?.negative,
-    color
-  );
-
-const obj=
-  new THREE.Mesh(
-    geometry,
-    material
-  );
-
-obj.name=
-  saved.name||"Objekt";
-
-obj.position.set(
-  saved.position?.x||0,
-  saved.position?.y||0,
-  saved.position?.z||0
-);
-
-obj.rotation.set(
-  saved.rotation?.x||0,
-  saved.rotation?.y||0,
-  saved.rotation?.z||0
-);
-
-obj.scale.set(
-  saved.scale?.x??1,
-  saved.scale?.y??1,
-  saved.scale?.z??1
-);
-
-obj.visible=
-  saved.visible!==false;
-
-obj.castShadow=true;
-obj.receiveShadow=true;
-
-obj.userData={
-  ...(saved.userData||{}),
-  id:
-    saved.userData?.id||
-    nextId++,
-  booleanConsumed:
-    !!saved.userData?.booleanConsumed
-};
-
-scene.add(obj);
-
-restored.push(obj);
-
-});
-
-renderObjectList();
-
-if(restored.length){
-  selectObjects([restored[0]]);
-}
-
-setStatus(
-  `Projekt geladen · ${restored.length} Objekt(e)`
-);
-
-}
-
-function saveProjectToFile(){
-
-try{
-
-const data=
-  JSON.stringify(
-    projectData(),
-    null,
-    2
-  );
-
-downloadBlob(
-  new Blob(
-    [data],
-    {type:"application/json"}
-  ),
-  "ghost-mini-blender-project.json"
-);
-
-setStatus("Projekt gespeichert");
-
-}catch(err){
-
-showModal(
-  "Speichern fehlgeschlagen",
-  String(err)
-);
-
-}
-
-}
-
-function loadProjectFromFile(){
-
-const input=
-  document.createElement("input");
-
-input.type="file";
-input.accept=".json,application/json";
-
-input.addEventListener(
-  "change",
-  async()=>{
-
-    const file=
-      input.files?.[0];
-
-    if(!file)return;
-
-    try{
-
-      const text=
-        await file.text();
-
-      restoreProject(
-        JSON.parse(text)
-      );
-
-    }catch(err){
-
-      showModal(
-        "Laden fehlgeschlagen",
-        String(err)
-      );
-
+            triangles.push(
+                [a,b,c],
+                [a,c,d]
+            );
+        }
     }
 
-  }
-);
 
-input.click();
+    /*
+       Endkappen
+    */
 
-}
+    const bottomCenter =
+        vertices.length;
 
-function downloadBlob(
-  blob,
-  filename
-){
+    vertices.push({
 
-const url=
-  URL.createObjectURL(blob);
+        x:radius,
+        y:0,
+        z:-s.height/2
+    });
 
-const a=
-  document.createElement("a");
 
-a.href=url;
-a.download=filename;
+    const topCenter =
+        vertices.length;
 
-document.body.appendChild(a);
-a.click();
-a.remove();
+    vertices.push({
 
-setTimeout(
-  ()=>URL.revokeObjectURL(url),
-  1000
-);
+        x:radius,
+        y:0,
+        z:s.height/2
+    });
 
-}
 
-function createExportGroup(){
+    for(
+        let j=0;
+        j<tubeSegments;
+        j++
+    ){
 
-const group=
-  new THREE.Group();
+        const n =
+            (j+1)%tubeSegments;
 
-getSelectableObjects()
-.filter(
-  obj=>
-    obj.visible&&
-    !obj.userData.negative&&
-    !obj.userData.booleanConsumed
-)
-.forEach(obj=>{
+        triangles.push([
+            bottomCenter,
+            n,
+            j
+        ]);
 
-obj.updateWorldMatrix(true,true);
+        const a =
+            pathSegments*tubeSegments+j;
 
-const geometry=
-  obj.geometry.clone();
+        const b =
+            pathSegments*tubeSegments+n;
 
-geometry.applyMatrix4(
-  obj.matrixWorld
-);
+        triangles.push([
+            topCenter,
+            a,
+            b
+        ]);
+    }
 
-const material=
-  obj.material?.clone()||
-  new THREE.MeshStandardMaterial({
-    color:0xffffff
-  });
 
-const mesh=
-  new THREE.Mesh(
-    geometry,
-    material
-  );
+    /*
+       Binary STL
+    */
 
-mesh.name=obj.name;
+    const buffer =
+        new ArrayBuffer(
+            84 +
+            triangles.length*50
+        );
 
-group.add(mesh);
+    const view =
+        new DataView(buffer);
 
-});
 
-return group;
+    const header =
+        "GHOST 3D Feder STL";
 
-}
+    for(
+        let i=0;
+        i<header.length && i<80;
+        i++
+    ){
 
-function disposeExportGroup(group){
+        view.setUint8(
+            i,
+            header.charCodeAt(i)
+        );
+    }
 
-group.traverse(obj=>{
 
-if(obj.isMesh){
-
-obj.geometry?.dispose();
-
-if(obj.material){
-
-if(Array.isArray(obj.material)){
-  obj.material.forEach(
-    m=>m.dispose()
-  );
-}else{
-  obj.material.dispose();
-}
-
-}
-
-}
-
-});
-
-}
-
-function exportSTL(){
-
-try{
-
-const group=
-  createExportGroup();
-
-if(!group.children.length){
-
-showModal(
-  "STL Export",
-  "Es gibt keine sichtbaren positiven Endobjekte."
-);
-
-return;
-
-}
-
-const exporter=
-  new STLExporter();
-
-const result=
-  exporter.parse(
-    group,
-    {binary:true}
-  );
-
-downloadBlob(
-  new Blob(
-    [result],
-    {type:"model/stl"}
-  ),
-  "ghost-mini-blender.stl"
-);
-
-disposeExportGroup(group);
-
-setStatus("STL exportiert");
-
-}catch(err){
-
-showModal(
-  "STL Export fehlgeschlagen",
-  String(err)
-);
-
-}
-
-}
-
-function exportGLB(){
-
-try{
-
-const group=
-  createExportGroup();
-
-if(!group.children.length){
-
-showModal(
-  "GLB Export",
-  "Es gibt keine sichtbaren positiven Endobjekte."
-);
-
-return;
-
-}
-
-const exporter=
-  new GLTFExporter();
-
-exporter.parse(
-  group,
-  result=>{
-
-    const blob=
-      new Blob(
-        [result],
-        {type:"model/gltf-binary"}
-      );
-
-    downloadBlob(
-      blob,
-      "ghost-mini-blender.glb"
+    view.setUint32(
+        80,
+        triangles.length,
+        true
     );
 
-    disposeExportGroup(group);
 
-    setStatus("GLB exportiert");
+    let offset = 84;
 
-  },
-  error=>{
 
-    disposeExportGroup(group);
+    function normal(a,b,c){
 
-    showModal(
-      "GLB Export fehlgeschlagen",
-      String(error)
+        const ax =
+            b.x-a.x;
+
+        const ay =
+            b.y-a.y;
+
+        const az =
+            b.z-a.z;
+
+        const bx =
+            c.x-a.x;
+
+        const by =
+            c.y-a.y;
+
+        const bz =
+            c.z-a.z;
+
+
+        let nx =
+            ay*bz -
+            az*by;
+
+        let ny =
+            az*bx -
+            ax*bz;
+
+        let nz =
+            ax*by -
+            ay*bx;
+
+
+        const l =
+            Math.sqrt(
+                nx*nx+
+                ny*ny+
+                nz*nz
+            ) || 1;
+
+        return {
+            x:nx/l,
+            y:ny/l,
+            z:nz/l
+        };
+    }
+
+
+    for(const tri of triangles){
+
+        const a =
+            vertices[tri[0]];
+
+        const b =
+            vertices[tri[1]];
+
+        const c =
+            vertices[tri[2]];
+
+
+        const n =
+            normal(a,b,c);
+
+
+        view.setFloat32(
+            offset,
+            n.x,
+            true
+        );
+
+        offset+=4;
+
+        view.setFloat32(
+            offset,
+            n.y,
+            true
+        );
+
+        offset+=4;
+
+        view.setFloat32(
+            offset,
+            n.z,
+            true
+        );
+
+        offset+=4;
+
+
+        for(const p of [a,b,c]){
+
+            view.setFloat32(
+                offset,
+                p.x,
+                true
+            );
+
+            offset+=4;
+
+            view.setFloat32(
+                offset,
+                p.y,
+                true
+            );
+
+            offset+=4;
+
+            view.setFloat32(
+                offset,
+                p.z,
+                true
+            );
+
+            offset+=4;
+        }
+
+
+        view.setUint16(
+            offset,
+            0,
+            true
+        );
+
+        offset+=2;
+    }
+
+
+    return new Blob(
+        [buffer],
+        {
+            type:"model/stl"
+        }
     );
-
-  },
-  {
-    binary:true,
-    onlyVisible:true
-  }
-);
-
-}catch(err){
-
-showModal(
-  "GLB Export fehlgeschlagen",
-  String(err)
-);
-
 }
 
-}
 
-function createAddObject(
-  type,
-  negative=false
-){
+/* =========================================================
+   DOWNLOAD
+   ========================================================= */
 
-let params={
-  position:new THREE.Vector3(
-    (Math.random()-.5)*50,
-    10,
-    (Math.random()-.5)*50
-  ),
-  color:
-    negative
-      ?0xc43d52
-      :0x4da3ff
-};
-
-if(type==="spring"){
-
-params={
-  ...params,
-  turns:8,
-  radius:8,
-  height:24,
-  tube:1.5,
-  position:new THREE.Vector3(
-    0,
-    12,
-    0
-  )
-};
-
-}
-
-const obj=
-  createPrimitive(
-    type,
-    negative,
-    params
-  );
-
-selectObjects([obj]);
-
-focusSelection();
-
-saveHistory();
-
-return obj;
-
-}
-
-function makeSnapshot(){
-return JSON.stringify(
-  projectData()
-);
-}
-
-function saveHistory(force=true){
-
-if(applyingHistory)return;
-
-const snapshot=
-  makeSnapshot();
-
-if(
-  history.length&&
-  history[historyIndex]===snapshot
-){
-  return;
-}
-
-history=
-  history.slice(
-    0,
-    historyIndex+1
-  );
-
-history.push(snapshot);
-
-if(history.length>40){
-  history.shift();
-}
-
-historyIndex=
-  history.length-1;
-
-if(force){
-  setStatus("Änderung gespeichert");
-}
-
-updateHistoryButtons();
-
-}
-
-function restoreSnapshot(snapshot){
-
-applyingHistory=true;
-
-try{
-
-restoreProject(
-  JSON.parse(snapshot)
-);
-
-}finally{
-
-applyingHistory=false;
-
-}
-
-updateHistoryButtons();
-
-}
-
-function undo(){
-
-if(historyIndex<=0){
-
-setStatus(
-  "Kein Undo-Schritt verfügbar"
-);
-
-return;
-
-}
-
-historyIndex--;
-
-restoreSnapshot(
-  history[historyIndex]
-);
-
-setStatus("Undo");
-
-}
-
-function redo(){
-
-if(
-  historyIndex>=
-  history.length-1
-){
-
-setStatus(
-  "Kein Redo-Schritt verfügbar"
-);
-
-return;
-
-}
-
-historyIndex++;
-
-restoreSnapshot(
-  history[historyIndex]
-);
-
-setStatus("Redo");
-
-}
-
-function updateHistoryButtons(){
-
-document.getElementById(
-  "undoBtn"
-).disabled=
-  historyIndex<=0;
-
-document.getElementById(
-  "redoBtn"
-).disabled=
-  historyIndex>=history.length-1;
-
-}
-
-function setupUI(){
-
-document.getElementById(
-  "addCubeBtn"
-).onclick=
-  ()=>createAddObject("cube");
-
-document.getElementById(
-  "addSphereBtn"
-).onclick=
-  ()=>createAddObject("sphere");
-
-document.getElementById(
-  "addCylinderBtn"
-).onclick=
-  ()=>createAddObject("cylinder");
-
-document.getElementById(
-  "addSpringBtn"
-).onclick=
-  ()=>createAddObject("spring");
-
-document.getElementById(
-  "addNegCubeBtn"
-).onclick=
-  ()=>createAddObject("cube",true);
-
-document.getElementById(
-  "addNegSphereBtn"
-).onclick=
-  ()=>createAddObject("sphere",true);
-
-document.getElementById(
-  "addNegCylinderBtn"
-).onclick=
-  ()=>createAddObject("cylinder",true);
-
-document.getElementById(
-  "moveToolBtn"
-).onclick=
-  ()=>setTool("translate");
-
-document.getElementById(
-  "moveToolPanelBtn"
-).onclick=
-  ()=>setTool("translate");
-
-document.getElementById(
-  "rotateToolBtn"
-).onclick=
-  ()=>setTool("rotate");
-
-document.getElementById(
-  "rotateToolPanelBtn"
-).onclick=
-  ()=>setTool("rotate");
-
-document.getElementById(
-  "scaleToolBtn"
-).onclick=
-  ()=>setTool("scale");
-
-document.getElementById(
-  "scaleToolPanelBtn"
-).onclick=
-  ()=>setTool("scale");
-
-document.getElementById(
-  "selectToolBtn"
-).onclick=
-  ()=>setTool("select");
-
-document.getElementById(
-  "sculptToolBtn"
-).onclick=
-  ()=>{
-    setTool("sculpt");
-    sculptMode="up";
-  };
-
-document.getElementById(
-  "focusToolBtn"
-).onclick=
-  focusSelection;
-
-document.getElementById(
-  "duplicateBtn"
-).onclick=
-  duplicateSelection;
-
-document.getElementById(
-  "deleteBtn"
-).onclick=
-  deleteSelection;
-
-document.getElementById(
-  "renameBtn"
-).onclick=
-  renameSelected;
-
-document.getElementById(
-  "visibilityBtn"
-).onclick=
-  toggleVisibility;
-
-document.getElementById(
-  "selectAllBtn"
-).onclick=
-  ()=>{
-    selectObjects(
-      getSelectableObjects()
-    );
-  };
-
-document.getElementById(
-  "deselectAllBtn"
-).onclick=
-  clearSelection;
-
-document.getElementById(
-  "focusBtn"
-).onclick=
-  focusSelection;
-
-document.getElementById(
-  "applyTransformBtn"
-).onclick=
-  applyTransformFields;
-
-[
-"posX","posY","posZ",
-"scaleX","scaleY","scaleZ",
-"rotX","rotY","rotZ"
-].forEach(id=>{
-
-document.getElementById(id)
+document
+.getElementById("download")
 .addEventListener(
-  "change",
-  applyTransformFields
+    "click",
+    ()=>{
+
+        const blob =
+            generateSTL();
+
+        const url =
+            URL.createObjectURL(blob);
+
+        const a =
+            document.createElement("a");
+
+        a.href = url;
+
+        a.download =
+            "GHOST_Feder.stl";
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        setTimeout(
+            ()=>{
+                URL.revokeObjectURL(url);
+            },
+            1000
+        );
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "STL wurde heruntergeladen";
+    }
 );
 
-});
 
-document.getElementById(
-  "applyColorBtn"
-).onclick=
-  applyColor;
+/* =========================================================
+   AKTUALISIEREN
+   ========================================================= */
 
-document.getElementById(
-  "placeOnBedBtn"
-).onclick=
-  setOnBed;
-
-document.getElementById(
-  "centerXZBtn"
-).onclick=
-  centerXZ;
-
-document.getElementById(
-  "applyRoundBtn"
-).onclick=
-  applyRoundCube;
-
-document.getElementById(
-  "rebuildSpringBtn"
-).onclick=
-  rebuildSpring;
-
-document.getElementById(
-  "sculptUpBtn"
-).onclick=
-  ()=>{
-    setTool("sculpt");
-    sculptMode="up";
-    setStatus("Shift + Ziehen: Sculpt Auf");
-  };
-
-document.getElementById(
-  "sculptDownBtn"
-).onclick=
-  ()=>{
-    setTool("sculpt");
-    sculptMode="down";
-    setStatus("Shift + Ziehen: Sculpt Ab");
-  };
-
-document.getElementById(
-  "sculptSmoothBtn"
-).onclick=
-  ()=>{
-    setTool("sculpt");
-    sculptMode="smooth";
-    setStatus("Glätten");
-  };
-
-document.getElementById(
-  "unionBtn"
-).onclick=
-  booleanUnion;
-
-document.getElementById(
-  "subtractBtn"
-).onclick=
-  booleanSubtract;
-
-document.getElementById(
-  "joinBtn"
-).onclick=
-  mergeSelectedMeshes;
-
-document.getElementById(
-  "applyBedBtn"
-).onclick=
-  applyBedSettings;
-
-document.getElementById(
-  "checkBedBtn"
-).onclick=
-  checkBed;
-
-document.getElementById(
-  "gridToggleBtn"
-).onclick=
-  ()=>{
-    bedGrid.visible=
-      !bedGrid.visible;
-  };
-
-document.querySelectorAll(
-  "[data-view]"
-).forEach(btn=>{
-
-btn.onclick=
-  ()=>setView(
-    btn.dataset.view
-  );
-
-});
-
-document.getElementById(
-  "resetSceneBtn"
-).onclick=
-  resetScene;
-
-document.getElementById(
-  "saveBtn"
-).onclick=
-  saveProjectToFile;
-
-document.getElementById(
-  "loadBtn"
-).onclick=
-  loadProjectFromFile;
-
-document.getElementById(
-  "exportStlBtn"
-).onclick=
-  exportSTL;
-
-document.getElementById(
-  "exportGlbBtn"
-).onclick=
-  exportGLB;
-
-document.getElementById(
-  "undoBtn"
-).onclick=
-  undo;
-
-document.getElementById(
-  "redoBtn"
-).onclick=
-  redo;
-
-window.addEventListener(
-  "keydown",
-  event=>{
-
-    if(
-      (event.ctrlKey||event.metaKey)&&
-      event.key.toLowerCase()==="z"
-    ){
-
-      event.preventDefault();
-
-      if(event.shiftKey){
-        redo();
-      }else{
-        undo();
-      }
-
+document
+.getElementById("update")
+.addEventListener(
+    "click",
+    ()=>{
+        createSpring();
     }
-
-    if(
-      (event.ctrlKey||event.metaKey)&&
-      event.key.toLowerCase()==="y"
-    ){
-
-      event.preventDefault();
-      redo();
-
-    }
-
-    if(
-      event.key==="Delete"&&
-      !event.target.matches("input")
-    ){
-
-      deleteSelection();
-
-    }
-
-    if(
-      event.key.toLowerCase()==="g"&&
-      !event.target.matches("input")
-    ){
-
-      setTool("translate");
-
-    }
-
-    if(
-      event.key.toLowerCase()==="r"&&
-      !event.target.matches("input")
-    ){
-
-      setTool("rotate");
-
-    }
-
-    if(
-      event.key.toLowerCase()==="s"&&
-      !event.target.matches("input")
-    ){
-
-      setTool("scale");
-
-    }
-
-    if(
-      event.key.toLowerCase()==="f"&&
-      !event.target.matches("input")
-    ){
-
-      focusSelection();
-
-    }
-
-  }
 );
 
-renderObjectList();
-updateHistoryButtons();
 
-}
+/* =========================================================
+   START
+   ========================================================= */
 
-function animate(){
+createSpring();
+draw();
 
-requestAnimationFrame(animate);
-
-try{
-
-orbit.update();
-
-renderer.render(
-  scene,
-  camera
-);
-
-}catch(err){
-
-log(
-  "Renderfehler: "+String(err),
-  true
-);
-
-}
-
-}
-
-})();
 </script>
 
 </body>
