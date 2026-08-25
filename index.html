@@ -3,18 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST 3D Editor + ULTRA FPS</title>
+<title>GHOST Mini Blender 3D</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+    box-sizing:border-box;
+}
+
 html,body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#101318;
+    background:#15171b;
+    color:#fff;
     font-family:Arial,Helvetica,sans-serif;
-    color:white;
+}
+
+body{
+    user-select:none;
 }
 
 #app{
@@ -24,101 +31,141 @@ html,body{
 
 canvas{
     display:block;
-    width:100%;
-    height:100%;
 }
 
-/* =========================
-   EDITOR UI
-========================= */
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 #topbar{
     position:absolute;
     top:0;
     left:0;
     right:0;
-    height:62px;
-    background:rgba(12,15,20,.94);
-    border-bottom:1px solid #303640;
+    height:54px;
+    z-index:100;
     display:flex;
     align-items:center;
-    gap:8px;
-    padding:7px;
-    z-index:100;
+    gap:5px;
+    padding:5px 7px;
+    background:rgba(24,26,31,.97);
+    border-bottom:1px solid #363b44;
+    overflow-x:auto;
+    white-space:nowrap;
 }
 
 .logo{
-    font-weight:bold;
-    font-size:18px;
-    padding:0 12px;
     color:#ffd400;
+    font-size:17px;
+    font-weight:bold;
+    padding:0 9px;
+}
+
+.group{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    padding-left:7px;
+    margin-left:3px;
+    border-left:1px solid #3c4149;
 }
 
 button{
-    border:1px solid #424a56;
-    background:#202630;
+    border:1px solid #444a55;
+    background:#252a32;
     color:#fff;
-    border-radius:6px;
-    padding:8px 10px;
+    border-radius:5px;
+    padding:7px 9px;
+    font-size:12px;
     cursor:pointer;
-    font-size:13px;
 }
 
 button:hover{
-    background:#303946;
+    background:#343b46;
 }
 
 button.active{
-    background:#d5a900;
+    background:#d5ad00;
+    border-color:#ffe56b;
     color:#111;
-    border-color:#ffe46a;
 }
 
-.toolGroup{
-    display:flex;
-    gap:4px;
-    border-left:1px solid #3a414c;
-    padding-left:7px;
-}
+/* =========================================================
+   LEFT TOOLBAR
+========================================================= */
 
-#side{
+#leftbar{
     position:absolute;
-    top:62px;
+    top:54px;
+    left:0;
+    bottom:0;
+    width:55px;
+    z-index:90;
+    background:rgba(25,27,32,.96);
+    border-right:1px solid #383d46;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:7px 5px;
+    gap:5px;
+}
+
+.tool{
+    width:43px;
+    height:38px;
+    padding:0;
+    font-size:17px;
+}
+
+.toolText{
+    font-size:9px;
+    display:block;
+    margin-top:1px;
+}
+
+/* =========================================================
+   RIGHT PANEL
+========================================================= */
+
+#right{
+    position:absolute;
+    top:54px;
     right:0;
     bottom:0;
-    width:310px;
-    background:rgba(15,18,24,.96);
-    border-left:1px solid #343b46;
+    width:325px;
     z-index:90;
     overflow:auto;
-    padding:10px;
+    background:rgba(22,24,29,.97);
+    border-left:1px solid #383d46;
+    padding:8px;
 }
 
 .panel{
-    border:1px solid #343b46;
-    background:#191e26;
-    border-radius:8px;
-    margin-bottom:10px;
+    background:#1c2027;
+    border:1px solid #353b45;
+    border-radius:7px;
+    margin-bottom:8px;
     overflow:hidden;
 }
 
 .panelTitle{
-    padding:9px 10px;
-    background:#222832;
+    padding:8px 10px;
+    background:#262b33;
+    border-bottom:1px solid #383e48;
+    font-size:12px;
     font-weight:bold;
-    font-size:13px;
 }
 
 .panelBody{
-    padding:9px;
+    padding:8px;
 }
 
 .row{
     display:grid;
-    grid-template-columns:80px 1fr;
-    gap:7px;
+    grid-template-columns:85px 1fr;
     align-items:center;
-    margin-bottom:7px;
+    gap:6px;
+    margin-bottom:6px;
 }
 
 .row3{
@@ -128,208 +175,204 @@ button.active{
 }
 
 label{
-    font-size:12px;
-    color:#aeb6c2;
+    font-size:11px;
+    color:#aeb5c0;
 }
 
-input,select{
+input,
+select{
     width:100%;
-    background:#10141a;
-    color:white;
-    border:1px solid #414955;
-    border-radius:5px;
+    min-width:0;
+    background:#111419;
+    color:#fff;
+    border:1px solid #414751;
+    border-radius:4px;
     padding:6px;
+    font-size:12px;
 }
 
-.smallBtn{
+input[type="color"]{
+    height:31px;
+    padding:2px;
+}
+
+input[type="range"]{
+    padding:0;
+}
+
+.full{
     width:100%;
     margin-top:4px;
 }
 
-#objects{
-    max-height:220px;
+.small{
+    font-size:10px;
+    color:#9098a4;
+    line-height:1.45;
+}
+
+/* =========================================================
+   OBJECT LIST
+========================================================= */
+
+#objectList{
+    max-height:210px;
     overflow:auto;
 }
 
-.objectItem{
-    padding:7px;
-    border-bottom:1px solid #2e343e;
+.object{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-height:30px;
+    padding:5px 6px;
+    border-bottom:1px solid #30353e;
     cursor:pointer;
-    font-size:13px;
+    font-size:12px;
 }
 
-.objectItem:hover{
-    background:#252c36;
+.object:hover{
+    background:#292f38;
 }
 
-.objectItem.selected{
-    background:#5d4a00;
-    color:#ffe35a;
+.object.selected{
+    background:#594800;
+    color:#ffe56a;
 }
 
-.typeBadge{
-    float:right;
-    color:#8f99a7;
+.objectIcon{
+    width:20px;
+    text-align:center;
+}
+
+.objectName{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.objectEye{
+    width:25px;
+    text-align:center;
+    cursor:pointer;
+}
+
+/* =========================================================
+   VIEW
+========================================================= */
+
+#viewInfo{
+    position:absolute;
+    left:65px;
+    top:65px;
+    z-index:60;
+    background:rgba(0,0,0,.45);
+    padding:7px 9px;
+    border-radius:5px;
+    font-size:11px;
+    line-height:1.45;
+    pointer-events:none;
+}
+
+#axis{
+    position:absolute;
+    left:68px;
+    bottom:20px;
+    z-index:60;
+    background:rgba(0,0,0,.45);
+    padding:7px 10px;
+    border-radius:5px;
     font-size:11px;
 }
 
-/* =========================
-   LEFT INFO
-========================= */
+/* =========================================================
+   SCULPT UI
+========================================================= */
 
-#info{
+#sculptPanel{
+    display:none;
+}
+
+#sculptCircle{
     position:absolute;
-    left:10px;
-    top:75px;
+    display:none;
+    width:70px;
+    height:70px;
+    border:2px solid #ffd400;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:1500;
+    transform:translate(-50%,-50%);
+}
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+#warnings{
+    position:absolute;
+    left:65px;
+    bottom:20px;
     z-index:80;
-    background:rgba(0,0,0,.5);
-    padding:9px;
-    border-radius:7px;
-    font-size:12px;
-    line-height:1.5;
+    max-width:420px;
     pointer-events:none;
 }
 
-/* =========================
-   FPS UI
-========================= */
+.warning{
+    background:rgba(150,30,30,.92);
+    border:1px solid #ff6767;
+    padding:8px 11px;
+    margin-top:5px;
+    border-radius:5px;
+    font-size:11px;
+}
 
-#crosshair{
+/* =========================================================
+   LOADING
+========================================================= */
+
+#loading{
     position:absolute;
-    left:50%;
-    top:50%;
-    width:16px;
-    height:16px;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-    z-index:1000;
-    display:none;
-}
-
-#crosshair:before,
-#crosshair:after{
-    content:"";
-    position:absolute;
-    background:white;
-}
-
-#crosshair:before{
-    left:7px;
-    top:0;
-    width:2px;
-    height:16px;
-}
-
-#crosshair:after{
-    left:0;
-    top:7px;
-    width:16px;
-    height:2px;
-}
-
-#fpsUI{
-    display:none;
-}
-
-#healthBar{
-    position:absolute;
-    left:20px;
-    bottom:20px;
-    width:280px;
-    height:20px;
-    border:2px solid white;
-    background:rgba(0,0,0,.3);
-}
-
-#healthFill{
-    width:100%;
-    height:100%;
-    background:#1e90ff;
-}
-
-#staminaBar{
-    position:absolute;
-    left:20px;
-    bottom:50px;
-    width:280px;
-    height:10px;
-    border:1px solid white;
-    background:rgba(0,0,0,.3);
-}
-
-#staminaFill{
-    width:100%;
-    height:100%;
-    background:lime;
-}
-
-#ammo{
-    position:absolute;
-    right:20px;
-    bottom:20px;
-    font-size:28px;
+    inset:0;
+    background:#101216;
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    font-size:25px;
     font-weight:bold;
-    color:white;
-    background:rgba(0,0,0,.35);
-    padding:10px 15px;
-    border-radius:8px;
 }
 
-#hitmarker{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    font-size:42px;
-    font-weight:bold;
-    color:red;
-    display:none;
-    pointer-events:none;
-}
-
-#debug{
-    position:absolute;
-    top:75px;
-    left:10px;
-    padding:8px;
-    background:rgba(0,0,0,.55);
-    color:#00ff00;
+#loadingSmall{
+    margin-top:10px;
     font-size:12px;
-    line-height:1.4;
-    border-radius:6px;
-    white-space:pre;
+    color:#9098a5;
+    font-weight:normal;
 }
 
-#fpsHint{
-    position:absolute;
-    left:50%;
-    bottom:30px;
-    transform:translateX(-50%);
-    background:rgba(0,0,0,.65);
-    padding:10px 15px;
-    border-radius:8px;
-    display:none;
-}
-
-/* =========================
+/* =========================================================
    MODAL
-========================= */
+========================================================= */
 
 #modal{
     position:absolute;
     inset:0;
+    z-index:5000;
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,.6);
-    z-index:2000;
+    background:rgba(0,0,0,.65);
 }
 
 .modalBox{
-    width:min(500px,90vw);
-    background:#191e26;
-    border:1px solid #555f6d;
-    border-radius:10px;
+    width:min(520px,90vw);
+    max-height:85vh;
+    overflow:auto;
+    background:#1c2027;
+    border:1px solid #505864;
+    border-radius:9px;
     padding:18px;
 }
 
@@ -337,38 +380,32 @@ input,select{
     margin-top:0;
 }
 
-/* =========================
-   LOADING
-========================= */
-
-#loading{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#101318;
-    color:white;
-    font-size:28px;
-    font-weight:bold;
-    z-index:9999;
+.modalBox p{
+    color:#c2c8d0;
+    font-size:13px;
+    line-height:1.5;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================================
+   MOBILE
+========================================================= */
 
-@media(max-width:800px){
-    #side{
-        width:260px;
+@media(max-width:900px){
+
+    #right{
+        width:275px;
     }
 
-    #topbar{
-        overflow-x:auto;
+    #leftbar{
+        width:48px;
     }
 
-    .logo{
-        display:none;
+    .tool{
+        width:37px;
+    }
+
+    #viewInfo{
+        left:55px;
     }
 }
 </style>
@@ -378,348 +415,599 @@ input,select{
 
 <div id="app">
 
-<div id="loading">GHOST 3D ENGINE wird geladen...</div>
+<div id="loading">
+    GHOST MINI BLENDER
+    <div id="loadingSmall">
+        3D-Editor wird geladen...
+    </div>
+</div>
 
-<!-- =========================
+<!-- =====================================================
      TOP BAR
-========================= -->
+===================================================== -->
 
 <div id="topbar">
 
-<div class="logo">GHOST 3D</div>
+    <div class="logo">GHOST 3D</div>
 
-<div class="toolGroup">
-<button id="addSphere">● Kugel</button>
-<button id="addCube">■ Würfel</button>
-<button id="addCylinder">⬢ Zylinder</button>
-<button id="addSpring">〰 Feder</button>
-</div>
+    <div class="group">
+        <button id="addSphere">● Kugel</button>
+        <button id="addCube">■ Würfel</button>
+        <button id="addCylinder">⬢ Zylinder</button>
+        <button id="addSpring">〰 Feder</button>
+    </div>
 
-<div class="toolGroup">
-<button id="addNegSphere">− Kugel</button>
-<button id="addNegCube">− Würfel</button>
-<button id="addNegCylinder">− Zylinder</button>
-</div>
+    <div class="group">
+        <button id="addNegSphere">− Kugel</button>
+        <button id="addNegCube">− Würfel</button>
+        <button id="addNegCylinder">− Zylinder</button>
+    </div>
 
-<div class="toolGroup">
-<button id="moveTool" class="active">↔ Move</button>
-<button id="rotateTool">↻ Rotate</button>
-<button id="scaleTool">⛶ Scale</button>
-</div>
+    <div class="group">
+        <button id="unionBtn">Vereinigung</button>
+        <button id="subtractBtn">Ausschneiden</button>
+        <button id="joinBtn">Verbinden</button>
+    </div>
 
-<div class="toolGroup">
-<button id="duplicateBtn">Duplizieren</button>
-<button id="deleteBtn">Löschen</button>
-<button id="selectAllBtn">Alle</button>
-</div>
+    <div class="group">
+        <button id="undoBtn">↶</button>
+        <button id="redoBtn">↷</button>
+        <button id="saveBtn">Speichern</button>
+        <button id="loadBtn">Laden</button>
+    </div>
 
-<div class="toolGroup">
-<button id="fpsBtn">FPS-Modus</button>
-<button id="exportBtn">GLB Export</button>
-</div>
-
-</div>
-
-<!-- =========================
-     SIDE PANEL
-========================= -->
-
-<div id="side">
-
-<div class="panel">
-<div class="panelTitle">Objekte</div>
-<div class="panelBody">
-<div id="objects"></div>
-</div>
-</div>
-
-<div class="panel">
-<div class="panelTitle">Transformation</div>
-<div class="panelBody">
-
-<div class="row">
-<label>Position X</label>
-<input id="posX" type="number" step="0.01">
-</div>
-
-<div class="row">
-<label>Position Y</label>
-<input id="posY" type="number" step="0.01">
-</div>
-
-<div class="row">
-<label>Position Z</label>
-<input id="posZ" type="number" step="0.01">
-</div>
-
-<div class="row">
-<label>Größe X</label>
-<input id="scaleX" type="number" step="0.01" min=".01">
-</div>
-
-<div class="row">
-<label>Größe Y</label>
-<input id="scaleY" type="number" step="0.01" min=".01">
-</div>
-
-<div class="row">
-<label>Größe Z</label>
-<input id="scaleZ" type="number" step="0.01" min=".01">
-</div>
-
-<div class="row">
-<label>Rotation X</label>
-<input id="rotX" type="number" step="1">
-</div>
-
-<div class="row">
-<label>Rotation Y</label>
-<input id="rotY" type="number" step="1">
-</div>
-
-<div class="row">
-<label>Rotation Z</label>
-<input id="rotZ" type="number" step="1">
-</div>
-
-<button class="smallBtn" id="groundBtn">
-Auf Platte stellen
-</button>
-
-<button class="smallBtn" id="centerBtn">
-In Mitte setzen
-</button>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panelTitle">Geometrie</div>
-<div class="panelBody">
-
-<div class="row">
-<label>Rundung</label>
-<input id="roundness" type="range" min="0" max="1" step=".05" value="0">
-</div>
-
-<div class="row">
-<label>Feder Windungen</label>
-<input id="springTurns" type="number" min="1" max="40" value="8">
-</div>
-
-<div class="row">
-<label>Feder Radius</label>
-<input id="springRadius" type="number" min=".1" max="10" step=".1" value="1">
-</div>
-
-<div class="row">
-<label>Feder Draht</label>
-<input id="springWire" type="number" min=".05" max="2" step=".05" value=".25">
-</div>
-
-<button class="smallBtn" id="rebuildSpring">
-Feder neu erstellen
-</button>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panelTitle">Sculpting</div>
-<div class="panelBody">
-
-<button class="smallBtn" id="sculptUp">
-Sculpt + 
-</button>
-
-<button class="smallBtn" id="sculptDown">
-Sculpt −
-</button>
-
-<button class="smallBtn" id="sculptSmooth">
-Glätten
-</button>
-
-</div>
-</div>
-
-<div class="panel">
-<div class="panelTitle">3D-Druck</div>
-<div class="panelBody">
-
-<div style="font-size:12px;line-height:1.5;color:#aeb6c2">
-Die Modelle sind geschlossene Volumen.
-<br><br>
-Das eigentliche Infill wird später in Bambu Studio festgelegt.
-<br><br>
-Die negativen Objekte dienen im Editor als Aussparungs-Markierungen.
-</div>
-
-<button class="smallBtn" id="preparePrint">
-Druck vorbereiten
-</button>
-
-<button class="smallBtn" id="removeNegatives">
-Negative aus Export entfernen
-</button>
-
-</div>
-</div>
+    <div class="group">
+        <button id="stlBtn">STL</button>
+        <button id="glbBtn">GLB</button>
+    </div>
 
 </div>
 
-<!-- =========================
-     INFO
-========================= -->
+<!-- =====================================================
+     LEFT BAR
+===================================================== -->
 
-<div id="info">
-<b>GHOST 3D EDITOR</b><br>
-Linksklick = Objekt auswählen<br>
-Shift + Klick = Mehrfachauswahl<br>
-WASD = Kamera bewegen<br>
-Mausrad = Zoom<br>
-G = Move &nbsp; R = Rotate &nbsp; S = Scale<br>
-Entf = Objekt löschen<br>
-Esc = Auswahl lösen
-</div>
+<div id="leftbar">
 
-<!-- =========================
-     FPS UI
-========================= -->
+    <button class="tool active" id="selectTool">
+        ↖
+        <span class="toolText">Select</span>
+    </button>
 
-<div id="fpsUI">
+    <button class="tool" id="moveTool">
+        ↔
+        <span class="toolText">Move</span>
+    </button>
 
-<div id="crosshair"></div>
+    <button class="tool" id="rotateTool">
+        ↻
+        <span class="toolText">Rotate</span>
+    </button>
 
-<div id="hitmarker">✖</div>
+    <button class="tool" id="scaleTool">
+        ⛶
+        <span class="toolText">Scale</span>
+    </button>
 
-<div id="healthBar">
-<div id="healthFill"></div>
-</div>
+    <button class="tool" id="sculptTool">
+        ✏
+        <span class="toolText">Sculpt</span>
+    </button>
 
-<div id="staminaBar">
-<div id="staminaFill"></div>
-</div>
-
-<div id="ammo">
-30 / 30
-</div>
-
-<div id="debug">
-FPS-Modus
-</div>
-
-<div id="fpsHint">
-Klicken für Pointer Lock · WASD · Space
-</div>
+    <button class="tool" id="panView">
+        ✋
+        <span class="toolText">Pan</span>
+    </button>
 
 </div>
 
-<!-- =========================
+<!-- =====================================================
+     RIGHT PANEL
+===================================================== -->
+
+<div id="right">
+
+    <!-- OBJECTS -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            📋 Objektverwaltung
+        </div>
+
+        <div class="panelBody">
+
+            <div id="objectList"></div>
+
+            <button class="full" id="duplicateBtn">
+                📋 Duplizieren
+            </button>
+
+            <button class="full" id="deleteBtn">
+                🗑 Löschen
+            </button>
+
+            <button class="full" id="renameBtn">
+                ✏ Umbenennen
+            </button>
+
+            <button class="full" id="hideBtn">
+                👁 Sichtbarkeit
+            </button>
+
+            <button class="full" id="selectAllBtn">
+                Mehrfachauswahl: Alle
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- TRANSFORM -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            📐 Transformation
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row">
+                <label>Position X</label>
+                <input id="px" type="number" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Position Y</label>
+                <input id="py" type="number" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Position Z</label>
+                <input id="pz" type="number" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Größe X</label>
+                <input id="sx" type="number" min=".001" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Größe Y</label>
+                <input id="sy" type="number" min=".001" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Größe Z</label>
+                <input id="sz" type="number" min=".001" step=".01">
+            </div>
+
+            <div class="row">
+                <label>Rotation X</label>
+                <input id="rx" type="number" step="1">
+            </div>
+
+            <div class="row">
+                <label>Rotation Y</label>
+                <input id="ry" type="number" step="1">
+            </div>
+
+            <div class="row">
+                <label>Rotation Z</label>
+                <input id="rz" type="number" step="1">
+            </div>
+
+            <button class="full" id="groundBtn">
+                Z = Druckplatte
+            </button>
+
+            <button class="full" id="centerBtn">
+                X/Z = Mitte
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- APPEARANCE -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🎨 Darstellung
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row">
+                <label>Farbe</label>
+                <input id="colorInput" type="color" value="#4da6ff">
+            </div>
+
+            <button class="full" id="applyColor">
+                Farbe übernehmen
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- GEOMETRY -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🧊 Geometrie
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row">
+                <label>Würfel Rundung</label>
+                <input id="roundness"
+                       type="range"
+                       min="0"
+                       max=".45"
+                       step=".01"
+                       value="0">
+            </div>
+
+            <button class="full" id="roundCube">
+                Würfel abrunden
+            </button>
+
+            <hr>
+
+            <div class="row">
+                <label>Feder Windungen</label>
+                <input id="springTurns"
+                       type="number"
+                       min="1"
+                       max="30"
+                       step="1"
+                       value="8">
+            </div>
+
+            <div class="row">
+                <label>Feder Radius</label>
+                <input id="springRadius"
+                       type="number"
+                       min=".2"
+                       max="10"
+                       step=".1"
+                       value="1.5">
+            </div>
+
+            <div class="row">
+                <label>Feder Höhe</label>
+                <input id="springHeight"
+                       type="number"
+                       min=".5"
+                       max="30"
+                       step=".1"
+                       value="7">
+            </div>
+
+            <div class="row">
+                <label>Draht</label>
+                <input id="springWire"
+                       type="number"
+                       min=".05"
+                       max="1"
+                       step=".01"
+                       value=".22">
+            </div>
+
+            <button class="full" id="rebuildSpring">
+                Feder aktualisieren
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- SCULPT -->
+
+    <div class="panel" id="sculptPanel">
+
+        <div class="panelTitle">
+            ✏️ Sculpting
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row">
+                <label>Radius</label>
+                <input id="brushRadius"
+                       type="range"
+                       min=".1"
+                       max="3"
+                       step=".05"
+                       value=".7">
+            </div>
+
+            <div class="row">
+                <label>Stärke</label>
+                <input id="brushStrength"
+                       type="range"
+                       min=".01"
+                       max=".5"
+                       step=".01"
+                       value=".08">
+            </div>
+
+            <button class="full" id="sculptModeAdd">
+                Sculpt + / Erhöhen
+            </button>
+
+            <button class="full" id="sculptModeSub">
+                Sculpt − / Absenken
+            </button>
+
+            <button class="full" id="smoothBtn">
+                Glätten
+            </button>
+
+            <div class="small">
+                Im Sculpt-Modus mit gedrückter linker
+                Maustaste über ein Modell ziehen.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SPRING -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            〰 Feder
+        </div>
+
+        <div class="panelBody">
+
+            <div class="small">
+                Die Feder besitzt einen echten massiven
+                Drahtkörper. Die Windungen haben bewusst
+                Abstand und sind nicht zu einem Zylinder
+                zusammengedrückt.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PRINT -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            🖨️ 3D-Druck
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row">
+                <label>Platte X</label>
+                <input id="bedX"
+                       type="number"
+                       value="256"
+                       step="1">
+            </div>
+
+            <div class="row">
+                <label>Platte Y</label>
+                <input id="bedY"
+                       type="number"
+                       value="256"
+                       step="1">
+            </div>
+
+            <div class="row">
+                <label>Platte Z</label>
+                <input id="bedZ"
+                       type="number"
+                       value="256"
+                       step="1">
+            </div>
+
+            <button class="full" id="updateBed">
+                Druckplatte aktualisieren
+            </button>
+
+            <button class="full" id="checkPrint">
+                Druckbereich prüfen
+            </button>
+
+            <div class="small">
+                Maße werden in mm behandelt.
+                Z=0 ist die Oberfläche der Druckplatte.
+                Infill wird nicht im Editor erzeugt.
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- VIEW -->
+
+    <div class="panel">
+
+        <div class="panelTitle">
+            👁️ Ansicht
+        </div>
+
+        <div class="panelBody">
+
+            <div class="row3">
+                <button id="viewFront">Front</button>
+                <button id="viewBack">Back</button>
+                <button id="viewLeft">Links</button>
+            </div>
+
+            <div class="row3">
+                <button id="viewRight">Rechts</button>
+                <button id="viewTop">Oben</button>
+                <button id="viewPerspective">Perspektive</button>
+            </div>
+
+            <button class="full" id="resetScene">
+                Szene zurücksetzen
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     VIEW INFO
+===================================================== -->
+
+<div id="viewInfo">
+    <b>GHOST MINI BLENDER</b><br>
+    Linksklick = auswählen<br>
+    Shift + Linksklick = Mehrfachauswahl<br>
+    MMB = Orbit / Ansicht drehen<br>
+    Shift + MMB = Pan<br>
+    Mausrad = Zoom<br>
+    G = Verschieben<br>
+    R = Drehen<br>
+    S = Skalieren<br>
+    X/Y/Z = Achse einschränken<br>
+    Entf = Löschen
+</div>
+
+<div id="axis">
+    X 0.00 &nbsp; Y 0.00 &nbsp; Z 0.00
+</div>
+
+<div id="warnings"></div>
+
+<div id="sculptCircle"></div>
+
+<!-- =====================================================
      MODAL
-========================= -->
+===================================================== -->
 
 <div id="modal">
-<div class="modalBox">
-<h2>GHOST 3D</h2>
-<p id="modalText"></p>
-<button id="closeModal">Schließen</button>
-</div>
-</div>
+
+    <div class="modalBox">
+
+        <h2 id="modalTitle">
+            GHOST 3D
+        </h2>
+
+        <p id="modalText"></p>
+
+        <button id="modalClose">
+            Schließen
+        </button>
+
+    </div>
 
 </div>
 
-<!-- THREE -->
+<!-- =====================================================
+     IMPORTMAP
+===================================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+        "three-bvh-csg":"https://cdn.jsdelivr.net/npm/three-bvh-csg@0.7.6/+esm"
+    }
+}
+</script>
 
-<script>
-"use strict";
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<script type="module">
+
+import * as THREE
+    from "three";
+
+import {
+    OrbitControls
+} from "three/addons/controls/OrbitControls.js";
+
+import {
+    TransformControls
+} from "three/addons/controls/TransformControls.js";
+
+import {
+    GLTFExporter
+} from "three/addons/exporters/GLTFExporter.js";
+
+import {
+    STLExporter
+} from "three/addons/exporters/STLExporter.js";
+
+import {
+    Evaluator,
+    Brush,
+    SUBTRACTION,
+    ADDITION
+} from "three-bvh-csg";
 
 /* =========================================================
-   GHOST 3D ENGINE
+   GLOBALS
 ========================================================= */
-
-const THREE = window.THREE;
 
 let scene;
 let camera;
 let renderer;
-let clock;
+let orbit;
+let transform;
 
-let raycaster;
-let mouse;
+let raycaster =
+    new THREE.Raycaster();
 
-let selected = [];
+let mouse =
+    new THREE.Vector2();
+
 let objects = [];
+let selected = [];
 
-let transformMode = "move";
+let bed;
 
-let dragging = false;
-let dragStart = null;
-let dragObjectData = [];
+let transformMode =
+    "translate";
 
-let ground;
-let grid;
+let axisLock = null;
 
-let editorCamera;
-let fpsCamera;
+let sculptMode = false;
+let sculptDirection = 1;
 
-let fpsMode = false;
-let pointerLocked = false;
+let history = [];
+let historyIndex = -1;
 
-const keys = {};
+let objectCounter = 0;
 
-let player = {
-    x:0,
-    y:2,
-    z:8,
-    vx:0,
-    vy:0,
-    vz:0,
-    speed:7,
-    stamina:100,
-    health:100
-};
-
-let yaw = 0;
-let pitch = 0;
-
-let ammo = 30;
-let shooting = false;
+let evaluator;
 
 /* =========================================================
    DOM
 ========================================================= */
 
-const loading = document.getElementById("loading");
-const objectList = document.getElementById("objects");
+const $ = id =>
+    document.getElementById(id);
 
-const posX = document.getElementById("posX");
-const posY = document.getElementById("posY");
-const posZ = document.getElementById("posZ");
+const objectList =
+    $("objectList");
 
-const scaleX = document.getElementById("scaleX");
-const scaleY = document.getElementById("scaleY");
-const scaleZ = document.getElementById("scaleZ");
+const loading =
+    $("loading");
 
-const rotX = document.getElementById("rotX");
-const rotY = document.getElementById("rotY");
-const rotZ = document.getElementById("rotZ");
-
-const roundness = document.getElementById("roundness");
-
-const fpsUI = document.getElementById("fpsUI");
-const crosshair = document.getElementById("crosshair");
-const fpsHint = document.getElementById("fpsHint");
-
-const healthFill = document.getElementById("healthFill");
-const staminaFill = document.getElementById("staminaFill");
-const ammoUI = document.getElementById("ammo");
-const debug = document.getElementById("debug");
-
-const modal = document.getElementById("modal");
-const modalText = document.getElementById("modalText");
+const sculptCircle =
+    $("sculptCircle");
 
 /* =========================================================
    INIT
@@ -727,42 +1015,45 @@ const modalText = document.getElementById("modalText");
 
 function init(){
 
-    scene = new THREE.Scene();
+    scene =
+        new THREE.Scene();
 
-    scene.background = new THREE.Color(0x87cfff);
+    scene.background =
+        new THREE.Color(0x20242a);
 
-    scene.fog = new THREE.Fog(
-        0x87cfff,
-        70,
-        250
+    scene.fog =
+        new THREE.Fog(
+            0x20242a,
+            250,
+            900
+        );
+
+    camera =
+        new THREE.PerspectiveCamera(
+            50,
+            innerWidth / innerHeight,
+            .01,
+            3000
+        );
+
+    camera.position.set(
+        170,
+        150,
+        190
     );
 
-    camera = new THREE.PerspectiveCamera(
-        60,
-        innerWidth / innerHeight,
-        .05,
-        1000
-    );
-
-    editorCamera = camera;
-
-    camera.position.set(10,9,14);
-    camera.lookAt(0,0,0);
-
-    fpsCamera = new THREE.PerspectiveCamera(
-        75,
-        innerWidth / innerHeight,
-        .05,
-        1000
-    );
-
-    renderer = new THREE.WebGLRenderer({
-        antialias:true,
-        powerPreference:"high-performance"
-    });
+    renderer =
+        new THREE.WebGLRenderer({
+            antialias:true,
+            powerPreference:
+                "high-performance"
+        });
 
     renderer.setPixelRatio(
-        Math.min(devicePixelRatio,2)
+        Math.min(
+            devicePixelRatio,
+            2
+        )
     );
 
     renderer.setSize(
@@ -770,44 +1061,116 @@ function init(){
         innerHeight
     );
 
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled =
+        true;
+
     renderer.shadowMap.type =
         THREE.PCFSoftShadowMap;
 
-    document.getElementById("app")
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+    document
+        .getElementById("app")
         .insertBefore(
             renderer.domElement,
-            document.getElementById("topbar")
+            $("topbar")
         );
 
-    clock = new THREE.Clock();
+    orbit =
+        new OrbitControls(
+            camera,
+            renderer.domElement
+        );
 
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
+    orbit.enableDamping =
+        true;
+
+    orbit.dampingFactor =
+        .08;
+
+    orbit.target.set(
+        0,
+        20,
+        0
+    );
+
+    orbit.minDistance =
+        5;
+
+    orbit.maxDistance =
+        1500;
+
+    transform =
+        new TransformControls(
+            camera,
+            renderer.domElement
+        );
+
+    transform.setMode(
+        "translate"
+    );
+
+    transform.setSize(
+        1.1
+    );
+
+    transform.addEventListener(
+        "dragging-changed",
+        e=>{
+            orbit.enabled =
+                !e.value;
+
+            if(e.value)
+                saveHistory();
+        }
+    );
+
+    transform.addEventListener(
+        "change",
+        ()=>{
+            updateInspector();
+            updateSelectionBoxes();
+            checkPrintWarnings();
+        }
+    );
+
+    scene.add(
+        transform.getHelper()
+    );
 
     createLights();
-    createGround();
+
+    createBed();
+
     createGrid();
 
-    createDefaultScene();
+    evaluator =
+        new Evaluator();
+
+    evaluator.useGroups = true;
 
     setupEvents();
 
-    loading.style.display = "none";
+    createInitialScene();
+
+    loading.style.display =
+        "none";
 
     animate();
 }
 
 /* =========================================================
-   LIGHTS
+   LIGHT
 ========================================================= */
 
 function createLights(){
 
     const ambient =
-        new THREE.AmbientLight(
+        new THREE.HemisphereLight(
             0xffffff,
-            1.5
+            0x555555,
+            1.7
         );
 
     scene.add(ambient);
@@ -815,131 +1178,191 @@ function createLights(){
     const sun =
         new THREE.DirectionalLight(
             0xffffff,
-            2.5
+            3
         );
 
     sun.position.set(
-        30,
-        60,
-        20
+        100,
+        250,
+        100
     );
 
-    sun.castShadow = true;
+    sun.castShadow =
+        true;
 
-    sun.shadow.mapSize.width = 2048;
-    sun.shadow.mapSize.height = 2048;
+    sun.shadow.mapSize.set(
+        2048,
+        2048
+    );
 
-    sun.shadow.camera.left = -100;
-    sun.shadow.camera.right = 100;
-    sun.shadow.camera.top = 100;
-    sun.shadow.camera.bottom = -100;
+    sun.shadow.camera.left =
+        -400;
+
+    sun.shadow.camera.right =
+        400;
+
+    sun.shadow.camera.top =
+        400;
+
+    sun.shadow.camera.bottom =
+        -400;
+
+    sun.shadow.camera.near =
+        .1;
+
+    sun.shadow.camera.far =
+        800;
 
     scene.add(sun);
 }
 
 /* =========================================================
-   GROUND
+   BED
 ========================================================= */
 
-function createGround(){
+function createBed(){
 
-    const geo =
+    const sizeX =
+        Number($("bedX").value);
+
+    const sizeY =
+        Number($("bedY").value);
+
+    const sizeZ =
+        .8;
+
+    const geometry =
         new THREE.BoxGeometry(
-            100,
-            .5,
-            100
+            sizeX,
+            sizeZ,
+            sizeY
         );
 
-    const mat =
+    const material =
         new THREE.MeshStandardMaterial({
-            color:0x3e9b45,
-            roughness:.9
+            color:0x363a40,
+            roughness:.85,
+            metalness:.1
         });
 
-    ground =
+    bed =
         new THREE.Mesh(
-            geo,
-            mat
+            geometry,
+            material
         );
 
-    ground.position.y = -.25;
+    bed.position.y =
+        -sizeZ/2;
 
-    ground.receiveShadow = true;
+    bed.receiveShadow =
+        true;
 
-    ground.userData.ground = true;
+    bed.userData.isBed =
+        true;
 
-    scene.add(ground);
+    scene.add(bed);
 }
+
+/* =========================================================
+   GRID
+========================================================= */
 
 function createGrid(){
 
-    grid =
+    const grid =
         new THREE.GridHelper(
-            100,
-            100,
-            0x555555,
-            0x333333
+            256,
+            64,
+            0x777777,
+            0x444444
         );
 
-    grid.position.y = .01;
+    grid.position.y =
+        .015;
+
+    grid.material.opacity =
+        .45;
+
+    grid.material.transparent =
+        true;
 
     scene.add(grid);
 }
 
 /* =========================================================
-   DEFAULT SCENE
+   MATERIAL
 ========================================================= */
 
-function createDefaultScene(){
-
-    addCube();
-    addSphere();
-    addCylinder();
-
-    objects[0].position.set(-4,1,0);
-    objects[1].position.set(0,1,0);
-    objects[2].position.set(4,1,0);
-
-    clearSelection();
-}
-
-/* =========================================================
-   MATERIALS
-========================================================= */
-
-function normalMaterial(color){
+function material(
+    color=0x4da6ff,
+    negative=false
+){
 
     return new THREE.MeshStandardMaterial({
-        color:color,
-        roughness:.65,
-        metalness:.05
-    });
-}
+        color:
+            negative
+                ? 0xd52c43
+                : color,
 
-function negativeMaterial(){
+        roughness:.58,
 
-    return new THREE.MeshStandardMaterial({
-        color:0xb51f30,
-        transparent:true,
-        opacity:.48,
-        roughness:.5,
-        wireframe:false
+        metalness:.04,
+
+        transparent:
+            negative,
+
+        opacity:
+            negative
+                ? .42
+                : 1
     });
 }
 
 /* =========================================================
-   REGISTER OBJECT
+   OBJECT NAME
 ========================================================= */
 
-function registerObject(mesh,type,negative=false){
+function nextName(type){
 
-    mesh.userData.editorObject = true;
-    mesh.userData.type = type;
-    mesh.userData.negative = negative;
-    mesh.userData.originalScale = mesh.scale.clone();
+    objectCounter++;
 
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
+    return type+
+        "."+
+        String(objectCounter)
+            .padStart(3,"0");
+}
+
+/* =========================================================
+   REGISTER
+========================================================= */
+
+function register(
+    mesh,
+    type,
+    negative=false
+){
+
+    mesh.userData.editor =
+        true;
+
+    mesh.userData.type =
+        type;
+
+    mesh.userData.negative =
+        negative;
+
+    mesh.userData.name =
+        nextName(
+            negative
+                ? "NEG_"+type
+                : type
+        );
+
+    mesh.castShadow =
+        true;
+
+    mesh.receiveShadow =
+        true;
 
     scene.add(mesh);
 
@@ -954,32 +1377,38 @@ function registerObject(mesh,type,negative=false){
    CUBE
 ========================================================= */
 
-function addCube(negative=false){
+function createCube(
+    negative=false
+){
 
-    const geo =
+    const geometry =
         new THREE.BoxGeometry(
-            2,
-            2,
-            2
+            20,
+            20,
+            20,
+            8,
+            8,
+            8
         );
 
     const mesh =
         new THREE.Mesh(
-            geo,
-            negative
-                ? negativeMaterial()
-                : normalMaterial(0x4da6ff)
+            geometry,
+            material(
+                0x4da6ff,
+                negative
+            )
         );
 
     mesh.position.set(
         0,
-        1,
+        10,
         0
     );
 
-    return registerObject(
+    return register(
         mesh,
-        negative ? "Negativer Würfel" : "Würfel",
+        "Würfel",
         negative
     );
 }
@@ -988,32 +1417,35 @@ function addCube(negative=false){
    SPHERE
 ========================================================= */
 
-function addSphere(negative=false){
+function createSphere(
+    negative=false
+){
 
-    const geo =
+    const geometry =
         new THREE.SphereGeometry(
-            1,
-            32,
-            20
+            10,
+            48,
+            32
         );
 
     const mesh =
         new THREE.Mesh(
-            geo,
-            negative
-                ? negativeMaterial()
-                : normalMaterial(0xffb62e)
+            geometry,
+            material(
+                0xffb52e,
+                negative
+            )
         );
 
     mesh.position.set(
         0,
-        1,
+        10,
         0
     );
 
-    return registerObject(
+    return register(
         mesh,
-        negative ? "Negative Kugel" : "Kugel",
+        "Kugel",
         negative
     );
 }
@@ -1022,146 +1454,166 @@ function addSphere(negative=false){
    CYLINDER
 ========================================================= */
 
-function addCylinder(negative=false){
+function createCylinder(
+    negative=false
+){
 
-    const geo =
+    const geometry =
         new THREE.CylinderGeometry(
-            1,
-            1,
-            2,
-            32
+            10,
+            10,
+            20,
+            48,
+            16
         );
 
     const mesh =
         new THREE.Mesh(
-            geo,
-            negative
-                ? negativeMaterial()
-                : normalMaterial(0x8f70ff)
+            geometry,
+            material(
+                0x9570ff,
+                negative
+            )
         );
 
     mesh.position.set(
         0,
-        1,
+        10,
         0
     );
 
-    return registerObject(
+    return register(
         mesh,
-        negative
-            ? "Negativer Zylinder"
-            : "Zylinder",
+        "Zylinder",
         negative
     );
 }
 
 /* =========================================================
-   MASSIVE SPRING
+   REAL SOLID SPRING
 ========================================================= */
 
-function createSpringGeometry(
-    turns=8,
-    radius=1,
-    wire=.25
-){
+function createSpring(){
+
+    const turns =
+        Math.max(
+            1,
+            Number(
+                $("springTurns").value
+            )
+        );
+
+    const radius =
+        Math.max(
+            .1,
+            Number(
+                $("springRadius").value
+            )
+        );
+
+    const height =
+        Math.max(
+            .5,
+            Number(
+                $("springHeight").value
+            )
+        );
+
+    const wire =
+        Math.max(
+            .03,
+            Number(
+                $("springWire").value
+            )
+        );
 
     /*
-       Die Feder wird nicht als dünne Fläche gebaut.
-       Jeder Punkt wird durch einen echten
-       Tube-Querschnitt erzeugt.
-       Dadurch besitzt sie ein geschlossenes,
-       massives Volumen.
+       WICHTIG:
+
+       Die Windungen werden NICHT aufeinander
+       gedrückt.
+
+       Die Helix hat eine definierte Höhe.
+       Jede Windung bekommt dadurch einen
+       vertikalen Abstand.
+
+       TubeGeometry erzeugt einen massiven,
+       geschlossenen Drahtkörper.
     */
 
-    const curvePoints = [];
+    const points = [];
+
+    const segmentsPerTurn = 36;
 
     const segments =
-        Math.max(80,Math.floor(turns*40));
+        Math.max(
+            72,
+            Math.ceil(
+                turns *
+                segmentsPerTurn
+            )
+        );
 
-    const height = 4;
+    for(
+        let i=0;
+        i<=segments;
+        i++
+    ){
 
-    for(let i=0;i<=segments;i++){
+        const t =
+            i/segments;
 
-        const t = i/segments;
-
-        const a =
-            t * Math.PI * 2 * turns;
-
-        const x =
-            Math.cos(a) * radius;
-
-        const z =
-            Math.sin(a) * radius;
+        const angle =
+            t *
+            turns *
+            Math.PI *
+            2;
 
         const y =
-            t * height;
+            t *
+            height;
 
-        curvePoints.push(
+        points.push(
             new THREE.Vector3(
-                x,
+                Math.cos(angle) *
+                    radius,
+
                 y,
-                z
+
+                Math.sin(angle) *
+                    radius
             )
         );
     }
 
     const curve =
         new THREE.CatmullRomCurve3(
-            curvePoints
+            points,
+            false,
+            "centripetal"
         );
 
-    return new THREE.TubeGeometry(
-        curve,
-        segments,
-        wire,
-        12,
-        false
-    );
-}
-
-function addSpring(){
-
-    const turns =
-        Number(
-            document.getElementById(
-                "springTurns"
-            ).value
-        ) || 8;
-
-    const radius =
-        Number(
-            document.getElementById(
-                "springRadius"
-            ).value
-        ) || 1;
-
-    const wire =
-        Number(
-            document.getElementById(
-                "springWire"
-            ).value
-        ) || .25;
-
-    const geo =
-        createSpringGeometry(
-            turns,
-            radius,
-            wire
+    const geometry =
+        new THREE.TubeGeometry(
+            curve,
+            segments,
+            wire,
+            16,
+            false
         );
 
     const mesh =
         new THREE.Mesh(
-            geo,
-            normalMaterial(0xe6e6e6)
+            geometry,
+            material(
+                0xd8dce3
+            )
         );
 
-    mesh.position.set(
-        0,
-        wire,
-        0
-    );
+    mesh.position.y =
+        wire;
 
-    return registerObject(
+    return register(
         mesh,
         "Feder",
         false
@@ -1169,101 +1621,271 @@ function addSpring(){
 }
 
 /* =========================================================
+   INITIAL
+========================================================= */
+
+function createInitialScene(){
+
+    const cube =
+        createCube();
+
+    cube.position.x =
+        -35;
+
+    const sphere =
+        createSphere();
+
+    sphere.position.x =
+        0;
+
+    const cylinder =
+        createCylinder();
+
+    cylinder.position.x =
+        35;
+
+    saveHistory();
+
+    selectObjects(
+        [cube]
+    );
+}
+
+/* =========================================================
    SELECTION
 ========================================================= */
 
-function selectObject(obj,add=false){
+function selectObjects(
+    list
+){
 
-    if(!add){
-        clearSelection();
+    selected =
+        list.filter(
+            o =>
+                objects.includes(o)
+        );
+
+    updateSelectionVisuals();
+
+    refreshObjectList();
+
+    updateInspector();
+
+    if(selected.length){
+
+        transform.attach(
+            selected[0]
+        );
+
+    }else{
+
+        transform.detach();
     }
+}
 
-    if(!selected.includes(obj)){
+function toggleSelection(
+    obj
+){
+
+    if(selected.includes(obj)){
+
+        selected =
+            selected.filter(
+                x=>x!==obj
+            );
+
+    }else{
+
         selected.push(obj);
     }
 
     updateSelectionVisuals();
+
     refreshObjectList();
+
     updateInspector();
+
+    if(selected.length){
+
+        transform.attach(
+            selected[0]
+        );
+
+    }else{
+
+        transform.detach();
+    }
 }
 
-function clearSelection(){
-
-    selected.length = 0;
-
-    updateSelectionVisuals();
-    refreshObjectList();
-    updateInspector();
-}
+/* =========================================================
+   SELECTION VISUAL
+========================================================= */
 
 function updateSelectionVisuals(){
 
-    objects.forEach(obj=>{
+    objects.forEach(
+        obj=>{
 
-        if(obj.userData.selectionBox){
+            if(
+                obj.userData.box
+            ){
 
-            scene.remove(
-                obj.userData.selectionBox
-            );
+                scene.remove(
+                    obj.userData.box
+                );
 
-            obj.userData.selectionBox = null;
+                obj.userData.box =
+                    null;
+            }
         }
-    });
+    );
 
-    selected.forEach(obj=>{
+    selected.forEach(
+        obj=>{
 
-        const helper =
-            new THREE.BoxHelper(
-                obj,
-                0xffff00
-            );
+            const box =
+                new THREE.BoxHelper(
+                    obj,
+                    0xffff00
+                );
 
-        helper.material.depthTest = false;
-        helper.material.depthWrite = false;
+            box.material.depthTest =
+                false;
 
-        scene.add(helper);
+            box.material.depthWrite =
+                false;
 
-        obj.userData.selectionBox =
-            helper;
-    });
+            box.renderOrder =
+                100;
+
+            scene.add(box);
+
+            obj.userData.box =
+                box;
+        }
+    );
+}
+
+function updateSelectionBoxes(){
+
+    objects.forEach(
+        obj=>{
+
+            if(obj.userData.box)
+                obj.userData.box.update();
+        }
+    );
 }
 
 /* =========================================================
    OBJECT LIST
 ========================================================= */
 
+function iconFor(
+    obj
+){
+
+    if(obj.userData.negative)
+        return "−";
+
+    if(obj.userData.type==="Kugel")
+        return "●";
+
+    if(obj.userData.type==="Würfel")
+        return "■";
+
+    if(obj.userData.type==="Zylinder")
+        return "⬢";
+
+    if(obj.userData.type==="Feder")
+        return "〰";
+
+    return "◆";
+}
+
 function refreshObjectList(){
 
-    objectList.innerHTML = "";
+    objectList.innerHTML =
+        "";
 
-    objects.forEach((obj,index)=>{
+    objects.forEach(
+        obj=>{
 
-        const div =
-            document.createElement("div");
+            const div =
+                document.createElement(
+                    "div"
+                );
 
-        div.className =
-            "objectItem" +
-            (
-                selected.includes(obj)
-                ? " selected"
-                : ""
-            );
+            div.className =
+                "object"+
+                (
+                    selected.includes(obj)
+                        ? " selected"
+                        : ""
+                );
 
-        div.innerHTML =
-            `${index+1}. ${obj.userData.type}
-             <span class="typeBadge">
-             ${obj.userData.negative ? "NEGATIV" : "SOLID"}
-             </span>`;
+            const icon =
+                document.createElement(
+                    "div"
+                );
 
-        div.onclick = e=>{
-            selectObject(
-                obj,
-                e.shiftKey
-            );
-        };
+            icon.className =
+                "objectIcon";
 
-        objectList.appendChild(div);
-    });
+            icon.textContent =
+                iconFor(obj);
+
+            const name =
+                document.createElement(
+                    "div"
+                );
+
+            name.className =
+                "objectName";
+
+            name.textContent =
+                obj.userData.name;
+
+            const eye =
+                document.createElement(
+                    "div"
+                );
+
+            eye.className =
+                "objectEye";
+
+            eye.textContent =
+                obj.visible
+                    ? "👁"
+                    : "🚫";
+
+            eye.onclick =
+                e=>{
+
+                    e.stopPropagation();
+
+                    obj.visible =
+                        !obj.visible;
+
+                    refreshObjectList();
+                };
+
+            div.appendChild(icon);
+            div.appendChild(name);
+            div.appendChild(eye);
+
+            div.onclick =
+                e=>{
+
+                    if(e.shiftKey)
+                        toggleSelection(obj);
+                    else
+                        selectObjects([obj]);
+                };
+
+            objectList.appendChild(div);
+        }
+    );
 }
 
 /* =========================================================
@@ -1272,226 +1894,162 @@ function refreshObjectList(){
 
 function updateInspector(){
 
-    if(selected.length !== 1){
+    if(selected.length!==1){
 
         [
-            posX,posY,posZ,
-            scaleX,scaleY,scaleZ,
-            rotX,rotY,rotZ
-        ].forEach(x=>x.value="");
+            "px","py","pz",
+            "sx","sy","sz",
+            "rx","ry","rz"
+        ].forEach(
+            id =>
+                $(id).value=""
+        );
 
         return;
     }
 
-    const o = selected[0];
+    const o =
+        selected[0];
 
-    posX.value = o.position.x.toFixed(2);
-    posY.value = o.position.y.toFixed(2);
-    posZ.value = o.position.z.toFixed(2);
+    $("px").value =
+        o.position.x.toFixed(3);
 
-    scaleX.value = o.scale.x.toFixed(2);
-    scaleY.value = o.scale.y.toFixed(2);
-    scaleZ.value = o.scale.z.toFixed(2);
+    $("py").value =
+        o.position.y.toFixed(3);
 
-    rotX.value =
+    $("pz").value =
+        o.position.z.toFixed(3);
+
+    $("sx").value =
+        o.scale.x.toFixed(3);
+
+    $("sy").value =
+        o.scale.y.toFixed(3);
+
+    $("sz").value =
+        o.scale.z.toFixed(3);
+
+    $("rx").value =
         THREE.MathUtils.radToDeg(
             o.rotation.x
         ).toFixed(1);
 
-    rotY.value =
+    $("ry").value =
         THREE.MathUtils.radToDeg(
             o.rotation.y
         ).toFixed(1);
 
-    rotZ.value =
+    $("rz").value =
         THREE.MathUtils.radToDeg(
             o.rotation.z
         ).toFixed(1);
+
+    if(o.material &&
+       o.material.color){
+
+        $("colorInput").value =
+            "#"+
+            o.material.color
+                .getHexString();
+    }
+
+    $("axis").textContent =
+        "X "+
+        o.position.x.toFixed(2)+
+        "   Y "+
+        o.position.y.toFixed(2)+
+        "   Z "+
+        o.position.z.toFixed(2);
 }
+
+/* =========================================================
+   INSPECTOR INPUT
+========================================================= */
 
 function applyInspector(){
 
-    if(selected.length!==1)return;
+    if(selected.length!==1)
+        return;
 
-    const o=selected[0];
+    const o =
+        selected[0];
 
     o.position.set(
-        Number(posX.value)||0,
-        Number(posY.value)||0,
-        Number(posZ.value)||0
+        Number($("px").value)||0,
+        Number($("py").value)||0,
+        Number($("pz").value)||0
     );
 
     o.scale.set(
-        Math.max(.01,Number(scaleX.value)||1),
-        Math.max(.01,Number(scaleY.value)||1),
-        Math.max(.01,Number(scaleZ.value)||1)
+        Math.max(
+            .001,
+            Number($("sx").value)||1
+        ),
+        Math.max(
+            .001,
+            Number($("sy").value)||1
+        ),
+        Math.max(
+            .001,
+            Number($("sz").value)||1
+        )
     );
 
     o.rotation.set(
         THREE.MathUtils.degToRad(
-            Number(rotX.value)||0
+            Number($("rx").value)||0
         ),
         THREE.MathUtils.degToRad(
-            Number(rotY.value)||0
+            Number($("ry").value)||0
         ),
         THREE.MathUtils.degToRad(
-            Number(rotZ.value)||0
+            Number($("rz").value)||0
         )
     );
 
     updateSelectionVisuals();
+
+    checkPrintWarnings();
 }
 
 /* =========================================================
-   TRANSFORM MODE
+   TRANSFORM
 ========================================================= */
 
-function setTransformMode(mode){
+function setTransform(
+    mode
+){
 
-    transformMode=mode;
+    transformMode =
+        mode;
 
-    document.getElementById(
-        "moveTool"
-    ).classList.toggle(
-        "active",
-        mode==="move"
+    transform.setMode(
+        mode
     );
 
-    document.getElementById(
-        "rotateTool"
-    ).classList.toggle(
-        "active",
-        mode==="rotate"
-    );
+    $("selectTool")
+        .classList.remove("active");
 
-    document.getElementById(
-        "scaleTool"
-    ).classList.toggle(
-        "active",
-        mode==="scale"
-    );
-}
+    $("moveTool")
+        .classList.remove("active");
 
-/* =========================================================
-   MOUSE EDITOR
-========================================================= */
+    $("rotateTool")
+        .classList.remove("active");
 
-function editorPointerDown(e){
+    $("scaleTool")
+        .classList.remove("active");
 
-    if(fpsMode)return;
+    if(mode==="translate")
+        $("moveTool")
+            .classList.add("active");
 
-    const rect =
-        renderer.domElement.getBoundingClientRect();
+    if(mode==="rotate")
+        $("rotateTool")
+            .classList.add("active");
 
-    mouse.x =
-        ((e.clientX-rect.left)/rect.width)*2-1;
-
-    mouse.y =
-        -((e.clientY-rect.top)/rect.height)*2+1;
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-    const hits =
-        raycaster.intersectObjects(
-            objects,
-            false
-        );
-
-    if(hits.length){
-
-        const obj=hits[0].object;
-
-        selectObject(
-            obj,
-            e.shiftKey
-        );
-
-        dragging=true;
-
-        dragStart={
-            x:e.clientX,
-            y:e.clientY
-        };
-
-        dragObjectData =
-            selected.map(o=>({
-                obj:o,
-                position:o.position.clone(),
-                rotation:o.rotation.clone(),
-                scale:o.scale.clone()
-            }));
-
-    }else{
-
-        clearSelection();
-    }
-}
-
-function editorPointerMove(e){
-
-    if(!dragging || fpsMode)return;
-
-    const dx =
-        e.clientX-dragStart.x;
-
-    const dy =
-        e.clientY-dragStart.y;
-
-    dragObjectData.forEach(data=>{
-
-        const o=data.obj;
-
-        if(transformMode==="move"){
-
-            o.position.x =
-                data.position.x + dx*.015;
-
-            o.position.y =
-                Math.max(
-                    0,
-                    data.position.y - dy*.015
-                );
-
-        }
-
-        if(transformMode==="rotate"){
-
-            o.rotation.y =
-                data.rotation.y + dx*.01;
-
-            o.rotation.x =
-                data.rotation.x + dy*.01;
-        }
-
-        if(transformMode==="scale"){
-
-            const amount =
-                1 + dy * -.005;
-
-            o.scale.set(
-                Math.max(.05,
-                    data.scale.x*amount
-                ),
-                Math.max(.05,
-                    data.scale.y*amount
-                ),
-                Math.max(.05,
-                    data.scale.z*amount
-                )
-            );
-        }
-    });
-
-    updateInspector();
-    updateSelectionVisuals();
-}
-
-function editorPointerUp(){
-
-    dragging=false;
+    if(mode==="scale")
+        $("scaleTool")
+            .classList.add("active");
 }
 
 /* =========================================================
@@ -1500,35 +2058,53 @@ function editorPointerUp(){
 
 function duplicateSelected(){
 
-    const originals =
-        [...selected];
+    if(!selected.length)
+        return;
 
-    clearSelection();
+    saveHistory();
 
-    originals.forEach(original=>{
+    const copies = [];
 
-        const clone =
-            original.clone();
+    selected.forEach(
+        original=>{
 
-        clone.geometry =
-            original.geometry.clone();
+            const clone =
+                original.clone();
 
-        clone.material =
-            original.material.clone();
+            clone.geometry =
+                original.geometry.clone();
 
-        clone.position.x += 2;
+            clone.material =
+                original.material.clone();
 
-        registerObject(
-            clone,
-            original.userData.type,
-            original.userData.negative
-        );
+            clone.position.x +=
+                10;
 
-        selectObject(
-            clone,
-            true
-        );
-    });
+            clone.userData =
+                {
+                    ...original.userData
+                };
+
+            delete clone.userData.box;
+
+            clone.userData.name =
+                nextName(
+                    clone.userData.negative
+                        ? "NEG_"+clone.userData.type
+                        : clone.userData.type
+                );
+
+            scene.add(clone);
+
+            objects.push(clone);
+
+            copies.push(clone);
+        }
+    );
+
+    selectObjects(copies);
+
+    refreshObjectList();
 }
 
 /* =========================================================
@@ -1537,182 +2113,490 @@ function duplicateSelected(){
 
 function deleteSelected(){
 
-    const toDelete =
-        [...selected];
+    if(!selected.length)
+        return;
 
-    toDelete.forEach(obj=>{
+    saveHistory();
 
-        if(obj.userData.selectionBox){
-            scene.remove(
-                obj.userData.selectionBox
-            );
+    selected.forEach(
+        obj=>{
+
+            if(obj.userData.box)
+                scene.remove(
+                    obj.userData.box
+                );
+
+            scene.remove(obj);
+
+            const i =
+                objects.indexOf(obj);
+
+            if(i>=0)
+                objects.splice(i,1);
         }
+    );
 
-        scene.remove(obj);
+    selectObjects([]);
 
-        const i =
-            objects.indexOf(obj);
-
-        if(i>=0){
-            objects.splice(i,1);
-        }
-    });
-
-    clearSelection();
+    refreshObjectList();
 }
 
 /* =========================================================
-   ALL
+   RENAME
 ========================================================= */
 
-function selectAll(){
+function renameSelected(){
 
-    selected =
-        [...objects];
+    if(selected.length!==1)
+        return;
 
-    updateSelectionVisuals();
-    refreshObjectList();
-    updateInspector();
+    const obj =
+        selected[0];
+
+    const name =
+        prompt(
+            "Neuer Objektname:",
+            obj.userData.name
+        );
+
+    if(
+        name &&
+        name.trim()
+    ){
+
+        saveHistory();
+
+        obj.userData.name =
+            name.trim();
+
+        refreshObjectList();
+    }
 }
 
 /* =========================================================
-   GROUND / CENTER
+   VISIBILITY
+========================================================= */
+
+function toggleVisibility(){
+
+    selected.forEach(
+        obj=>{
+            obj.visible =
+                !obj.visible;
+        }
+    );
+
+    refreshObjectList();
+}
+
+/* =========================================================
+   GROUND
 ========================================================= */
 
 function putOnGround(){
 
-    selected.forEach(obj=>{
+    if(!selected.length)
+        return;
 
-        const box =
-            new THREE.Box3()
-                .setFromObject(obj);
+    saveHistory();
 
-        const bottom =
-            box.min.y;
+    selected.forEach(
+        obj=>{
 
-        obj.position.y -= bottom;
+            const box =
+                new THREE.Box3()
+                    .setFromObject(obj);
 
-        if(obj.position.y<0)
-            obj.position.y=0;
-    });
+            const bottom =
+                box.min.y;
 
-    updateSelectionVisuals();
+            obj.position.y -=
+                bottom;
+        }
+    );
+
+    updateSelectionBoxes();
+
     updateInspector();
+
+    checkPrintWarnings();
 }
+
+/* =========================================================
+   CENTER
+========================================================= */
 
 function centerSelected(){
 
-    selected.forEach(obj=>{
-        obj.position.x=0;
-        obj.position.z=0;
-    });
+    if(!selected.length)
+        return;
 
-    updateSelectionVisuals();
+    saveHistory();
+
+    selected.forEach(
+        obj=>{
+
+            obj.position.x =
+                0;
+
+            obj.position.z =
+                0;
+        }
+    );
+
     updateInspector();
 }
 
 /* =========================================================
-   ROUNDING
+   COLOR
 ========================================================= */
 
-function roundSelected(){
+function applyColor(){
 
-    if(selected.length!==1)return;
-
-    const obj=selected[0];
-
-    if(obj.userData.type!=="Würfel" &&
-       obj.userData.type!=="Negativer Würfel"){
-        showModal(
-            "Rundung ist für Würfel vorgesehen."
-        );
+    if(!selected.length)
         return;
-    }
 
-    const oldGeometry =
-        obj.geometry;
+    saveHistory();
 
-    const size =
-        2;
+    const color =
+        $("colorInput").value;
 
-    const radius =
-        Number(roundness.value);
+    selected.forEach(
+        obj=>{
 
-    const segments=6;
+            if(
+                obj.material &&
+                obj.material.color
+            ){
 
-    obj.geometry =
-        new THREE.BoxGeometry(
-            size,
-            size,
-            size
-        );
-
-    /*
-       Visuelle Rundung:
-       bei höheren Werten wird das Objekt
-       stärker geglättet.
-    */
-
-    if(radius>.01){
-
-        const s =
-            1 + radius*.18;
-
-        obj.scale.multiplyScalar(s);
-    }
-
-    oldGeometry.dispose();
-
-    updateSelectionVisuals();
+                obj.material.color
+                    .set(color);
+            }
+        }
+    );
 }
 
 /* =========================================================
-   SCULPTING
+   ROUNDED CUBE
 ========================================================= */
 
-function sculpt(direction){
+function roundCube(){
 
-    if(selected.length!==1)return;
+    if(selected.length!==1)
+        return;
 
-    const obj=selected[0];
+    const obj =
+        selected[0];
 
-    const geo=obj.geometry;
+    if(
+        obj.userData.type!=="Würfel"
+    ){
 
-    if(!geo.attributes.position)return;
+        showModal(
+            "Würfel abrunden",
+            "Bitte zuerst einen Würfel auswählen."
+        );
 
-    const pos =
-        geo.attributes.position;
-
-    for(let i=0;i<pos.count;i++){
-
-        const x=pos.getX(i);
-        const y=pos.getY(i);
-        const z=pos.getZ(i);
-
-        const length =
-            Math.sqrt(
-                x*x+y*y+z*z
-            );
-
-        if(length>0){
-
-            const factor =
-                1 + direction*.035;
-
-            pos.setXYZ(
-                i,
-                x*factor,
-                y*factor,
-                z*factor
-            );
-        }
+        return;
     }
 
-    pos.needsUpdate=true;
+    const amount =
+        Number(
+            $("roundness").value
+        );
 
-    geo.computeVertexNormals();
+    if(amount<=0)
+        return;
 
-    updateSelectionVisuals();
+    saveHistory();
+
+    /*
+       Für einen kleinen Mini-Editor wird
+       ein stark unterteiltes Box-Mesh
+       verwendet und die Eckbereiche
+       Richtung Kugelform verschoben.
+    */
+
+    const pos =
+        obj.geometry
+            .attributes
+            .position;
+
+    for(
+        let i=0;
+        i<pos.count;
+        i++
+    ){
+
+        let x=pos.getX(i);
+        let y=pos.getY(i);
+        let z=pos.getZ(i);
+
+        const hx=10;
+        const hy=10;
+        const hz=10;
+
+        const cx =
+            THREE.MathUtils.clamp(
+                x,
+                -hx+amount*10,
+                hx-amount*10
+            );
+
+        const cy =
+            THREE.MathUtils.clamp(
+                y,
+                -hy+amount*10,
+                hy-amount*10
+            );
+
+        const cz =
+            THREE.MathUtils.clamp(
+                z,
+                -hz+amount*10,
+                hz-amount*10
+            );
+
+        let dx=x-cx;
+        let dy=y-cy;
+        let dz=z-cz;
+
+        const len =
+            Math.sqrt(
+                dx*dx+
+                dy*dy+
+                dz*dz
+            );
+
+        if(len>0){
+
+            const target =
+                Math.min(
+                    amount*10,
+                    len
+                );
+
+            const factor =
+                target/len;
+
+            x =
+                cx+
+                dx*factor;
+
+            y =
+                cy+
+                dy*factor;
+
+            z =
+                cz+
+                dz*factor;
+        }
+
+        pos.setXYZ(
+            i,
+            x,
+            y,
+            z
+        );
+    }
+
+    pos.needsUpdate =
+        true;
+
+    obj.geometry
+        .computeVertexNormals();
+
+    updateSelectionBoxes();
+}
+
+/* =========================================================
+   SCULPT
+========================================================= */
+
+function startSculpt(
+    direction
+){
+
+    sculptMode =
+        true;
+
+    sculptDirection =
+        direction;
+
+    transform.detach();
+
+    orbit.enabled =
+        false;
+
+    $("sculptPanel")
+        .style.display =
+        "block";
+
+    $("sculptTool")
+        .classList.add(
+            "active"
+        );
+
+    sculptCircle.style.display =
+        "block";
+}
+
+function stopSculpt(){
+
+    sculptMode =
+        false;
+
+    orbit.enabled =
+        true;
+
+    $("sculptTool")
+        .classList.remove(
+            "active"
+        );
+
+    sculptCircle.style.display =
+        "none";
+
+    if(selected.length)
+        transform.attach(
+            selected[0]
+        );
+}
+
+/* =========================================================
+   SCULPT BRUSH
+========================================================= */
+
+function sculptAt(
+    event
+){
+
+    if(!sculptMode)
+        return;
+
+    if(!selected.length)
+        return;
+
+    const obj =
+        selected[0];
+
+    if(!obj.visible)
+        return;
+
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+    mouse.x =
+        (
+            (event.clientX -
+             rect.left) /
+            rect.width
+        ) * 2 - 1;
+
+    mouse.y =
+        -(
+            (event.clientY -
+             rect.top) /
+            rect.height
+        ) * 2 + 1;
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const hits =
+        raycaster.intersectObject(
+            obj,
+            false
+        );
+
+    if(!hits.length)
+        return;
+
+    const hit =
+        hits[0];
+
+    const localPoint =
+        obj.worldToLocal(
+            hit.point.clone()
+        );
+
+    const radius =
+        Number(
+            $("brushRadius").value
+        );
+
+    const strength =
+        Number(
+            $("brushStrength").value
+        );
+
+    const position =
+        obj.geometry
+            .attributes
+            .position;
+
+    for(
+        let i=0;
+        i<position.count;
+        i++
+    ){
+
+        const p =
+            new THREE.Vector3(
+                position.getX(i),
+                position.getY(i),
+                position.getZ(i)
+            );
+
+        const distance =
+            p.distanceTo(
+                localPoint
+            );
+
+        if(distance>radius)
+            continue;
+
+        const influence =
+            1 -
+            distance/radius;
+
+        const amount =
+            strength *
+            influence *
+            sculptDirection;
+
+        /*
+           Normale annähernd aus Richtung
+           vom Objektmittelpunkt.
+        */
+
+        const normal =
+            p.clone()
+                .normalize();
+
+        p.addScaledVector(
+            normal,
+            amount
+        );
+
+        position.setXYZ(
+            i,
+            p.x,
+            p.y,
+            p.z
+        );
+    }
+
+    position.needsUpdate =
+        true;
+
+    obj.geometry
+        .computeVertexNormals();
+
+    updateSelectionBoxes();
 }
 
 /* =========================================================
@@ -1721,534 +2605,1279 @@ function sculpt(direction){
 
 function smoothSelected(){
 
-    if(selected.length!==1)return;
-
-    const obj=selected[0];
-
-    obj.geometry.computeVertexNormals();
-
-    updateSelectionVisuals();
-}
-
-/* =========================================================
-   SPRING REBUILD
-========================================================= */
-
-function rebuildSpring(){
-
-    if(selected.length!==1){
-        showModal(
-            "Wähle zuerst genau eine Feder aus."
-        );
+    if(selected.length!==1)
         return;
-    }
 
-    const obj=selected[0];
+    const obj =
+        selected[0];
 
-    if(obj.userData.type!=="Feder"){
-        showModal(
-            "Das ausgewählte Objekt ist keine Feder."
-        );
-        return;
-    }
-
-    const old =
-        obj.geometry;
-
-    obj.geometry =
-        createSpringGeometry(
-            Number(
-                document.getElementById(
-                    "springTurns"
-                ).value
-            ),
-            Number(
-                document.getElementById(
-                    "springRadius"
-                ).value
-            ),
-            Number(
-                document.getElementById(
-                    "springWire"
-                ).value
-            )
-        );
-
-    old.dispose();
-
-    updateSelectionVisuals();
-}
-
-/* =========================================================
-   NEGATIVE OBJECTS
-========================================================= */
-
-function removeNegativesFromScene(){
-
-    objects
-        .filter(o=>o.userData.negative)
-        .forEach(o=>{
-
-            scene.remove(o);
-
-            const i=objects.indexOf(o);
-
-            if(i>=0)
-                objects.splice(i,1);
-        });
-
-    clearSelection();
-}
-
-/* =========================================================
-   BOOLEAN PREVIEW
-========================================================= */
-
-function preparePrint(){
+    const position =
+        obj.geometry
+            .attributes
+            .position;
 
     /*
-       Ohne three-bvh-csg wird kein falsches Boolean
-       vorgetäuscht.
-
-       Stattdessen werden negative Objekte eindeutig
-       markiert. Die eigentliche Aussparung kann der
-       Slicer anhand einer vorbereiteten Geometrie
-       übernehmen.
-
-       Wichtig:
-       Das verhindert den früheren CSG-Fehler.
+       Einfaches geometrisches Glätten.
+       Es arbeitet mit benachbarten
+       Vertexpositionen.
     */
 
-    objects.forEach(o=>{
+    const old=[];
 
-        if(o.userData.negative){
+    for(
+        let i=0;
+        i<position.count;
+        i++
+    ){
 
-            o.material.transparent=true;
-            o.material.opacity=.28;
+        old.push(
+            new THREE.Vector3(
+                position.getX(i),
+                position.getY(i),
+                position.getZ(i)
+            )
+        );
+    }
 
-        }else{
+    for(
+        let i=0;
+        i<position.count;
+        i++
+    ){
 
-            o.material.transparent=false;
-            o.material.opacity=1;
+        const p =
+            old[i];
+
+        let closest =
+            null;
+
+        let dist =
+            Infinity;
+
+        for(
+            let j=0;
+            j<old.length;
+            j++
+        ){
+
+            if(i===j)
+                continue;
+
+            const d =
+                p.distanceToSquared(
+                    old[j]
+                );
+
+            if(
+                d>0 &&
+                d<dist
+            ){
+
+                dist=d;
+                closest=old[j];
+            }
         }
-    });
 
-    showModal(
-        "Druckvorbereitung abgeschlossen. " +
-        "Negative Objekte sind als Aussparungen markiert. " +
-        "Das Infill wird später in Bambu Studio eingestellt."
+        if(closest){
+
+            const n =
+                p.clone()
+                    .lerp(
+                        closest,
+                        .12
+                    );
+
+            position.setXYZ(
+                i,
+                n.x,
+                n.y,
+                n.z
+            );
+        }
+    }
+
+    position.needsUpdate =
+        true;
+
+    obj.geometry
+        .computeVertexNormals();
+
+    updateSelectionBoxes();
+}
+
+/* =========================================================
+   BOOLEAN HELPERS
+========================================================= */
+
+function makeBrush(
+    obj
+){
+
+    const brush =
+        new Brush(
+            obj.geometry.clone()
+        );
+
+    brush.position.copy(
+        obj.position
+    );
+
+    brush.rotation.copy(
+        obj.rotation
+    );
+
+    brush.scale.copy(
+        obj.scale
+    );
+
+    brush.updateMatrixWorld();
+
+    return brush;
+}
+
+function removeObject(
+    obj
+){
+
+    if(obj.userData.box)
+        scene.remove(
+            obj.userData.box
+        );
+
+    scene.remove(obj);
+
+    const index =
+        objects.indexOf(obj);
+
+    if(index>=0)
+        objects.splice(
+            index,
+            1
+        );
+}
+
+/* =========================================================
+   BOOLEAN UNION
+========================================================= */
+
+function booleanUnion(){
+
+    if(selected.length<2){
+
+        showModal(
+            "Vereinigung",
+            "Wähle mindestens zwei Objekte aus."
+        );
+
+        return;
+    }
+
+    try{
+
+        saveHistory();
+
+        let result =
+            makeBrush(
+                selected[0]
+            );
+
+        for(
+            let i=1;
+            i<selected.length;
+            i++
+        ){
+
+            const next =
+                makeBrush(
+                    selected[i]
+                );
+
+            result =
+                evaluator.evaluate(
+                    result,
+                    next,
+                    ADDITION
+                );
+        }
+
+        const mesh =
+            new THREE.Mesh(
+                result.geometry.clone(),
+                material(
+                    0x5eb6ff
+                )
+            );
+
+        mesh.position.set(
+            0,0,0
+        );
+
+        mesh.rotation.set(
+            0,0,0
+        );
+
+        mesh.scale.set(
+            1,1,1
+        );
+
+        mesh.userData.type =
+            "Boolean";
+
+        mesh.userData.name =
+            nextName(
+                "Boolean"
+            );
+
+        mesh.userData.editor =
+            true;
+
+        scene.add(mesh);
+
+        selected.forEach(
+            removeObject
+        );
+
+        objects.push(mesh);
+
+        selectObjects(
+            [mesh]
+        );
+
+        refreshObjectList();
+
+    }catch(error){
+
+        console.error(
+            "Boolean Union:",
+            error
+        );
+
+        showModal(
+            "Boolean-Fehler",
+            "Die Vereinigung konnte nicht berechnet werden. Der Editor bleibt geöffnet und stürzt nicht ab."
+        );
+    }
+}
+
+/* =========================================================
+   BOOLEAN SUBTRACTION
+========================================================= */
+
+function booleanSubtract(){
+
+    const positive =
+        selected.find(
+            o =>
+                !o.userData.negative
+        );
+
+    const cutters =
+        selected.filter(
+            o =>
+                o.userData.negative
+        );
+
+    if(
+        !positive ||
+        !cutters.length
+    ){
+
+        showModal(
+            "Ausschneiden",
+            "Wähle ein normales Objekt und mindestens ein negatives Objekt aus."
+        );
+
+        return;
+    }
+
+    try{
+
+        saveHistory();
+
+        let result =
+            makeBrush(
+                positive
+            );
+
+        for(
+            const cutterObj of cutters
+        ){
+
+            const cutter =
+                makeBrush(
+                    cutterObj
+                );
+
+            result =
+                evaluator.evaluate(
+                    result,
+                    cutter,
+                    SUBTRACTION
+                );
+        }
+
+        const mesh =
+            new THREE.Mesh(
+                result.geometry.clone(),
+                positive.material.clone()
+            );
+
+        mesh.position.set(
+            0,0,0
+        );
+
+        mesh.rotation.set(
+            0,0,0
+        );
+
+        mesh.scale.set(
+            1,1,1
+        );
+
+        mesh.userData.editor =
+            true;
+
+        mesh.userData.type =
+            positive.userData.type;
+
+        mesh.userData.negative =
+            false;
+
+        mesh.userData.name =
+            positive.userData.name+
+            "_Boolean";
+
+        scene.add(mesh);
+
+        removeObject(
+            positive
+        );
+
+        cutters.forEach(
+            removeObject
+        );
+
+        objects.push(mesh);
+
+        selectObjects(
+            [mesh]
+        );
+
+        refreshObjectList();
+
+    }catch(error){
+
+        console.error(
+            "Boolean Subtraction:",
+            error
+        );
+
+        showModal(
+            "Boolean-Fehler",
+            "Das Ausschneiden konnte nicht berechnet werden. Die negativen Objekte bleiben erhalten."
+        );
+    }
+}
+
+/* =========================================================
+   JOIN
+========================================================= */
+
+function joinObjects(){
+
+    if(selected.length<2)
+        return;
+
+    saveHistory();
+
+    const first =
+        selected[0];
+
+    const group =
+        new THREE.Group();
+
+    group.name =
+        nextName(
+            "Gruppe"
+        );
+
+    group.userData.editor =
+        true;
+
+    group.userData.type =
+        "Gruppe";
+
+    group.userData.name =
+        group.name;
+
+    scene.add(group);
+
+    selected.forEach(
+        obj=>{
+
+            scene.remove(obj);
+
+            group.add(obj);
+        }
+    );
+
+    objects =
+        objects.filter(
+            o =>
+                !selected.includes(o)
+        );
+
+    objects.push(group);
+
+    selectObjects(
+        [group]
+    );
+
+    refreshObjectList();
+}
+
+/* =========================================================
+   CHECK PRINT
+========================================================= */
+
+function checkPrintWarnings(){
+
+    const warnings =
+        $("warnings");
+
+    warnings.innerHTML =
+        "";
+
+    const sizeX =
+        Number($("bedX").value);
+
+    const sizeY =
+        Number($("bedY").value);
+
+    const sizeZ =
+        Number($("bedZ").value);
+
+    objects.forEach(
+        obj=>{
+
+            if(
+                obj.userData.negative ||
+                !obj.visible
+            )
+                return;
+
+            const box =
+                new THREE.Box3()
+                    .setFromObject(obj);
+
+            const center =
+                box.getCenter(
+                    new THREE.Vector3()
+                );
+
+            let messages=[];
+
+            if(
+                box.min.x <
+                -sizeX/2 ||
+                box.max.x >
+                sizeX/2
+            )
+                messages.push(
+                    "X außerhalb"
+                );
+
+            if(
+                box.min.z <
+                -sizeY/2 ||
+                box.max.z >
+                sizeY/2
+            )
+                messages.push(
+                    "Y außerhalb"
+                );
+
+            if(
+                box.max.y >
+                sizeZ
+            )
+                messages.push(
+                    "Z außerhalb"
+                );
+
+            if(
+                box.min.y < -.05
+            )
+                messages.push(
+                    "unter Druckplatte"
+                );
+
+            if(messages.length){
+
+                const warning =
+                    document.createElement(
+                        "div"
+                    );
+
+                warning.className =
+                    "warning";
+
+                warning.textContent =
+                    obj.userData.name+
+                    ": "+
+                    messages.join(
+                        ", "
+                    );
+
+                warnings.appendChild(
+                    warning
+                );
+            }
+        }
     );
 }
 
 /* =========================================================
-   GLB EXPORT
+   UPDATE BED
+========================================================= */
+
+function updateBed(){
+
+    if(bed)
+        scene.remove(bed);
+
+    createBed();
+
+    checkPrintWarnings();
+}
+
+/* =========================================================
+   VIEW
+========================================================= */
+
+function setView(
+    type
+){
+
+    const target =
+        orbit.target.clone();
+
+    const distance =
+        300;
+
+    if(type==="front"){
+
+        camera.position.set(
+            0,
+            80,
+            distance
+        );
+    }
+
+    if(type==="back"){
+
+        camera.position.set(
+            0,
+            80,
+            -distance
+        );
+    }
+
+    if(type==="left"){
+
+        camera.position.set(
+            -distance,
+            80,
+            0
+        );
+    }
+
+    if(type==="right"){
+
+        camera.position.set(
+            distance,
+            80,
+            0
+        );
+    }
+
+    if(type==="top"){
+
+        camera.position.set(
+            0,
+            distance,
+            .01
+        );
+    }
+
+    if(type==="perspective"){
+
+        camera.position.set(
+            180,
+            140,
+            190
+        );
+    }
+
+    orbit.target.copy(
+        target
+    );
+
+    orbit.update();
+}
+
+/* =========================================================
+   SAVE STATE
+========================================================= */
+
+function serializeObject(
+    obj
+){
+
+    const data={
+        name:
+            obj.userData.name,
+
+        type:
+            obj.userData.type,
+
+        negative:
+            !!obj.userData.negative,
+
+        visible:
+            obj.visible,
+
+        position:[
+            obj.position.x,
+            obj.position.y,
+            obj.position.z
+        ],
+
+        rotation:[
+            obj.rotation.x,
+            obj.rotation.y,
+            obj.rotation.z
+        ],
+
+        scale:[
+            obj.scale.x,
+            obj.scale.y,
+            obj.scale.z
+        ],
+
+        color:
+            obj.material &&
+            obj.material.color
+                ? obj.material.color.getHex()
+                : 0xffffff
+    };
+
+    return data;
+}
+
+function createFromData(
+    data
+){
+
+    let obj;
+
+    if(data.type==="Kugel")
+        obj=createSphere(
+            data.negative
+        );
+
+    else if(data.type==="Würfel")
+        obj=createCube(
+            data.negative
+        );
+
+    else if(data.type==="Zylinder")
+        obj=createCylinder(
+            data.negative
+        );
+
+    else if(data.type==="Feder")
+        obj=createSpring();
+
+    else
+        obj=createCube(
+            data.negative
+        );
+
+    obj.userData.name =
+        data.name;
+
+    obj.position.fromArray(
+        data.position
+    );
+
+    obj.rotation.set(
+        data.rotation[0],
+        data.rotation[1],
+        data.rotation[2]
+    );
+
+    obj.scale.fromArray(
+        data.scale
+    );
+
+    obj.visible =
+        data.visible;
+
+    if(
+        obj.material &&
+        obj.material.color
+    ){
+
+        obj.material.color.setHex(
+            data.color
+        );
+    }
+
+    return obj;
+}
+
+function serializeScene(){
+
+    return {
+        version:1,
+
+        bed:{
+            x:Number($("bedX").value),
+            y:Number($("bedY").value),
+            z:Number($("bedZ").value)
+        },
+
+        objects:
+            objects
+                .filter(
+                    o =>
+                        o.userData.editor
+                )
+                .map(
+                    serializeObject
+                )
+    };
+}
+
+/* =========================================================
+   SAVE FILE
+========================================================= */
+
+function saveProject(){
+
+    const data =
+        serializeScene();
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+    downloadBlob(
+        blob,
+        "ghost-project.json"
+    );
+}
+
+/* =========================================================
+   LOAD FILE
+========================================================= */
+
+function loadProject(){
+
+    const input =
+        document.createElement(
+            "input"
+        );
+
+    input.type =
+        "file";
+
+    input.accept =
+        ".json";
+
+    input.onchange =
+        async()=>{
+
+            const file =
+                input.files[0];
+
+            if(!file)
+                return;
+
+            try{
+
+                const text =
+                    await file.text();
+
+                const data =
+                    JSON.parse(text);
+
+                objects.forEach(
+                    removeObject
+                );
+
+                objects=[];
+
+                selected=[];
+
+                if(data.bed){
+
+                    $("bedX").value =
+                        data.bed.x;
+
+                    $("bedY").value =
+                        data.bed.y;
+
+                    $("bedZ").value =
+                        data.bed.z;
+
+                    updateBed();
+                }
+
+                if(
+                    Array.isArray(
+                        data.objects
+                    )
+                ){
+
+                    data.objects.forEach(
+                        createFromData
+                    );
+                }
+
+                refreshObjectList();
+
+                updateSelectionVisuals();
+
+                checkPrintWarnings();
+
+            }catch(error){
+
+                showModal(
+                    "Ladefehler",
+                    "Das Projekt konnte nicht geladen werden."
+                );
+
+                console.error(error);
+            }
+        };
+
+    input.click();
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function saveHistory(){
+
+    const state =
+        serializeScene();
+
+    history =
+        history.slice(
+            0,
+            historyIndex+1
+        );
+
+    history.push(
+        JSON.stringify(state)
+    );
+
+    if(history.length>30)
+        history.shift();
+
+    historyIndex =
+        history.length-1;
+}
+
+function restoreState(
+    json
+){
+
+    const data =
+        JSON.parse(json);
+
+    objects.forEach(
+        removeObject
+    );
+
+    objects=[];
+
+    selected=[];
+
+    data.objects.forEach(
+        createFromData
+    );
+
+    refreshObjectList();
+
+    updateSelectionVisuals();
+
+    checkPrintWarnings();
+}
+
+function undo(){
+
+    if(historyIndex<=0)
+        return;
+
+    historyIndex--;
+
+    restoreState(
+        history[historyIndex]
+    );
+}
+
+function redo(){
+
+    if(
+        historyIndex>=
+        history.length-1
+    )
+        return;
+
+    historyIndex++;
+
+    restoreState(
+        history[historyIndex]
+    );
+}
+
+/* =========================================================
+   EXPORT HELPERS
+========================================================= */
+
+function downloadBlob(
+    blob,
+    filename
+){
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+    const a =
+        document.createElement(
+            "a"
+        );
+
+    a.href=url;
+
+    a.download=filename;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    setTimeout(
+        ()=>{
+            URL.revokeObjectURL(url);
+        },
+        1500
+    );
+}
+
+/* =========================================================
+   EXPORT GROUP
+========================================================= */
+
+function makeExportGroup(){
+
+    const group =
+        new THREE.Group();
+
+    objects
+        .filter(
+            o =>
+                o.userData.editor &&
+                !o.userData.negative &&
+                o.visible
+        )
+        .forEach(
+            obj=>{
+
+                /*
+                   Negative Objekte werden hier
+                   absichtlich niemals hinzugefügt.
+                */
+
+                const clone =
+                    obj.clone(true);
+
+                clone.traverse(
+                    child=>{
+
+                        if(
+                            child.isMesh
+                        ){
+
+                            child.material =
+                                child.material.clone();
+
+                            child.material
+                                .transparent=false;
+
+                            child.material
+                                .opacity=1;
+                        }
+                    }
+                );
+
+                group.add(
+                    clone
+                );
+            }
+        );
+
+    return group;
+}
+
+/* =========================================================
+   STL
+========================================================= */
+
+function exportSTL(){
+
+    const group =
+        makeExportGroup();
+
+    if(!group.children.length){
+
+        showModal(
+            "STL Export",
+            "Keine druckbaren positiven Objekte vorhanden."
+        );
+
+        return;
+    }
+
+    const exporter =
+        new STLExporter();
+
+    const result =
+        exporter.parse(
+            group,
+            {
+                binary:true
+            }
+        );
+
+    const blob =
+        new Blob(
+            [result],
+            {
+                type:
+                    "model/stl"
+            }
+        );
+
+    downloadBlob(
+        blob,
+        "ghost-model.stl"
+    );
+}
+
+/* =========================================================
+   GLB
 ========================================================= */
 
 function exportGLB(){
 
-    const exportObjects =
-        objects.filter(
-            o=>!o.userData.negative
-        );
+    const group =
+        makeExportGroup();
 
-    if(!exportObjects.length){
+    if(!group.children.length){
 
         showModal(
-            "Keine positiven Objekte zum Export vorhanden."
+            "GLB Export",
+            "Keine druckbaren positiven Objekte vorhanden."
         );
 
         return;
     }
 
-    /*
-       Wir erzeugen eine einfache GLTF/GLB-Datei
-       ohne zusätzliche CSG-Abhängigkeit.
+    const exporter =
+        new GLTFExporter();
 
-       Wenn GLTFExporter verfügbar ist, wird er
-       dynamisch nachgeladen.
-    */
+    exporter.parse(
+        group,
+        result=>{
 
-    const script =
-        document.createElement("script");
-
-    script.type="module";
-
-    script.textContent=`
-        import {GLTFExporter}
-        from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/exporters/GLTFExporter.js";
-
-        window.dispatchEvent(
-            new CustomEvent(
-                "ghost-gltf-exporter-ready",
-                {
-                    detail:{GLTFExporter}
-                }
-            )
-        );
-    `;
-
-    document.head.appendChild(script);
-
-    window.addEventListener(
-        "ghost-gltf-exporter-ready",
-        function handler(e){
-
-            window.removeEventListener(
-                "ghost-gltf-exporter-ready",
-                handler
-            );
-
-            const Exporter =
-                e.detail.GLTFExporter;
-
-            const exporter =
-                new Exporter();
-
-            const group =
-                new THREE.Group();
-
-            exportObjects.forEach(o=>{
-
-                const clone =
-                    o.clone(true);
-
-                clone.traverse(child=>{
-
-                    if(child.isMesh){
-
-                        child.material =
-                            child.material.clone();
-
-                        child.material.transparent=false;
-                        child.material.opacity=1;
+            const blob =
+                new Blob(
+                    [result],
+                    {
+                        type:
+                            "model/gltf-binary"
                     }
-                });
+                );
 
-                group.add(clone);
-            });
-
-            exporter.parse(
-                group,
-                result=>{
-
-                    let blob;
-
-                    if(result instanceof ArrayBuffer){
-
-                        blob =
-                            new Blob(
-                                [result],
-                                {
-                                    type:
-                                    "model/gltf-binary"
-                                }
-                            );
-
-                    }else{
-
-                        blob =
-                            new Blob(
-                                [
-                                    JSON.stringify(result)
-                                ],
-                                {
-                                    type:
-                                    "application/json"
-                                }
-                            );
-                    }
-
-                    const url =
-                        URL.createObjectURL(blob);
-
-                    const a =
-                        document.createElement("a");
-
-                    a.href=url;
-                    a.download=
-                        "ghost-model.glb";
-
-                    a.click();
-
-                    setTimeout(()=>{
-                        URL.revokeObjectURL(url);
-                    },1000);
-                },
-                {
-                    binary:true
-                }
+            downloadBlob(
+                blob,
+                "ghost-model.glb"
             );
+        },
+        error=>{
+            console.error(error);
 
+            showModal(
+                "GLB Export",
+                "Der GLB-Export ist fehlgeschlagen."
+            );
+        },
+        {
+            binary:true,
+            onlyVisible:true
         }
     );
 }
 
 /* =========================================================
-   MODAL
+   RESET
 ========================================================= */
 
-function showModal(text){
+function resetScene(){
 
-    modalText.textContent=text;
-    modal.style.display="flex";
-}
+    if(
+        !confirm(
+            "Szene wirklich zurücksetzen?"
+        )
+    )
+        return;
 
-/* =========================================================
-   FPS MODE
-========================================================= */
-
-function enableFPS(){
-
-    fpsMode=true;
-
-    document.getElementById(
-        "side"
-    ).style.display="none";
-
-    document.getElementById(
-        "topbar"
-    ).style.display="none";
-
-    document.getElementById(
-        "info"
-    ).style.display="none";
-
-    fpsUI.style.display="block";
-
-    crosshair.style.display="block";
-
-    fpsHint.style.display="block";
-
-    player.x=0;
-    player.y=2;
-    player.z=8;
-
-    yaw=0;
-    pitch=0;
-
-    document.body.requestPointerLock();
-}
-
-function disableFPS(){
-
-    fpsMode=false;
-
-    document.getElementById(
-        "side"
-    ).style.display="block";
-
-    document.getElementById(
-        "topbar"
-    ).style.display="flex";
-
-    document.getElementById(
-        "info"
-    ).style.display="block";
-
-    fpsUI.style.display="none";
-
-    crosshair.style.display="none";
-
-    fpsHint.style.display="none";
-
-    document.exitPointerLock?.();
-}
-
-function updateFPS(dt){
-
-    const forward =
-        new THREE.Vector3(
-            Math.sin(yaw),
-            0,
-            Math.cos(yaw)
-        );
-
-    const right =
-        new THREE.Vector3(
-            Math.cos(yaw),
-            0,
-            -Math.sin(yaw)
-        );
-
-    let movement =
-        new THREE.Vector3();
-
-    if(keys["KeyW"])
-        movement.add(forward);
-
-    if(keys["KeyS"])
-        movement.sub(forward);
-
-    if(keys["KeyD"])
-        movement.add(right);
-
-    if(keys["KeyA"])
-        movement.sub(right);
-
-    const moving =
-        movement.lengthSq()>0;
-
-    if(moving)
-        movement.normalize();
-
-    let speed=player.speed;
-
-    if(keys["ShiftLeft"] &&
-       player.stamina>0 &&
-       moving){
-
-        speed*=1.7;
-
-        player.stamina -=
-            30*dt;
-
-    }else{
-
-        player.stamina +=
-            20*dt;
-    }
-
-    player.stamina =
-        THREE.MathUtils.clamp(
-            player.stamina,
-            0,
-            100
-        );
-
-    player.x +=
-        movement.x*
-        speed*
-        dt;
-
-    player.z +=
-        movement.z*
-        speed*
-        dt;
-
-    player.vy -=
-        20*dt;
-
-    if(keys["Space"] &&
-       player.y<=2.01){
-
-        player.vy=8;
-    }
-
-    player.y +=
-        player.vy*dt;
-
-    if(player.y<2){
-
-        player.y=2;
-        player.vy=0;
-    }
-
-    /*
-       Weltgrenze
-    */
-
-    player.x =
-        THREE.MathUtils.clamp(
-            player.x,
-            -49,
-            49
-        );
-
-    player.z =
-        THREE.MathUtils.clamp(
-            player.z,
-            -49,
-            49
-        );
-
-    fpsCamera.position.set(
-        player.x,
-        player.y,
-        player.z
+    objects.forEach(
+        removeObject
     );
 
-    fpsCamera.rotation.order="YXZ";
+    objects=[];
 
-    fpsCamera.rotation.y=yaw;
-    fpsCamera.rotation.x=pitch;
+    selected=[];
 
-    healthFill.style.width =
-        player.health+"%";
+    createInitialScene();
 
-    staminaFill.style.width =
-        player.stamina+"%";
+    refreshObjectList();
 
-    ammoUI.textContent =
-        ammo+" / 30";
-
-    debug.textContent =
-        "ULTRA FPS ENGINE\n"+
-        "X: "+player.x.toFixed(2)+"\n"+
-        "Y: "+player.y.toFixed(2)+"\n"+
-        "Z: "+player.z.toFixed(2);
+    checkPrintWarnings();
 }
 
 /* =========================================================
-   SHOOTING
+   RAYCAST SELECTION
 ========================================================= */
 
-function shoot(){
+function selectFromMouse(
+    event
+){
 
-    if(!fpsMode)return;
+    if(sculptMode)
+        return;
 
-    if(ammo<=0)return;
+    if(
+        event.button!==0
+    )
+        return;
 
-    ammo--;
+    if(
+        event.target!==renderer.domElement
+    )
+        return;
 
-    ammoUI.textContent =
-        ammo+" / 30";
+    const rect =
+        renderer.domElement
+            .getBoundingClientRect();
+
+    mouse.x =
+        (
+            event.clientX -
+            rect.left
+        ) /
+        rect.width *
+        2 - 1;
+
+    mouse.y =
+        -(
+            (
+                event.clientY -
+                rect.top
+            ) /
+            rect.height
+        ) *
+        2 + 1;
 
     raycaster.setFromCamera(
-        new THREE.Vector2(0,0),
-        fpsCamera
+        mouse,
+        camera
     );
+
+    const visible =
+        objects.filter(
+            o =>
+                o.visible
+        );
 
     const hits =
         raycaster.intersectObjects(
-            objects.filter(
-                o=>!o.userData.negative
-            ),
-            false
+            visible,
+            true
         );
 
-    if(hits.length){
+    if(!hits.length){
 
-        const hit =
-            document.getElementById(
-                "hitmarker"
-            );
+        if(!event.shiftKey)
+            selectObjects([]);
 
-        hit.style.display="block";
-
-        setTimeout(()=>{
-            hit.style.display="none";
-        },100);
+        return;
     }
+
+    let obj =
+        hits[0].object;
+
+    while(
+        obj &&
+        !obj.userData.editor
+    ){
+
+        obj=obj.parent;
+    }
+
+    if(!obj)
+        return;
+
+    if(event.shiftKey)
+        toggleSelection(obj);
+    else
+        selectObjects([obj]);
 }
 
 /* =========================================================
-   MOUSE LOOK
+   POINTER
 ========================================================= */
 
-function mouseLook(e){
+let middleDown=false;
 
-    if(!fpsMode || !pointerLocked)
-        return;
+rendererDummySetup();
 
-    yaw -= e.movementX*.0025;
-    pitch -= e.movementY*.0025;
+function rendererDummySetup(){
 
-    pitch =
-        THREE.MathUtils.clamp(
-            pitch,
-            -Math.PI/2+.05,
-            Math.PI/2-.05
-        );
+    /*
+       Wird nach init nochmals
+       mit dem echten Renderer verbunden.
+    */
 }
 
 /* =========================================================
@@ -2259,281 +3888,604 @@ function setupEvents(){
 
     window.addEventListener(
         "resize",
-        onResize
+        resize
     );
 
     renderer.domElement.addEventListener(
         "pointerdown",
-        editorPointerDown
+        event=>{
+
+            if(
+                sculptMode &&
+                event.button===0
+            ){
+
+                saveHistory();
+
+                sculptAt(event);
+
+                return;
+            }
+
+            if(
+                event.button===1
+            ){
+
+                middleDown=true;
+
+                if(event.shiftKey)
+                    orbit.mouseButtons.RIGHT =
+                        THREE.MOUSE.PAN;
+
+                return;
+            }
+
+            selectFromMouse(event);
+        }
     );
 
-    window.addEventListener(
+    renderer.domElement.addEventListener(
         "pointermove",
-        editorPointerMove
+        event=>{
+
+            if(sculptMode){
+
+                sculptCircle.style.left =
+                    event.clientX+
+                    "px";
+
+                sculptCircle.style.top =
+                    event.clientY+
+                    "px";
+
+                if(
+                    event.buttons&
+                    1
+                ){
+
+                    sculptAt(event);
+                }
+            }
+        }
     );
 
-    window.addEventListener(
+    renderer.domElement.addEventListener(
         "pointerup",
-        editorPointerUp
+        event=>{
+
+            if(
+                event.button===1
+            ){
+
+                middleDown=false;
+            }
+        }
+    );
+
+    renderer.domElement.addEventListener(
+        "wheel",
+        ()=>{
+            checkPrintWarnings();
+        },
+        {
+            passive:true
+        }
     );
 
     window.addEventListener(
         "keydown",
-        e=>{
+        event=>{
 
-            keys[e.code]=true;
+            if(
+                event.target.tagName==="INPUT"
+            )
+                return;
 
-            if(e.code==="Delete"){
+            if(
+                event.code==="Delete"
+            ){
+
                 deleteSelected();
             }
 
-            if(!fpsMode){
+            if(
+                event.code==="KeyG"
+            ){
 
-                if(e.code==="KeyG")
-                    setTransformMode("move");
-
-                if(e.code==="KeyR")
-                    setTransformMode("rotate");
-
-                if(e.code==="KeyS")
-                    setTransformMode("scale");
-
-                if(e.code==="Escape")
-                    clearSelection();
+                setTransform(
+                    "translate"
+                );
             }
 
-            if(fpsMode &&
-               e.code==="KeyR" &&
-               ammo===0){
+            if(
+                event.code==="KeyR"
+            ){
 
-                ammo=30;
+                setTransform(
+                    "rotate"
+                );
+            }
+
+            if(
+                event.code==="KeyS"
+            ){
+
+                setTransform(
+                    "scale"
+                );
+            }
+
+            if(
+                event.code==="KeyX"
+            ){
+
+                axisLock =
+                    "X";
+
+                transform.setMode(
+                    transformMode
+                );
+
+                transform.setSpace(
+                    "world"
+                );
+            }
+
+            if(
+                event.code==="KeyY"
+            ){
+
+                axisLock =
+                    "Y";
+            }
+
+            if(
+                event.code==="KeyZ"
+            ){
+
+                axisLock =
+                    "Z";
+            }
+
+            if(
+                event.code==="Escape"
+            ){
+
+                axisLock=null;
+
+                stopSculpt();
+            }
+
+            if(
+                event.ctrlKey &&
+                event.code==="KeyZ"
+            ){
+
+                event.preventDefault();
+
+                undo();
+            }
+
+            if(
+                event.ctrlKey &&
+                event.code==="KeyY"
+            ){
+
+                event.preventDefault();
+
+                redo();
             }
         }
     );
 
-    window.addEventListener(
-        "keyup",
-        e=>{
-            keys[e.code]=false;
-        }
-    );
+    /* =========================
+       ADD
+    ========================= */
 
-    document.addEventListener(
-        "mousemove",
-        mouseLook
-    );
+    $("addSphere").onclick=()=>{
+        saveHistory();
 
-    document.addEventListener(
-        "pointerlockchange",
-        ()=>{
-            pointerLocked =
-                document.pointerLockElement!==null;
-        }
-    );
+        const o =
+            createSphere();
 
-    document.addEventListener(
-        "mousedown",
-        e=>{
-            if(fpsMode &&
-               e.button===0){
+        selectObjects([o]);
 
-                shoot();
-            }
-        }
-    );
-
-    /* Buttons */
-
-    document.getElementById(
-        "addCube"
-    ).onclick=()=>{
-        const o=addCube();
-        selectObject(o);
-    };
-
-    document.getElementById(
-        "addSphere"
-    ).onclick=()=>{
-        const o=addSphere();
-        selectObject(o);
-    };
-
-    document.getElementById(
-        "addCylinder"
-    ).onclick=()=>{
-        const o=addCylinder();
-        selectObject(o);
-    };
-
-    document.getElementById(
-        "addSpring"
-    ).onclick=()=>{
-        const o=addSpring();
-        selectObject(o);
         putOnGround();
     };
 
-    document.getElementById(
-        "addNegCube"
-    ).onclick=()=>{
-        const o=addCube(true);
-        selectObject(o);
+    $("addCube").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createCube();
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "addNegSphere"
-    ).onclick=()=>{
-        const o=addSphere(true);
-        selectObject(o);
+    $("addCylinder").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createCylinder();
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "addNegCylinder"
-    ).onclick=()=>{
-        const o=addCylinder(true);
-        selectObject(o);
+    $("addSpring").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createSpring();
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "moveTool"
-    ).onclick=()=>{
-        setTransformMode("move");
+    $("addNegSphere").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createSphere(true);
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "rotateTool"
-    ).onclick=()=>{
-        setTransformMode("rotate");
+    $("addNegCube").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createCube(true);
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "scaleTool"
-    ).onclick=()=>{
-        setTransformMode("scale");
+    $("addNegCylinder").onclick=()=>{
+        saveHistory();
+
+        const o =
+            createCylinder(true);
+
+        selectObjects([o]);
+
+        putOnGround();
     };
 
-    document.getElementById(
-        "duplicateBtn"
-    ).onclick=duplicateSelected;
+    /* =========================
+       TOOLS
+    ========================= */
 
-    document.getElementById(
-        "deleteBtn"
-    ).onclick=deleteSelected;
+    $("selectTool").onclick=()=>{
+        stopSculpt();
 
-    document.getElementById(
-        "selectAllBtn"
-    ).onclick=selectAll;
+        transform.detach();
 
-    document.getElementById(
-        "groundBtn"
-    ).onclick=putOnGround;
+        $("selectTool")
+            .classList.add("active");
 
-    document.getElementById(
-        "centerBtn"
-    ).onclick=centerSelected;
+        $("moveTool")
+            .classList.remove("active");
 
-    document.getElementById(
-        "sculptUp"
-    ).onclick=()=>{
-        sculpt(1);
+        $("rotateTool")
+            .classList.remove("active");
+
+        $("scaleTool")
+            .classList.remove("active");
+
+        if(selected.length)
+            transform.attach(
+                selected[0]
+            );
     };
 
-    document.getElementById(
-        "sculptDown"
-    ).onclick=()=>{
-        sculpt(-1);
+    $("moveTool").onclick=()=>{
+        stopSculpt();
+
+        setTransform(
+            "translate"
+        );
     };
 
-    document.getElementById(
-        "sculptSmooth"
-    ).onclick=smoothSelected;
+    $("rotateTool").onclick=()=>{
+        stopSculpt();
 
-    document.getElementById(
-        "rebuildSpring"
-    ).onclick=rebuildSpring;
-
-    document.getElementById(
-        "preparePrint"
-    ).onclick=preparePrint;
-
-    document.getElementById(
-        "removeNegatives"
-    ).onclick=removeNegativesFromScene;
-
-    document.getElementById(
-        "exportBtn"
-    ).onclick=exportGLB;
-
-    document.getElementById(
-        "fpsBtn"
-    ).onclick=enableFPS;
-
-    document.getElementById(
-        "closeModal"
-    ).onclick=()=>{
-        modal.style.display="none";
+        setTransform(
+            "rotate"
+        );
     };
+
+    $("scaleTool").onclick=()=>{
+        stopSculpt();
+
+        setTransform(
+            "scale"
+        );
+    };
+
+    $("sculptTool").onclick=()=>{
+
+        if(sculptMode)
+            stopSculpt();
+        else
+            startSculpt(1);
+    };
+
+    $("panView").onclick=()=>{
+
+        orbit.mouseButtons.LEFT =
+            THREE.MOUSE.PAN;
+
+        showModal(
+            "Pan",
+            "Zum normalen Orbit zurückzukehren: mittlere Maustaste benutzen."
+        );
+    };
+
+    /* =========================
+       OBJECT
+    ========================= */
+
+    $("duplicateBtn").onclick=
+        duplicateSelected;
+
+    $("deleteBtn").onclick=
+        deleteSelected;
+
+    $("renameBtn").onclick=
+        renameSelected;
+
+    $("hideBtn").onclick=
+        toggleVisibility;
+
+    $("selectAllBtn").onclick=()=>{
+        selectObjects(
+            [...objects]
+        );
+    };
+
+    /* =========================
+       TRANSFORM INPUTS
+    ========================= */
 
     [
-        posX,posY,posZ,
-        scaleX,scaleY,scaleZ,
-        rotX,rotY,rotZ
-    ].forEach(input=>{
-        input.addEventListener(
-            "input",
-            applyInspector
-        );
-    });
+        "px","py","pz",
+        "sx","sy","sz",
+        "rx","ry","rz"
+    ].forEach(
+        id=>{
 
-    document.getElementById(
-        "roundness"
-    ).addEventListener(
-        "change",
-        roundSelected
+            $(id).addEventListener(
+                "input",
+                applyInspector
+            );
+        }
     );
 
-    window.addEventListener(
-        "wheel",
-        e=>{
+    $("groundBtn").onclick=
+        putOnGround;
 
-            if(fpsMode)return;
+    $("centerBtn").onclick=
+        centerSelected;
 
-            /*
-               Langsames Editor-Zooming.
-            */
+    $("applyColor").onclick=
+        applyColor;
 
-            const dir =
-                e.deltaY>0 ? 1 : -1;
+    /* =========================
+       GEOMETRY
+    ========================= */
 
-            camera.position.multiplyScalar(
-                1 + dir*.04
+    $("roundCube").onclick=
+        roundCube;
+
+    $("rebuildSpring").onclick=()=>{
+
+        if(selected.length!==1)
+            return;
+
+        const old =
+            selected[0];
+
+        if(
+            old.userData.type!=="Feder"
+        ){
+
+            showModal(
+                "Feder",
+                "Bitte eine Feder auswählen."
             );
 
-            camera.position.y =
-                Math.max(
-                    1.5,
-                    camera.position.y
-                );
+            return;
+        }
+
+        saveHistory();
+
+        const pos =
+            old.position.clone();
+
+        const rot =
+            old.rotation.clone();
+
+        const scl =
+            old.scale.clone();
+
+        removeObject(old);
+
+        const replacement =
+            createSpring();
+
+        replacement.position.copy(pos);
+        replacement.rotation.copy(rot);
+        replacement.scale.copy(scl);
+
+        selectObjects(
+            [replacement]
+        );
+    };
+
+    /* =========================
+       SCULPT
+    ========================= */
+
+    $("sculptModeAdd").onclick=
+        ()=>startSculpt(1);
+
+    $("sculptModeSub").onclick=
+        ()=>startSculpt(-1);
+
+    $("smoothBtn").onclick=()=>{
+        saveHistory();
+
+        smoothSelected();
+    };
+
+    /* =========================
+       BOOLEAN
+    ========================= */
+
+    $("unionBtn").onclick=
+        booleanUnion;
+
+    $("subtractBtn").onclick=
+        booleanSubtract;
+
+    $("joinBtn").onclick=
+        joinObjects;
+
+    /* =========================
+       PRINT
+    ========================= */
+
+    $("updateBed").onclick=
+        updateBed;
+
+    $("checkPrint").onclick=
+        checkPrintWarnings;
+
+    /* =========================
+       FILE
+    ========================= */
+
+    $("saveBtn").onclick=
+        saveProject;
+
+    $("loadBtn").onclick=
+        loadProject;
+
+    $("stlBtn").onclick=
+        exportSTL;
+
+    $("glbBtn").onclick=
+        exportGLB;
+
+    /* =========================
+       UNDO
+    ========================= */
+
+    $("undoBtn").onclick=
+        undo;
+
+    $("redoBtn").onclick=
+        redo;
+
+    $("resetScene").onclick=
+        resetScene;
+
+    /* =========================
+       VIEW
+    ========================= */
+
+    $("viewFront").onclick=
+        ()=>setView("front");
+
+    $("viewBack").onclick=
+        ()=>setView("back");
+
+    $("viewLeft").onclick=
+        ()=>setView("left");
+
+    $("viewRight").onclick=
+        ()=>setView("right");
+
+    $("viewTop").onclick=
+        ()=>setView("top");
+
+    $("viewPerspective").onclick=
+        ()=>setView("perspective");
+
+    $("modalClose").onclick=()=>{
+        $("modal").style.display =
+            "none";
+    };
+
+    /* =========================
+       TOUCH
+    ========================= */
+
+    renderer.domElement.addEventListener(
+        "touchstart",
+        e=>{
+
+            if(
+                e.touches.length===1
+            ){
+
+                const t =
+                    e.touches[0];
+
+                selectFromMouse({
+                    clientX:t.clientX,
+                    clientY:t.clientY,
+                    button:0,
+                    shiftKey:false,
+                    target:
+                        renderer.domElement
+                });
+            }
         },
-        {passive:true}
+        {
+            passive:true
+        }
     );
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function showModal(
+    title,
+    text
+){
+
+    $("modalTitle")
+        .textContent=title;
+
+    $("modalText")
+        .textContent=text;
+
+    $("modal")
+        .style.display="flex";
 }
 
 /* =========================================================
    RESIZE
 ========================================================= */
 
-function onResize(){
+function resize(){
 
     camera.aspect =
-        innerWidth/innerHeight;
+        innerWidth/
+        innerHeight;
 
     camera.updateProjectionMatrix();
-
-    fpsCamera.aspect =
-        innerWidth/innerHeight;
-
-    fpsCamera.updateProjectionMatrix();
 
     renderer.setSize(
         innerWidth,
@@ -2542,63 +4494,7 @@ function onResize(){
 }
 
 /* =========================================================
-   EDITOR CAMERA
-========================================================= */
-
-function updateEditorCamera(dt){
-
-    /*
-       Einfaches WASD-Kamerasystem im Editor.
-       Die eigentliche Auswahl bleibt unabhängig davon.
-    */
-
-    const speed=8*dt;
-
-    const direction =
-        new THREE.Vector3();
-
-    camera.getWorldDirection(
-        direction
-    );
-
-    direction.y=0;
-    direction.normalize();
-
-    const right =
-        new THREE.Vector3()
-            .crossVectors(
-                direction,
-                new THREE.Vector3(0,1,0)
-            )
-            .normalize();
-
-    if(keys["KeyW"])
-        camera.position.addScaledVector(
-            direction,
-            speed
-        );
-
-    if(keys["KeyS"])
-        camera.position.addScaledVector(
-            direction,
-            -speed
-        );
-
-    if(keys["KeyD"])
-        camera.position.addScaledVector(
-            right,
-            speed
-        );
-
-    if(keys["KeyA"])
-        camera.position.addScaledVector(
-            right,
-            -speed
-        );
-}
-
-/* =========================================================
-   ANIMATION
+   ANIMATE
 ========================================================= */
 
 function animate(){
@@ -2607,39 +4503,16 @@ function animate(){
         animate
     );
 
-    const dt =
-        Math.min(
-            clock.getDelta(),
-            .05
-        );
+    orbit.update();
 
-    if(fpsMode){
+    updateSelectionBoxes();
 
-        updateFPS(dt);
+    checkPrintWarnings();
 
-        renderer.render(
-            scene,
-            fpsCamera
-        );
-
-    }else{
-
-        updateEditorCamera(dt);
-
-        objects.forEach(o=>{
-
-            if(o.userData.selectionBox){
-
-                o.userData.selectionBox
-                    .update();
-            }
-        });
-
-        renderer.render(
-            scene,
-            camera
-        );
-    }
+    renderer.render(
+        scene,
+        camera
+    );
 }
 
 /* =========================================================
@@ -2652,10 +4525,13 @@ try{
 
 }catch(error){
 
-    loading.textContent =
-        "Fehler: "+error.message;
-
     console.error(error);
+
+    loading.innerHTML =
+        "<div>GHOST 3D konnte nicht geladen werden</div>"+
+        "<div style='font-size:12px;color:#ff7777;margin-top:10px'>"+
+        error.message+
+        "</div>";
 }
 
 </script>
