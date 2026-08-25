@@ -1,13 +1,10 @@
 {
-  "name": "ghost-3d-modeler",
+  "name": "lumora-ai",
   "version": "1.0.0",
-  "description": "Echter browserbasierter 3D-Modellierer mit Three.js",
+  "description": "Lumora AI Web App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
   },
   "dependencies": {
     "express": "^5.1.0"
