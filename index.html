@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>GHOST Feder 3D</title>
+<title>GHOST VIDEO CUTTER</title>
 
 <style>
 *{
@@ -14,136 +14,351 @@
 html,body{
     margin:0;
     width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#101318;
-    color:white;
-    font-family:Arial,sans-serif;
+    min-height:100%;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#111318;
+    color:#fff;
 }
 
 body{
     display:flex;
-    flex-direction:column;
+    justify-content:center;
+    padding:25px 12px;
+}
+
+.app{
+    width:100%;
+    max-width:1000px;
+    background:#1a1d24;
+    border:1px solid #303541;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
 
 header{
-    height:64px;
-    background:#181d24;
-    border-bottom:1px solid #303741;
+    padding:22px 25px;
+    border-bottom:1px solid #303541;
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    padding:0 18px;
-    font-size:21px;
-    font-weight:bold;
+    gap:15px;
 }
 
 .logo{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.logo span{
     color:#ffd400;
 }
 
-.container{
-    flex:1;
-    display:flex;
-    min-height:0;
+.status{
+    font-size:13px;
+    color:#aeb4c0;
 }
 
-.preview{
-    flex:1;
-    position:relative;
-    background:
-        radial-gradient(circle at center,#202833 0%,#0c1015 70%);
+.content{
+    padding:25px;
 }
 
-canvas{
-    width:100%;
-    height:100%;
-    display:block;
-    cursor:grab;
+.upload{
+    border:2px dashed #444a57;
+    border-radius:15px;
+    padding:40px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
 }
 
-canvas:active{
-    cursor:grabbing;
+.upload:hover{
+    border-color:#ffd400;
+    background:#20242d;
 }
 
-.panel{
-    width:310px;
-    background:#181d24;
-    border-left:1px solid #303741;
-    padding:18px;
-    overflow:auto;
+.upload.drag{
+    border-color:#ffd400;
+    background:#292b20;
 }
 
-h2{
-    margin:0 0 18px;
+.upload-icon{
+    font-size:48px;
+    margin-bottom:10px;
+}
+
+.upload-title{
     font-size:20px;
+    font-weight:bold;
+}
+
+.upload-sub{
+    color:#9299a7;
+    margin-top:8px;
+}
+
+#fileInput{
+    display:none;
+}
+
+.editor{
+    display:none;
+    margin-top:25px;
+}
+
+.video-box{
+    background:#000;
+    border-radius:14px;
+    overflow:hidden;
+    position:relative;
+}
+
+video{
+    width:100%;
+    max-height:550px;
+    display:block;
+    background:#000;
+}
+
+.file-info{
+    padding:12px 15px;
+    background:#20242c;
+    color:#aeb4c0;
+    font-size:14px;
+}
+
+.controls{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.control-card{
+    background:#20242c;
+    border-radius:12px;
+    padding:16px;
 }
 
 label{
     display:block;
-    margin-top:16px;
-    margin-bottom:7px;
-    color:#bfc6cf;
+    color:#b8bec9;
+    font-size:13px;
+    margin-bottom:8px;
 }
 
-input{
+.time-row{
+    display:flex;
+    gap:8px;
+}
+
+input[type="number"],
+input[type="text"]{
     width:100%;
-    background:#0e1217;
-    border:1px solid #39424d;
+    background:#111318;
+    color:#fff;
+    border:1px solid #3b414d;
     border-radius:8px;
-    color:white;
     padding:11px;
     font-size:15px;
+    outline:none;
+}
+
+input:focus{
+    border-color:#ffd400;
+}
+
+.range-area{
+    margin-top:20px;
+    background:#20242c;
+    border-radius:12px;
+    padding:18px;
+}
+
+.range-title{
+    display:flex;
+    justify-content:space-between;
+    color:#b8bec9;
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+.range-wrap{
+    position:relative;
+    height:40px;
+}
+
+.range-track{
+    position:absolute;
+    top:17px;
+    left:0;
+    right:0;
+    height:7px;
+    background:#3a3f49;
+    border-radius:10px;
+}
+
+.range-selected{
+    position:absolute;
+    top:17px;
+    height:7px;
+    background:#ffd400;
+    border-radius:10px;
+}
+
+input[type="range"]{
+    position:absolute;
+    left:0;
+    top:5px;
+    width:100%;
+    height:30px;
+    margin:0;
+    pointer-events:none;
+    appearance:none;
+    background:transparent;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+    appearance:none;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#ffd400;
+    border:3px solid #111318;
+    cursor:pointer;
+    pointer-events:auto;
+}
+
+input[type="range"]::-moz-range-thumb{
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    background:#ffd400;
+    border:3px solid #111318;
+    cursor:pointer;
+    pointer-events:auto;
+}
+
+.buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:20px;
 }
 
 button{
-    width:100%;
-    margin-top:20px;
-    padding:14px;
     border:0;
-    border-radius:10px;
-    background:#ffd400;
-    color:#111;
+    border-radius:9px;
+    padding:12px 18px;
+    font-size:14px;
     font-weight:bold;
-    font-size:16px;
     cursor:pointer;
+    transition:.15s;
 }
 
 button:hover{
-    background:#ffe45c;
+    transform:translateY(-1px);
 }
 
-.info{
+.primary{
+    background:#ffd400;
+    color:#111;
+}
+
+.secondary{
+    background:#303541;
+    color:#fff;
+}
+
+.danger{
+    background:#54282d;
+    color:#fff;
+}
+
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.progress{
+    display:none;
     margin-top:20px;
-    padding:13px;
-    background:#10151b;
-    border-radius:10px;
-    line-height:1.7;
-    color:#cbd2da;
-    font-size:14px;
+    background:#20242c;
+    padding:16px;
+    border-radius:12px;
 }
 
-.status{
-    margin-top:14px;
-    color:#78e08f;
+.progress-text{
+    display:flex;
+    justify-content:space-between;
     font-size:13px;
+    color:#b8bec9;
+    margin-bottom:9px;
 }
 
-@media(max-width:700px){
+.progress-bar{
+    width:100%;
+    height:9px;
+    background:#111318;
+    border-radius:10px;
+    overflow:hidden;
+}
 
-    .container{
+.progress-fill{
+    width:0%;
+    height:100%;
+    background:#ffd400;
+    transition:.2s;
+}
+
+.result{
+    display:none;
+    margin-top:20px;
+    padding:18px;
+    border-radius:12px;
+    background:#20242c;
+}
+
+.result-title{
+    font-weight:bold;
+    margin-bottom:12px;
+}
+
+.download{
+    display:inline-block;
+    background:#ffd400;
+    color:#111;
+    padding:13px 20px;
+    border-radius:9px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.message{
+    margin-top:15px;
+    color:#ffcf4a;
+    font-size:14px;
+    line-height:1.5;
+}
+
+@media(max-width:650px){
+    .controls{
+        grid-template-columns:1fr;
+    }
+
+    header{
         flex-direction:column;
+        align-items:flex-start;
     }
 
-    .preview{
-        height:55%;
-        flex:none;
+    .content{
+        padding:15px;
     }
 
-    .panel{
-        width:100%;
-        height:45%;
-        border-left:0;
-        border-top:1px solid #303741;
+    .upload{
+        padding:30px 15px;
     }
 }
 </style>
@@ -151,992 +366,1263 @@ button:hover{
 
 <body>
 
+<div class="app">
+
 <header>
-    <span class="logo">GHOST</span>&nbsp; 3D Feder
-</header>
-
-<div class="container">
-
-    <div class="preview">
-        <canvas id="canvas"></canvas>
+    <div class="logo">
+        GHOST <span>VIDEO CUTTER</span>
     </div>
 
-    <div class="panel">
+    <div class="status" id="status">
+        Bereit
+    </div>
+</header>
 
-        <h2>Feder erstellen</h2>
-<label>Außendurchmesser (mm)</label>
-<input id="diameter" type="number" value="20" min="4" max="100" step="1">
+<div class="content">
 
-<label>Höhe (mm)</label>
-<input id="height" type="number" value="30" min="5" max="200" step="1">
+    <!-- UPLOAD -->
+    <div class="upload" id="upload">
+        <div class="upload-icon">🎬</div>
 
-<label>Windungen</label>
-<input id="turns" type="number" value="5" min="1" max="50" step="0.5">
+        <div class="upload-title">
+            Video auswählen
+        </div>
 
-<label>Drahtdurchmesser (mm)</label>
-<input id="wire" type="number" value="3.5" min="0.3" max="10" step="0.1">
+        <div class="upload-sub">
+            Klicke hier oder ziehe ein Video hierher
+        </div>
 
-<label>Auflösung</label>
-<input id="resolution" type="number" value="30" min="8" max="50" step="1">
+        <input
+            id="fileInput"
+            type="file"
+            accept="video/*"
+        >
+    </div>
 
-<button id="update">
 
-            🔄 Vorschau aktualisieren
-        </button>
+    <!-- EDITOR -->
+    <div class="editor" id="editor">
 
-        <button id="download">
-            ⬇ STL herunterladen
-        </button>
+        <div class="video-box">
+            <video
+                id="video"
+                controls
+                playsinline
+                preload="metadata">
+            </video>
 
-        <div class="info">
+            <div class="file-info" id="fileInfo">
+                Kein Video
+            </div>
+        </div>
 
-            <b>Bambu Studio</b>
 
-            <br><br>
+        <!-- ZEIT -->
+        <div class="controls">
 
-            Die heruntergeladene Datei ist eine normale
-            <b>STL-Datei</b>.
+            <div class="control-card">
 
-            <br><br>
+                <label>
+                    Startzeit in Sekunden
+                </label>
 
-            Öffne sie anschließend in Bambu Studio.
+                <input
+                    id="startInput"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                >
 
-            <br><br>
+            </div>
 
-            Dort kannst du unter den
-            <b>Druckeinstellungen</b> den gewünschten
-            <b>Infill</b> einstellen.
 
-            <br><br>
+            <div class="control-card">
 
-            Beispiele:
-            <br>
-            • 10 % Infill
-            <br>
-            • 20 % Infill
-            <br>
-            • 50 % Infill
-            <br>
-            • 100 % Infill
+                <label>
+                    Endzeit in Sekunden
+                </label>
+
+                <input
+                    id="endInput"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value="0"
+                >
+
+            </div>
 
         </div>
 
-        <div id="status" class="status">
-            Feder bereit
+
+        <!-- RANGE -->
+        <div class="range-area">
+
+            <div class="range-title">
+
+                <span>
+                    Schnittbereich
+                </span>
+
+                <span id="durationText">
+                    0:00 / 0:00
+                </span>
+
+            </div>
+
+            <div class="range-wrap">
+
+                <div class="range-track"></div>
+
+                <div
+                    class="range-selected"
+                    id="rangeSelected">
+                </div>
+
+                <input
+                    id="startRange"
+                    type="range"
+                    min="0"
+                    max="0"
+                    step="0.01"
+                    value="0"
+                >
+
+                <input
+                    id="endRange"
+                    type="range"
+                    min="0"
+                    max="0"
+                    step="0.01"
+                    value="0"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- BUTTONS -->
+        <div class="buttons">
+
+            <button
+                class="secondary"
+                id="setStart">
+                Start = aktuelle Position
+            </button>
+
+            <button
+                class="secondary"
+                id="setEnd">
+                Ende = aktuelle Position
+            </button>
+
+            <button
+                class="secondary"
+                id="preview">
+                ▶ Bereich ansehen
+            </button>
+
+            <button
+                class="primary"
+                id="cut">
+                ✂️ Video zuschneiden
+            </button>
+
+            <button
+                class="danger"
+                id="reset">
+                Neues Video
+            </button>
+
+        </div>
+
+
+        <!-- PROGRESS -->
+        <div
+            class="progress"
+            id="progress">
+
+            <div class="progress-text">
+                <span id="progressText">
+                    Video wird verarbeitet...
+                </span>
+
+                <span id="progressPercent">
+                    0%
+                </span>
+            </div>
+
+            <div class="progress-bar">
+                <div
+                    class="progress-fill"
+                    id="progressFill">
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- RESULT -->
+        <div
+            class="result"
+            id="result">
+
+            <div class="result-title">
+                ✅ Video wurde zugeschnitten
+            </div>
+
+            <a
+                id="download"
+                class="download"
+                download="ghost-cut.mp4">
+                💾 Video herunterladen
+            </a>
+
+        </div>
+
+
+        <div
+            class="message"
+            id="message">
         </div>
 
     </div>
 
 </div>
 
-<script>
-
-/* =========================================================
-   GHOST 3D FEDER
-   ========================================================= */
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-let width = 0;
-let height = 0;
-
-let rotationX = -0.45;
-let rotationY = 0.65;
-
-let zoom = 1;
-
-let dragging = false;
-let lastX = 0;
-let lastY = 0;
-
-let spring = null;
+</div>
 
 
-/* =========================================================
-   RESIZE
-   ========================================================= */
+<script type="module">
 
-function resize(){
+/*
+    GHOST VIDEO CUTTER
 
-    const rect = canvas.getBoundingClientRect();
+    FFmpeg wird nur bei Bedarf geladen.
+*/
 
-    width = rect.width;
-    height = rect.height;
+const upload = document.getElementById("upload");
+const fileInput = document.getElementById("fileInput");
 
-    const dpr = window.devicePixelRatio || 1;
+const editor = document.getElementById("editor");
+const video = document.getElementById("video");
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+const fileInfo = document.getElementById("fileInfo");
+const status = document.getElementById("status");
 
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-}
+const startInput = document.getElementById("startInput");
+const endInput = document.getElementById("endInput");
 
-window.addEventListener("resize",resize);
+const startRange = document.getElementById("startRange");
+const endRange = document.getElementById("endRange");
 
-resize();
+const rangeSelected =
+    document.getElementById("rangeSelected");
 
+const durationText =
+    document.getElementById("durationText");
 
-/* =========================================================
-   FEDER PARAMETER
-   ========================================================= */
+const setStart =
+    document.getElementById("setStart");
 
-function getSettings(){
+const setEnd =
+    document.getElementById("setEnd");
 
-    return {
+const preview =
+    document.getElementById("preview");
 
-        diameter:
-            Number(document.getElementById("diameter").value),
+const cut =
+    document.getElementById("cut");
 
-        height:
-            Number(document.getElementById("height").value),
+const reset =
+    document.getElementById("reset");
 
-        turns:
-            Number(document.getElementById("turns").value),
+const progress =
+    document.getElementById("progress");
 
-        wire:
-            Number(document.getElementById("wire").value),
+const progressFill =
+    document.getElementById("progressFill");
 
-        resolution:
-            Number(document.getElementById("resolution").value)
+const progressText =
+    document.getElementById("progressText");
 
-    };
-}
+const progressPercent =
+    document.getElementById("progressPercent");
 
+const result =
+    document.getElementById("result");
 
-/* =========================================================
-   3D PUNKT
-   ========================================================= */
+const download =
+    document.getElementById("download");
 
-function rotatePoint(p){
-
-    let x = p.x;
-    let y = p.y;
-    let z = p.z;
-
-    const cx = Math.cos(rotationX);
-    const sx = Math.sin(rotationX);
-
-    const cy = Math.cos(rotationY);
-    const sy = Math.sin(rotationY);
-
-    let y1 = y * cx - z * sx;
-    let z1 = y * sx + z * cx;
-
-    let x2 = x * cy + z1 * sy;
-    let z2 = -x * sy + z1 * cy;
-
-    return {
-        x:x2,
-        y:y1,
-        z:z2
-    };
-}
+const message =
+    document.getElementById("message");
 
 
-/* =========================================================
-   PROJEKTION
-   ========================================================= */
+let currentFile = null;
+let currentUrl = null;
+let outputUrl = null;
 
-function project(p){
+let duration = 0;
 
-    const r = rotatePoint(p);
-
-    const scale =
-        Math.min(width,height) /
-        45 *
-        zoom;
-
-    const perspective =
-        1 /
-        (1 + r.z / 120);
-
-    return {
-
-        x:
-            width / 2 +
-            r.x * scale * perspective,
-
-        y:
-            height / 2 -
-            r.y * scale * perspective,
-
-        z:r.z
-
-    };
-}
+let ffmpeg = null;
 
 
-/* =========================================================
-   FEDER ERZEUGEN
-   ========================================================= */
+/* -------------------------
+   UPLOAD
+------------------------- */
 
-function createSpring(){
+upload.addEventListener("click", () => {
+    fileInput.click();
+});
 
-    const s = getSettings();
+fileInput.addEventListener("change", () => {
 
-    const radius =
-        s.diameter / 2 -
-        s.wire / 2;
+    if(fileInput.files.length > 0){
 
-    const rings =
-        Math.max(
-            20,
-            Math.floor(
-                s.turns * s.resolution
-            )
-        );
-
-    const points = [];
-
-    for(let i=0;i<=rings;i++){
-
-        const t = i / rings;
-
-        const angle =
-            t *
-            Math.PI *
-            2 *
-            s.turns;
-
-        points.push({
-
-            x:
-                radius *
-                Math.cos(angle),
-
-            y:
-                radius *
-                Math.sin(angle),
-
-            z:
-                t *
-                s.height -
-                s.height / 2
-
-        });
+        loadVideo(fileInput.files[0]);
 
     }
 
-    spring = {
-        points,
-        settings:s
-    };
+});
 
-    document.getElementById("status").textContent =
-        "Feder aktualisiert";
+
+/* Drag & Drop */
+
+upload.addEventListener("dragover", e => {
+
+    e.preventDefault();
+
+    upload.classList.add("drag");
+
+});
+
+
+upload.addEventListener("dragleave", () => {
+
+    upload.classList.remove("drag");
+
+});
+
+
+upload.addEventListener("drop", e => {
+
+    e.preventDefault();
+
+    upload.classList.remove("drag");
+
+    const file =
+        e.dataTransfer.files[0];
+
+    if(file && file.type.startsWith("video/")){
+
+        loadVideo(file);
+
+    }
+
+});
+
+
+/* -------------------------
+   VIDEO LADEN
+------------------------- */
+
+function loadVideo(file){
+
+    currentFile = file;
+
+    if(currentUrl){
+
+        URL.revokeObjectURL(currentUrl);
+
+    }
+
+    currentUrl =
+        URL.createObjectURL(file);
+
+    video.src = currentUrl;
+
+    video.load();
+
+    editor.style.display = "block";
+
+    upload.style.display = "none";
+
+    result.style.display = "none";
+
+    message.textContent = "";
+
+    status.textContent = "Video geladen";
+
+    fileInfo.textContent =
+        file.name +
+        " • " +
+        formatBytes(file.size);
+
 }
 
 
-/* =========================================================
-   3D VORSCHAU
-   ========================================================= */
+/* -------------------------
+   METADATA
+------------------------- */
 
-function draw(){
+video.addEventListener("loadedmetadata", () => {
 
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
+    duration = video.duration;
 
-    if(!spring){
-
-        requestAnimationFrame(draw);
-
+    if(!isFinite(duration)){
         return;
     }
 
-    const projected =
-        spring.points.map(project);
+    startRange.max = duration;
+    endRange.max = duration;
 
-    /*
-       Schatten
-    */
+    startRange.value = 0;
+    endRange.value = duration;
 
-    ctx.beginPath();
+    startInput.value = 0;
+    endInput.value = duration.toFixed(2);
 
-    ctx.ellipse(
-        width/2,
-        height/2 + 170 * zoom,
-        100 * zoom,
-        20 * zoom,
-        0,
-        0,
-        Math.PI*2
-    );
+    updateRange();
 
-    ctx.fillStyle =
-        "rgba(0,0,0,0.35)";
+    updateDurationText();
 
-    ctx.fill();
+});
 
 
-    /*
-       Feder
-    */
+/* -------------------------
+   VIDEO POSITION
+------------------------- */
 
-    ctx.beginPath();
+video.addEventListener("timeupdate", () => {
 
-    for(let i=0;i<projected.length;i++){
+    updateDurationText();
 
-        const p = projected[i];
-
-        if(i===0){
-
-            ctx.moveTo(
-                p.x,
-                p.y
-            );
-
-        }else{
-
-            ctx.lineTo(
-                p.x,
-                p.y
-            );
-        }
-    }
-
-    ctx.lineWidth =
-        Math.max(
-            2,
-            spring.settings.wire *
-            Math.min(width,height) /
-            45 *
-            zoom
-        );
-
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-
-    ctx.strokeStyle =
-        "#d9dde2";
-
-    ctx.stroke();
+});
 
 
-    /*
-       Highlight
-    */
+function updateDurationText(){
 
-    ctx.beginPath();
+    durationText.textContent =
+        formatTime(video.currentTime) +
+        " / " +
+        formatTime(duration);
 
-    for(let i=0;i<projected.length;i++){
-
-        const p = projected[i];
-
-        if(i===0)
-            ctx.moveTo(p.x,p.y);
-        else
-            ctx.lineTo(p.x,p.y);
-    }
-
-    ctx.lineWidth =
-        Math.max(
-            0.6,
-            spring.settings.wire *
-            Math.min(width,height) /
-            45 *
-            zoom *
-            0.35
-        );
-
-    ctx.strokeStyle =
-        "#ffffff";
-
-    ctx.stroke();
-
-
-    requestAnimationFrame(draw);
 }
 
 
-/* =========================================================
-   MAUS
-   ========================================================= */
+/* -------------------------
+   START RANGE
+------------------------- */
 
-canvas.addEventListener(
-    "pointerdown",
-    e=>{
+startRange.addEventListener("input", () => {
 
-        dragging = true;
+    let value =
+        Number(startRange.value);
 
-        lastX = e.clientX;
-        lastY = e.clientY;
+    let end =
+        Number(endRange.value);
 
-        canvas.setPointerCapture(
-            e.pointerId
-        );
-    }
-);
+    if(value > end){
 
+        value = end;
 
-canvas.addEventListener(
-    "pointerup",
-    ()=>{
-        dragging = false;
-    }
-);
+        startRange.value = value;
 
-
-canvas.addEventListener(
-    "pointermove",
-    e=>{
-
-        if(!dragging)
-            return;
-
-        const dx =
-            e.clientX - lastX;
-
-        const dy =
-            e.clientY - lastY;
-
-        rotationY += dx * 0.008;
-        rotationX += dy * 0.008;
-
-        lastX = e.clientX;
-        lastY = e.clientY;
-    }
-);
-
-
-canvas.addEventListener(
-    "wheel",
-    e=>{
-
-        e.preventDefault();
-
-        if(e.deltaY < 0)
-            zoom *= 1.08;
-        else
-            zoom *= 0.92;
-
-        zoom =
-            Math.max(
-                0.3,
-                Math.min(3,zoom)
-            );
-    },
-    {passive:false}
-);
-
-
-/* =========================================================
-   STL GENERIERUNG
-   ========================================================= */
-
-/*
-   Die Feder wird als Rohr entlang der Helix gebaut.
-*/
-
-function generateSTL(){
-
-    const s = getSettings();
-
-    const radius =
-        s.diameter / 2 -
-        s.wire / 2;
-
-    const pathSegments =
-        Math.max(
-            32,
-            Math.floor(
-                s.turns *
-                s.resolution
-            )
-        );
-
-    const tubeSegments =
-        16;
-
-    const vertices = [];
-
-    const triangles = [];
-
-
-    /*
-       Centerline + Tube
-    */
-
-    for(let i=0;i<=pathSegments;i++){
-
-        const t =
-            i/pathSegments;
-
-        const angle =
-            t *
-            Math.PI *
-            2 *
-            s.turns;
-
-        const x =
-            radius *
-            Math.cos(angle);
-
-        const y =
-            radius *
-            Math.sin(angle);
-
-        const z =
-            t*s.height -
-            s.height/2;
-
-
-        /*
-           Tangente
-        */
-
-        let tx =
-            -radius *
-            Math.sin(angle) *
-            Math.PI *
-            2 *
-            s.turns;
-
-        let ty =
-            radius *
-            Math.cos(angle) *
-            Math.PI *
-            2 *
-            s.turns;
-
-        let tz =
-            s.height;
-
-        let tl =
-            Math.sqrt(
-                tx*tx+
-                ty*ty+
-                tz*tz
-            );
-
-        tx/=tl;
-        ty/=tl;
-        tz/=tl;
-
-
-        /*
-           Radialer Vektor
-        */
-
-        let nx =
-            Math.cos(angle);
-
-        let ny =
-            Math.sin(angle);
-
-        let nz = 0;
-
-
-        /*
-           Binormal
-        */
-
-        let bx =
-            ty*nz -
-            tz*ny;
-
-        let by =
-            tz*nx -
-            tx*nz;
-
-        let bz =
-            tx*ny -
-            ty*nx;
-
-        let bl =
-            Math.sqrt(
-                bx*bx+
-                by*by+
-                bz*bz
-            );
-
-        bx/=bl;
-        by/=bl;
-        bz/=bl;
-
-
-        for(let j=0;j<tubeSegments;j++){
-
-            const q =
-                j/tubeSegments *
-                Math.PI*2;
-
-            const cq =
-                Math.cos(q);
-
-            const sq =
-                Math.sin(q);
-
-            vertices.push({
-
-                x:
-                    x +
-                    s.wire/2 *
-                    (
-                        cq*nx+
-                        sq*bx
-                    ),
-
-                y:
-                    y +
-                    s.wire/2 *
-                    (
-                        cq*ny+
-                        sq*by
-                    ),
-
-                z:
-                    z +
-                    s.wire/2 *
-                    (
-                        cq*nz+
-                        sq*bz
-                    )
-            });
-        }
     }
 
+    startInput.value =
+        value.toFixed(2);
 
-    /*
-       Seitenflächen
-    */
+    updateRange();
 
-    for(
-        let i=0;
-        i<pathSegments;
-        i++
-    ){
-
-        for(
-            let j=0;
-            j<tubeSegments;
-            j++
-        ){
-
-            const a =
-                i*tubeSegments+j;
-
-            const b =
-                i*tubeSegments+
-                ((j+1)%tubeSegments);
-
-            const c =
-                (i+1)*tubeSegments+
-                ((j+1)%tubeSegments);
-
-            const d =
-                (i+1)*tubeSegments+j;
+});
 
 
-            triangles.push(
-                [a,b,c],
-                [a,c,d]
-            );
-        }
+/* -------------------------
+   END RANGE
+------------------------- */
+
+endRange.addEventListener("input", () => {
+
+    let value =
+        Number(endRange.value);
+
+    let start =
+        Number(startRange.value);
+
+    if(value < start){
+
+        value = start;
+
+        endRange.value = value;
+
     }
 
+    endInput.value =
+        value.toFixed(2);
 
-    /*
-       Endkappen
-    */
+    updateRange();
 
-    const bottomCenter =
-        vertices.length;
-
-    vertices.push({
-
-        x:radius,
-        y:0,
-        z:-s.height/2
-    });
+});
 
 
-    const topCenter =
-        vertices.length;
+/* -------------------------
+   START INPUT
+------------------------- */
 
-    vertices.push({
+startInput.addEventListener("change", () => {
 
-        x:radius,
-        y:0,
-        z:s.height/2
-    });
+    let value =
+        Number(startInput.value);
 
-
-    for(
-        let j=0;
-        j<tubeSegments;
-        j++
-    ){
-
-        const n =
-            (j+1)%tubeSegments;
-
-        triangles.push([
-            bottomCenter,
-            n,
-            j
-        ]);
-
-        const a =
-            pathSegments*tubeSegments+j;
-
-        const b =
-            pathSegments*tubeSegments+n;
-
-        triangles.push([
-            topCenter,
-            a,
-            b
-        ]);
+    if(!isFinite(value)){
+        value = 0;
     }
 
+    value =
+        Math.max(0, Math.min(value, duration));
 
-    /*
-       Binary STL
-    */
+    if(value > Number(endRange.value)){
 
-    const buffer =
-        new ArrayBuffer(
-            84 +
-            triangles.length*50
-        );
+        value =
+            Number(endRange.value);
 
-    const view =
-        new DataView(buffer);
-
-
-    const header =
-        "GHOST 3D Feder STL";
-
-    for(
-        let i=0;
-        i<header.length && i<80;
-        i++
-    ){
-
-        view.setUint8(
-            i,
-            header.charCodeAt(i)
-        );
     }
 
+    startInput.value =
+        value.toFixed(2);
 
-    view.setUint32(
-        80,
-        triangles.length,
-        true
-    );
+    startRange.value = value;
 
+    updateRange();
 
-    let offset = 84;
-
-
-    function normal(a,b,c){
-
-        const ax =
-            b.x-a.x;
-
-        const ay =
-            b.y-a.y;
-
-        const az =
-            b.z-a.z;
-
-        const bx =
-            c.x-a.x;
-
-        const by =
-            c.y-a.y;
-
-        const bz =
-            c.z-a.z;
+});
 
 
-        let nx =
-            ay*bz -
-            az*by;
+/* -------------------------
+   END INPUT
+------------------------- */
 
-        let ny =
-            az*bx -
-            ax*bz;
+endInput.addEventListener("change", () => {
 
-        let nz =
-            ax*by -
-            ay*bx;
+    let value =
+        Number(endInput.value);
 
-
-        const l =
-            Math.sqrt(
-                nx*nx+
-                ny*ny+
-                nz*nz
-            ) || 1;
-
-        return {
-            x:nx/l,
-            y:ny/l,
-            z:nz/l
-        };
+    if(!isFinite(value)){
+        value = duration;
     }
 
+    value =
+        Math.max(0, Math.min(value, duration));
 
-    for(const tri of triangles){
+    if(value < Number(startRange.value)){
 
-        const a =
-            vertices[tri[0]];
+        value =
+            Number(startRange.value);
 
-        const b =
-            vertices[tri[1]];
-
-        const c =
-            vertices[tri[2]];
-
-
-        const n =
-            normal(a,b,c);
-
-
-        view.setFloat32(
-            offset,
-            n.x,
-            true
-        );
-
-        offset+=4;
-
-        view.setFloat32(
-            offset,
-            n.y,
-            true
-        );
-
-        offset+=4;
-
-        view.setFloat32(
-            offset,
-            n.z,
-            true
-        );
-
-        offset+=4;
-
-
-        for(const p of [a,b,c]){
-
-            view.setFloat32(
-                offset,
-                p.x,
-                true
-            );
-
-            offset+=4;
-
-            view.setFloat32(
-                offset,
-                p.y,
-                true
-            );
-
-            offset+=4;
-
-            view.setFloat32(
-                offset,
-                p.z,
-                true
-            );
-
-            offset+=4;
-        }
-
-
-        view.setUint16(
-            offset,
-            0,
-            true
-        );
-
-        offset+=2;
     }
 
+    endInput.value =
+        value.toFixed(2);
 
-    return new Blob(
-        [buffer],
-        {
-            type:"model/stl"
-        }
-    );
+    endRange.value = value;
+
+    updateRange();
+
+});
+
+
+/* -------------------------
+   RANGE VISUALISIERUNG
+------------------------- */
+
+function updateRange(){
+
+    if(duration <= 0){
+        return;
+    }
+
+    const start =
+        Number(startRange.value);
+
+    const end =
+        Number(endRange.value);
+
+    const left =
+        (start / duration) * 100;
+
+    const width =
+        ((end - start) / duration) * 100;
+
+    rangeSelected.style.left =
+        left + "%";
+
+    rangeSelected.style.width =
+        width + "%";
+
 }
 
 
-/* =========================================================
-   DOWNLOAD
-   ========================================================= */
+/* -------------------------
+   START SETZEN
+------------------------- */
 
-document
-.getElementById("download")
-.addEventListener(
-    "click",
-    ()=>{
+setStart.addEventListener("click", () => {
+
+    let value =
+        video.currentTime;
+
+    if(value > Number(endRange.value)){
+
+        value =
+            Number(endRange.value);
+
+    }
+
+    startRange.value = value;
+
+    startInput.value =
+        value.toFixed(2);
+
+    updateRange();
+
+});
+
+
+/* -------------------------
+   ENDE SETZEN
+------------------------- */
+
+setEnd.addEventListener("click", () => {
+
+    let value =
+        video.currentTime;
+
+    if(value < Number(startRange.value)){
+
+        value =
+            Number(startRange.value);
+
+    }
+
+    endRange.value = value;
+
+    endInput.value =
+        value.toFixed(2);
+
+    updateRange();
+
+});
+
+
+/* -------------------------
+   PREVIEW
+------------------------- */
+
+preview.addEventListener("click", async () => {
+
+    const start =
+        Number(startRange.value);
+
+    const end =
+        Number(endRange.value);
+
+    if(end <= start){
+
+        showMessage(
+            "Der Endzeitpunkt muss größer als der Startzeitpunkt sein."
+        );
+
+        return;
+
+    }
+
+    video.currentTime = start;
+
+    await video.play();
+
+    const stopPreview = () => {
+
+        if(video.currentTime >= end){
+
+            video.pause();
+
+            video.removeEventListener(
+                "timeupdate",
+                stopPreview
+            );
+
+        }
+
+    };
+
+    video.addEventListener(
+        "timeupdate",
+        stopPreview
+    );
+
+});
+
+
+/* -------------------------
+   FFmpeg LADEN
+------------------------- */
+
+async function loadFFmpeg(){
+
+    if(ffmpeg){
+        return ffmpeg;
+    }
+
+    status.textContent =
+        "FFmpeg wird geladen...";
+
+    progress.style.display =
+        "block";
+
+    progressText.textContent =
+        "Video-Schnittmodul wird geladen...";
+
+    progressFill.style.width = "10%";
+    progressPercent.textContent = "10%";
+
+
+    try{
+
+        const module =
+            await import(
+                "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js"
+            );
+
+        const util =
+            await import(
+                "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js"
+            );
+
+        const {
+            FFmpeg
+        } = module;
+
+        const {
+            fetchFile,
+            toBlobURL
+        } = util;
+
+        ffmpeg =
+            new FFmpeg();
+
+        ffmpeg.on(
+            "progress",
+            ({progress}) => {
+
+                const percent =
+                    Math.round(progress * 100);
+
+                progressFill.style.width =
+                    percent + "%";
+
+                progressPercent.textContent =
+                    percent + "%";
+
+            }
+        );
+
+        const baseURL =
+            "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
+
+        await ffmpeg.load({
+            coreURL:
+                await toBlobURL(
+                    `${baseURL}/ffmpeg-core.js`,
+                    "text/javascript"
+                ),
+
+            wasmURL:
+                await toBlobURL(
+                    `${baseURL}/ffmpeg-core.wasm`,
+                    "application/wasm"
+                )
+        });
+
+        progressFill.style.width = "20%";
+        progressPercent.textContent = "20%";
+
+        return ffmpeg;
+
+    }catch(error){
+
+        console.error(error);
+
+        ffmpeg = null;
+
+        throw error;
+
+    }
+
+}
+
+
+/* -------------------------
+   VIDEO SCHNEIDEN
+------------------------- */
+
+cut.addEventListener("click", async () => {
+
+    if(!currentFile){
+
+        showMessage(
+            "Bitte zuerst ein Video auswählen."
+        );
+
+        return;
+
+    }
+
+    const start =
+        Number(startRange.value);
+
+    const end =
+        Number(endRange.value);
+
+    if(!isFinite(start) || !isFinite(end)){
+
+        showMessage(
+            "Ungültige Zeit."
+        );
+
+        return;
+
+    }
+
+    if(end <= start){
+
+        showMessage(
+            "Das Ende muss nach dem Start liegen."
+        );
+
+        return;
+
+    }
+
+    const length =
+        end - start;
+
+    if(length <= 0){
+
+        showMessage(
+            "Der ausgewählte Bereich ist leer."
+        );
+
+        return;
+
+    }
+
+
+    cut.disabled = true;
+
+    preview.disabled = true;
+
+    progress.style.display =
+        "block";
+
+    result.style.display =
+        "none";
+
+    message.textContent = "";
+
+    progressText.textContent =
+        "FFmpeg wird vorbereitet...";
+
+    progressFill.style.width =
+        "5%";
+
+    progressPercent.textContent =
+        "5%";
+
+
+    try{
+
+        const engine =
+            await loadFFmpeg();
+
+
+        progressText.textContent =
+            "Video wird verarbeitet...";
+
+
+        const inputName =
+            "input_" +
+            Date.now() +
+            getExtension(currentFile.name);
+
+
+        const outputName =
+            "ghost_cut_" +
+            Date.now() +
+            ".mp4";
+
+
+        /*
+            Datei in FFmpeg schreiben
+        */
+
+        await engine.writeFile(
+            inputName,
+            await fetchFile(currentFile)
+        );
+
+
+        /*
+            Schneiden.
+
+            -ss = Start
+            -t  = Länge
+            -c:v libx264 = kompatibles MP4
+            -c:a aac     = kompatibles Audio
+        */
+
+        await engine.exec([
+            "-ss",
+            String(start),
+
+            "-i",
+            inputName,
+
+            "-t",
+            String(length),
+
+            "-c:v",
+            "libx264",
+
+            "-preset",
+            "veryfast",
+
+            "-crf",
+            "18",
+
+            "-c:a",
+            "aac",
+
+            "-movflags",
+            "+faststart",
+
+            outputName
+        ]);
+
+
+        progressText.textContent =
+            "Download wird vorbereitet...";
+
+
+        const data =
+            await engine.readFile(
+                outputName
+            );
+
 
         const blob =
-            generateSTL();
+            new Blob(
+                [data.buffer],
+                {
+                    type:"video/mp4"
+                }
+            );
 
-        const url =
+
+        if(outputUrl){
+
+            URL.revokeObjectURL(
+                outputUrl
+            );
+
+        }
+
+
+        outputUrl =
             URL.createObjectURL(blob);
 
-        const a =
-            document.createElement("a");
 
-        a.href = url;
+        download.href =
+            outputUrl;
 
-        a.download =
-            "GHOST_Feder.stl";
+        download.download =
+            createOutputName(
+                currentFile.name
+            );
 
-        document.body.appendChild(a);
 
-        a.click();
+        progressFill.style.width =
+            "100%";
 
-        a.remove();
+        progressPercent.textContent =
+            "100%";
 
-        setTimeout(
-            ()=>{
-                URL.revokeObjectURL(url);
-            },
-            1000
+        progressText.textContent =
+            "Fertig!";
+
+
+        result.style.display =
+            "block";
+
+
+        status.textContent =
+            "Schnitt fertig";
+
+
+        /*
+            Temporäre Dateien löschen
+        */
+
+        try{
+
+            await engine.deleteFile(
+                inputName
+            );
+
+            await engine.deleteFile(
+                outputName
+            );
+
+        }catch(e){
+
+            console.warn(
+                "Temporäre Datei konnte nicht gelöscht werden.",
+                e
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(error);
+
+        progressFill.style.width =
+            "0%";
+
+        progressPercent.textContent =
+            "Fehler";
+
+        progressText.textContent =
+            "Verarbeitung fehlgeschlagen";
+
+        showMessage(
+            "Das Video konnte nicht geschnitten werden. " +
+            "Prüfe, ob der Browser FFmpeg laden kann."
         );
 
-        document.getElementById(
-            "status"
-        ).textContent =
-            "STL wurde heruntergeladen";
+    }finally{
+
+        cut.disabled = false;
+
+        preview.disabled = false;
+
+    }
+
+});
+
+
+/* -------------------------
+   RESET
+------------------------- */
+
+reset.addEventListener("click", () => {
+
+    if(currentUrl){
+
+        URL.revokeObjectURL(
+            currentUrl
+        );
+
+    }
+
+    if(outputUrl){
+
+        URL.revokeObjectURL(
+            outputUrl
+        );
+
+    }
+
+    currentFile = null;
+    currentUrl = null;
+    outputUrl = null;
+
+    video.pause();
+
+    video.removeAttribute("src");
+
+    video.load();
+
+    fileInput.value = "";
+
+    editor.style.display =
+        "none";
+
+    upload.style.display =
+        "block";
+
+    progress.style.display =
+        "none";
+
+    result.style.display =
+        "none";
+
+    message.textContent = "";
+
+    status.textContent =
+        "Bereit";
+
+});
+
+
+/* -------------------------
+   HILFSFUNKTIONEN
+------------------------- */
+
+function formatTime(seconds){
+
+    if(!isFinite(seconds)){
+        return "0:00";
+    }
+
+    seconds =
+        Math.max(0, seconds);
+
+    const hours =
+        Math.floor(seconds / 3600);
+
+    const minutes =
+        Math.floor(
+            (seconds % 3600) / 60
+        );
+
+    const secs =
+        Math.floor(seconds % 60);
+
+    if(hours > 0){
+
+        return (
+            hours +
+            ":" +
+            String(minutes).padStart(2,"0") +
+            ":" +
+            String(secs).padStart(2,"0")
+        );
+
+    }
+
+    return (
+        minutes +
+        ":" +
+        String(secs).padStart(2,"0")
+    );
+
+}
+
+
+function formatBytes(bytes){
+
+    if(bytes === 0){
+        return "0 Bytes";
+    }
+
+    const units =
+        [
+            "Bytes",
+            "KB",
+            "MB",
+            "GB"
+        ];
+
+    const index =
+        Math.floor(
+            Math.log(bytes) /
+            Math.log(1024)
+        );
+
+    return (
+        (bytes /
+        Math.pow(1024,index))
+        .toFixed(2)
+        +
+        " " +
+        units[index]
+    );
+
+}
+
+
+function getExtension(name){
+
+    const match =
+        name.match(/\.[^/.]+$/);
+
+    return match
+        ? match[0]
+        : ".mp4";
+
+}
+
+
+function createOutputName(name){
+
+    const withoutExtension =
+        name.replace(
+            /\.[^/.]+$/,
+            ""
+        );
+
+    return (
+        withoutExtension +
+        "_geschnitten.mp4"
+    );
+
+}
+
+
+function showMessage(text){
+
+    message.textContent =
+        text;
+
+}
+
+
+/* -------------------------
+   TASTATUR
+------------------------- */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        /*
+            Leertaste = Play/Pause,
+            aber nicht wenn gerade
+            ein Eingabefeld benutzt wird.
+        */
+
+        if(
+            e.code === "Space" &&
+            document.activeElement.tagName !== "INPUT"
+        ){
+
+            e.preventDefault();
+
+            if(video.paused){
+                video.play();
+            }else{
+                video.pause();
+            }
+
+        }
+
     }
 );
-
-
-/* =========================================================
-   AKTUALISIEREN
-   ========================================================= */
-
-document
-.getElementById("update")
-.addEventListener(
-    "click",
-    ()=>{
-        createSpring();
-    }
-);
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-createSpring();
-draw();
 
 </script>
 
