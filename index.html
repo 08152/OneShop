@@ -6,13 +6,11 @@
 <title>GHOST 3D Editor</title>
 
 <style>
-
 *{
     box-sizing:border-box;
 }
 
-html,
-body{
+html,body{
     margin:0;
     width:100%;
     height:100%;
@@ -25,14 +23,11 @@ body{
 canvas{
     position:fixed;
     inset:0;
-    width:100%;
-    height:100%;
     display:block;
     z-index:0;
 }
 
-button,
-input{
+button,input{
     font:inherit;
 }
 
@@ -46,7 +41,6 @@ button{
     top:0;
     left:0;
     right:0;
-
     min-height:64px;
     padding:8px;
 
@@ -99,8 +93,8 @@ button{
 }
 
 .btn.spring{
-    background:#5b4022;
-    border-color:#aa7a42;
+    background:#5a4023;
+    border-color:#9d6c36;
 }
 
 .separator{
@@ -110,25 +104,19 @@ button{
     margin:0 3px;
 }
 
-/* =========================================================
-   RIGHT BAR
-========================================================= */
-
 #rightbar{
     position:fixed;
-
     top:64px;
     right:0;
     bottom:0;
 
-    width:290px;
+    width:285px;
 
     overflow:auto;
 
     padding:14px;
 
     background:rgba(18,22,28,.97);
-
     border-left:1px solid #353b44;
 
     z-index:1000;
@@ -138,7 +126,6 @@ button{
     color:#9ca8b8;
     font-size:11px;
     letter-spacing:1px;
-
     margin:4px 0 8px;
 }
 
@@ -161,7 +148,6 @@ button{
     border-radius:7px;
 
     background:#20252d;
-
     color:white;
 }
 
@@ -189,7 +175,6 @@ button{
     border-radius:7px;
 
     background:#20252d;
-
     color:white;
 }
 
@@ -199,26 +184,15 @@ button{
 }
 
 .springBox{
-    background:rgba(112,74,35,.12);
-
-    border:1px solid rgba(177,125,62,.4);
-
-    border-radius:8px;
-
+    background:rgba(122,79,34,.12);
+    border:1px solid rgba(185,130,66,.35);
+    border-radius:7px;
     padding:9px;
-
-    margin-bottom:8px;
-
-    color:#c9a16e;
-
+    color:#c99c63;
     font-size:11px;
-
     line-height:1.5;
+    margin-bottom:8px;
 }
-
-/* =========================================================
-   INFO
-========================================================= */
 
 .info{
     position:fixed;
@@ -226,15 +200,14 @@ button{
     left:12px;
     bottom:12px;
 
-    min-width:375px;
-    max-width:450px;
+    min-width:365px;
+    max-width:430px;
 
     padding:13px;
 
     background:rgba(13,17,22,.96);
 
     border:1px solid #3a424d;
-
     border-radius:10px;
 
     z-index:1000;
@@ -272,7 +245,6 @@ button{
 .positionTitle{
     margin-top:14px;
     margin-bottom:7px;
-
     color:#8e99a8;
     font-size:10px;
     letter-spacing:1px;
@@ -316,7 +288,6 @@ button{
 .rounding label{
     display:flex;
     justify-content:space-between;
-
     color:#8f99a7;
     font-size:10px;
 }
@@ -336,10 +307,6 @@ button{
     font-size:11px;
 }
 
-/* =========================================================
-   STATUS
-========================================================= */
-
 #status{
     position:fixed;
 
@@ -351,19 +318,13 @@ button{
     padding:8px 15px;
 
     background:rgba(0,0,0,.65);
-
     border-radius:20px;
 
     font-size:12px;
 
     z-index:2000;
-
     pointer-events:none;
 }
-
-/* =========================================================
-   CROSSHAIR
-========================================================= */
 
 #crosshair{
     position:fixed;
@@ -377,23 +338,19 @@ button{
     transform:translate(-50%,-50%);
 
     pointer-events:none;
-
     z-index:900;
 }
 
 #crosshair:before,
 #crosshair:after{
     content:"";
-
     position:absolute;
-
     background:#fff;
 }
 
 #crosshair:before{
     left:7px;
     top:0;
-
     width:2px;
     height:16px;
 }
@@ -401,29 +358,25 @@ button{
 #crosshair:after{
     left:0;
     top:7px;
-
     width:16px;
     height:2px;
 }
 
 #selectBox{
     position:fixed;
-
     display:none;
 
     border:1px solid #54a8ff;
-
     background:rgba(40,140,255,.12);
 
     z-index:3000;
-
     pointer-events:none;
 }
 
 #help{
     position:fixed;
 
-    right:305px;
+    right:300px;
     bottom:15px;
 
     padding:10px;
@@ -443,7 +396,7 @@ button{
 @media(max-width:900px){
 
     #rightbar{
-        width:240px;
+        width:235px;
     }
 
     #help{
@@ -452,30 +405,23 @@ button{
 
     .info{
         min-width:300px;
-        max-width:calc(100vw - 255px);
+        max-width:calc(100vw - 250px);
     }
 }
-
 </style>
 
-
 <!-- =========================================================
-     EINHEITLICHE THREE.JS VERSION
+     IMPORTMAP
+     EINHEITLICHE VERSIONEN
 ========================================================= -->
 
 <script type="importmap">
 {
     "imports":{
-
-        "three":
-        "https://cdn.jsdelivr.net/npm/three@0.179.0/build/three.module.js",
-
-        "three/addons/":
-        "https://cdn.jsdelivr.net/npm/three@0.179.0/examples/jsm/",
-
-        "three-csg-ts":
-        "https://cdn.jsdelivr.net/npm/three-csg-ts@3.2.0/lib/esm/index.js"
-
+        "three":"https://cdn.jsdelivr.net/npm/three@0.179.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.179.0/examples/jsm/",
+        "three-mesh-bvh":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.14/build/index.module.js",
+        "three-bvh-csg":"https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.18/src/index.js"
     }
 }
 </script>
@@ -483,7 +429,6 @@ button{
 </head>
 
 <body>
-
 
 <!-- =========================================================
      TOPBAR
@@ -495,115 +440,60 @@ button{
         GHOST 3D
     </div>
 
-
-    <button
-        class="btn"
-        id="sphere"
-    >
+    <button class="btn" id="sphere">
         ⚪ Kugel
     </button>
 
-
-    <button
-        class="btn"
-        id="cube"
-    >
+    <button class="btn" id="cube">
         ■ Würfel
     </button>
 
-
-    <button
-        class="btn"
-        id="cylinder"
-    >
+    <button class="btn" id="cylinder">
         🛢 Zylinder
     </button>
 
-
-    <!-- NEUES OBJEKT -->
-
-    <button
-        class="btn spring"
-        id="spring"
-    >
+    <!-- NEU: FEDER -->
+    <button class="btn spring" id="spring">
         🌀 Feder
     </button>
 
-
     <div class="separator"></div>
 
-
-    <button
-        class="btn red"
-        id="negSphere"
-    >
+    <button class="btn red" id="negSphere">
         − Kugel
     </button>
 
-
-    <button
-        class="btn red"
-        id="negCube"
-    >
+    <button class="btn red" id="negCube">
         − Würfel
     </button>
 
-
-    <button
-        class="btn red"
-        id="negCylinder"
-    >
+    <button class="btn red" id="negCylinder">
         − Zylinder
     </button>
 
-
     <div class="separator"></div>
 
-
-    <button
-        class="btn active"
-        id="move"
-    >
+    <button class="btn active" id="move">
         ↔ Move
     </button>
 
-
-    <button
-        class="btn"
-        id="rotate"
-    >
+    <button class="btn" id="rotate">
         ↻ Rotate
     </button>
 
-
-    <button
-        class="btn"
-        id="scale"
-    >
+    <button class="btn" id="scale">
         ▣ Größe
     </button>
 
-
-    <button
-        class="btn"
-        id="center"
-    >
+    <button class="btn" id="center">
         ⊙ Zentrieren
     </button>
 
-
-    <button
-        class="btn blue"
-        id="newPlate"
-    >
+    <button class="btn blue" id="newPlate">
         + Platte
     </button>
 
-
-    <button
-        class="btn green"
-        id="export"
-    >
+    <button class="btn green" id="export">
         ↓ GLB
     </button>
 
@@ -611,18 +501,16 @@ button{
 
 
 <!-- =========================================================
-     RIGHT BAR
+     RIGHTBAR
 ========================================================= -->
 
 <div id="rightbar">
-
 
     <div class="section">
 
         <h3>
             MODELLIEREN
         </h3>
-
 
         <button
             class="tool active"
@@ -631,14 +519,12 @@ button{
             ▲ Erhöhen
         </button>
 
-
         <button
             class="tool"
             id="lower"
         >
             ▼ Senken
         </button>
-
 
         <button
             class="tool"
@@ -656,14 +542,12 @@ button{
             PINSEL
         </h3>
 
-
         <button
             class="tool active brush"
             data-size=".18"
         >
             • Fein
         </button>
-
 
         <button
             class="tool brush"
@@ -672,14 +556,12 @@ button{
             ● Mittel
         </button>
 
-
         <button
             class="tool brush"
             data-size=".70"
         >
             ● Groß
         </button>
-
 
         <button
             class="tool brush"
@@ -691,35 +573,24 @@ button{
     </div>
 
 
-    <!-- =====================================================
-         FEDER
-    ====================================================== -->
-
     <div class="section">
 
         <h3>
             FEDER
         </h3>
 
-
         <div class="springBox">
 
-            Die Feder ist ein echtes
-            3D-Volumen mit rundem
-            Drahtquerschnitt.
-
-            <br><br>
-
-            Ausgangsdraht:
-            <b>ca. 1,3 mm</b>
+            Echte 3D-Feder mit
+            rundem Drahtquerschnitt.
 
             <br>
 
-            Geeignet als Ausgangsgeometrie
-            für PLA-Basic.
+            Sie kann verschoben,
+            gedreht und skaliert
+            werden.
 
         </div>
-
 
         <button
             class="tool"
@@ -728,14 +599,12 @@ button{
             🌀 Kleine Feder
         </button>
 
-
         <button
             class="tool"
             id="springNormal"
         >
             🌀 Normale Feder
         </button>
-
 
         <button
             class="tool"
@@ -747,32 +616,22 @@ button{
     </div>
 
 
-    <!-- =====================================================
-         PLATTEN
-    ====================================================== -->
-
     <div class="section">
 
         <h3>
             PLATTEN
         </h3>
 
-
         <div id="plates"></div>
 
     </div>
 
-
-    <!-- =====================================================
-         AUSWAHL
-    ====================================================== -->
 
     <div class="section">
 
         <h3>
             AUSWAHL
         </h3>
-
 
         <button
             class="tool"
@@ -781,14 +640,12 @@ button{
             🔗 Verbinden / Boolean
         </button>
 
-
         <button
             class="tool danger"
             id="deleteObject"
         >
             🗑 Objekt löschen
         </button>
-
 
         <button
             class="tool danger"
@@ -800,16 +657,11 @@ button{
     </div>
 
 
-    <!-- =====================================================
-         BEDIENUNG
-    ====================================================== -->
-
     <div class="section">
 
         <h3>
             BEDIENUNG
         </h3>
-
 
         <div
             style="
@@ -822,13 +674,13 @@ button{
             Linksklick = Objekt auswählen<br>
 
             Shift + Linksklick =
-            Mehrfachauswahl<br>
+            hinzufügen<br>
 
             Strg + Ziehen =
             Rechteckauswahl<br>
 
             Leere Fläche =
-            Kamera bewegen<br>
+            Kamera<br>
 
             Mausrad =
             Zoom<br>
@@ -846,7 +698,7 @@ button{
             Boolean<br>
 
             Modellieren =
-            Objekt ziehen
+            Linksklick ziehen
 
         </div>
 
@@ -863,11 +715,9 @@ button{
 
 <div id="selectBox"></div>
 
-
 <div id="help">
     Strg + Ziehen = Mehrfachauswahl
 </div>
-
 
 <div id="status">
     3D wird geladen...
@@ -875,16 +725,14 @@ button{
 
 
 <!-- =========================================================
-     INFO PANEL
+     INFO
 ========================================================= -->
 
 <div class="info">
 
-
     <div id="objectName">
         Kein Objekt ausgewählt
     </div>
-
 
     <div id="plateName">
         Keine Platte
@@ -905,7 +753,6 @@ button{
 
         </div>
 
-
         <div>
 
             <small>
@@ -917,7 +764,6 @@ button{
             </strong>
 
         </div>
-
 
         <div>
 
@@ -940,7 +786,6 @@ button{
 
 
     <div class="positionGrid">
-
 
         <div class="posBox">
 
@@ -991,13 +836,11 @@ button{
 
     <div class="rounding">
 
-
         <label>
 
             <span>
                 ABRUNDUNG
             </span>
-
 
             <span id="roundValue">
                 0
@@ -1026,13 +869,12 @@ button{
 
 
 <!-- =========================================================
-     MAIN JAVASCRIPT
+     JAVASCRIPT
 ========================================================= -->
 
 <script type="module">
 
-import * as THREE
-from "three";
+import * as THREE from "three";
 
 
 import {
@@ -1054,81 +896,57 @@ from "three/addons/exporters/GLTFExporter.js";
 
 
 import {
-    CSG
+    Brush,
+    Evaluator,
+    SUBTRACTION
 }
-from "three-csg-ts";
+from "three-bvh-csg";
 
 
 /* =========================================================
-   GLOBALS
+   VARIABLEN
 ========================================================= */
 
 let scene;
-
 let camera;
-
 let renderer;
 
 let orbit;
-
 let transform;
-
 let raycaster;
 
+let selectedObject = null;
+let selectedPlate = null;
 
-let selectedObject=null;
+let selectedObjects = [];
 
-let selectedPlate=null;
+let plates = [];
+let objects = [];
 
+let mode = "translate";
 
-let selectedObjects=[];
+let sculptMode = "raise";
 
+let brushSize = .18;
 
-let plates=[];
+let sculpting = false;
 
-let objects=[];
+let selectionDragging = false;
 
-
-let mode=
-    "translate";
-
-
-let sculptMode=
-    "raise";
-
-
-let brushSize=
-    .18;
-
-
-let sculpting=
-    false;
-
-
-let selectionDragging=
-    false;
-
-
-let selectionStart={
+let selectionStart = {
     x:0,
     y:0
 };
 
+let roundingTimer = null;
 
-let roundingTimer=
-    null;
+let transformWasDragging = false;
 
-
-let transformWasDragging=
-    false;
-
-
-let booleanBusy=
-    false;
+let evaluator = null;
 
 
 /* =========================================================
-   INITIALIZE
+   INIT
 ========================================================= */
 
 init();
@@ -1136,293 +954,233 @@ init();
 
 function init(){
 
-    try{
-
-        /* =================================================
-           SCENE
-        ================================================= */
-
-        scene=
-            new THREE.Scene();
+    scene =
+        new THREE.Scene();
 
 
-        scene.background=
-            new THREE.Color(
-                0x101318
-            );
-
-
-        scene.fog=
-            new THREE.Fog(
-                0x101318,
-                25,
-                140
-            );
-
-
-        /* =================================================
-           CAMERA
-        ================================================= */
-
-        camera=
-            new THREE.PerspectiveCamera(
-                55,
-                innerWidth /
-                innerHeight,
-                0.01,
-                500
-            );
-
-
-        camera.position.set(
-            10,
-            8,
-            10
+    scene.background =
+        new THREE.Color(
+            0x101318
         );
 
 
-        /* =================================================
-           RENDERER
-        ================================================= */
-
-        renderer=
-            new THREE.WebGLRenderer({
-
-                antialias:true,
-
-                powerPreference:
-                    "high-performance"
-
-            });
-
-
-        renderer.setPixelRatio(
-            Math.min(
-                devicePixelRatio,
-                2
-            )
+    scene.fog =
+        new THREE.Fog(
+            0x101318,
+            20,
+            120
         );
 
 
-        renderer.setSize(
-            innerWidth,
-            innerHeight
+    camera =
+        new THREE.PerspectiveCamera(
+            55,
+            innerWidth /
+            innerHeight,
+            .01,
+            500
         );
 
 
-        renderer.outputColorSpace=
-            THREE.SRGBColorSpace;
+    camera.position.set(
+        9,
+        7,
+        10
+    );
 
 
-        renderer.shadowMap.enabled=
-            true;
+    renderer =
+        new THREE.WebGLRenderer({
+
+            antialias:true,
+
+            powerPreference:
+                "high-performance"
+
+        });
 
 
-        renderer.shadowMap.type=
-            THREE.PCFSoftShadowMap;
+    renderer.setPixelRatio(
+        Math.min(
+            devicePixelRatio,
+            2
+        )
+    );
 
 
-        /*
-           Wichtig:
-           canvas wird IMMER hinzugefügt.
-        */
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
 
-        document.body.appendChild(
+
+    renderer.shadowMap.enabled =
+        true;
+
+
+    renderer.shadowMap.type =
+        THREE.PCFSoftShadowMap;
+
+
+    renderer.outputColorSpace =
+        THREE.SRGBColorSpace;
+
+
+    document.body.appendChild(
+        renderer.domElement
+    );
+
+
+    /* =====================================================
+       3D AUS DEINEM FUNKTIONIERENDEN CODE
+    ===================================================== */
+
+    orbit =
+        new OrbitControls(
+            camera,
             renderer.domElement
         );
 
 
-        /* =================================================
-           ORBIT CONTROLS
-        ================================================= */
-
-        orbit=
-            new OrbitControls(
-                camera,
-                renderer.domElement
-            );
+    orbit.enableDamping =
+        true;
 
 
-        orbit.enableDamping=
-            true;
+    orbit.dampingFactor =
+        .08;
 
 
-        orbit.dampingFactor=
-            .08;
+    orbit.enableZoom =
+        true;
 
 
-        orbit.enableZoom=
-            true;
+    orbit.zoomSpeed =
+        .65;
 
 
-        orbit.zoomSpeed=
-            .7;
+    orbit.minDistance =
+        .7;
 
 
-        orbit.rotateSpeed=
-            .7;
+    orbit.maxDistance =
+        100;
 
 
-        orbit.panSpeed=
-            .8;
+    /*
+       TransformControls aus genau dieser
+       Three.js-Version.
 
+       r179 besitzt getHelper().
+    */
 
-        orbit.minDistance=
-            .6;
-
-
-        orbit.maxDistance=
-            120;
-
-
-        orbit.target.set(
-            0,
-            0,
-            0
+    transform =
+        new TransformControls(
+            camera,
+            renderer.domElement
         );
 
 
-        /* =================================================
-           TRANSFORM CONTROLS
-        ================================================= */
-
-        transform=
-            new TransformControls(
-                camera,
-                renderer.domElement
-            );
+    transform.setMode(
+        "translate"
+    );
 
 
-        transform.setMode(
-            "translate"
-        );
+    transform.setSize(
+        1.15
+    );
 
 
-        transform.setSize(
-            1.2
-        );
+    const transformHelper =
+        transform.getHelper();
 
 
-        /*
-           Bei r179 besitzt TransformControls
-           getHelper().
-        */
-
-        const gizmo=
-            transform.getHelper();
+    scene.add(
+        transformHelper
+    );
 
 
-        scene.add(
-            gizmo
-        );
+    transform.addEventListener(
+        "dragging-changed",
+        event=>{
+
+            orbit.enabled =
+                !event.value;
 
 
-        transform.addEventListener(
-            "dragging-changed",
-            event=>{
+            transformWasDragging =
+                event.value;
 
-                orbit.enabled=
-                    !event.value;
+        }
+    );
 
 
-                transformWasDragging=
-                    event.value;
+    transform.addEventListener(
+        "objectChange",
+        ()=>{
+
+            if(
+                !selectedObject
+            ){
+                return;
+            }
+
+
+            if(
+                mode ===
+                "translate"
+            ){
+
+                keepOnPlate();
 
             }
-        );
 
 
-        transform.addEventListener(
-            "objectChange",
-            ()=>{
+            updateInfo();
 
-                if(
-                    !selectedObject
-                ){
-                    return;
-                }
+            updateHelpers();
+
+        }
+    );
 
 
-                if(
-                    mode===
-                    "translate"
-                ){
-
-                    keepOnPlate();
-
-                }
+    raycaster =
+        new THREE.Raycaster();
 
 
-                updateInfo();
+    /*
+       Boolean aus deinem
+       funktionierenden statischen System.
+    */
+
+    evaluator =
+        new Evaluator();
 
 
-                updateHelpers();
-
-            }
-        );
+    evaluator.useGroups =
+        false;
 
 
-        /* =================================================
-           RAYCAST
-        ================================================= */
+    createLights();
 
-        raycaster=
-            new THREE.Raycaster();
+    createGround();
 
+    createPlate();
 
-        /* =================================================
-           SCENE CONTENT
-        ================================================= */
+    setupButtons();
 
-        createLights();
+    setupInputs();
 
-        createGround();
+    setupMouse();
 
-        createPlate();
+    setupKeyboard();
 
 
-        /* =================================================
-           UI
-        ================================================= */
-
-        setupButtons();
-
-        setupInputs();
-
-        setupMouse();
-
-        setupKeyboard();
+    setStatus(
+        "3D bereit"
+    );
 
 
-        setStatus(
-            "3D bereit"
-        );
-
-
-        animate();
-
-
-    }catch(error){
-
-        console.error(
-            "GHOST 3D INIT ERROR:",
-            error
-        );
-
-
-        document.getElementById(
-            "status"
-        ).textContent=
-            "3D-Fehler: "+
-            error.message;
-
-
-        alert(
-            "3D konnte nicht gestartet werden.\n\n"+
-            error.message
-        );
-
-    }
+    animate();
 
 }
 
@@ -1433,11 +1191,11 @@ function init(){
 
 function createLights(){
 
-    const hemi=
+    const hemi =
         new THREE.HemisphereLight(
             0xffffff,
             0x303030,
-            2.2
+            2.5
         );
 
 
@@ -1446,10 +1204,10 @@ function createLights(){
     );
 
 
-    const ambient=
+    const ambient =
         new THREE.AmbientLight(
             0xffffff,
-            .7
+            .5
         );
 
 
@@ -1458,7 +1216,7 @@ function createLights(){
     );
 
 
-    const sun=
+    const sun =
         new THREE.DirectionalLight(
             0xffffff,
             3
@@ -1466,30 +1224,20 @@ function createLights(){
 
 
     sun.position.set(
-        10,
-        18,
-        10
+        8,
+        15,
+        8
     );
 
 
-    sun.castShadow=
+    sun.castShadow =
         true;
 
 
-    sun.shadow.mapSize.width=
-        2048;
-
-
-    sun.shadow.mapSize.height=
-        2048;
-
-
-    sun.shadow.camera.near=
-        .1;
-
-
-    sun.shadow.camera.far=
-        120;
+    sun.shadow.mapSize.set(
+        2048,
+        2048
+    );
 
 
     scene.add(
@@ -1505,36 +1253,34 @@ function createLights(){
 
 function createGround(){
 
-    const ground=
+    const ground =
         new THREE.Mesh(
 
             new THREE.PlaneGeometry(
-                160,
-                160
+                120,
+                120
             ),
 
             new THREE.MeshStandardMaterial({
 
-                color:0x12171d,
+                color:0x11151b,
 
-                roughness:1,
-
-                metalness:0
+                roughness:1
 
             })
 
         );
 
 
-    ground.rotation.x=
+    ground.rotation.x =
         -Math.PI / 2;
 
 
-    ground.position.y=
-        -.2;
+    ground.position.y =
+        -.15;
 
 
-    ground.receiveShadow=
+    ground.receiveShadow =
         true;
 
 
@@ -1543,17 +1289,17 @@ function createGround(){
     );
 
 
-    const grid=
+    const grid =
         new THREE.GridHelper(
-            160,
-            160,
+            120,
+            120,
             0x555b64,
             0x292e35
         );
 
 
-    grid.position.y=
-        -.19;
+    grid.position.y =
+        -.14;
 
 
     scene.add(
@@ -1569,11 +1315,11 @@ function createGround(){
 
 function createPlate(){
 
-    const index=
+    const index =
         plates.length;
 
 
-    const plate=
+    const plate =
         new THREE.Mesh(
 
             new THREE.BoxGeometry(
@@ -1588,7 +1334,7 @@ function createPlate(){
 
                 roughness:.8,
 
-                metalness:.12
+                metalness:.15
 
             })
 
@@ -1606,24 +1352,24 @@ function createPlate(){
     );
 
 
-    plate.userData.isPlate=
+    plate.userData.isPlate =
         true;
 
 
-    plate.userData.name=
+    plate.userData.name =
         "Platte " +
         (index + 1);
 
 
-    plate.userData.objects=
+    plate.userData.objects =
         [];
 
 
-    plate.receiveShadow=
+    plate.receiveShadow =
         true;
 
 
-    plate.castShadow=
+    plate.castShadow =
         true;
 
 
@@ -1646,7 +1392,7 @@ function createPlate(){
 
 
     setStatus(
-        plate.userData.name+
+        plate.userData.name +
         " erstellt"
     );
 
@@ -1654,12 +1400,12 @@ function createPlate(){
 
 
 /* =========================================================
-   ADD NORMAL OBJECT
+   OBJEKTE
 ========================================================= */
 
 function addObject(
     type,
-    negative=false
+    negative = false
 ){
 
     if(
@@ -1671,15 +1417,14 @@ function addObject(
     }
 
 
-    let geometry=
-        null;
+    let geometry;
 
 
     if(
-        type==="sphere"
+        type === "sphere"
     ){
 
-        geometry=
+        geometry =
             new THREE.SphereGeometry(
                 1,
                 48,
@@ -1690,10 +1435,10 @@ function addObject(
 
 
     if(
-        type==="cube"
+        type === "cube"
     ){
 
-        geometry=
+        geometry =
             new THREE.BoxGeometry(
                 2,
                 2,
@@ -1707,10 +1452,10 @@ function addObject(
 
 
     if(
-        type==="cylinder"
+        type === "cylinder"
     ){
 
-        geometry=
+        geometry =
             new THREE.CylinderGeometry(
                 1,
                 1,
@@ -1726,16 +1471,14 @@ function addObject(
     if(
         !geometry
     ){
-
         return;
-
     }
 
 
     geometry.computeVertexNormals();
 
 
-    const material=
+    const material =
         new THREE.MeshStandardMaterial({
 
             color:
@@ -1758,38 +1501,38 @@ function addObject(
         });
 
 
-    const mesh=
+    const mesh =
         new THREE.Mesh(
             geometry,
             material
         );
 
 
-    mesh.castShadow=
+    mesh.castShadow =
         true;
 
 
-    mesh.receiveShadow=
+    mesh.receiveShadow =
         true;
 
 
-    mesh.userData.type=
+    mesh.userData.type =
         type;
 
 
-    mesh.userData.negative=
+    mesh.userData.negative =
         negative;
 
 
-    mesh.userData.rounding=
+    mesh.userData.rounding =
         0;
 
 
-    mesh.userData.plate=
+    mesh.userData.plate =
         selectedPlate;
 
 
-    mesh.userData.name=
+    mesh.userData.name =
 
         (
             negative
@@ -1798,15 +1541,15 @@ function addObject(
         )+
 
         (
-            type==="sphere"
+            type === "sphere"
             ?"Kugel"
-            :type==="cube"
+            :type === "cube"
             ?"Würfel"
             :"Zylinder"
         );
 
 
-    putObjectOnPlate(
+    positionOnPlate(
         mesh
     );
 
@@ -1833,7 +1576,7 @@ function addObject(
 
 
     setStatus(
-        mesh.userData.name+
+        mesh.userData.name +
         " erstellt"
     );
 
@@ -1841,7 +1584,7 @@ function addObject(
 
 
 /* =========================================================
-   SPRING
+   FEDER
 ========================================================= */
 
 function createSpringGeometry(
@@ -1851,20 +1594,14 @@ function createSpringGeometry(
     wireRadius
 ){
 
-    /*
-       3D-Helix.
-       Der Querschnitt ist rund.
-       Die Geometrie ist geschlossen.
-    */
-
-    const points=[];
+    const points = [];
 
 
-    const segments=
+    const segments =
         Math.max(
-            160,
+            180,
             Math.floor(
-                turns*42
+                turns * 40
             )
         );
 
@@ -1875,33 +1612,33 @@ function createSpringGeometry(
         i++
     ){
 
-        const t=
-            i/segments;
+        const t =
+            i / segments;
 
 
-        const angle=
-            t*
-            Math.PI*
-            2*
+        const angle =
+            t *
+            Math.PI *
+            2 *
             turns;
 
 
-        const x=
+        const x =
             Math.cos(
                 angle
-            )*
+            ) *
             radius;
 
 
-        const y=
-            -height/2+
-            t*height;
+        const y =
+            -height / 2 +
+            t * height;
 
 
-        const z=
+        const z =
             Math.sin(
                 angle
-            )*
+            ) *
             radius;
 
 
@@ -1916,20 +1653,16 @@ function createSpringGeometry(
     }
 
 
-    const curve=
+    const curve =
         new THREE.CatmullRomCurve3(
             points,
             false,
             "centripetal",
-            0.1
+            .1
         );
 
 
-    curve.arcLengthDivisions=
-        segments*2;
-
-
-    const geometry=
+    const geometry =
         new THREE.TubeGeometry(
             curve,
             segments,
@@ -1947,16 +1680,11 @@ function createSpringGeometry(
 
 
     return geometry;
-
 }
 
 
-/* =========================================================
-   ADD SPRING
-========================================================= */
-
 function addSpring(
-    preset="normal"
+    preset = "normal"
 ){
 
     if(
@@ -1968,49 +1696,58 @@ function addSpring(
     }
 
 
-    /*
-       Maße in Editor-Einheiten.
+    let radius =
+        .85;
 
-       Der Editor rechnet 1 Einheit = 10 mm.
+    let height =
+        3.6;
 
-       Normal:
-       Draht ca. 1.3 mm.
-    */
+    let turns =
+        9;
 
-    let radius=.85;
-
-    let height=3.6;
-
-    let turns=9;
-
-    let wire=.13;
+    let wire =
+        .13;
 
 
     if(
-        preset==="small"
+        preset === "small"
     ){
 
-        radius=.6;
-        height=2.5;
-        turns=7;
-        wire=.12;
+        radius =
+            .60;
+
+        height =
+            2.5;
+
+        turns =
+            7;
+
+        wire =
+            .12;
 
     }
 
 
     if(
-        preset==="large"
+        preset === "large"
     ){
 
-        radius=1.2;
-        height=5;
-        turns=11;
-        wire=.16;
+        radius =
+            1.2;
+
+        height =
+            5;
+
+        turns =
+            11;
+
+        wire =
+            .16;
 
     }
 
 
-    const geometry=
+    const geometry =
         createSpringGeometry(
             radius,
             height,
@@ -2019,7 +1756,7 @@ function addSpring(
         );
 
 
-    const material=
+    const material =
         new THREE.MeshStandardMaterial({
 
             color:0xb67a32,
@@ -2031,42 +1768,42 @@ function addSpring(
         });
 
 
-    const spring=
+    const spring =
         new THREE.Mesh(
             geometry,
             material
         );
 
 
-    spring.castShadow=
+    spring.castShadow =
         true;
 
 
-    spring.receiveShadow=
+    spring.receiveShadow =
         true;
 
 
-    spring.userData.type=
+    spring.userData.type =
         "spring";
 
 
-    spring.userData.negative=
+    spring.userData.negative =
         false;
 
 
-    spring.userData.rounding=
+    spring.userData.rounding =
         0;
 
 
-    spring.userData.plate=
+    spring.userData.plate =
         selectedPlate;
 
 
-    spring.userData.name=
+    spring.userData.name =
         "Feder";
 
 
-    spring.userData.springData={
+    spring.userData.springData = {
 
         radius,
         height,
@@ -2076,12 +1813,7 @@ function addSpring(
     };
 
 
-    /*
-       Feder so platzieren,
-       dass sie die Platte berührt.
-    */
-
-    putObjectOnPlate(
+    positionOnPlate(
         spring
     );
 
@@ -2108,17 +1840,17 @@ function addSpring(
 
 
     setStatus(
-        "3D-Feder erstellt"
+        "Feder erstellt"
     );
 
 }
 
 
 /* =========================================================
-   PUT OBJECT ON PLATE
+   POSITION ON PLATE
 ========================================================= */
 
-function putObjectOnPlate(
+function positionOnPlate(
     object
 ){
 
@@ -2133,7 +1865,7 @@ function putObjectOnPlate(
 
         selectedPlate.position.x,
 
-        selectedPlate.position.y+.1,
+        selectedPlate.position.y + .1,
 
         selectedPlate.position.z
 
@@ -2145,42 +1877,43 @@ function putObjectOnPlate(
     );
 
 
-    const box=
+    const box =
         new THREE.Box3()
             .setFromObject(
                 object
             );
 
 
-    const top=
-        selectedPlate.position.y+
+    const top =
+        selectedPlate.position.y +
         .1;
 
 
     object.position.y +=
-        top-box.min.y;
+        top -
+        box.min.y;
 
 }
 
 
 /* =========================================================
-   SELECT OBJECT
+   AUSWAHL
 ========================================================= */
 
 function selectObject(
     object,
-    add=false
+    add = false
 ){
 
     if(
         !object
     ){
 
-        selectedObject=
+        selectedObject =
             null;
 
 
-        selectedObjects=
+        selectedObjects =
             [];
 
 
@@ -2215,14 +1948,14 @@ function selectObject(
 
     }else{
 
-        selectedObjects=[
+        selectedObjects = [
             object
         ];
 
     }
 
 
-    selectedObject=
+    selectedObject =
         object;
 
 
@@ -2248,7 +1981,7 @@ function selectObject(
 
 
 /* =========================================================
-   UPDATE HELPERS
+   HELPERS
 ========================================================= */
 
 function updateHelpers(){
@@ -2265,7 +1998,7 @@ function updateHelpers(){
                 );
 
 
-                object.userData.selectionHelper=
+                object.userData.selectionHelper =
                     null;
 
             }
@@ -2277,12 +2010,12 @@ function updateHelpers(){
     selectedObjects.forEach(
         object=>{
 
-            const helper=
+            const helper =
                 new THREE.BoxHelper(
 
                     object,
 
-                    object===selectedObject
+                    object === selectedObject
                     ?0xffff00
                     :0x2495ff
 
@@ -2294,7 +2027,7 @@ function updateHelpers(){
             );
 
 
-            object.userData.selectionHelper=
+            object.userData.selectionHelper =
                 helper;
 
         }
@@ -2304,7 +2037,7 @@ function updateHelpers(){
 
 
 /* =========================================================
-   SELECT PLATE
+   PLATE SELECT
 ========================================================= */
 
 function selectPlate(
@@ -2323,7 +2056,7 @@ function selectPlate(
 
             p.material.color.set(
 
-                p===plate
+                p === plate
                 ?0x315e93
                 :0x252a31
 
@@ -2333,15 +2066,15 @@ function selectPlate(
     );
 
 
-    selectedPlate=
+    selectedPlate =
         plate;
 
 
-    selectedObjects=
+    selectedObjects =
         [];
 
 
-    selectedObject=
+    selectedObject =
         null;
 
 
@@ -2349,6 +2082,7 @@ function selectPlate(
 
 
     updatePlateList();
+
 
     updateInfo();
 
@@ -2361,31 +2095,31 @@ function selectPlate(
 
 function updatePlateList(){
 
-    const container=
+    const container =
         document.getElementById(
             "plates"
         );
 
 
-    container.innerHTML=
+    container.innerHTML =
         "";
 
 
     plates.forEach(
         plate=>{
 
-            const button=
+            const button =
                 document.createElement(
                     "button"
                 );
 
 
-            button.className=
+            button.className =
                 "plate";
 
 
             if(
-                plate===selectedPlate
+                plate === selectedPlate
             ){
 
                 button.classList.add(
@@ -2395,11 +2129,11 @@ function updatePlateList(){
             }
 
 
-            button.textContent=
+            button.textContent =
                 plate.userData.name;
 
 
-            button.onclick=
+            button.onclick =
                 event=>{
 
                     event.stopPropagation();
@@ -2426,14 +2160,14 @@ function updatePlateList(){
 
 
 /* =========================================================
-   TRANSFORM MODE
+   TRANSFORM MODUS
 ========================================================= */
 
 function setMode(
     newMode
 ){
 
-    mode=
+    mode =
         newMode;
 
 
@@ -2457,35 +2191,24 @@ function setMode(
         );
 
 
-    const ids={
+    const map = {
 
-        translate:
-            "move",
+        translate:"move",
 
-        rotate:
-            "rotate",
+        rotate:"rotate",
 
-        scale:
-            "scale"
+        scale:"scale"
 
     };
 
 
-    const button=
-        document.getElementById(
-            ids[newMode]
-        );
-
-
-    if(
-        button
-    ){
-
-        button.classList.add(
+    document
+        .getElementById(
+            map[newMode]
+        )
+        .classList.add(
             "active"
         );
-
-    }
 
 
     if(
@@ -2502,14 +2225,14 @@ function setMode(
 
 
 /* =========================================================
-   RELATIVE POSITION
+   POSITION
 ========================================================= */
 
 function getRelativePosition(
     object
 ){
 
-    const plate=
+    const plate =
         object.userData.plate;
 
 
@@ -2540,12 +2263,10 @@ function updateInfo(){
 
     document.getElementById(
         "plateName"
-    ).textContent=
+    ).textContent =
 
         selectedPlate
-
         ?selectedPlate.userData.name
-
         :"Keine Platte";
 
 
@@ -2555,11 +2276,11 @@ function updateInfo(){
 
         document.getElementById(
             "objectName"
-        ).textContent=
+        ).textContent =
 
             selectedObjects.length
 
-            ?selectedObjects.length+
+            ?selectedObjects.length +
              " Objekte ausgewählt"
 
             :"Kein Objekt ausgewählt";
@@ -2578,54 +2299,47 @@ function updateInfo(){
     );
 
 
-    const box=
+    const box =
         new THREE.Box3()
             .setFromObject(
                 selectedObject
             );
 
 
-    const size=
+    const size =
         box.getSize(
             new THREE.Vector3()
         );
 
 
-    /*
-       1 Einheit = 10 mm.
-    */
-
     document.getElementById(
         "width"
-    ).textContent=
-
-        (size.x*10).toFixed(1)+
+    ).textContent =
+        (size.x * 10).toFixed(1) +
         " mm";
 
 
     document.getElementById(
         "height"
-    ).textContent=
-
-        (size.y*10).toFixed(1)+
+    ).textContent =
+        (size.y * 10).toFixed(1) +
         " mm";
 
 
     document.getElementById(
         "depth"
-    ).textContent=
-
-        (size.z*10).toFixed(1)+
+    ).textContent =
+        (size.z * 10).toFixed(1) +
         " mm";
 
 
     document.getElementById(
         "objectName"
-    ).textContent=
+    ).textContent =
         selectedObject.userData.name;
 
 
-    const p=
+    const p =
         getRelativePosition(
             selectedObject
         );
@@ -2633,40 +2347,40 @@ function updateInfo(){
 
     document.getElementById(
         "posX"
-    ).value=
+    ).value =
         p.x.toFixed(2);
 
 
     document.getElementById(
         "posY"
-    ).value=
+    ).value =
         p.y.toFixed(2);
 
 
     document.getElementById(
         "posZ"
-    ).value=
+    ).value =
         p.z.toFixed(2);
 
 
-    const rounding=
+    const rounding =
         selectedObject.userData.rounding ||
         0;
 
 
     document.getElementById(
         "rounding"
-    ).value=
+    ).value =
         rounding;
 
 
     document.getElementById(
         "roundValue"
-    ).textContent=
+    ).textContent =
         rounding;
 
 
-    const attr=
+    const position =
         selectedObject.geometry
             .getAttribute(
                 "position"
@@ -2675,11 +2389,13 @@ function updateInfo(){
 
     document.getElementById(
         "pointCount"
-    ).textContent=
+    ).textContent =
 
-        attr
-        ?attr.count+
-         " Punkte"
+        position
+
+        ? position.count +
+          " Punkte"
+
         :"0 Punkte";
 
 }
@@ -2693,55 +2409,55 @@ function setInfoZero(){
 
     document.getElementById(
         "width"
-    ).textContent=
+    ).textContent =
         "0 mm";
 
 
     document.getElementById(
         "height"
-    ).textContent=
+    ).textContent =
         "0 mm";
 
 
     document.getElementById(
         "depth"
-    ).textContent=
+    ).textContent =
         "0 mm";
 
 
     document.getElementById(
         "posX"
-    ).value=
+    ).value =
         "";
 
 
     document.getElementById(
         "posY"
-    ).value=
+    ).value =
         "";
 
 
     document.getElementById(
         "posZ"
-    ).value=
+    ).value =
         "";
 
 
     document.getElementById(
         "rounding"
-    ).value=
+    ).value =
         0;
 
 
     document.getElementById(
         "roundValue"
-    ).textContent=
+    ).textContent =
         "0";
 
 
     document.getElementById(
         "pointCount"
-    ).textContent=
+    ).textContent =
         "0 Punkte";
 
 }
@@ -2760,7 +2476,7 @@ function applyPosition(){
     }
 
 
-    const plate=
+    const plate =
         selectedObject.userData.plate;
 
 
@@ -2771,7 +2487,7 @@ function applyPosition(){
     }
 
 
-    const x=
+    const x =
         Number(
             document.getElementById(
                 "posX"
@@ -2779,7 +2495,7 @@ function applyPosition(){
         ) || 0;
 
 
-    const y=
+    const y =
         Number(
             document.getElementById(
                 "posY"
@@ -2787,7 +2503,7 @@ function applyPosition(){
         ) || 0;
 
 
-    const z=
+    const z =
         Number(
             document.getElementById(
                 "posZ"
@@ -2797,17 +2513,17 @@ function applyPosition(){
 
     selectedObject.position.set(
 
-        plate.position.x+x,
+        plate.position.x + x,
 
-        plate.position.y+y,
+        plate.position.y + y,
 
-        plate.position.z+z
+        plate.position.z + z
 
     );
 
 
     if(
-        mode==="translate"
+        mode === "translate"
     ){
 
         keepOnPlate();
@@ -2835,7 +2551,7 @@ function keepOnPlate(){
     }
 
 
-    const plate=
+    const plate =
         selectedObject.userData.plate;
 
 
@@ -2851,26 +2567,26 @@ function keepOnPlate(){
     );
 
 
-    const box=
+    const box =
         new THREE.Box3()
             .setFromObject(
                 selectedObject
             );
 
 
-    const plateTop=
-        plate.position.y+
+    const plateTop =
+        plate.position.y +
         .1;
 
 
     if(
-        box.min.y<
+        box.min.y <
         plateTop
     ){
 
-        selectedObject.position.y+=
+        selectedObject.position.y +=
 
-            plateTop-
+            plateTop -
             box.min.y;
 
     }
@@ -2879,7 +2595,7 @@ function keepOnPlate(){
 
 
 /* =========================================================
-   CENTER SELECTED
+   CENTER
 ========================================================= */
 
 function centerSelected(){
@@ -2892,12 +2608,13 @@ function centerSelected(){
             "Kein Objekt ausgewählt"
         );
 
+
         return;
 
     }
 
 
-    const plate=
+    const plate =
         selectedObject.userData.plate;
 
 
@@ -2908,11 +2625,11 @@ function centerSelected(){
     }
 
 
-    selectedObject.position.x=
+    selectedObject.position.x =
         plate.position.x;
 
 
-    selectedObject.position.z=
+    selectedObject.position.z =
         plate.position.z;
 
 
@@ -2925,14 +2642,14 @@ function centerSelected(){
 
 
     setStatus(
-        "Objekt auf Plattenmitte zentriert"
+        "Objekt zentriert"
     );
 
 }
 
 
 /* =========================================================
-   CAMERA FOCUS
+   FOCUS
 ========================================================= */
 
 function focusPlate(){
@@ -2951,11 +2668,14 @@ function focusPlate(){
 
     camera.position.set(
 
-        selectedPlate.position.x+8,
+        selectedPlate.position.x +
+        8,
 
-        selectedPlate.position.y+7,
+        selectedPlate.position.y +
+        7,
 
-        selectedPlate.position.z+8
+        selectedPlate.position.z +
+        8
 
     );
 
@@ -2966,7 +2686,7 @@ function focusPlate(){
 
 
 /* =========================================================
-   MOUSE SETUP
+   MOUSE
 ========================================================= */
 
 function setupMouse(){
@@ -3000,11 +2720,16 @@ function onPointerDown(
 ){
 
     if(
-        event.button!==0
+        event.button !== 0
     ){
-
         return;
+    }
 
+
+    if(
+        transformWasDragging
+    ){
+        return;
     }
 
 
@@ -3016,47 +2741,47 @@ function onPointerDown(
         event.ctrlKey
     ){
 
-        orbit.enabled=
+        orbit.enabled =
             false;
 
 
-        selectionDragging=
+        selectionDragging =
             true;
 
 
-        selectionStart.x=
+        selectionStart.x =
             event.clientX;
 
 
-        selectionStart.y=
+        selectionStart.y =
             event.clientY;
 
 
-        const box=
+        const box =
             document.getElementById(
                 "selectBox"
             );
 
 
-        box.style.display=
+        box.style.display =
             "block";
 
 
-        box.style.left=
-            event.clientX+
+        box.style.left =
+            event.clientX +
             "px";
 
 
-        box.style.top=
-            event.clientY+
+        box.style.top =
+            event.clientY +
             "px";
 
 
-        box.style.width=
+        box.style.width =
             "0px";
 
 
-        box.style.height=
+        box.style.height =
             "0px";
 
 
@@ -3066,7 +2791,7 @@ function onPointerDown(
 
 
     /*
-       Sculpting
+       Sculpt
     */
 
     if(
@@ -3079,33 +2804,22 @@ function onPointerDown(
 
     ){
 
-        /*
-           Feder nicht zerstören.
-        */
+        const hit =
+            raycastSelectedObject(
+                event
+            );
+
 
         if(
-            selectedObject.userData.type!==
-            "spring"
+            hit
         ){
 
-            const hit=
-                raycastSelectedObject(
-                    event
-                );
+            startSculpt(
+                event
+            );
 
 
-            if(
-                hit
-            ){
-
-                startSculpt(
-                    event
-                );
-
-
-                return;
-
-            }
+            return;
 
         }
 
@@ -3113,10 +2827,10 @@ function onPointerDown(
 
 
     /*
-       Objekt auswählen
+       Objekt
     */
 
-    const hit=
+    const hit =
         raycastObjects(
             event
         );
@@ -3138,10 +2852,10 @@ function onPointerDown(
 
 
     /*
-       Platte auswählen
+       Platte
     */
 
-    const plateHit=
+    const plateHit =
         raycastPlates(
             event
         );
@@ -3169,13 +2883,13 @@ function onPointerDown(
 
 function isSculptModeActive(){
 
-    return(
+    return (
 
-        sculptMode==="raise" ||
+        sculptMode === "raise" ||
 
-        sculptMode==="lower" ||
+        sculptMode === "lower" ||
 
-        sculptMode==="smooth"
+        sculptMode === "smooth"
 
     );
 
@@ -3194,54 +2908,54 @@ function onPointerMove(
         selectionDragging
     ){
 
-        const x=
+        const x =
             Math.min(
                 selectionStart.x,
                 event.clientX
             );
 
 
-        const y=
+        const y =
             Math.min(
                 selectionStart.y,
                 event.clientY
             );
 
 
-        const w=
+        const w =
             Math.abs(
-                event.clientX-
+                event.clientX -
                 selectionStart.x
             );
 
 
-        const h=
+        const h =
             Math.abs(
-                event.clientY-
+                event.clientY -
                 selectionStart.y
             );
 
 
-        const box=
+        const box =
             document.getElementById(
                 "selectBox"
             );
 
 
-        box.style.left=
-            x+"px";
+        box.style.left =
+            x + "px";
 
 
-        box.style.top=
-            y+"px";
+        box.style.top =
+            y + "px";
 
 
-        box.style.width=
-            w+"px";
+        box.style.width =
+            w + "px";
 
 
-        box.style.height=
-            h+"px";
+        box.style.height =
+            h + "px";
 
 
         selectObjectsInRectangle(
@@ -3280,17 +2994,17 @@ function onPointerUp(){
         selectionDragging
     ){
 
-        selectionDragging=
+        selectionDragging =
             false;
 
 
         document.getElementById(
             "selectBox"
-        ).style.display=
+        ).style.display =
             "none";
 
 
-        orbit.enabled=
+        orbit.enabled =
             true;
 
 
@@ -3308,11 +3022,11 @@ function onPointerUp(){
         sculpting
     ){
 
-        sculpting=
+        sculpting =
             false;
 
 
-        orbit.enabled=
+        orbit.enabled =
             true;
 
 
@@ -3337,14 +3051,14 @@ function onPointerUp(){
 
 
 /* =========================================================
-   MOUSE POSITION
+   MOUSE VECTOR
 ========================================================= */
 
 function getMouse(
     event
 ){
 
-    const rect=
+    const rect =
         renderer.domElement
             .getBoundingClientRect();
 
@@ -3353,20 +3067,19 @@ function getMouse(
 
         (
             (
-                event.clientX-
+                event.clientX -
                 rect.left
             ) /
             rect.width
-        )*2-1,
-
+        ) * 2 - 1,
 
         -(
             (
-                event.clientY-
+                event.clientY -
                 rect.top
             ) /
             rect.height
-        )*2+1
+        ) * 2 + 1
 
     );
 
@@ -3382,20 +3095,24 @@ function raycastObjects(
 ){
 
     raycaster.setFromCamera(
-        getMouse(event),
+        getMouse(
+            event
+        ),
         camera
     );
 
 
-    const candidates=
+    const candidates =
         objects.filter(
-            object=>
-                object.userData.plate===
+            object =>
+
+                object.userData.plate ===
                 selectedPlate
+
         );
 
 
-    const hits=
+    const hits =
         raycaster.intersectObjects(
             candidates,
             false
@@ -3403,8 +3120,8 @@ function raycastObjects(
 
 
     return hits.length
-        ?hits[0].object
-        :null;
+        ? hits[0].object
+        : null;
 
 }
 
@@ -3425,12 +3142,14 @@ function raycastSelectedObject(
 
 
     raycaster.setFromCamera(
-        getMouse(event),
+        getMouse(
+            event
+        ),
         camera
     );
 
 
-    const hits=
+    const hits =
         raycaster.intersectObject(
             selectedObject,
             false
@@ -3438,8 +3157,8 @@ function raycastSelectedObject(
 
 
     return hits.length
-        ?hits[0]
-        :null;
+        ? hits[0]
+        : null;
 
 }
 
@@ -3453,12 +3172,14 @@ function raycastPlates(
 ){
 
     raycaster.setFromCamera(
-        getMouse(event),
+        getMouse(
+            event
+        ),
         camera
     );
 
 
-    const hits=
+    const hits =
         raycaster.intersectObjects(
             plates,
             false
@@ -3466,14 +3187,14 @@ function raycastPlates(
 
 
     return hits.length
-        ?hits[0].object
-        :null;
+        ? hits[0].object
+        : null;
 
 }
 
 
 /* =========================================================
-   RECTANGLE SELECTION
+   RECTANGLE SELECT
 ========================================================= */
 
 function selectObjectsInRectangle(
@@ -3490,14 +3211,14 @@ function selectObjectsInRectangle(
     }
 
 
-    const result=[];
+    const result = [];
 
 
     objects.forEach(
         object=>{
 
             if(
-                object.userData.plate!==
+                object.userData.plate !==
                 selectedPlate
             ){
 
@@ -3506,11 +3227,11 @@ function selectObjectsInRectangle(
             }
 
 
-            const center=
+            const center =
                 new THREE.Vector3();
 
 
-            const box=
+            const box =
                 new THREE.Box3()
                     .setFromObject(
                         object
@@ -3522,36 +3243,35 @@ function selectObjectsInRectangle(
             );
 
 
-            const projected=
+            const projected =
                 center.clone()
                     .project(
                         camera
                     );
 
 
-            const sx=
+            const sx =
                 (
-                    projected.x+1
-                )/2*
+                    projected.x +
+                    1
+                ) / 2 *
                 innerWidth;
 
 
-            const sy=
+            const sy =
                 (
-                    -projected.y+1
-                )/2*
+                    -projected.y +
+                    1
+                ) / 2 *
                 innerHeight;
 
 
             if(
 
-                sx>=x &&
-
-                sx<=x+w &&
-
-                sy>=y &&
-
-                sy<=y+h
+                sx >= x &&
+                sx <= x + w &&
+                sy >= y &&
+                sy <= y + h
 
             ){
 
@@ -3565,7 +3285,7 @@ function selectObjectsInRectangle(
     );
 
 
-    selectedObjects=
+    selectedObjects =
         result;
 
 
@@ -3573,9 +3293,9 @@ function selectObjectsInRectangle(
         result.length
     ){
 
-        selectedObject=
+        selectedObject =
             result[
-                result.length-1
+                result.length - 1
             ];
 
 
@@ -3593,7 +3313,7 @@ function selectObjectsInRectangle(
 
     }else{
 
-        selectedObject=
+        selectedObject =
             null;
 
 
@@ -3615,71 +3335,87 @@ function selectObjectsInRectangle(
 
 function setupButtons(){
 
-    /* Shapes */
-
     document.getElementById(
         "sphere"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addObject("sphere");
+            addObject(
+                "sphere"
+            );
         };
 
 
     document.getElementById(
         "cube"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addObject("cube");
+            addObject(
+                "cube"
+            );
         };
 
 
     document.getElementById(
         "cylinder"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addObject("cylinder");
+            addObject(
+                "cylinder"
+            );
         };
 
 
-    /* Feder */
+    /*
+       Feder
+    */
 
     document.getElementById(
         "spring"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addSpring("normal");
+            addSpring(
+                "normal"
+            );
         };
 
 
     document.getElementById(
         "springSmall"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addSpring("small");
+            addSpring(
+                "small"
+            );
         };
 
 
     document.getElementById(
         "springNormal"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addSpring("normal");
+            addSpring(
+                "normal"
+            );
         };
 
 
     document.getElementById(
         "springLarge"
-    ).onclick=
+    ).onclick =
         ()=>{
-            addSpring("large");
+            addSpring(
+                "large"
+            );
         };
 
 
-    /* Negative */
+    /*
+       Negative
+    */
 
     document.getElementById(
         "negSphere"
-    ).onclick=
+    ).onclick =
         ()=>{
             addObject(
                 "sphere",
@@ -3690,7 +3426,7 @@ function setupButtons(){
 
     document.getElementById(
         "negCube"
-    ).onclick=
+    ).onclick =
         ()=>{
             addObject(
                 "cube",
@@ -3701,7 +3437,7 @@ function setupButtons(){
 
     document.getElementById(
         "negCylinder"
-    ).onclick=
+    ).onclick =
         ()=>{
             addObject(
                 "cylinder",
@@ -3710,99 +3446,103 @@ function setupButtons(){
         };
 
 
-    /* Modes */
+    /*
+       Move
+    */
 
     document.getElementById(
         "move"
-    ).onclick=
+    ).onclick =
         ()=>{
-            sculpting=
+            sculpting =
                 false;
-
 
             setMode(
                 "translate"
             );
-
         };
 
 
+    /*
+       Rotate
+    */
+
     document.getElementById(
         "rotate"
-    ).onclick=
+    ).onclick =
         ()=>{
-            sculpting=
+            sculpting =
                 false;
-
 
             setMode(
                 "rotate"
             );
-
         };
 
 
+    /*
+       Scale
+    */
+
     document.getElementById(
         "scale"
-    ).onclick=
+    ).onclick =
         ()=>{
-            sculpting=
+            sculpting =
                 false;
-
 
             setMode(
                 "scale"
             );
-
         };
 
 
-    /* Other */
-
     document.getElementById(
         "center"
-    ).onclick=
+    ).onclick =
         centerSelected;
 
 
     document.getElementById(
         "newPlate"
-    ).onclick=
+    ).onclick =
         createPlate;
 
 
     document.getElementById(
         "deleteObject"
-    ).onclick=
+    ).onclick =
         deleteSelected;
 
 
     document.getElementById(
         "deletePlate"
-    ).onclick=
+    ).onclick =
         deleteSelectedPlate;
 
 
     document.getElementById(
         "combine"
-    ).onclick=
+    ).onclick =
         combineSelected;
 
 
     document.getElementById(
         "export"
-    ).onclick=
+    ).onclick =
         exportCurrentPlate;
 
 
-    /* Sculpt */
+    /*
+       Sculpt
+    */
 
     document.getElementById(
         "raise"
-    ).onclick=
+    ).onclick =
         ()=>{
 
-            sculptMode=
+            sculptMode =
                 "raise";
 
 
@@ -3818,10 +3558,10 @@ function setupButtons(){
 
     document.getElementById(
         "lower"
-    ).onclick=
+    ).onclick =
         ()=>{
 
-            sculptMode=
+            sculptMode =
                 "lower";
 
 
@@ -3837,10 +3577,10 @@ function setupButtons(){
 
     document.getElementById(
         "smooth"
-    ).onclick=
+    ).onclick =
         ()=>{
 
-            sculptMode=
+            sculptMode =
                 "smooth";
 
 
@@ -3854,17 +3594,19 @@ function setupButtons(){
         };
 
 
-    /* Brush */
+    /*
+       Brush
+    */
 
     document.querySelectorAll(
         ".brush"
     ).forEach(
         button=>{
 
-            button.onclick=
+            button.onclick =
                 ()=>{
 
-                    brushSize=
+                    brushSize =
                         Number(
                             button.dataset.size
                         );
@@ -3909,11 +3651,9 @@ function setSculptButton(
         )
         .forEach(
             button=>{
-
                 button.classList.remove(
                     "active"
                 );
-
             }
         );
 
@@ -3930,7 +3670,7 @@ function setSculptButton(
 
 
 /* =========================================================
-   DETACH FOR SCULPT
+   DETACH
 ========================================================= */
 
 function detachForSculpt(){
@@ -3943,7 +3683,7 @@ function detachForSculpt(){
 
 
         setStatus(
-            "Modellieren aktiv"
+            "Modellieren aktiv – Objekt ziehen"
         );
 
     }
@@ -3983,11 +3723,11 @@ function setupInputs(){
                     event=>{
 
                         if(
-                            event.key==="Enter"
+                            event.key ===
+                            "Enter"
                         ){
 
                             applyPosition();
-
 
                             event.target.blur();
 
@@ -4013,40 +3753,29 @@ function setupInputs(){
             }
 
 
-            /*
-               Feder bekommt keine
-               Cube-Abrundung.
-            */
-
             if(
-                selectedObject.userData.type===
+                selectedObject.userData.type ===
                 "spring"
             ){
-
-                document.getElementById(
-                    "roundValue"
-                ).textContent=
-                    "nicht nötig";
-
 
                 return;
 
             }
 
 
-            const value=
+            const value =
                 Number(
                     event.target.value
                 );
 
 
-            selectedObject.userData.rounding=
+            selectedObject.userData.rounding =
                 value;
 
 
             document.getElementById(
                 "roundValue"
-            ).textContent=
+            ).textContent =
                 value;
 
 
@@ -4071,7 +3800,7 @@ function updateRounding(
 ){
 
     if(
-        object.userData.type!==
+        object.userData.type !==
         "cube"
     ){
 
@@ -4085,45 +3814,38 @@ function updateRounding(
     );
 
 
-    roundingTimer=
+    roundingTimer =
         setTimeout(
             ()=>{
 
-                const old=
+                const old =
                     object.geometry;
 
 
                 if(
-                    value===0
+                    value === 0
                 ){
 
-                    object.geometry=
+                    object.geometry =
                         new THREE.BoxGeometry(
-
                             2,
                             2,
                             2,
-
-                            24,
-                            24,
-                            24
-
+                            32,
+                            32,
+                            32
                         );
 
                 }else{
 
-                    object.geometry=
+                    object.geometry =
                         createRoundedCube(
-
                             2,
-
                             Math.min(
                                 .9,
-                                value/100*.9
+                                value / 100 * .9
                             ),
-
                             24
-
                         );
 
                 }
@@ -4138,16 +3860,12 @@ function updateRounding(
 
                 keepOnPlate();
 
-
                 updateInfo();
-
 
                 updateHelpers();
 
             },
-
             10
-
         );
 
 }
@@ -4163,7 +3881,7 @@ function createRoundedCube(
     segments
 ){
 
-    const geometry=
+    const geometry =
         new THREE.BoxGeometry(
             size,
             size,
@@ -4174,14 +3892,14 @@ function createRoundedCube(
         );
 
 
-    const position=
+    const position =
         geometry.getAttribute(
             "position"
         );
 
 
-    const half=
-        size/2;
+    const half =
+        size / 2;
 
 
     for(
@@ -4190,90 +3908,90 @@ function createRoundedCube(
         i++
     ){
 
-        let x=
+        let x =
             position.getX(i);
 
 
-        let y=
+        let y =
             position.getY(i);
 
 
-        let z=
+        let z =
             position.getZ(i);
 
 
-        const cx=
+        const cx =
             Math.max(
-                -half+radius,
+                -half + radius,
                 Math.min(
-                    half-radius,
+                    half - radius,
                     x
                 )
             );
 
 
-        const cy=
+        const cy =
             Math.max(
-                -half+radius,
+                -half + radius,
                 Math.min(
-                    half-radius,
+                    half - radius,
                     y
                 )
             );
 
 
-        const cz=
+        const cz =
             Math.max(
-                -half+radius,
+                -half + radius,
                 Math.min(
-                    half-radius,
+                    half - radius,
                     z
                 )
             );
 
 
-        const dx=
-            x-cx;
+        const dx =
+            x - cx;
 
 
-        const dy=
-            y-cy;
+        const dy =
+            y - cy;
 
 
-        const dz=
-            z-cz;
+        const dz =
+            z - cz;
 
 
-        const length=
+        const length =
             Math.sqrt(
-                dx*dx+
-                dy*dy+
+                dx*dx +
+                dy*dy +
                 dz*dz
             );
 
 
         if(
-            length>0 &&
-            length>radius
+            length > 0 &&
+            length > radius
         ){
 
-            const factor=
-                radius/length;
+            const factor =
+                radius / length;
 
 
-            x=
-                cx+
-                dx*factor;
+            x =
+                cx +
+                dx * factor;
 
 
-            y=
-                cy+
-                dy*factor;
+            y =
+                cy +
+                dy * factor;
 
 
-            z=
-                cz+
-                dz*factor;
+            z =
+                cz +
+                dz * factor;
 
         }
 
@@ -4288,15 +4006,13 @@ function createRoundedCube(
     }
 
 
-    position.needsUpdate=
+    position.needsUpdate =
         true;
 
 
     geometry.computeVertexNormals();
 
-
     geometry.computeBoundingBox();
-
 
     geometry.computeBoundingSphere();
 
@@ -4315,7 +4031,21 @@ function startSculpt(
 ){
 
     if(
-        !selectedObject
+        !selectedObject ||
+        transformWasDragging
+    ){
+        return;
+    }
+
+
+    /*
+       Feder nicht sculpten.
+       Sie bleibt eine stabile Druckgeometrie.
+    */
+
+    if(
+        selectedObject.userData.type ===
+        "spring"
     ){
 
         return;
@@ -4323,11 +4053,11 @@ function startSculpt(
     }
 
 
-    sculpting=
+    sculpting =
         true;
 
 
-    orbit.enabled=
+    orbit.enabled =
         false;
 
 
@@ -4356,17 +4086,7 @@ function sculptAt(
     }
 
 
-    if(
-        selectedObject.userData.type===
-        "spring"
-    ){
-
-        return;
-
-    }
-
-
-    const hit=
+    const hit =
         raycastSelectedObject(
             event
         );
@@ -4379,39 +4099,36 @@ function sculptAt(
     }
 
 
-    const local=
+    const local =
         selectedObject.worldToLocal(
             hit.point.clone()
         );
 
 
-    const geometry=
+    const geometry =
         selectedObject.geometry;
 
 
-    const position=
+    const position =
         geometry.getAttribute(
             "position"
         );
 
 
-    const center=
+    const center =
         local;
 
 
-    const baseStrength=
-
-        sculptMode==="smooth"
-
-        ?.12
-
-        :.035;
+    const strengthBase =
+        sculptMode === "smooth"
+        ? .12
+        : .035;
 
 
-    const delta=
+    const delta =
         event.buttons
-        ?baseStrength
-        :0;
+        ? strengthBase
+        : 0;
 
 
     for(
@@ -4420,7 +4137,7 @@ function sculptAt(
         i++
     ){
 
-        const v=
+        const v =
             new THREE.Vector3()
                 .fromBufferAttribute(
                     position,
@@ -4428,65 +4145,63 @@ function sculptAt(
                 );
 
 
-        const distance=
+        const distance =
             v.distanceTo(
                 center
             );
 
 
         if(
-            distance>
+            distance >
             brushSize
         ){
-
             continue;
-
         }
 
 
-        const normalized=
-            1-
-            distance/
+        const normalized =
+            1 -
+            distance /
             brushSize;
 
 
-        const falloff=
-            normalized*
-            normalized*
+        const falloff =
+            normalized *
+            normalized *
             (
-                3-
-                2*normalized
+                3 -
+                2 * normalized
             );
 
 
-        const amount=
-            delta*
+        const amount =
+            delta *
             falloff;
 
 
         if(
-            sculptMode===
+            sculptMode ===
             "raise"
         ){
 
-            v.y+=
+            v.y +=
                 amount;
 
         }else if(
-            sculptMode===
+            sculptMode ===
             "lower"
         ){
 
-            v.y-=
+            v.y -=
                 amount;
 
         }else{
 
-            v.y+=
+            v.y +=
                 (
-                    center.y-
+                    center.y -
                     v.y
-                )*
+                ) *
                 amount;
 
         }
@@ -4502,7 +4217,7 @@ function sculptAt(
     }
 
 
-    position.needsUpdate=
+    position.needsUpdate =
         true;
 
 
@@ -4521,26 +4236,24 @@ function sculptAt(
 
 
 /* =========================================================
-   DELETE
+   DELETE OBJECT
 ========================================================= */
 
 function deleteSelected(){
 
     if(
-
         !selectedObjects.length &&
         selectedObject
-
     ){
 
-        selectedObjects=[
+        selectedObjects = [
             selectedObject
         ];
 
     }
 
 
-    const list=
+    const list =
         [...selectedObjects];
 
 
@@ -4552,7 +4265,6 @@ function deleteSelected(){
             "Kein Objekt ausgewählt"
         );
 
-
         return;
 
     }
@@ -4561,14 +4273,14 @@ function deleteSelected(){
     list.forEach(
         object=>{
 
-            const index=
+            const index =
                 objects.indexOf(
                     object
                 );
 
 
             if(
-                index>=0
+                index >= 0
             ){
 
                 objects.splice(
@@ -4579,7 +4291,7 @@ function deleteSelected(){
             }
 
 
-            const plate=
+            const plate =
                 object.userData.plate;
 
 
@@ -4587,7 +4299,7 @@ function deleteSelected(){
                 plate
             ){
 
-                const pi=
+                const pi =
                     plate.userData.objects
                         .indexOf(
                             object
@@ -4595,7 +4307,7 @@ function deleteSelected(){
 
 
                 if(
-                    pi>=0
+                    pi >= 0
                 ){
 
                     plate.userData.objects
@@ -4638,23 +4350,7 @@ function deleteSelected(){
                 object.material
             ){
 
-                if(
-                    Array.isArray(
-                        object.material
-                    )
-                ){
-
-                    object.material
-                        .forEach(
-                            m=>
-                                m.dispose()
-                        );
-
-                }else{
-
-                    object.material.dispose();
-
-                }
+                object.material.dispose();
 
             }
 
@@ -4662,11 +4358,11 @@ function deleteSelected(){
     );
 
 
-    selectedObject=
+    selectedObject =
         null;
 
 
-    selectedObjects=
+    selectedObjects =
         [];
 
 
@@ -4674,7 +4370,6 @@ function deleteSelected(){
 
 
     updateHelpers();
-
 
     updateInfo();
 
@@ -4700,20 +4395,19 @@ function deleteSelectedPlate(){
 
 
     if(
-        plates.length<=1
+        plates.length <= 1
     ){
 
         setStatus(
             "Mindestens eine Platte muss bleiben"
         );
 
-
         return;
 
     }
 
 
-    const plate=
+    const plate =
         selectedPlate;
 
 
@@ -4722,18 +4416,18 @@ function deleteSelectedPlate(){
         .forEach(
             object=>{
 
-                const oi=
+                const index =
                     objects.indexOf(
                         object
                     );
 
 
                 if(
-                    oi>=0
+                    index >= 0
                 ){
 
                     objects.splice(
-                        oi,
+                        index,
                         1
                     );
 
@@ -4777,14 +4471,14 @@ function deleteSelectedPlate(){
         );
 
 
-    const index=
+    const index =
         plates.indexOf(
             plate
         );
 
 
     if(
-        index>=0
+        index >= 0
     ){
 
         plates.splice(
@@ -4805,15 +4499,15 @@ function deleteSelectedPlate(){
     plate.material.dispose();
 
 
-    selectedPlate=
+    selectedPlate =
         plates[0];
 
 
-    selectedObjects=
+    selectedObjects =
         [];
 
 
-    selectedObject=
+    selectedObject =
         null;
 
 
@@ -4836,22 +4530,13 @@ function deleteSelectedPlate(){
 
 
 /* =========================================================
-   BOOLEAN
+   BOOLEAN – AUS DEINEM FUNKTIONIERENDEN CODE
 ========================================================= */
 
 function combineSelected(){
 
     if(
-        booleanBusy
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        selectedObjects.length<2
+        selectedObjects.length < 2
     ){
 
         setStatus(
@@ -4864,23 +4549,16 @@ function combineSelected(){
     }
 
 
-    /*
-       Eine Feder darf als Cutter oder Basis
-       verwendet werden, denn sie ist ein
-       geschlossenes Volumen.
-    */
-
-
-    const normal=
+    const normal =
         selectedObjects.find(
-            object=>
+            object =>
                 !object.userData.negative
         );
 
 
-    const negatives=
+    const negatives =
         selectedObjects.filter(
-            object=>
+            object =>
                 object.userData.negative
         );
 
@@ -4917,10 +4595,6 @@ function performBoolean(
     negatives
 ){
 
-    booleanBusy=
-        true;
-
-
     setStatus(
         "Boolean wird berechnet..."
     );
@@ -4928,28 +4602,36 @@ function performBoolean(
 
     try{
 
-        normal.updateMatrixWorld(
-            true
+        /*
+           Genau wie im ursprünglichen
+           funktionierenden Ansatz:
+           Brush + Evaluator + SUBTRACTION
+        */
+
+        const evaluator =
+            new Evaluator();
+
+
+        let result =
+            new Brush(
+                normal.geometry.clone(),
+                normal.material.clone()
+            );
+
+
+        result.position.copy(
+            normal.position
         );
 
 
-        let result;
+        result.quaternion.copy(
+            normal.quaternion
+        );
 
 
-        /*
-           Wir verwenden Mesh-Kopien.
-        */
-
-        result=
-            normal.clone();
-
-
-        result.geometry=
-            normal.geometry.clone();
-
-
-        result.material=
-            normal.material.clone();
+        result.scale.copy(
+            normal.scale
+        );
 
 
         result.updateMatrixWorld(
@@ -4958,24 +4640,30 @@ function performBoolean(
 
 
         for(
-            const negative of negatives
+            const negative
+            of negatives
         ){
 
-            negative.updateMatrixWorld(
-                true
+            const cutter =
+                new Brush(
+                    negative.geometry.clone(),
+                    negative.material.clone()
+                );
+
+
+            cutter.position.copy(
+                negative.position
             );
 
 
-            const cutter=
-                negative.clone();
+            cutter.quaternion.copy(
+                negative.quaternion
+            );
 
 
-            cutter.geometry=
-                negative.geometry.clone();
-
-
-            cutter.material=
-                negative.material.clone();
+            cutter.scale.copy(
+                negative.scale
+            );
 
 
             cutter.updateMatrixWorld(
@@ -4983,27 +4671,28 @@ function performBoolean(
             );
 
 
-            const next=
-                CSG.subtract(
+            const next =
+                evaluator.evaluate(
                     result,
-                    cutter
+                    cutter,
+                    SUBTRACTION
                 );
 
 
-            if(
-                result.geometry
-            ){
-
-                result.geometry.dispose();
-
-            }
-
-
-            result=
+            result =
                 next;
 
 
             cutter.geometry.dispose();
+
+
+            if(
+                cutter.material
+            ){
+
+                cutter.material.dispose();
+
+            }
 
         }
 
@@ -5011,11 +4700,7 @@ function performBoolean(
         result.geometry.computeVertexNormals();
 
 
-        /*
-           Neues normales Material
-        */
-
-        result.material=
+        const material =
             new THREE.MeshStandardMaterial({
 
                 color:0x7188aa,
@@ -5027,78 +4712,100 @@ function performBoolean(
             });
 
 
-        result.userData.type=
+        const mesh =
+            new THREE.Mesh(
+                result.geometry,
+                material
+            );
+
+
+        /*
+           Resultposition übernehmen
+        */
+
+        mesh.position.copy(
+            result.position
+        );
+
+
+        mesh.quaternion.copy(
+            result.quaternion
+        );
+
+
+        mesh.scale.copy(
+            result.scale
+        );
+
+
+        mesh.userData.type =
             normal.userData.type;
 
 
-        result.userData.negative=
+        mesh.userData.negative =
             false;
 
 
-        result.userData.rounding=
+        mesh.userData.rounding =
             normal.userData.rounding ||
             0;
 
 
-        result.userData.name=
-            normal.userData.name+
+        mesh.userData.name =
+            normal.userData.name +
             " Boolean";
 
 
-        result.userData.plate=
+        mesh.userData.plate =
             normal.userData.plate;
 
 
-        result.castShadow=
+        mesh.castShadow =
             true;
 
 
-        result.receiveShadow=
+        mesh.receiveShadow =
             true;
 
 
-        const plate=
+        const plate =
             normal.userData.plate;
 
-
-        /*
-           Neues Objekt in Szene
-        */
 
         scene.add(
-            result
+            mesh
         );
 
 
         objects.push(
-            result
+            mesh
         );
 
 
         plate.userData.objects.push(
-            result
+            mesh
         );
 
 
         /*
-           Alte ausgewählte Objekte löschen
+           Alte Objekte löschen
         */
 
-        const removeList=
+        const removeList =
             [...selectedObjects];
 
 
         removeList.forEach(
             object=>{
 
-                const oi=
+                const oi =
                     objects.indexOf(
                         object
                     );
 
 
                 if(
-                    oi>=0
+                    oi >= 0
                 ){
 
                     objects.splice(
@@ -5109,7 +4816,7 @@ function performBoolean(
                 }
 
 
-                const pi=
+                const pi =
                     plate.userData.objects
                         .indexOf(
                             object
@@ -5117,7 +4824,7 @@ function performBoolean(
 
 
                 if(
-                    pi>=0
+                    pi >= 0
                 ){
 
                     plate.userData.objects
@@ -5140,20 +4847,13 @@ function performBoolean(
                 }
 
 
-                if(
-                    object!==result
-                ){
-
-                    scene.remove(
-                        object
-                    );
-
-                }
+                scene.remove(
+                    object
+                );
 
 
                 if(
-                    object.geometry &&
-                    object!==result
+                    object.geometry
                 ){
 
                     object.geometry.dispose();
@@ -5162,8 +4862,7 @@ function performBoolean(
 
 
                 if(
-                    object.material &&
-                    object!==result
+                    object.material
                 ){
 
                     object.material.dispose();
@@ -5174,20 +4873,20 @@ function performBoolean(
         );
 
 
-        selectedObjects=[
-            result
+        selectedObjects = [
+            mesh
         ];
 
 
-        selectedObject=
-            result;
+        selectedObject =
+            mesh;
 
 
         transform.detach();
 
 
         transform.attach(
-            result
+            mesh
         );
 
 
@@ -5209,7 +4908,7 @@ function performBoolean(
     }catch(error){
 
         console.error(
-            "BOOLEAN:",
+            "BOOLEAN ERROR:",
             error
         );
 
@@ -5220,14 +4919,9 @@ function performBoolean(
 
 
         alert(
-            "Boolean konnte nicht berechnet werden.\n\n"+
+            "Boolean konnte nicht berechnet werden.\n\n" +
             error.message
         );
-
-    }finally{
-
-        booleanBusy=
-            false;
 
     }
 
@@ -5235,7 +4929,7 @@ function performBoolean(
 
 
 /* =========================================================
-   KEYBOARD
+   SHORTCUTS
 ========================================================= */
 
 function setupKeyboard(){
@@ -5245,11 +4939,10 @@ function setupKeyboard(){
         event=>{
 
             if(
-
                 event.ctrlKey &&
                 event.shiftKey &&
-                event.code==="KeyY"
-
+                event.code ===
+                "KeyY"
             ){
 
                 event.preventDefault();
@@ -5261,7 +4954,8 @@ function setupKeyboard(){
 
 
             if(
-                event.key==="Delete"
+                event.key ===
+                "Delete"
             ){
 
                 deleteSelected();
@@ -5270,8 +4964,10 @@ function setupKeyboard(){
 
 
             if(
-                event.key==="g" ||
-                event.key==="G"
+                event.key ===
+                "g" ||
+                event.key ===
+                "G"
             ){
 
                 if(
@@ -5288,8 +4984,10 @@ function setupKeyboard(){
 
 
             if(
-                event.key==="r" ||
-                event.key==="R"
+                event.key ===
+                "r" ||
+                event.key ===
+                "R"
             ){
 
                 if(
@@ -5306,8 +5004,10 @@ function setupKeyboard(){
 
 
             if(
-                event.key==="s" ||
-                event.key==="S"
+                event.key ===
+                "s" ||
+                event.key ===
+                "S"
             ){
 
                 if(
@@ -5324,62 +5024,6 @@ function setupKeyboard(){
 
         }
     );
-
-}
-
-
-/* =========================================================
-   EXPORT GEOMETRY
-========================================================= */
-
-function prepareGeometryForExport(
-    geometry
-){
-
-    const clone=
-        geometry.clone();
-
-
-    /*
-       CSG verwendet drawRange.
-       Für Export vollständige Geometrie.
-    */
-
-    if(
-        clone.index
-    ){
-
-        clone.setDrawRange(
-            0,
-            clone.index.count
-        );
-
-    }else{
-
-        const attr=
-            clone.getAttribute(
-                "position"
-            );
-
-
-        if(
-            attr
-        ){
-
-            clone.setDrawRange(
-                0,
-                attr.count
-            );
-
-        }
-
-    }
-
-
-    clone.computeVertexNormals();
-
-
-    return clone;
 
 }
 
@@ -5409,29 +5053,25 @@ async function exportCurrentPlate(){
     );
 
 
-    const exportScene=
+    const exportScene =
         new THREE.Scene();
 
 
-    const group=
+    const group =
         new THREE.Group();
 
 
-    group.name=
+    group.name =
         selectedPlate.userData.name;
 
 
-    /*
-       Platte
-    */
-
-    const plate=
+    const plate =
         selectedPlate.clone(
             true
         );
 
 
-    plate.material=
+    plate.material =
         new THREE.MeshStandardMaterial({
 
             color:0x777777,
@@ -5446,32 +5086,21 @@ async function exportCurrentPlate(){
     );
 
 
-    /*
-       Objekte
-    */
-
     selectedPlate.userData.objects
         .forEach(
             object=>{
 
-                const clone=
+                const clone =
                     object.clone(
                         true
                     );
 
 
-                clone.geometry=
-                    prepareGeometryForExport(
-                        object.geometry
-                    );
-
-
-                clone.material=
+                clone.material =
                     new THREE.MeshStandardMaterial({
 
                         color:
-
-                            object.userData.type===
+                            object.userData.type ===
                             "spring"
 
                             ?0xb67a32
@@ -5485,12 +5114,9 @@ async function exportCurrentPlate(){
                         roughness:.5,
 
                         metalness:
-
-                            object.userData.type===
+                            object.userData.type ===
                             "spring"
-
                             ?.28
-
                             :.12
 
                     });
@@ -5509,13 +5135,13 @@ async function exportCurrentPlate(){
     );
 
 
-    const exporter=
+    const exporter =
         new GLTFExporter();
 
 
     try{
 
-        const data=
+        const data =
             await exporter.parseAsync(
                 exportScene,
                 {
@@ -5528,40 +5154,42 @@ async function exportCurrentPlate(){
             );
 
 
-        const blob=
+        const blob =
             new Blob(
                 [data],
                 {
+
                     type:
                         "model/gltf-binary"
+
                 }
             );
 
 
-        const url=
+        const url =
             URL.createObjectURL(
                 blob
             );
 
 
-        const a=
+        const a =
             document.createElement(
                 "a"
             );
 
 
-        a.href=
+        a.href =
             url;
 
 
-        a.download=
+        a.download =
             selectedPlate
                 .userData
                 .name
                 .replace(
                     /[^a-z0-9]/gi,
                     "_"
-                )+
+                ) +
                 ".glb";
 
 
@@ -5578,11 +5206,15 @@ async function exportCurrentPlate(){
 
         setTimeout(
             ()=>{
+
                 URL.revokeObjectURL(
                     url
                 );
+
             },
+
             1000
+
         );
 
 
@@ -5594,13 +5226,13 @@ async function exportCurrentPlate(){
     }catch(error){
 
         console.error(
-            "EXPORT:",
+            "EXPORT ERROR:",
             error
         );
 
 
         alert(
-            "GLB-Export fehlgeschlagen.\n\n"+
+            "GLB-Export fehlgeschlagen.\n\n" +
             error.message
         );
 
@@ -5622,7 +5254,7 @@ function setStatus(
     text
 ){
 
-    const element=
+    const element =
         document.getElementById(
             "status"
         );
@@ -5632,7 +5264,7 @@ function setStatus(
         element
     ){
 
-        element.textContent=
+        element.textContent =
             text;
 
     }
@@ -5652,14 +5284,12 @@ window.addEventListener(
             !camera ||
             !renderer
         ){
-
             return;
-
         }
 
 
-        camera.aspect=
-            innerWidth/
+        camera.aspect =
+            innerWidth /
             innerHeight;
 
 
@@ -5676,7 +5306,7 @@ window.addEventListener(
 
 
 /* =========================================================
-   RENDER LOOP
+   ANIMATION
 ========================================================= */
 
 function animate(){
@@ -5686,13 +5316,7 @@ function animate(){
     );
 
 
-    if(
-        orbit
-    ){
-
-        orbit.update();
-
-    }
+    orbit.update();
 
 
     objects.forEach(
