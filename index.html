@@ -2,364 +2,455 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GHOST VIDEO CUTTER</title>
+<title>Lumora AI</title>
 
 <style>
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-html,body{
-    margin:0;
-    width:100%;
-    min-height:100%;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#111318;
-    color:#fff;
+html,
+body {
+    width: 100%;
+    height: 100%;
 }
 
-body{
-    display:flex;
-    justify-content:center;
-    padding:25px 12px;
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #0d0d0f;
+    color: #f5f5f5;
+    overflow: hidden;
 }
 
-.app{
-    width:100%;
-    max-width:1000px;
-    background:#1a1d24;
-    border:1px solid #303541;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.45);
+/* =========================
+   APP
+========================= */
+
+.app {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background:
+        radial-gradient(circle at 50% 40%, rgba(70,70,100,.12), transparent 40%),
+        #0d0d0f;
 }
 
-header{
-    padding:22px 25px;
-    border-bottom:1px solid #303541;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:15px;
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 250px;
+    height: 100%;
+    background: rgba(18,18,21,.96);
+    border-right: 1px solid #29292e;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    transition: .3s;
 }
 
-.logo{
-    font-size:24px;
-    font-weight:800;
-    letter-spacing:1px;
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
 }
 
-.logo span{
-    color:#ffd400;
+.logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        #4285f4,
+        #9b72cb,
+        #d96570,
+        #fbbc04
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 19px;
 }
 
-.status{
-    font-size:13px;
-    color:#aeb4c0;
+.new-chat {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 14px;
+    background: #242429;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .2s;
 }
 
-.content{
-    padding:25px;
+.new-chat:hover {
+    background: #303036;
+    transform: translateY(-1px);
 }
 
-.upload{
-    border:2px dashed #444a57;
-    border-radius:15px;
-    padding:40px 20px;
-    text-align:center;
-    cursor:pointer;
-    transition:.2s;
+.sidebar-title {
+    color: #8c8c94;
+    font-size: 12px;
+    margin: 28px 8px 10px;
 }
 
-.upload:hover{
-    border-color:#ffd400;
-    background:#20242d;
+.history {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.upload.drag{
-    border-color:#ffd400;
-    background:#292b20;
+.history-item {
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: #c8c8ce;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.upload-icon{
-    font-size:48px;
-    margin-bottom:10px;
+.history-item:hover {
+    background: #202025;
 }
 
-.upload-title{
-    font-size:20px;
-    font-weight:bold;
+.sidebar-bottom {
+    margin-top: auto;
 }
 
-.upload-sub{
-    color:#9299a7;
-    margin-top:8px;
+.sidebar-button {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #bdbdc4;
+    border: none;
+    text-align: left;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-#fileInput{
-    display:none;
+.sidebar-button:hover {
+    background: #202025;
 }
 
-.editor{
-    display:none;
-    margin-top:25px;
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-.video-box{
-    background:#000;
-    border-radius:14px;
-    overflow:hidden;
-    position:relative;
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 24px;
 }
 
-video{
-    width:100%;
-    max-height:550px;
-    display:block;
-    background:#000;
+.model {
+    background: #1d1d21;
+    border: 1px solid #303037;
+    border-radius: 20px;
+    padding: 9px 15px;
+    color: #d5d5da;
+    font-size: 13px;
 }
 
-.file-info{
-    padding:12px 15px;
-    background:#20242c;
-    color:#aeb4c0;
-    font-size:14px;
+/* =========================
+   CENTER
+========================= */
+
+.center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transform: translateY(-25px);
 }
 
-.controls{
-    margin-top:20px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:15px;
+.ai-name {
+    font-size: clamp(35px, 6vw, 65px);
+    font-weight: 700;
+    letter-spacing: -3px;
+    margin-bottom: 9px;
+
+    background: linear-gradient(
+        90deg,
+        #4285f4,
+        #8e75d9,
+        #d96570,
+        #fbbc04,
+        #34a853,
+        #4285f4
+    );
+
+    background-size: 400% 400%;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    animation: rainbow 7s ease infinite;
 }
 
-.control-card{
-    background:#20242c;
-    border-radius:12px;
-    padding:16px;
+.subtitle {
+    color: #77777f;
+    font-size: 14px;
+    margin-bottom: 35px;
 }
 
-label{
-    display:block;
-    color:#b8bec9;
-    font-size:13px;
-    margin-bottom:8px;
+/* =========================
+   INPUT AREA
+========================= */
+
+.input-wrapper {
+    width: min(850px, 92%);
+    position: relative;
 }
 
-.time-row{
-    display:flex;
-    gap:8px;
+.input-box {
+    width: 100%;
+    min-height: 155px;
+    border-radius: 30px;
+    padding: 5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #4285f4,
+            #8e75d9,
+            #d96570,
+            #fbbc04,
+            #34a853,
+            #4285f4
+        );
+
+    background-size: 500% 500%;
+    animation: rainbow 8s linear infinite;
+
+    box-shadow:
+        0 0 25px rgba(66,133,244,.12),
+        0 0 50px rgba(217,101,112,.07);
 }
 
-input[type="number"],
-input[type="text"]{
-    width:100%;
-    background:#111318;
-    color:#fff;
-    border:1px solid #3b414d;
-    border-radius:8px;
-    padding:11px;
-    font-size:15px;
-    outline:none;
+.input-inner {
+    width: 100%;
+    min-height: 145px;
+    border-radius: 26px;
+    background: #17171b;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
-input:focus{
-    border-color:#ffd400;
+textarea {
+    flex: 1;
+    width: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 17px;
+    font-family: inherit;
+    line-height: 1.5;
 }
 
-.range-area{
-    margin-top:20px;
-    background:#20242c;
-    border-radius:12px;
-    padding:18px;
+textarea::placeholder {
+    color: #77777f;
 }
 
-.range-title{
-    display:flex;
-    justify-content:space-between;
-    color:#b8bec9;
-    font-size:13px;
-    margin-bottom:12px;
+/* =========================
+   BOTTOM INPUT BUTTONS
+========================= */
+
+.input-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
 }
 
-.range-wrap{
-    position:relative;
-    height:40px;
+.left-buttons,
+.right-buttons {
+    display: flex;
+    gap: 8px;
 }
 
-.range-track{
-    position:absolute;
-    top:17px;
-    left:0;
-    right:0;
-    height:7px;
-    background:#3a3f49;
-    border-radius:10px;
+.icon-button {
+    width: 39px;
+    height: 39px;
+    border: none;
+    border-radius: 50%;
+    background: #25252b;
+    color: #d8d8dd;
+    cursor: pointer;
+    font-size: 18px;
+    transition: .2s;
 }
 
-.range-selected{
-    position:absolute;
-    top:17px;
-    height:7px;
-    background:#ffd400;
-    border-radius:10px;
+.icon-button:hover {
+    background: #34343b;
+    transform: scale(1.06);
 }
 
-input[type="range"]{
-    position:absolute;
-    left:0;
-    top:5px;
-    width:100%;
-    height:30px;
-    margin:0;
-    pointer-events:none;
-    appearance:none;
-    background:transparent;
+.send-button {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4285f4,
+            #9b72cb,
+            #d96570
+        );
+
+    color: white;
+    font-size: 19px;
+    cursor: pointer;
+    transition: .2s;
 }
 
-input[type="range"]::-webkit-slider-thumb{
-    appearance:none;
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:#ffd400;
-    border:3px solid #111318;
-    cursor:pointer;
-    pointer-events:auto;
+.send-button:hover {
+    transform: scale(1.08);
 }
 
-input[type="range"]::-moz-range-thumb{
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:#ffd400;
-    border:3px solid #111318;
-    cursor:pointer;
-    pointer-events:auto;
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+.preview {
+    display: none;
+    gap: 10px;
+    padding: 8px 0;
+    overflow-x: auto;
 }
 
-.buttons{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:20px;
+.preview.show {
+    display: flex;
 }
 
-button{
-    border:0;
-    border-radius:9px;
-    padding:12px 18px;
-    font-size:14px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:.15s;
+.preview-image {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #44444b;
 }
 
-button:hover{
-    transform:translateY(-1px);
+/* =========================
+   FOOTER
+========================= */
+
+.footer {
+    text-align: center;
+    color: #55555c;
+    font-size: 11px;
+    padding: 15px;
 }
 
-.primary{
-    background:#ffd400;
-    color:#111;
-}
+/* =========================
+   ANIMATION
+========================= */
 
-.secondary{
-    background:#303541;
-    color:#fff;
-}
-
-.danger{
-    background:#54282d;
-    color:#fff;
-}
-
-button:disabled{
-    opacity:.45;
-    cursor:not-allowed;
-    transform:none;
-}
-
-.progress{
-    display:none;
-    margin-top:20px;
-    background:#20242c;
-    padding:16px;
-    border-radius:12px;
-}
-
-.progress-text{
-    display:flex;
-    justify-content:space-between;
-    font-size:13px;
-    color:#b8bec9;
-    margin-bottom:9px;
-}
-
-.progress-bar{
-    width:100%;
-    height:9px;
-    background:#111318;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.progress-fill{
-    width:0%;
-    height:100%;
-    background:#ffd400;
-    transition:.2s;
-}
-
-.result{
-    display:none;
-    margin-top:20px;
-    padding:18px;
-    border-radius:12px;
-    background:#20242c;
-}
-
-.result-title{
-    font-weight:bold;
-    margin-bottom:12px;
-}
-
-.download{
-    display:inline-block;
-    background:#ffd400;
-    color:#111;
-    padding:13px 20px;
-    border-radius:9px;
-    text-decoration:none;
-    font-weight:bold;
-}
-
-.message{
-    margin-top:15px;
-    color:#ffcf4a;
-    font-size:14px;
-    line-height:1.5;
-}
-
-@media(max-width:650px){
-    .controls{
-        grid-template-columns:1fr;
+@keyframes rainbow {
+    0% {
+        background-position: 0% 50%;
     }
 
-    header{
-        flex-direction:column;
-        align-items:flex-start;
+    25% {
+        background-position: 50% 100%;
     }
 
-    .content{
-        padding:15px;
+    50% {
+        background-position: 100% 50%;
     }
 
-    .upload{
-        padding:30px 15px;
+    75% {
+        background-position: 50% 0%;
     }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .topbar {
+        height: 60px;
+        padding-right: 15px;
+    }
+
+    .center {
+        transform: translateY(-10px);
+    }
+
+    .ai-name {
+        font-size: 45px;
+    }
+
+    .subtitle {
+        margin-bottom: 25px;
+    }
+
+    .input-wrapper {
+        width: 96%;
+    }
+
+    .input-box {
+        min-height: 145px;
+    }
+
+    .input-inner {
+        min-height: 135px;
+        padding: 16px;
+    }
+
+    textarea {
+        font-size: 16px;
+    }
+}
+
+/* =========================
+   FILE INPUT
+========================= */
+
+#imageInput {
+    display: none;
 }
 </style>
 </head>
@@ -368,1261 +459,247 @@ button:disabled{
 
 <div class="app">
 
-<header>
-    <div class="logo">
-        GHOST <span>VIDEO CUTTER</span>
-    </div>
+    <!-- SIDEBAR -->
 
-    <div class="status" id="status">
-        Bereit
-    </div>
-</header>
+    <aside class="sidebar">
 
-<div class="content">
-
-    <!-- UPLOAD -->
-    <div class="upload" id="upload">
-        <div class="upload-icon">🎬</div>
-
-        <div class="upload-title">
-            Video auswählen
+        <div class="logo">
+            <div class="logo-icon">✦</div>
+            <span>Lumora</span>
         </div>
 
-        <div class="upload-sub">
-            Klicke hier oder ziehe ein Video hierher
+        <button class="new-chat">
+            ＋ Neuer Chat
+        </button>
+
+        <div class="sidebar-title">
+            VERLAUF
         </div>
 
-        <input
-            id="fileInput"
-            type="file"
-            accept="video/*"
-        >
-    </div>
+        <div class="history">
 
-
-    <!-- EDITOR -->
-    <div class="editor" id="editor">
-
-        <div class="video-box">
-            <video
-                id="video"
-                controls
-                playsinline
-                preload="metadata">
-            </video>
-
-            <div class="file-info" id="fileInfo">
-                Kein Video
-            </div>
-        </div>
-
-
-        <!-- ZEIT -->
-        <div class="controls">
-
-            <div class="control-card">
-
-                <label>
-                    Startzeit in Sekunden
-                </label>
-
-                <input
-                    id="startInput"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="0"
-                >
-
+            <div class="history-item">
+                Mein erster Chat
             </div>
 
+            <div class="history-item">
+                Bilder analysieren
+            </div>
 
-            <div class="control-card">
-
-                <label>
-                    Endzeit in Sekunden
-                </label>
-
-                <input
-                    id="endInput"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value="0"
-                >
-
+            <div class="history-item">
+                Ideen für ein Spiel
             </div>
 
         </div>
 
+        <div class="sidebar-bottom">
 
-        <!-- RANGE -->
-        <div class="range-area">
+            <button class="sidebar-button">
+                ⚙ Einstellungen
+            </button>
 
-            <div class="range-title">
+            <button class="sidebar-button">
+                ? Hilfe
+            </button>
 
-                <span>
-                    Schnittbereich
-                </span>
+        </div>
 
-                <span id="durationText">
-                    0:00 / 0:00
-                </span>
+    </aside>
 
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <div class="topbar">
+            <div class="model">
+                Lumora 1.0 ▾
+            </div>
+        </div>
+
+
+        <section class="center">
+
+            <div class="ai-name">
+                Lumora
             </div>
 
-            <div class="range-wrap">
+            <div class="subtitle">
+                Deine kreative KI
+            </div>
 
-                <div class="range-track"></div>
 
-                <div
-                    class="range-selected"
-                    id="rangeSelected">
+            <!-- INPUT -->
+
+            <div class="input-wrapper">
+
+                <div class="input-box">
+
+                    <div class="input-inner">
+
+                        <div id="preview"
+                             class="preview">
+                        </div>
+
+                        <textarea
+                            id="message"
+                            placeholder="Frag Lumora etwas …"
+                        ></textarea>
+
+
+                        <div class="input-bottom">
+
+                            <div class="left-buttons">
+
+                                <!-- IMAGE UPLOAD -->
+
+                                <label
+                                    for="imageInput"
+                                    class="icon-button"
+                                    title="Bild hochladen"
+                                >
+                                    ＋
+                                </label>
+
+                                <input
+                                    id="imageInput"
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                >
+
+
+                                <button
+                                    class="icon-button"
+                                    title="Bild"
+                                >
+                                    🖼
+                                </button>
+
+                            </div>
+
+
+                            <div class="right-buttons">
+
+                                <button
+                                    class="icon-button"
+                                    title="Mikrofon"
+                                >
+                                    🎤
+                                </button>
+
+                                <button
+                                    class="send-button"
+                                    title="Senden"
+                                >
+                                    ↑
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <input
-                    id="startRange"
-                    type="range"
-                    min="0"
-                    max="0"
-                    step="0.01"
-                    value="0"
-                >
-
-                <input
-                    id="endRange"
-                    type="range"
-                    min="0"
-                    max="0"
-                    step="0.01"
-                    value="0"
-                >
-
             </div>
 
+        </section>
+
+
+        <div class="footer">
+            Lumora kann Fehler machen. Überprüfe wichtige Informationen.
         </div>
 
-
-        <!-- BUTTONS -->
-        <div class="buttons">
-
-            <button
-                class="secondary"
-                id="setStart">
-                Start = aktuelle Position
-            </button>
-
-            <button
-                class="secondary"
-                id="setEnd">
-                Ende = aktuelle Position
-            </button>
-
-            <button
-                class="secondary"
-                id="preview">
-                ▶ Bereich ansehen
-            </button>
-
-            <button
-                class="primary"
-                id="cut">
-                ✂️ Video zuschneiden
-            </button>
-
-            <button
-                class="danger"
-                id="reset">
-                Neues Video
-            </button>
-
-        </div>
-
-
-        <!-- PROGRESS -->
-        <div
-            class="progress"
-            id="progress">
-
-            <div class="progress-text">
-                <span id="progressText">
-                    Video wird verarbeitet...
-                </span>
-
-                <span id="progressPercent">
-                    0%
-                </span>
-            </div>
-
-            <div class="progress-bar">
-                <div
-                    class="progress-fill"
-                    id="progressFill">
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- RESULT -->
-        <div
-            class="result"
-            id="result">
-
-            <div class="result-title">
-                ✅ Video wurde zugeschnitten
-            </div>
-
-            <a
-                id="download"
-                class="download"
-                download="ghost-cut.mp4">
-                💾 Video herunterladen
-            </a>
-
-        </div>
-
-
-        <div
-            class="message"
-            id="message">
-        </div>
-
-    </div>
-
-</div>
+    </main>
 
 </div>
 
 
-<script type="module">
+<script>
 
-/*
-    GHOST VIDEO CUTTER
+/* =========================
+   IMAGE UPLOAD PREVIEW
+========================= */
 
-    FFmpeg wird nur bei Bedarf geladen.
-*/
-
-const upload = document.getElementById("upload");
-const fileInput = document.getElementById("fileInput");
-
-const editor = document.getElementById("editor");
-const video = document.getElementById("video");
-
-const fileInfo = document.getElementById("fileInfo");
-const status = document.getElementById("status");
-
-const startInput = document.getElementById("startInput");
-const endInput = document.getElementById("endInput");
-
-const startRange = document.getElementById("startRange");
-const endRange = document.getElementById("endRange");
-
-const rangeSelected =
-    document.getElementById("rangeSelected");
-
-const durationText =
-    document.getElementById("durationText");
-
-const setStart =
-    document.getElementById("setStart");
-
-const setEnd =
-    document.getElementById("setEnd");
+const imageInput =
+    document.getElementById("imageInput");
 
 const preview =
     document.getElementById("preview");
 
-const cut =
-    document.getElementById("cut");
 
-const reset =
-    document.getElementById("reset");
+imageInput.addEventListener("change", function () {
 
-const progress =
-    document.getElementById("progress");
+    preview.innerHTML = "";
 
-const progressFill =
-    document.getElementById("progressFill");
+    const files = Array.from(this.files);
 
-const progressText =
-    document.getElementById("progressText");
+    if (files.length === 0) {
+        preview.classList.remove("show");
+        return;
+    }
 
-const progressPercent =
-    document.getElementById("progressPercent");
+    preview.classList.add("show");
 
-const result =
-    document.getElementById("result");
+    files.forEach(file => {
 
-const download =
-    document.getElementById("download");
+        if (!file.type.startsWith("image/")) {
+            return;
+        }
 
-const message =
+        const img =
+            document.createElement("img");
+
+        img.className = "preview-image";
+
+        img.src =
+            URL.createObjectURL(file);
+
+        preview.appendChild(img);
+
+    });
+
+});
+
+
+/* =========================
+   TEXTAREA AUTO GROW
+========================= */
+
+const textarea =
     document.getElementById("message");
 
+textarea.addEventListener("input", function () {
 
-let currentFile = null;
-let currentUrl = null;
-let outputUrl = null;
+    this.style.height = "auto";
 
-let duration = 0;
-
-let ffmpeg = null;
-
-
-/* -------------------------
-   UPLOAD
-------------------------- */
-
-upload.addEventListener("click", () => {
-    fileInput.click();
-});
-
-fileInput.addEventListener("change", () => {
-
-    if(fileInput.files.length > 0){
-
-        loadVideo(fileInput.files[0]);
-
-    }
+    this.style.height =
+        Math.min(this.scrollHeight, 90) + "px";
 
 });
 
 
-/* Drag & Drop */
+/* =========================
+   ENTER
+========================= */
 
-upload.addEventListener("dragover", e => {
+textarea.addEventListener("keydown", function (event) {
 
-    e.preventDefault();
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey
+    ) {
 
-    upload.classList.add("drag");
+        event.preventDefault();
 
-});
-
-
-upload.addEventListener("dragleave", () => {
-
-    upload.classList.remove("drag");
-
-});
-
-
-upload.addEventListener("drop", e => {
-
-    e.preventDefault();
-
-    upload.classList.remove("drag");
-
-    const file =
-        e.dataTransfer.files[0];
-
-    if(file && file.type.startsWith("video/")){
-
-        loadVideo(file);
+        // Noch keine KI-Funktion.
+        console.log("Senden");
 
     }
 
 });
-
-
-/* -------------------------
-   VIDEO LADEN
-------------------------- */
-
-function loadVideo(file){
-
-    currentFile = file;
-
-    if(currentUrl){
-
-        URL.revokeObjectURL(currentUrl);
-
-    }
-
-    currentUrl =
-        URL.createObjectURL(file);
-
-    video.src = currentUrl;
-
-    video.load();
-
-    editor.style.display = "block";
-
-    upload.style.display = "none";
-
-    result.style.display = "none";
-
-    message.textContent = "";
-
-    status.textContent = "Video geladen";
-
-    fileInfo.textContent =
-        file.name +
-        " • " +
-        formatBytes(file.size);
-
-}
-
-
-/* -------------------------
-   METADATA
-------------------------- */
-
-video.addEventListener("loadedmetadata", () => {
-
-    duration = video.duration;
-
-    if(!isFinite(duration)){
-        return;
-    }
-
-    startRange.max = duration;
-    endRange.max = duration;
-
-    startRange.value = 0;
-    endRange.value = duration;
-
-    startInput.value = 0;
-    endInput.value = duration.toFixed(2);
-
-    updateRange();
-
-    updateDurationText();
-
-});
-
-
-/* -------------------------
-   VIDEO POSITION
-------------------------- */
-
-video.addEventListener("timeupdate", () => {
-
-    updateDurationText();
-
-});
-
-
-function updateDurationText(){
-
-    durationText.textContent =
-        formatTime(video.currentTime) +
-        " / " +
-        formatTime(duration);
-
-}
-
-
-/* -------------------------
-   START RANGE
-------------------------- */
-
-startRange.addEventListener("input", () => {
-
-    let value =
-        Number(startRange.value);
-
-    let end =
-        Number(endRange.value);
-
-    if(value > end){
-
-        value = end;
-
-        startRange.value = value;
-
-    }
-
-    startInput.value =
-        value.toFixed(2);
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   END RANGE
-------------------------- */
-
-endRange.addEventListener("input", () => {
-
-    let value =
-        Number(endRange.value);
-
-    let start =
-        Number(startRange.value);
-
-    if(value < start){
-
-        value = start;
-
-        endRange.value = value;
-
-    }
-
-    endInput.value =
-        value.toFixed(2);
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   START INPUT
-------------------------- */
-
-startInput.addEventListener("change", () => {
-
-    let value =
-        Number(startInput.value);
-
-    if(!isFinite(value)){
-        value = 0;
-    }
-
-    value =
-        Math.max(0, Math.min(value, duration));
-
-    if(value > Number(endRange.value)){
-
-        value =
-            Number(endRange.value);
-
-    }
-
-    startInput.value =
-        value.toFixed(2);
-
-    startRange.value = value;
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   END INPUT
-------------------------- */
-
-endInput.addEventListener("change", () => {
-
-    let value =
-        Number(endInput.value);
-
-    if(!isFinite(value)){
-        value = duration;
-    }
-
-    value =
-        Math.max(0, Math.min(value, duration));
-
-    if(value < Number(startRange.value)){
-
-        value =
-            Number(startRange.value);
-
-    }
-
-    endInput.value =
-        value.toFixed(2);
-
-    endRange.value = value;
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   RANGE VISUALISIERUNG
-------------------------- */
-
-function updateRange(){
-
-    if(duration <= 0){
-        return;
-    }
-
-    const start =
-        Number(startRange.value);
-
-    const end =
-        Number(endRange.value);
-
-    const left =
-        (start / duration) * 100;
-
-    const width =
-        ((end - start) / duration) * 100;
-
-    rangeSelected.style.left =
-        left + "%";
-
-    rangeSelected.style.width =
-        width + "%";
-
-}
-
-
-/* -------------------------
-   START SETZEN
-------------------------- */
-
-setStart.addEventListener("click", () => {
-
-    let value =
-        video.currentTime;
-
-    if(value > Number(endRange.value)){
-
-        value =
-            Number(endRange.value);
-
-    }
-
-    startRange.value = value;
-
-    startInput.value =
-        value.toFixed(2);
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   ENDE SETZEN
-------------------------- */
-
-setEnd.addEventListener("click", () => {
-
-    let value =
-        video.currentTime;
-
-    if(value < Number(startRange.value)){
-
-        value =
-            Number(startRange.value);
-
-    }
-
-    endRange.value = value;
-
-    endInput.value =
-        value.toFixed(2);
-
-    updateRange();
-
-});
-
-
-/* -------------------------
-   PREVIEW
-------------------------- */
-
-preview.addEventListener("click", async () => {
-
-    const start =
-        Number(startRange.value);
-
-    const end =
-        Number(endRange.value);
-
-    if(end <= start){
-
-        showMessage(
-            "Der Endzeitpunkt muss größer als der Startzeitpunkt sein."
-        );
-
-        return;
-
-    }
-
-    video.currentTime = start;
-
-    await video.play();
-
-    const stopPreview = () => {
-
-        if(video.currentTime >= end){
-
-            video.pause();
-
-            video.removeEventListener(
-                "timeupdate",
-                stopPreview
-            );
-
-        }
-
-    };
-
-    video.addEventListener(
-        "timeupdate",
-        stopPreview
-    );
-
-});
-
-
-/* -------------------------
-   FFmpeg LADEN
-------------------------- */
-
-async function loadFFmpeg(){
-
-    if(ffmpeg){
-        return ffmpeg;
-    }
-
-    status.textContent =
-        "FFmpeg wird geladen...";
-
-    progress.style.display =
-        "block";
-
-    progressText.textContent =
-        "Video-Schnittmodul wird geladen...";
-
-    progressFill.style.width = "10%";
-    progressPercent.textContent = "10%";
-
-
-    try{
-
-        const module =
-            await import(
-                "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js"
-            );
-
-        const util =
-            await import(
-                "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js"
-            );
-
-        const {
-            FFmpeg
-        } = module;
-
-        const {
-            fetchFile,
-            toBlobURL
-        } = util;
-
-        ffmpeg =
-            new FFmpeg();
-
-        ffmpeg.on(
-            "progress",
-            ({progress}) => {
-
-                const percent =
-                    Math.round(progress * 100);
-
-                progressFill.style.width =
-                    percent + "%";
-
-                progressPercent.textContent =
-                    percent + "%";
-
-            }
-        );
-
-        const baseURL =
-            "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
-
-        await ffmpeg.load({
-            coreURL:
-                await toBlobURL(
-                    `${baseURL}/ffmpeg-core.js`,
-                    "text/javascript"
-                ),
-
-            wasmURL:
-                await toBlobURL(
-                    `${baseURL}/ffmpeg-core.wasm`,
-                    "application/wasm"
-                )
-        });
-
-        progressFill.style.width = "20%";
-        progressPercent.textContent = "20%";
-
-        return ffmpeg;
-
-    }catch(error){
-
-        console.error(error);
-
-        ffmpeg = null;
-
-        throw error;
-
-    }
-
-}
-
-
-/* -------------------------
-   VIDEO SCHNEIDEN
-------------------------- */
-
-cut.addEventListener("click", async () => {
-
-    if(!currentFile){
-
-        showMessage(
-            "Bitte zuerst ein Video auswählen."
-        );
-
-        return;
-
-    }
-
-    const start =
-        Number(startRange.value);
-
-    const end =
-        Number(endRange.value);
-
-    if(!isFinite(start) || !isFinite(end)){
-
-        showMessage(
-            "Ungültige Zeit."
-        );
-
-        return;
-
-    }
-
-    if(end <= start){
-
-        showMessage(
-            "Das Ende muss nach dem Start liegen."
-        );
-
-        return;
-
-    }
-
-    const length =
-        end - start;
-
-    if(length <= 0){
-
-        showMessage(
-            "Der ausgewählte Bereich ist leer."
-        );
-
-        return;
-
-    }
-
-
-    cut.disabled = true;
-
-    preview.disabled = true;
-
-    progress.style.display =
-        "block";
-
-    result.style.display =
-        "none";
-
-    message.textContent = "";
-
-    progressText.textContent =
-        "FFmpeg wird vorbereitet...";
-
-    progressFill.style.width =
-        "5%";
-
-    progressPercent.textContent =
-        "5%";
-
-
-    try{
-
-        const engine =
-            await loadFFmpeg();
-
-
-        progressText.textContent =
-            "Video wird verarbeitet...";
-
-
-        const inputName =
-            "input_" +
-            Date.now() +
-            getExtension(currentFile.name);
-
-
-        const outputName =
-            "ghost_cut_" +
-            Date.now() +
-            ".mp4";
-
-
-        /*
-            Datei in FFmpeg schreiben
-        */
-
-        await engine.writeFile(
-            inputName,
-            await fetchFile(currentFile)
-        );
-
-
-        /*
-            Schneiden.
-
-            -ss = Start
-            -t  = Länge
-            -c:v libx264 = kompatibles MP4
-            -c:a aac     = kompatibles Audio
-        */
-
-        await engine.exec([
-            "-ss",
-            String(start),
-
-            "-i",
-            inputName,
-
-            "-t",
-            String(length),
-
-            "-c:v",
-            "libx264",
-
-            "-preset",
-            "veryfast",
-
-            "-crf",
-            "18",
-
-            "-c:a",
-            "aac",
-
-            "-movflags",
-            "+faststart",
-
-            outputName
-        ]);
-
-
-        progressText.textContent =
-            "Download wird vorbereitet...";
-
-
-        const data =
-            await engine.readFile(
-                outputName
-            );
-
-
-        const blob =
-            new Blob(
-                [data.buffer],
-                {
-                    type:"video/mp4"
-                }
-            );
-
-
-        if(outputUrl){
-
-            URL.revokeObjectURL(
-                outputUrl
-            );
-
-        }
-
-
-        outputUrl =
-            URL.createObjectURL(blob);
-
-
-        download.href =
-            outputUrl;
-
-        download.download =
-            createOutputName(
-                currentFile.name
-            );
-
-
-        progressFill.style.width =
-            "100%";
-
-        progressPercent.textContent =
-            "100%";
-
-        progressText.textContent =
-            "Fertig!";
-
-
-        result.style.display =
-            "block";
-
-
-        status.textContent =
-            "Schnitt fertig";
-
-
-        /*
-            Temporäre Dateien löschen
-        */
-
-        try{
-
-            await engine.deleteFile(
-                inputName
-            );
-
-            await engine.deleteFile(
-                outputName
-            );
-
-        }catch(e){
-
-            console.warn(
-                "Temporäre Datei konnte nicht gelöscht werden.",
-                e
-            );
-
-        }
-
-
-    }catch(error){
-
-        console.error(error);
-
-        progressFill.style.width =
-            "0%";
-
-        progressPercent.textContent =
-            "Fehler";
-
-        progressText.textContent =
-            "Verarbeitung fehlgeschlagen";
-
-        showMessage(
-            "Das Video konnte nicht geschnitten werden. " +
-            "Prüfe, ob der Browser FFmpeg laden kann."
-        );
-
-    }finally{
-
-        cut.disabled = false;
-
-        preview.disabled = false;
-
-    }
-
-});
-
-
-/* -------------------------
-   RESET
-------------------------- */
-
-reset.addEventListener("click", () => {
-
-    if(currentUrl){
-
-        URL.revokeObjectURL(
-            currentUrl
-        );
-
-    }
-
-    if(outputUrl){
-
-        URL.revokeObjectURL(
-            outputUrl
-        );
-
-    }
-
-    currentFile = null;
-    currentUrl = null;
-    outputUrl = null;
-
-    video.pause();
-
-    video.removeAttribute("src");
-
-    video.load();
-
-    fileInput.value = "";
-
-    editor.style.display =
-        "none";
-
-    upload.style.display =
-        "block";
-
-    progress.style.display =
-        "none";
-
-    result.style.display =
-        "none";
-
-    message.textContent = "";
-
-    status.textContent =
-        "Bereit";
-
-});
-
-
-/* -------------------------
-   HILFSFUNKTIONEN
-------------------------- */
-
-function formatTime(seconds){
-
-    if(!isFinite(seconds)){
-        return "0:00";
-    }
-
-    seconds =
-        Math.max(0, seconds);
-
-    const hours =
-        Math.floor(seconds / 3600);
-
-    const minutes =
-        Math.floor(
-            (seconds % 3600) / 60
-        );
-
-    const secs =
-        Math.floor(seconds % 60);
-
-    if(hours > 0){
-
-        return (
-            hours +
-            ":" +
-            String(minutes).padStart(2,"0") +
-            ":" +
-            String(secs).padStart(2,"0")
-        );
-
-    }
-
-    return (
-        minutes +
-        ":" +
-        String(secs).padStart(2,"0")
-    );
-
-}
-
-
-function formatBytes(bytes){
-
-    if(bytes === 0){
-        return "0 Bytes";
-    }
-
-    const units =
-        [
-            "Bytes",
-            "KB",
-            "MB",
-            "GB"
-        ];
-
-    const index =
-        Math.floor(
-            Math.log(bytes) /
-            Math.log(1024)
-        );
-
-    return (
-        (bytes /
-        Math.pow(1024,index))
-        .toFixed(2)
-        +
-        " " +
-        units[index]
-    );
-
-}
-
-
-function getExtension(name){
-
-    const match =
-        name.match(/\.[^/.]+$/);
-
-    return match
-        ? match[0]
-        : ".mp4";
-
-}
-
-
-function createOutputName(name){
-
-    const withoutExtension =
-        name.replace(
-            /\.[^/.]+$/,
-            ""
-        );
-
-    return (
-        withoutExtension +
-        "_geschnitten.mp4"
-    );
-
-}
-
-
-function showMessage(text){
-
-    message.textContent =
-        text;
-
-}
-
-
-/* -------------------------
-   TASTATUR
-------------------------- */
-
-document.addEventListener(
-    "keydown",
-    e => {
-
-        /*
-            Leertaste = Play/Pause,
-            aber nicht wenn gerade
-            ein Eingabefeld benutzt wird.
-        */
-
-        if(
-            e.code === "Space" &&
-            document.activeElement.tagName !== "INPUT"
-        ){
-
-            e.preventDefault();
-
-            if(video.paused){
-                video.play();
-            }else{
-                video.pause();
-            }
-
-        }
-
-    }
-);
 
 </script>
 
