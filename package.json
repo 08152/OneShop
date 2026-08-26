@@ -1,12 +1,16 @@
 {
-  "name": "riskylive-ai-nachrichten",
+  "name": "ai-control-center",
   "version": "1.0.0",
-  "description": "RiskyLive KI-Nachrichtenplattform",
+  "description": "KI-Leitstand für Unternehmens-Agenten",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
