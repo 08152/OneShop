@@ -2,1827 +2,632 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Control Center</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Rechnungs- & Bestellvergleich</title>
 
 <style>
-:root {
-    --bg: #08090d;
-    --panel: #101219;
-    --panel-2: #0d0f14;
-    --panel-3: #0b0d12;
-    --border: #232733;
-    --text: #f5f7fb;
-    --muted: #777f8e;
-    --accent: #6675ff;
-    --green: #55df82;
-    --danger: #ff7777;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    width: 100%;
-    min-height: 100%;
-}
-
-body {
-    margin: 0;
-    font-family: Inter, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-}
-
-/* APP */
-
-.app {
-    min-height: 100vh;
-    display: flex;
-}
-
-/* SIDEBAR */
-
-.sidebar {
-    width: 240px;
-    flex: 0 0 240px;
-    min-height: 100vh;
-    background: var(--panel-2);
-    border-right: 1px solid #20232c;
-    padding: 22px 16px;
-}
-
-.logo {
-    font-size: 20px;
-    font-weight: 800;
-    margin-bottom: 35px;
-}
-
-.logo span {
-    color: #7280ff;
-}
-
-.menu-title {
-    color: #656b78;
-    font-size: 11px;
-    text-transform: uppercase;
-    margin: 22px 10px 8px;
-}
-
-.menu button {
-    width: 100%;
-    display: block;
-    border: 0;
-    background: transparent;
-    color: #aeb4c0;
-    text-align: left;
-    padding: 12px;
-    border-radius: 9px;
-    cursor: pointer;
-    margin-bottom: 4px;
-    font: inherit;
-}
-
-.menu button:hover,
-.menu button.active {
-    background: #191c25;
-    color: white;
-}
-
-/* MAIN */
-
-.main {
-    flex: 1;
-    min-width: 0;
-    padding: 28px;
-}
-
-/* TOPBAR */
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 25px;
-}
-
-.title {
-    min-width: 0;
-}
-
-.title h1 {
-    margin: 0;
-    font-size: 28px;
-    line-height: 1.2;
-}
-
-.title p {
-    margin: 7px 0 0;
-    color: var(--muted);
-}
-
-.right {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-shrink: 0;
-}
-
-.live {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #77e29a;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 12px var(--green);
-}
-
-.upgrade {
-    border: 0;
-    background: var(--accent);
-    color: white;
-    font-weight: 700;
-    padding: 11px 18px;
-    border-radius: 9px;
-    cursor: pointer;
-    transition: .2s;
-}
-
-.upgrade:hover {
-    background: #7885ff;
-}
-
-/* STATS */
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
-.stat {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-    min-width: 0;
-}
-
-.stat-label {
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    margin-top: 8px;
-}
-
-/* SECTION */
-
-.section-header {
-    margin-bottom: 15px;
-}
-
-.section-header h2 {
-    margin: 0;
-    font-size: 19px;
-}
-
-/* AGENTS */
-
-.agents {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 15px;
-}
-
-.agent {
-    min-width: 0;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    padding: 19px;
-}
-
-.agent-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-
-.agent-name {
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    font-weight: 700;
-}
-
-.agent-icon {
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: #1c2030;
-    font-size: 20px;
-}
-
-.status {
-    flex-shrink: 0;
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
-.idle {
-    background: #252831;
-    color: #aeb4c0;
-}
-
-.working {
-    background: #102d20;
-    color: #6be590;
-}
-
-.waiting {
-    background: #2d2712;
-    color: #e8c85c;
-}
-
-.task {
-    margin-top: 18px;
-    background: var(--panel-3);
-    border-radius: 9px;
-    padding: 13px;
-}
-
-.task-label {
-    color: #646b78;
-    font-size: 10px;
-    margin-bottom: 6px;
-}
-
-.task-text {
-    color: #dfe3eb;
-    font-size: 14px;
-    overflow-wrap: anywhere;
-}
-
-.meta {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-    color: #686f7c;
-    font-size: 11px;
-}
-
-.agent-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 15px;
-}
-
-.setup,
-.delete {
-    border: 1px solid #303541;
-    background: #171a22;
-    color: white;
-    padding: 9px 13px;
-    border-radius: 8px;
-    cursor: pointer;
-    font: inherit;
-}
-
-.setup:hover {
-    background: #202430;
-}
-
-.delete {
-    color: var(--danger);
-}
-
-.delete:hover {
-    background: #24171b;
-}
-
-/* EMPTY */
-
-.empty {
-    grid-column: 1 / -1;
-    padding: 45px 20px;
-    text-align: center;
-    background: var(--panel);
-    border: 1px dashed #292d38;
-    border-radius: 15px;
-    color: var(--muted);
-}
-
-/* MODALS */
-
-.modal-bg {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(0, 0, 0, .78);
-    backdrop-filter: blur(6px);
-}
-
-.modal-bg.show {
-    display: flex;
-}
-
-.modal {
-    width: min(720px, 100%);
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    background: var(--panel);
-    border: 1px solid #292d38;
-    border-radius: 18px;
-    padding: 25px;
-    box-shadow: 0 30px 100px rgba(0, 0, 0, .55);
-    position: relative;
-    isolation: isolate;
-}
-
-.modal-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 8px;
-}
-
-.modal-header h2 {
-    margin: 0;
-}
-
-.close {
-    width: 36px;
-    height: 36px;
-    flex: 0 0 36px;
-    border: 0;
-    background: #1c2029;
-    color: #aaa;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 19px;
-    line-height: 1;
-}
-
-.close:hover {
-    background: #292e39;
-    color: white;
-}
-
-.modal-description {
-    color: var(--muted);
-    margin: 0 0 20px;
-    line-height: 1.5;
-}
-
-/* UPGRADE */
-
-.upgrade-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: var(--panel-3);
-    border: 1px solid #242833;
-    padding: 16px;
-    border-radius: 13px;
-    margin-bottom: 12px;
-}
-
-.upgrade-card:last-child {
-    margin-bottom: 0;
-}
-
-.upgrade-icon {
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
-    display: grid;
-    place-items: center;
-    background: #1c2030;
-    border-radius: 12px;
-    font-size: 24px;
-}
-
-.upgrade-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.upgrade-info h3 {
-    margin: 0 0 5px;
-    font-size: 15px;
-}
-
-.upgrade-info p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.45;
-}
-
-.add-agent {
-    flex-shrink: 0;
-    border: 1px solid #303646;
-    background: #171a22;
-    color: white;
-    padding: 9px 13px;
-    border-radius: 8px;
-    cursor: pointer;
-    font: inherit;
-}
-
-.add-agent:hover {
-    background: #232735;
-}
-
-/* MAIL UPLOAD */
-
-.upload-area {
-    display: block;
-    width: 100%;
-    border: 2px dashed #343949;
-    border-radius: 15px;
-    padding: 35px 20px;
-    text-align: center;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: .2s;
-}
-
-.upload-area:hover {
-    border-color: var(--accent);
-    background: #11131c;
-}
-
-.upload-area input {
-    display: none;
-}
-
-.file-name {
-    margin-top: 15px;
-    color: #777f8e;
-    word-break: break-word;
-    text-align: center;
-}
-
-.start-analysis {
-    width: 100%;
-    margin-top: 18px;
-    padding: 13px;
-    border: 0;
-    border-radius: 9px;
-    background: var(--accent);
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.start-analysis:hover:not(:disabled) {
-    background: #7885ff;
-}
-
-.start-analysis:disabled {
-    opacity: .5;
-    cursor: not-allowed;
-}
-
-/* ANALYSIS */
-
-.analysis {
-    display: none;
-    margin-top: 20px;
-}
-
-.analysis.show {
-    display: block;
-}
-
-.progress {
-    width: 100%;
-    height: 7px;
-    background: #20232c;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    width: 0;
-    background: var(--accent);
-    border-radius: inherit;
-    transition: width .35s ease;
-}
-
-.analysis-text {
-    margin-top: 12px;
-    color: #8f96a5;
-    font-size: 13px;
-}
-
-/* RESULT */
-
-.result {
-    display: none;
-    margin-top: 20px;
-}
-
-.result.show {
-    display: block;
-}
-
-.result-box {
-    background: var(--panel-3);
-    border: 1px solid #252936;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 12px;
-}
-
-.result-box:last-child {
-    margin-bottom: 0;
-}
-
-.result-title {
-    color: #737b89;
-    font-size: 11px;
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-.reply {
-    display: block;
-    width: 100%;
-    min-height: 180px;
-    resize: vertical;
-    background: #08090d;
-    border: 1px solid #292e3a;
-    border-radius: 10px;
-    padding: 14px;
-    color: white;
-    font-family: inherit;
-    line-height: 1.5;
-    outline: none;
-}
-
-.reply:focus {
-    border-color: var(--accent);
-}
-
-.copy {
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: #191d27;
-    color: white;
-    border: 1px solid #303541;
-    border-radius: 8px;
-    cursor: pointer;
-    font: inherit;
-}
-
-.copy:hover {
-    background: #242936;
-}
-
-/* ANIMATION */
-
-@keyframes pulse {
-    0%, 100% {
-        opacity: .4;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-.analyzing {
-    animation: pulse 1.2s infinite;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1000px) {
-    .sidebar {
-        width: 210px;
-        flex-basis: 210px;
-    }
-
-    .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .agents {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 760px) {
-    .app {
-        display: block;
-    }
-
-    .sidebar {
-        display: none;
-    }
-
-    .main {
-        width: 100%;
-        padding: 18px;
-    }
-
-    .topbar {
-        align-items: flex-start;
-    }
-
-    .right {
-        gap: 8px;
-    }
-
-    .live {
-        display: none;
-    }
-}
-
-@media (max-width: 560px) {
-    .main {
-        padding: 14px;
-    }
-
-    .topbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .right {
-        justify-content: space-between;
-        width: 100%;
-    }
-
-    .upgrade {
-        width: 100%;
-    }
-
-    .stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .stat {
-        padding: 14px;
-    }
-
-    .stat-value {
-        font-size: 24px;
-    }
-
-    .agent-top {
-        align-items: flex-start;
-    }
-
-    .upgrade-card {
-        flex-wrap: wrap;
-    }
-
-    .upgrade-info {
-        flex: 1 1 calc(100% - 65px);
-    }
-
-    .add-agent {
-        width: 100%;
-    }
-
-    .modal-bg {
-        padding: 10px;
-    }
-
-    .modal {
-        max-height: calc(100vh - 20px);
-        padding: 18px;
-        border-radius: 15px;
-    }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f6f9;
+  color:#172033;
+}
+header{
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:22px 30px;
+  font-size:24px;
+  font-weight:bold;
+}
+main{
+  max-width:1100px;
+  margin:35px auto;
+  padding:0 20px;
+}
+.card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:20px;
+  box-shadow:0 5px 20px #00000010;
+}
+h1{margin-top:0}
+h2{margin-top:0}
+.uploads{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.upload{
+  border:2px dashed #b8c0cc;
+  border-radius:15px;
+  padding:30px;
+  text-align:center;
+}
+.upload input{
+  width:100%;
+  margin-top:15px;
+}
+button{
+  border:0;
+  border-radius:12px;
+  padding:14px 22px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.primary{
+  background:#172033;
+  color:white;
+  width:100%;
+  margin-top:20px;
+}
+.primary:hover{opacity:.9}
+
+.status{
+  padding:16px;
+  border-radius:12px;
+  margin-top:15px;
+  display:none;
+}
+
+.success{background:#e8f8ee;color:#16733b}
+.warning{background:#fff5d9;color:#7a5b00}
+.error{background:#ffe9e9;color:#a32121}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td{
+  padding:13px;
+  border-bottom:1px solid #e4e7eb;
+  text-align:left;
+}
+th{background:#f5f7fa}
+
+.match{color:#13833d;font-weight:bold}
+.mismatch{color:#c12727;font-weight:bold}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+.stat{
+  padding:20px;
+  border-radius:14px;
+  background:#f5f7fa;
+}
+.stat strong{
+  display:block;
+  font-size:25px;
+  margin-top:7px;
+}
+
+@media(max-width:700px){
+  .uploads,.summary{grid-template-columns:1fr}
+  table{font-size:13px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<header>
+  📄 Rechnungs- & Bestellvergleich
+</header>
 
-    <aside class="sidebar">
+<main>
 
-        <div class="logo">
-            <span>AI</span> Control
-        </div>
+<div class="card">
+  <h1>Rechnung und Bestellung vergleichen</h1>
+  <p>
+    Lade eine Rechnung und die dazugehörige Bestellung hoch.
+    Die Anwendung vergleicht Artikel, Mengen, Einzelpreise und Gesamtsummen.
+  </p>
 
-        <div class="menu">
+  <div class="uploads">
 
-            <div class="menu-title">Übersicht</div>
-
-            <button class="active" type="button">◉ Dashboard</button>
-            <button type="button">🤖 Meine KIs</button>
-            <button type="button">⚙ Aufgaben</button>
-
-            <div class="menu-title">System</div>
-
-            <button type="button">📊 Statistiken</button>
-            <button type="button">📝 Protokolle</button>
-            <button type="button">⚙ Einstellungen</button>
-
-        </div>
-
-    </aside>
-
-    <main class="main">
-
-        <div class="topbar">
-
-            <div class="title">
-                <h1>KI-Leitstand</h1>
-                <p>Überblick über deine KI-Agenten</p>
-            </div>
-
-            <div class="right">
-
-                <div class="live">
-                    <div class="live-dot"></div>
-                    System online
-                </div>
-
-                <button
-                    class="upgrade"
-                    id="upgradeButton"
-                    type="button">
-                    Upgrade
-                </button>
-
-            </div>
-
-        </div>
-
-        <div class="stats">
-
-            <div class="stat">
-                <div class="stat-label">KIs insgesamt</div>
-                <div class="stat-value" id="total">0</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-label">Gerade aktiv</div>
-                <div class="stat-value" id="active">0</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-label">Warten</div>
-                <div class="stat-value" id="waiting">0</div>
-            </div>
-
-            <div class="stat">
-                <div class="stat-label">Nichts zu tun</div>
-                <div class="stat-value" id="idle">0</div>
-            </div>
-
-        </div>
-
-        <div class="section-header">
-            <h2>Meine KI-Agenten</h2>
-        </div>
-
-        <div class="agents" id="agents"></div>
-
-    </main>
-
-</div>
-
-
-<!-- UPGRADE MODAL -->
-
-<div
-    class="modal-bg"
-    id="upgradeModal"
-    aria-hidden="true">
-
-    <div
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="upgradeTitle">
-
-        <div class="modal-header">
-
-            <h2 id="upgradeTitle">🤖 KI-Agenten hinzufügen</h2>
-
-            <button
-                class="close"
-                type="button"
-                data-close="upgradeModal"
-                aria-label="Fenster schließen">
-                ×
-            </button>
-
-        </div>
-
-        <p class="modal-description">
-            Wähle einen Agenten für dein Unternehmen.
-        </p>
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-icon">📧</div>
-
-            <div class="upgrade-info">
-                <h3>E-Mail-Agent</h3>
-                <p>
-                    E-Mails analysieren und Antwortvorschläge erstellen.
-                </p>
-            </div>
-
-            <button
-                class="add-agent"
-                type="button"
-                data-install="email">
-                Installieren
-            </button>
-
-        </div>
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-icon">📊</div>
-
-            <div class="upgrade-info">
-                <h3>Daten-Agent</h3>
-                <p>
-                    Unternehmensdaten auswerten und Erkenntnisse liefern.
-                </p>
-            </div>
-
-            <button
-                class="add-agent"
-                type="button"
-                data-install="data">
-                Installieren
-            </button>
-
-        </div>
-
-        <div class="upgrade-card">
-
-            <div class="upgrade-icon">📄</div>
-
-            <div class="upgrade-info">
-                <h3>Dokumenten-Agent</h3>
-                <p>
-                    Dokumente analysieren und zusammenfassen.
-                </p>
-            </div>
-
-            <button
-                class="add-agent"
-                type="button"
-                data-install="document">
-                Installieren
-            </button>
-
-        </div>
-
+    <div class="upload">
+      <h2>🧾 Rechnung</h2>
+      <p>PDF, TXT, CSV oder JSON</p>
+      <input id="invoiceFile" type="file"
+             accept=".pdf,.txt,.csv,.json">
     </div>
 
-</div>
-
-
-<!-- EMAIL MODAL -->
-
-<div
-    class="modal-bg"
-    id="emailModal"
-    aria-hidden="true">
-
-    <div
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="emailTitle">
-
-        <div class="modal-header">
-
-            <h2 id="emailTitle">📧 E-Mail-Agent einrichten</h2>
-
-            <button
-                class="close"
-                type="button"
-                data-close="emailModal"
-                aria-label="Fenster schließen">
-                ×
-            </button>
-
-        </div>
-
-        <p class="modal-description">
-            Lade eine E-Mail-Datei hoch. Die KI analysiert den Inhalt
-            und erstellt anschließend einen Antwortvorschlag.
-        </p>
-
-        <label class="upload-area">
-
-            <input
-                type="file"
-                id="mailFile"
-                accept=".txt,.eml">
-
-            <div style="font-size:35px;">📤</div>
-
-            <div style="margin-top:8px;">
-                E-Mail-Datei auswählen
-            </div>
-
-            <div
-                style="font-size:12px;color:#656b78;margin-top:8px;">
-                Unterstützt: TXT und EML
-            </div>
-
-        </label>
-
-        <div
-            class="file-name"
-            id="fileName">
-            Keine Datei ausgewählt
-        </div>
-
-        <button
-            class="start-analysis"
-            id="analyzeButton"
-            type="button"
-            disabled>
-            🔍 E-Mail analysieren
-        </button>
-
-        <div
-            class="analysis"
-            id="analysis">
-
-            <div class="progress">
-                <div
-                    class="progress-bar"
-                    id="progressBar">
-                </div>
-            </div>
-
-            <div
-                class="analysis-text analyzing"
-                id="analysisText">
-                KI wird gestartet...
-            </div>
-
-        </div>
-
-        <div
-            class="result"
-            id="result">
-
-            <div class="result-box">
-
-                <div class="result-title">
-                    ANALYSE
-                </div>
-
-                <div id="analysisResult">
-                </div>
-
-            </div>
-
-            <div class="result-box">
-
-                <div class="result-title">
-                    ANTWORTSVORSCHLAG
-                </div>
-
-                <textarea
-                    class="reply"
-                    id="replyText"
-                    spellcheck="true">
-                </textarea>
-
-                <button
-                    class="copy"
-                    id="copyButton"
-                    type="button">
-                    📋 Antwort kopieren
-                </button>
-
-            </div>
-
-        </div>
-
+    <div class="upload">
+      <h2>📦 Bestellung</h2>
+      <p>PDF, TXT, CSV oder JSON</p>
+      <input id="orderFile" type="file"
+             accept=".pdf,.txt,.csv,.json">
     </div>
 
+  </div>
+
+  <button class="primary" onclick="compareFiles()">
+    🔍 Dateien vergleichen
+  </button>
+
+  <div id="status" class="status"></div>
 </div>
+
+
+<div id="results" style="display:none">
+
+  <div class="card">
+    <h2>Ergebnis</h2>
+
+    <div class="summary">
+
+      <div class="stat">
+        Artikel
+        <strong id="articleCount">0</strong>
+      </div>
+
+      <div class="stat">
+        Übereinstimmungen
+        <strong id="matchCount">0</strong>
+      </div>
+
+      <div class="stat">
+        Abweichungen
+        <strong id="differenceCount">0</strong>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="card">
+    <h2>Artikelvergleich</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Artikel</th>
+          <th>Bestellung</th>
+          <th>Rechnung</th>
+          <th>Preis Bestellung</th>
+          <th>Preis Rechnung</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="comparisonTable"></tbody>
+    </table>
+  </div>
+
+
+  <div class="card">
+    <h2>💰 Summenvergleich</h2>
+
+    <table>
+      <tr>
+        <td>Bestellsumme</td>
+        <td id="orderTotal">0,00 €</td>
+      </tr>
+
+      <tr>
+        <td>Rechnungssumme</td>
+        <td id="invoiceTotal">0,00 €</td>
+      </tr>
+
+      <tr>
+        <td><strong>Differenz</strong></td>
+        <td id="totalDifference"><strong>0,00 €</strong></td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+</main>
 
 
 <script>
-"use strict";
 
-/* -----------------------------
-   STATE
------------------------------ */
+function showStatus(text,type){
 
-const agents = [];
-let selectedFile = null;
+  const status=document.getElementById("status");
 
+  status.style.display="block";
+  status.className="status "+type;
+  status.textContent=text;
 
-/* -----------------------------
-   AGENT TYPES
------------------------------ */
-
-const types = {
-    email: {
-        name: "E-Mail-Agent",
-        icon: "📧",
-        model: "Business Mail AI"
-    },
-
-    data: {
-        name: "Daten-Agent",
-        icon: "📊",
-        model: "Business Data AI"
-    },
-
-    document: {
-        name: "Dokumenten-Agent",
-        icon: "📄",
-        model: "Document AI"
-    }
-};
-
-
-/* -----------------------------
-   ELEMENTS
------------------------------ */
-
-const agentsContainer =
-    document.getElementById("agents");
-
-const totalElement =
-    document.getElementById("total");
-
-const activeElement =
-    document.getElementById("active");
-
-const waitingElement =
-    document.getElementById("waiting");
-
-const idleElement =
-    document.getElementById("idle");
-
-const upgradeModal =
-    document.getElementById("upgradeModal");
-
-const emailModal =
-    document.getElementById("emailModal");
-
-const mailFile =
-    document.getElementById("mailFile");
-
-const fileName =
-    document.getElementById("fileName");
-
-const analyzeButton =
-    document.getElementById("analyzeButton");
-
-const analysis =
-    document.getElementById("analysis");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-const analysisText =
-    document.getElementById("analysisText");
-
-const result =
-    document.getElementById("result");
-
-const analysisResult =
-    document.getElementById("analysisResult");
-
-const replyText =
-    document.getElementById("replyText");
-
-
-/* -----------------------------
-   MODAL SYSTEM
------------------------------ */
-
-function openModal(modal) {
-    if (!modal) return;
-
-    modal.classList.add("show");
-    modal.setAttribute("aria-hidden", "false");
-
-    document.body.style.overflow = "hidden";
-}
-
-function closeModal(modal) {
-    if (!modal) return;
-
-    modal.classList.remove("show");
-    modal.setAttribute("aria-hidden", "true");
-
-    const anotherModalIsOpen =
-        document.querySelector(".modal-bg.show");
-
-    if (!anotherModalIsOpen) {
-        document.body.style.overflow = "";
-    }
-}
-
-function closeAllModals() {
-    document
-        .querySelectorAll(".modal-bg.show")
-        .forEach(modal => {
-            modal.classList.remove("show");
-            modal.setAttribute("aria-hidden", "true");
-        });
-
-    document.body.style.overflow = "";
 }
 
 
-/* Upgrade öffnen */
+async function readFile(file){
 
-document
-    .getElementById("upgradeButton")
-    .addEventListener("click", () => {
-        openModal(upgradeModal);
-    });
+  if(!file) return "";
 
+  const name=file.name.toLowerCase();
 
-/* Schließen */
+  /*
+     TXT / CSV / JSON können direkt gelesen werden.
+     PDFs werden hier bewusst nicht automatisch ausgelesen,
+     weil dafür normalerweise ein PDF-Parser benötigt wird.
+  */
 
-document
-    .querySelectorAll("[data-close]")
-    .forEach(button => {
+  if(
+    name.endsWith(".txt") ||
+    name.endsWith(".csv") ||
+    name.endsWith(".json")
+  ){
+    return await file.text();
+  }
 
-        button.addEventListener("click", () => {
-
-            const id =
-                button.getAttribute("data-close");
-
-            const modal =
-                document.getElementById(id);
-
-            closeModal(modal);
-        });
-    });
-
-
-/* Klick auf dunklen Hintergrund */
-
-document
-    .querySelectorAll(".modal-bg")
-    .forEach(modal => {
-
-        modal.addEventListener("click", event => {
-
-            if (event.target === modal) {
-                closeModal(modal);
-            }
-
-        });
-
-    });
-
-
-/* ESC */
-
-document.addEventListener("keydown", event => {
-
-    if (event.key === "Escape") {
-        closeAllModals();
-    }
-
-});
-
-
-/* -----------------------------
-   INSTALL AGENT
------------------------------ */
-
-document
-    .querySelectorAll("[data-install]")
-    .forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            const type =
-                button.getAttribute("data-install");
-
-            installAgent(type);
-
-        });
-
-    });
-
-
-function installAgent(type) {
-
-    if (!types[type]) {
-        return;
-    }
-
-    const alreadyExists =
-        agents.some(agent => agent.type === type);
-
-    if (alreadyExists) {
-        return;
-    }
-
-    const data = types[type];
-
-    agents.push({
-        type,
-        name: data.name,
-        icon: data.icon,
-        model: data.model,
-        status: "idle",
-        task: "Nichts zu tun"
-    });
-
-    renderAgents();
-    closeModal(upgradeModal);
+  return "";
 }
 
 
-/* -----------------------------
-   DELETE AGENT
------------------------------ */
+function parseData(text){
 
-function deleteAgent(index) {
+  /*
+    Unterstütztes Format:
 
-    if (!Number.isInteger(index)) {
-        return;
+    Artikel;Menge;Preis
+
+    Milch;2;1.50
+    Brot;1;2.20
+  */
+
+  const result=[];
+
+  const lines=text
+    .split(/\r?\n/)
+    .map(x=>x.trim())
+    .filter(Boolean);
+
+  for(const line of lines){
+
+    if(
+      line.toLowerCase().includes("artikel") &&
+      line.toLowerCase().includes("menge")
+    ){
+      continue;
     }
 
-    const agent = agents[index];
+    const parts=line.split(";");
 
-    if (!agent) {
-        return;
-    }
+    if(parts.length<3) continue;
 
-    const confirmed = window.confirm(
-        "Soll " + agent.name + " wirklich gelöscht werden?"
+    const name=parts[0].trim();
+    const quantity=parseFloat(
+      parts[1].replace(",",".")
     );
 
-    if (!confirmed) {
-        return;
-    }
-
-    agents.splice(index, 1);
-
-    renderAgents();
-}
-
-
-/* -----------------------------
-   SETUP AGENT
------------------------------ */
-
-function setupAgent(index) {
-
-    if (!Number.isInteger(index)) {
-        return;
-    }
-
-    const agent = agents[index];
-
-    if (!agent) {
-        return;
-    }
-
-    if (agent.type === "email") {
-
-        resetMailModal();
-
-        openModal(emailModal);
-
-        return;
-    }
-
-    window.alert(
-        agent.name +
-        " ist vorhanden. Die Einrichtung dieses Agenten kommt später."
+    const price=parseFloat(
+      parts[2]
+        .replace("€","")
+        .replace(",",".")
+        .trim()
     );
+
+    if(
+      name &&
+      !isNaN(quantity) &&
+      !isNaN(price)
+    ){
+      result.push({
+        name,
+        quantity,
+        price
+      });
+    }
+  }
+
+  return result;
 }
 
 
-/* -----------------------------
-   RENDER AGENTS
------------------------------ */
+async function compareFiles(){
 
-function renderAgents() {
+  const invoice=document.getElementById("invoiceFile").files[0];
+  const order=document.getElementById("orderFile").files[0];
 
-    agentsContainer.innerHTML = "";
+  if(!invoice || !order){
 
-    let active = 0;
-    let waiting = 0;
-    let idle = 0;
+    showStatus(
+      "Bitte zuerst Rechnung und Bestellung auswählen.",
+      "warning"
+    );
+
+    return;
+  }
+
+  showStatus(
+    "Dateien werden geprüft...",
+    "warning"
+  );
+
+  const invoiceText=await readFile(invoice);
+  const orderText=await readFile(order);
+
+  if(!invoiceText || !orderText){
+
+    showStatus(
+      "Für diese Demo werden TXT, CSV oder JSON benötigt. PDF-Dateien können mit einem Server/PDF-Parser ergänzt werden.",
+      "error"
+    );
+
+    return;
+  }
+
+  let invoiceData=[];
+  let orderData=[];
 
 
-    if (agents.length === 0) {
+  try{
 
-        agentsContainer.innerHTML = `
-            <div class="empty">
-                Noch keine KI-Agenten installiert.<br>
-                Klicke oben rechts auf <b>Upgrade</b>.
-            </div>
-        `;
-
+    if(invoice.name.toLowerCase().endsWith(".json")){
+      invoiceData=JSON.parse(invoiceText);
+    }else{
+      invoiceData=parseData(invoiceText);
     }
 
+    if(order.name.toLowerCase().endsWith(".json")){
+      orderData=JSON.parse(orderText);
+    }else{
+      orderData=parseData(orderText);
+    }
 
-    agents.forEach((agent, index) => {
+  }catch(e){
 
-        if (agent.status === "working") {
-            active++;
-        } else if (agent.status === "waiting") {
-            waiting++;
-        } else {
-            idle++;
-        }
+    showStatus(
+      "Eine Datei konnte nicht gelesen werden.",
+      "error"
+    );
 
-
-        let statusText = "Nichts zu tun";
-        let statusClass = "idle";
-
-        if (agent.status === "working") {
-            statusText = "Arbeitet";
-            statusClass = "working";
-        }
-
-        if (agent.status === "waiting") {
-            statusText = "Wartet";
-            statusClass = "waiting";
-        }
+    return;
+  }
 
 
-        const card =
-            document.createElement("div");
-
-        card.className = "agent";
-
-
-        card.innerHTML = `
-            <div class="agent-top">
-
-                <div class="agent-name">
-
-                    <div class="agent-icon">
-                        ${escapeHtml(agent.icon)}
-                    </div>
-
-                    <span>
-                        ${escapeHtml(agent.name)}
-                    </span>
-
-                </div>
-
-                <div class="status ${statusClass}">
-                    ${statusText}
-                </div>
-
-            </div>
-
-            <div class="task">
-
-                <div class="task-label">
-                    AKTUELLE AUFGABE
-                </div>
-
-                <div class="task-text">
-                    ${escapeHtml(agent.task)}
-                </div>
-
-            </div>
-
-            <div class="meta">
-
-                <span>
-                    ${escapeHtml(agent.model)}
-                </span>
-
-                <span>
-                    ${
-                        agent.status === "idle"
-                            ? "Keine Aktivität"
-                            : "Gerade aktiv"
-                    }
-                </span>
-
-            </div>
-
-            <div class="agent-actions">
-
-                ${
-                    agent.status === "idle"
-                        ? `
-                        <button
-                            class="setup"
-                            type="button"
-                            data-setup-index="${index}">
-                            Einrichten
-                        </button>
-                        `
-                        : ""
-                }
-
-                <button
-                    class="delete"
-                    type="button"
-                    data-delete-index="${index}">
-                    🗑 Löschen
-                </button>
-
-            </div>
-        `;
-
-
-        agentsContainer.appendChild(card);
-
-    });
-
-
-    totalElement.textContent = agents.length;
-    activeElement.textContent = active;
-    waitingElement.textContent = waiting;
-    idleElement.textContent = idle;
-
-
-    /* Setup-Buttons */
-
-    agentsContainer
-        .querySelectorAll("[data-setup-index]")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                const index =
-                    Number(button.dataset.setupIndex);
-
-                setupAgent(index);
-            });
-
-        });
-
-
-    /* Delete-Buttons */
-
-    agentsContainer
-        .querySelectorAll("[data-delete-index]")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                const index =
-                    Number(button.dataset.deleteIndex);
-
-                deleteAgent(index);
-            });
-
-        });
-
+  compare(orderData,invoiceData);
 }
 
 
-/* -----------------------------
-   FILE SELECTION
------------------------------ */
+function compare(orderData,invoiceData){
 
-mailFile.addEventListener("change", () => {
+  const table=document.getElementById(
+    "comparisonTable"
+  );
 
-    selectedFile =
-        mailFile.files && mailFile.files.length
-            ? mailFile.files[0]
-            : null;
+  table.innerHTML="";
+
+  let matches=0;
+  let differences=0;
+
+  let orderTotal=0;
+  let invoiceTotal=0;
+
+  const invoiceMap=new Map();
+
+  invoiceData.forEach(item=>{
+    invoiceMap.set(
+      item.name.toLowerCase(),
+      item
+    );
+
+    invoiceTotal += item.quantity * item.price;
+  });
 
 
-    if (!selectedFile) {
+  orderData.forEach(orderItem=>{
 
-        fileName.textContent =
-            "Keine Datei ausgewählt";
+    orderTotal +=
+      orderItem.quantity * orderItem.price;
 
-        analyzeButton.disabled = true;
+    const invoiceItem=
+      invoiceMap.get(
+        orderItem.name.toLowerCase()
+      );
 
-        return;
+
+    let status="✓ Gleich";
+    let className="match";
+
+
+    if(!invoiceItem){
+
+      status="✕ Fehlt auf Rechnung";
+      className="mismatch";
+
+      differences++;
+
+    }else{
+
+      const quantitySame=
+        orderItem.quantity ===
+        invoiceItem.quantity;
+
+      const priceSame=
+        Math.abs(
+          orderItem.price -
+          invoiceItem.price
+        ) < 0.001;
+
+      if(quantitySame && priceSame){
+
+        matches++;
+
+      }else{
+
+        status="⚠ Abweichung";
+        className="mismatch";
+
+        differences++;
+      }
+
     }
 
 
-    const extension =
-        selectedFile.name
-            .split(".")
-            .pop()
-            .toLowerCase();
+    const row=document.createElement("tr");
 
+    row.innerHTML=`
 
-    if (extension !== "txt" && extension !== "eml") {
+      <td>${escapeHTML(orderItem.name)}</td>
 
-        selectedFile = null;
-        mailFile.value = "";
+      <td>${orderItem.quantity}</td>
 
-        fileName.textContent =
-            "Nur TXT- und EML-Dateien sind erlaubt.";
-
-        analyzeButton.disabled = true;
-
-        return;
-    }
-
-
-    fileName.textContent =
-        selectedFile.name;
-
-    analyzeButton.disabled = false;
-
-});
-
-
-/* -----------------------------
-   MAIL ANALYSIS
------------------------------ */
-
-analyzeButton.addEventListener(
-    "click",
-    analyzeMail
-);
-
-
-async function analyzeMail() {
-
-    if (!selectedFile) {
-        return;
-    }
-
-
-    analyzeButton.disabled = true;
-
-    result.classList.remove("show");
-    analysis.classList.add("show");
-
-    progressBar.style.width = "0%";
-
-    analysisText.textContent =
-        "KI wird gestartet...";
-
-
-    const steps = [
-        ["E-Mail wird gelesen...", 20],
-        ["Absender und Inhalt werden erkannt...", 40],
-        ["Anliegen wird analysiert...", 60],
-        ["Kontext wird verarbeitet...", 80],
-        ["Antwort wird erstellt...", 95]
-    ];
-
-
-    try {
-
-        for (const [message, percentage] of steps) {
-
-            analysisText.textContent = message;
-            progressBar.style.width =
-                percentage + "%";
-
-            await sleep(550);
-
+      <td>
+        ${
+          invoiceItem
+          ? invoiceItem.quantity
+          : "—"
         }
+      </td>
 
+      <td>${formatEuro(orderItem.price)}</td>
 
-        const formData =
-            new FormData();
-
-        formData.append(
-            "mail",
-            selectedFile
-        );
-
-
-        const response =
-            await fetch(
-                "/api/analyze-mail",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error ||
-                "Analyse fehlgeschlagen."
-            );
-
+      <td>
+        ${
+          invoiceItem
+          ? formatEuro(invoiceItem.price)
+          : "—"
         }
+      </td>
+
+      <td class="${className}">
+        ${status}
+      </td>
+
+    `;
+
+    table.appendChild(row);
+
+  });
 
 
-        progressBar.style.width = "100%";
-
-        analysisText.classList.remove("analyzing");
-
-        analysisText.textContent =
-            "Analyse abgeschlossen.";
-
-
-        analysisResult.innerHTML = `
-            <strong>Betreff:</strong>
-            ${escapeHtml(data.subject || "Nicht erkannt")}
-            <br><br>
-
-            <strong>Anliegen:</strong>
-            ${escapeHtml(data.intent || "Nicht erkannt")}
-            <br><br>
-
-            <strong>Priorität:</strong>
-            ${escapeHtml(data.priority || "Normal")}
-        `;
+  const orderNames=
+    new Set(
+      orderData.map(
+        x=>x.name.toLowerCase()
+      )
+    );
 
 
-        replyText.value =
-            data.reply || "";
+  invoiceData.forEach(invoiceItem=>{
 
+    if(!orderNames.has(
+      invoiceItem.name.toLowerCase()
+    )){
 
-        result.classList.add("show");
+      differences++;
 
+      const row=document.createElement("tr");
 
-        const emailAgent =
-            agents.find(
-                agent => agent.type === "email"
-            );
+      row.innerHTML=`
 
+        <td>${escapeHTML(invoiceItem.name)}</td>
+        <td>—</td>
+        <td>${invoiceItem.quantity}</td>
+        <td>—</td>
+        <td>${formatEuro(invoiceItem.price)}</td>
+        <td class="mismatch">
+          ⚠ Nicht bestellt
+        </td>
 
-        if (emailAgent) {
+      `;
 
-            emailAgent.status = "idle";
-            emailAgent.task =
-                "Antwortvorschlag erstellt";
-
-            renderAgents();
-
-        }
-
-    }
-    catch (error) {
-
-        analysisText.classList.remove("analyzing");
-
-        analysisText.textContent =
-            "Fehler: " + error.message;
-
-        progressBar.style.width = "0%";
+      table.appendChild(row);
 
     }
-    finally {
 
-        analyzeButton.disabled =
-            !selectedFile;
+  });
 
-    }
+
+  const difference=
+    invoiceTotal-orderTotal;
+
+
+  document.getElementById(
+    "articleCount"
+  ).textContent=
+    orderData.length;
+
+
+  document.getElementById(
+    "matchCount"
+  ).textContent=
+    matches;
+
+
+  document.getElementById(
+    "differenceCount"
+  ).textContent=
+    differences;
+
+
+  document.getElementById(
+    "orderTotal"
+  ).textContent=
+    formatEuro(orderTotal);
+
+
+  document.getElementById(
+    "invoiceTotal"
+  ).textContent=
+    formatEuro(invoiceTotal);
+
+
+  document.getElementById(
+    "totalDifference"
+  ).textContent=
+    formatEuro(difference);
+
+
+  document.getElementById(
+    "results"
+  ).style.display="block";
+
+
+  if(differences===0){
+
+    showStatus(
+      "✓ Rechnung und Bestellung stimmen vollständig überein.",
+      "success"
+    );
+
+  }else{
+
+    showStatus(
+      "⚠ Es wurden Abweichungen gefunden.",
+      "warning"
+    );
+
+  }
 
 }
 
 
-/* -----------------------------
-   COPY
------------------------------ */
+function formatEuro(value){
 
-document
-    .getElementById("copyButton")
-    .addEventListener("click", async () => {
-
-        const text =
-            replyText.value;
-
-        try {
-
-            await navigator.clipboard.writeText(text);
-
-            const button =
-                document.getElementById("copyButton");
-
-            const oldText =
-                button.textContent;
-
-            button.textContent =
-                "✓ Kopiert";
-
-            setTimeout(() => {
-                button.textContent = oldText;
-            }, 1500);
-
-        }
-        catch {
-
-            replyText.select();
-
-            document.execCommand("copy");
-        }
-
-    });
-
-
-/* -----------------------------
-   RESET EMAIL MODAL
------------------------------ */
-
-function resetMailModal() {
-
-    selectedFile = null;
-
-    mailFile.value = "";
-
-    fileName.textContent =
-        "Keine Datei ausgewählt";
-
-    analyzeButton.disabled = true;
-
-    analysis.classList.remove("show");
-
-    result.classList.remove("show");
-
-    progressBar.style.width = "0%";
-
-    analysisText.classList.add("analyzing");
-
-    analysisText.textContent =
-        "KI wird gestartet...";
-
-    analysisResult.innerHTML = "";
-
-    replyText.value = "";
+  return value.toLocaleString(
+    "de-DE",
+    {
+      style:"currency",
+      currency:"EUR"
+    }
+  );
 
 }
 
 
-/* -----------------------------
-   UTILS
------------------------------ */
+function escapeHTML(value){
 
-function sleep(ms) {
-    return new Promise(resolve => {
-        setTimeout(resolve, ms);
-    });
-}
-
-
-function escapeHtml(value) {
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
-
-/* -----------------------------
-   START
------------------------------ */
-
-renderAgents();
 </script>
 
 </body>
