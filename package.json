@@ -1,7 +1,7 @@
 {
   "name": "lumora-ai",
-  "version": "1.0.0",
-  "description": "Lumora AI Web App",
+  "version": "1.0.1",
+  "description": "Lumora AI with web search",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
