@@ -14,10 +14,6 @@
 
 <style>
 
-/* ======================================================
-   RESET
-====================================================== */
-
 *{
     box-sizing:border-box;
     margin:0;
@@ -31,70 +27,81 @@ body{
 }
 
 body{
+
+    background:#0d0d10;
+
+    color:white;
+
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    background:#0d0d0f;
-
-    color:#fff;
-
     overflow:hidden;
+
 }
 
 
-/* ======================================================
+/* =====================================================
    APP
-====================================================== */
+===================================================== */
 
 .app{
+
     width:100%;
     height:100vh;
 
     display:flex;
+
 }
 
 
-/* ======================================================
+/* =====================================================
    SIDEBAR
-====================================================== */
+===================================================== */
 
 .sidebar{
-    width:250px;
 
-    height:100%;
+    width:245px;
 
-    background:#121215;
+    background:#121216;
 
     border-right:
         1px solid #29292e;
 
     padding:18px;
 
-    display:flex;
-    flex-direction:column;
+    flex-shrink:0;
+
 }
 
 .logo{
+
     display:flex;
 
     align-items:center;
 
     gap:10px;
 
-    font-size:20px;
+    font-size:21px;
 
-    font-weight:700;
+    font-weight:bold;
 
-    margin-bottom:30px;
+    margin-bottom:28px;
+
 }
 
 .logoIcon{
+
     width:38px;
     height:38px;
 
     border-radius:13px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
 
     background:
         linear-gradient(
@@ -106,107 +113,95 @@ body{
             #34a853
         );
 
-    background-size:
-        400% 400%;
+    background-size:400% 400%;
 
     animation:
         rainbow 7s linear infinite;
 
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
 }
 
 .newChat{
-    width:100%;
 
-    padding:13px;
+    width:100%;
 
     border:0;
 
     border-radius:14px;
 
+    padding:13px;
+
     background:#242429;
 
-    color:#fff;
+    color:white;
 
     cursor:pointer;
 
-    font-size:14px;
 }
 
 .newChat:hover{
-    background:#303037;
+
+    background:#303036;
+
 }
 
 .sidebarTitle{
+
     color:#77777f;
 
     font-size:11px;
 
     margin:
         28px 8px 10px;
-}
 
-.history{
-    display:flex;
-
-    flex-direction:column;
-
-    gap:3px;
 }
 
 .historyItem{
+
     padding:11px;
 
     border-radius:10px;
 
-    color:#c7c7cd;
+    color:#c8c8ce;
 
     font-size:13px;
 
-    cursor:pointer;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
 }
 
 .historyItem:hover{
+
     background:#202025;
+
 }
 
 
-/* ======================================================
+/* =====================================================
    MAIN
-====================================================== */
+===================================================== */
 
 .main{
+
     flex:1;
 
     min-width:0;
 
     height:100%;
 
-    position:relative;
-
     display:flex;
 
     flex-direction:column;
+
+    position:relative;
+
 }
 
 
-/* ======================================================
-   TOPBAR
-====================================================== */
+/* =====================================================
+   TOP
+===================================================== */
 
 .topbar{
-    height:65px;
 
-    flex-shrink:0;
+    height:65px;
 
     display:flex;
 
@@ -215,66 +210,62 @@ body{
     justify-content:flex-end;
 
     padding:
-        0 25px;
+        0 24px;
+
 }
 
 .model{
-    background:#1e1e22;
-
-    border:
-        1px solid #303036;
-
-    border-radius:20px;
 
     padding:
         9px 15px;
 
-    color:#d5d5da;
+    border-radius:20px;
+
+    background:#1e1e23;
+
+    border:
+        1px solid #303037;
+
+    color:#d5d5db;
 
     font-size:13px;
+
 }
 
 
-/* ======================================================
+/* =====================================================
    CHAT
-====================================================== */
+===================================================== */
 
 .chat{
+
     flex:1;
 
     overflow-y:auto;
 
     padding:
-        20px 20px 190px;
+        20px 20px 200px;
 
-    scroll-behavior:smooth;
-}
-
-.chat::-webkit-scrollbar{
-    width:7px;
-}
-
-.chat::-webkit-scrollbar-thumb{
-    background:#33333a;
-
-    border-radius:10px;
 }
 
 .chatInner{
+
     width:
         min(900px,100%);
 
     margin:auto;
+
 }
 
 
-/* ======================================================
-   START SCREEN
-====================================================== */
+/* =====================================================
+   START
+===================================================== */
 
-.startScreen{
+.start{
+
     min-height:
-        calc(100vh - 180px);
+        calc(100vh - 200px);
 
     display:flex;
 
@@ -284,102 +275,88 @@ body{
 
     align-items:center;
 
-    text-align:center;
 }
 
-.aiName{
-    font-size:
-        clamp(45px,7vw,72px);
+.lumora{
 
-    font-weight:700;
+    font-size:
+        clamp(52px,8vw,76px);
+
+    font-weight:bold;
 
     letter-spacing:-4px;
-
-    margin-bottom:8px;
 
     background:
         linear-gradient(
             90deg,
             #4285f4,
-            #8e75d9,
+            #9b72cb,
             #d96570,
             #fbbc04,
             #34a853,
             #4285f4
         );
 
-    background-size:
-        500% 500%;
-
-    -webkit-background-clip:
-        text;
-
-    background-clip:
-        text;
-
-    color:transparent;
+    background-size:500% 500%;
 
     animation:
         rainbow 7s linear infinite;
+
+    -webkit-background-clip:text;
+
+    background-clip:text;
+
+    color:transparent;
+
 }
 
-.subtitle{
+.startText{
+
     color:#77777f;
 
-    font-size:14px;
+    margin-top:8px;
+
 }
 
 
-/* ======================================================
-   MESSAGES
-====================================================== */
+/* =====================================================
+   MESSAGE
+===================================================== */
 
 .message{
-    width:100%;
+
+    margin-bottom:28px;
+
+}
+
+.user{
 
     display:flex;
 
-    margin-bottom:25px;
-}
-
-.message.user{
     justify-content:flex-end;
-}
 
-.message.ai{
-    justify-content:flex-start;
 }
 
 .userBubble{
-    max-width:
-        min(720px,85%);
 
-    background:#29292f;
-
-    border-radius:
-        22px 22px 5px 22px;
+    max-width:80%;
 
     padding:
         13px 17px;
 
-    color:#f1f1f3;
+    border-radius:
+        22px 22px 5px 22px;
 
-    line-height:1.5;
+    background:#29292f;
 
     white-space:pre-wrap;
 
-    word-break:break-word;
-}
+    line-height:1.5;
 
-.aiMessage{
-    width:
-        min(850px,100%);
-
-    padding:
-        4px 0;
 }
 
 .aiHeader{
+
     display:flex;
 
     align-items:center;
@@ -388,325 +365,21 @@ body{
 
     margin-bottom:10px;
 
-    color:#dddde2;
+    font-weight:bold;
 
-    font-weight:600;
 }
 
-.aiSmallIcon{
-    width:28px;
-    height:28px;
+.aiIcon{
+
+    width:29px;
+    height:29px;
 
     border-radius:9px;
 
-    background:
-        linear-gradient(
-            135deg,
-            #4285f4,
-            #9b72cb,
-            #d96570,
-            #fbbc04
-        );
-
     display:flex;
 
     align-items:center;
-
     justify-content:center;
-
-    font-size:14px;
-}
-
-.aiText{
-    color:#dddde1;
-
-    line-height:1.6;
-
-    font-size:15px;
-}
-
-
-/* ======================================================
-   SEARCH RESULTS INSIDE MESSAGE
-====================================================== */
-
-.searchIntro{
-    margin-bottom:14px;
-
-    color:#d5d5da;
-
-    font-size:15px;
-}
-
-.searchResults{
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
-}
-
-.searchResult{
-    display:block;
-
-    text-decoration:none;
-
-    background:#18181d;
-
-    border:
-        1px solid #2c2c32;
-
-    border-radius:15px;
-
-    padding:15px;
-
-    transition:.2s;
-}
-
-.searchResult:hover{
-    background:#202027;
-
-    border-color:#44444c;
-
-    transform:
-        translateY(-1px);
-}
-
-.searchResultTitle{
-    color:#8ab4f8;
-
-    font-size:16px;
-
-    font-weight:600;
-
-    margin-bottom:7px;
-}
-
-.searchResultDescription{
-    color:#c3c3ca;
-
-    font-size:13px;
-
-    line-height:1.5;
-}
-
-.searchResultUrl{
-    color:#65b879;
-
-    font-size:11px;
-
-    margin-top:9px;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-    white-space:nowrap;
-}
-
-.searchInfo{
-    margin-top:13px;
-
-    color:#77777f;
-
-    font-size:12px;
-}
-
-.searchError{
-    background:#1b1718;
-
-    border:
-        1px solid #4b2c30;
-
-    border-radius:14px;
-
-    padding:15px;
-
-    color:#ddd;
-}
-
-.searchErrorTitle{
-    color:#f28b82;
-
-    font-weight:600;
-
-    margin-bottom:7px;
-}
-
-
-/* ======================================================
-   IMAGE
-====================================================== */
-
-.imageMessage{
-    display:flex;
-
-    gap:8px;
-
-    flex-wrap:wrap;
-
-    margin-top:10px;
-}
-
-.imageMessage img{
-    width:100px;
-    height:100px;
-
-    object-fit:cover;
-
-    border-radius:13px;
-
-    border:
-        1px solid #3b3b42;
-}
-
-
-/* ======================================================
-   INPUT AREA
-====================================================== */
-
-.inputArea{
-    position:absolute;
-
-    left:0;
-    right:0;
-    bottom:0;
-
-    z-index:50;
-
-    padding:
-        15px 20px 20px;
-
-    background:
-        linear-gradient(
-            to top,
-            #0d0d0f 68%,
-            transparent
-        );
-}
-
-.inputWrapper{
-    width:
-        min(850px,100%);
-
-    margin:auto;
-}
-
-.inputBox{
-    padding:5px;
-
-    border-radius:30px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #4285f4,
-            #8e75d9,
-            #d96570,
-            #fbbc04,
-            #34a853,
-            #4285f4
-        );
-
-    background-size:
-        500% 500%;
-
-    animation:
-        rainbow 7s linear infinite;
-}
-
-.inputInner{
-    min-height:155px;
-
-    border-radius:26px;
-
-    background:#17171b;
-
-    padding:20px;
-
-    display:flex;
-
-    flex-direction:column;
-}
-
-textarea{
-    width:100%;
-
-    min-height:70px;
-
-    max-height:130px;
-
-    resize:none;
-
-    outline:none;
-
-    border:0;
-
-    background:transparent;
-
-    color:#fff;
-
-    font-family:inherit;
-
-    font-size:17px;
-
-    line-height:1.5;
-}
-
-textarea::placeholder{
-    color:#77777f;
-}
-
-.inputBottom{
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    margin-top:12px;
-}
-
-.buttonGroup{
-    display:flex;
-
-    gap:8px;
-}
-
-.iconButton{
-    width:40px;
-    height:40px;
-
-    border:0;
-
-    border-radius:50%;
-
-    background:#25252b;
-
-    color:#fff;
-
-    cursor:pointer;
-
-    font-size:18px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-}
-
-.iconButton:hover{
-    background:#36363d;
-}
-
-.sendButton{
-    width:44px;
-    height:44px;
-
-    border:0;
-
-    border-radius:50%;
 
     background:
         linear-gradient(
@@ -716,142 +389,433 @@ textarea::placeholder{
             #d96570
         );
 
-    color:#fff;
+}
+
+.aiContent{
+
+    color:#dedee3;
+
+    line-height:1.6;
+
+}
+
+
+/* =====================================================
+   SEARCH ANSWER
+===================================================== */
+
+.answerBox{
+
+    padding:16px;
+
+    border-radius:17px;
+
+    background:#18181d;
+
+    border:
+        1px solid #2d2d34;
+
+    margin-bottom:12px;
+
+}
+
+.answerTitle{
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    margin-bottom:9px;
+
+}
+
+.answerText{
+
+    color:#d3d3d8;
+
+    line-height:1.6;
+
+}
+
+.source{
+
+    display:inline-block;
+
+    margin-top:12px;
+
+    color:#8ab4f8;
+
+    text-decoration:none;
+
+    font-size:12px;
+
+}
+
+.source:hover{
+
+    text-decoration:underline;
+
+}
+
+
+/* =====================================================
+   TOPICS
+===================================================== */
+
+.topicList{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+.topic{
+
+    display:block;
+
+    text-decoration:none;
+
+    background:#18181d;
+
+    border:
+        1px solid #2b2b31;
+
+    padding:14px;
+
+    border-radius:14px;
+
+}
+
+.topic:hover{
+
+    background:#202026;
+
+}
+
+.topicTitle{
+
+    color:#8ab4f8;
+
+    font-weight:bold;
+
+    margin-bottom:5px;
+
+}
+
+.topicText{
+
+    color:#bdbdc4;
+
+    font-size:13px;
+
+    line-height:1.5;
+
+}
+
+
+/* =====================================================
+   IMAGE
+===================================================== */
+
+.resultImage{
+
+    max-width:260px;
+
+    max-height:180px;
+
+    object-fit:cover;
+
+    border-radius:14px;
+
+    margin-bottom:14px;
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading{
+
+    color:#9999a2;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+}
+
+.dots{
+
+    display:flex;
+
+    gap:4px;
+
+}
+
+.dot{
+
+    width:6px;
+    height:6px;
+
+    background:#888;
+
+    border-radius:50%;
+
+    animation:
+        pulse 1s infinite alternate;
+
+}
+
+.dot:nth-child(2){
+
+    animation-delay:.2s;
+
+}
+
+.dot:nth-child(3){
+
+    animation-delay:.4s;
+
+}
+
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.error{
+
+    padding:15px;
+
+    border-radius:15px;
+
+    background:#21191b;
+
+    border:
+        1px solid #503136;
+
+    color:#ddd;
+
+}
+
+.error strong{
+
+    display:block;
+
+    color:#f28b82;
+
+    margin-bottom:6px;
+
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.inputArea{
+
+    position:absolute;
+
+    bottom:0;
+
+    left:0;
+    right:0;
+
+    padding:
+        15px 20px 20px;
+
+    background:
+        linear-gradient(
+            to top,
+            #0d0d10 70%,
+            transparent
+        );
+
+}
+
+.inputWrapper{
+
+    width:
+        min(850px,100%);
+
+    margin:auto;
+
+}
+
+.inputBox{
+
+    padding:5px;
+
+    border-radius:30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #4285f4,
+            #9b72cb,
+            #d96570,
+            #fbbc04,
+            #34a853,
+            #4285f4
+        );
+
+    background-size:500% 500%;
+
+    animation:
+        rainbow 7s linear infinite;
+
+}
+
+.inputInner{
+
+    background:#17171b;
+
+    border-radius:26px;
+
+    padding:19px;
+
+    min-height:150px;
+
+}
+
+textarea{
+
+    width:100%;
+
+    min-height:70px;
+
+    max-height:130px;
+
+    resize:none;
+
+    border:0;
+
+    outline:0;
+
+    background:transparent;
+
+    color:white;
+
+    font-size:17px;
+
+    font-family:inherit;
+
+}
+
+textarea::placeholder{
+
+    color:#77777f;
+
+}
+
+.inputBottom{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:12px;
+
+}
+
+.buttons{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+.iconButton,
+.sendButton{
+
+    width:42px;
+    height:42px;
+
+    border:0;
+
+    border-radius:50%;
 
     cursor:pointer;
 
-    font-size:20px;
+    color:white;
 
     display:flex;
 
     align-items:center;
 
     justify-content:center;
+
 }
 
-.sendButton:hover{
-    transform:scale(1.07);
+.iconButton{
+
+    background:#27272d;
+
+}
+
+.iconButton:hover{
+
+    background:#36363d;
+
+}
+
+.sendButton{
+
+    background:
+        linear-gradient(
+            135deg,
+            #4285f4,
+            #9b72cb,
+            #d96570
+        );
+
+    font-size:19px;
+
 }
 
 .sendButton:disabled{
+
     opacity:.5;
 
     cursor:wait;
 
-    transform:none;
 }
 
 #imageInput{
-    display:none;
-}
 
-
-/* ======================================================
-   IMAGE PREVIEW
-====================================================== */
-
-.preview{
     display:none;
 
-    gap:8px;
-
-    margin-bottom:10px;
-
-    overflow-x:auto;
 }
-
-.preview.show{
-    display:flex;
-}
-
-.previewItem{
-    flex-shrink:0;
-}
-
-.previewItem img{
-    width:62px;
-    height:62px;
-
-    object-fit:cover;
-
-    border-radius:11px;
-
-    border:
-        1px solid #444;
-}
-
-
-/* ======================================================
-   STATUS
-====================================================== */
 
 .status{
-    height:18px;
 
-    margin-top:7px;
+    height:18px;
 
     text-align:center;
 
     color:#77777f;
 
     font-size:11px;
-}
-
-.footer{
-    text-align:center;
-
-    color:#55555c;
-
-    font-size:10px;
 
     margin-top:7px;
+
 }
 
 
-/* ======================================================
-   LOADING
-====================================================== */
-
-.loading{
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    color:#aaaab1;
-}
-
-.loadingDots{
-    display:flex;
-
-    gap:4px;
-}
-
-.dot{
-    width:6px;
-    height:6px;
-
-    border-radius:50%;
-
-    background:#888;
-
-    animation:
-        pulse 1s infinite alternate;
-}
-
-.dot:nth-child(2){
-    animation-delay:.2s;
-}
-
-.dot:nth-child(3){
-    animation-delay:.4s;
-}
-
-
-/* ======================================================
+/* =====================================================
    ANIMATION
-====================================================== */
+===================================================== */
 
 @keyframes rainbow{
 
@@ -859,16 +823,8 @@ textarea::placeholder{
         background-position:0% 50%;
     }
 
-    25%{
-        background-position:50% 100%;
-    }
-
     50%{
         background-position:100% 50%;
-    }
-
-    75%{
-        background-position:50% 0%;
     }
 
     100%{
@@ -890,9 +846,9 @@ textarea::placeholder{
 }
 
 
-/* ======================================================
+/* =====================================================
    MOBILE
-====================================================== */
+===================================================== */
 
 @media(max-width:700px){
 
@@ -900,31 +856,14 @@ textarea::placeholder{
         display:none;
     }
 
-    .topbar{
-        height:55px;
-
-        padding:
-            0 15px;
-    }
-
     .chat{
         padding:
-            15px 13px 190px;
+            15px 12px 195px;
     }
 
     .inputArea{
         padding:
-            10px 10px 14px;
-    }
-
-    .inputInner{
-        min-height:145px;
-
-        padding:16px;
-    }
-
-    .aiName{
-        font-size:50px;
+            10px;
     }
 
     .userBubble{
@@ -942,9 +881,7 @@ textarea::placeholder{
 <div class="app">
 
 
-<!-- =====================================================
-     SIDEBAR
-===================================================== -->
+<!-- SIDEBAR -->
 
 <aside class="sidebar">
 
@@ -954,7 +891,7 @@ textarea::placeholder{
             ✦
         </div>
 
-        <span>Lumora</span>
+        Lumora
 
     </div>
 
@@ -972,10 +909,7 @@ textarea::placeholder{
     </div>
 
 
-    <div
-        id="history"
-        class="history"
-    >
+    <div id="history">
 
         <div class="historyItem">
             Neuer Chat
@@ -986,135 +920,99 @@ textarea::placeholder{
 </aside>
 
 
-<!-- =====================================================
-     MAIN
-===================================================== -->
+<!-- MAIN -->
 
 <main class="main">
 
 
-<div class="topbar">
+    <div class="topbar">
 
-    <div class="model">
-        Lumora 1.0 ▾
+        <div class="model">
+            Lumora 1.0 ▾
+        </div>
+
     </div>
 
-</div>
-
-
-<!-- =====================================================
-     CHAT
-===================================================== -->
-
-<div
-    id="chat"
-    class="chat"
->
 
     <div
-        id="chatInner"
-        class="chatInner"
+        id="chat"
+        class="chat"
     >
 
         <div
-            id="startScreen"
-            class="startScreen"
+            id="chatInner"
+            class="chatInner"
         >
 
-            <div class="aiName">
-                Lumora
-            </div>
+            <div
+                id="start"
+                class="start"
+            >
 
-            <div class="subtitle">
-                Deine kreative KI
+                <div class="lumora">
+                    Lumora
+                </div>
+
+                <div class="startText">
+                    Deine kreative KI
+                </div>
+
             </div>
 
         </div>
 
     </div>
 
-</div>
+
+    <!-- INPUT -->
+
+    <div class="inputArea">
+
+        <div class="inputWrapper">
+
+            <div class="inputBox">
+
+                <div class="inputInner">
+
+                    <textarea
+                        id="message"
+                        placeholder="Frag Lumora etwas …"
+                    ></textarea>
 
 
-<!-- =====================================================
-     INPUT
-===================================================== -->
-
-<div class="inputArea">
-
-    <div class="inputWrapper">
-
-        <div class="inputBox">
-
-            <div class="inputInner">
+                    <div class="inputBottom">
 
 
-                <div
-                    id="preview"
-                    class="preview"
-                ></div>
+                        <div class="buttons">
+
+                            <label
+                                class="iconButton"
+                                for="imageInput"
+                            >
+                                🖼
+                            </label>
+
+                            <input
+                                id="imageInput"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                            >
+
+                        </div>
 
 
-                <textarea
-                    id="message"
-                    placeholder="Frag Lumora etwas …"
-                    autocomplete="off"
-                ></textarea>
+                        <div class="buttons">
 
+                            <button
+                                class="sendButton"
+                                id="sendButton"
+                            >
+                                ↑
+                            </button>
 
-                <div class="inputBottom">
+                        </div>
 
-
-                    <div class="buttonGroup">
-
-                        <label
-                            for="imageInput"
-                            class="iconButton"
-                            title="Bild hochladen"
-                        >
-                            ＋
-                        </label>
-
-
-                        <input
-                            id="imageInput"
-                            type="file"
-                            accept="image/*"
-                            multiple
-                        >
-
-
-                        <button
-                            type="button"
-                            class="iconButton"
-                            onclick="openImagePicker()"
-                            title="Bild hochladen"
-                        >
-                            🖼
-                        </button>
-
-                    </div>
-
-
-                    <div class="buttonGroup">
-
-                        <button
-                            type="button"
-                            class="iconButton"
-                            title="Mikrofon"
-                        >
-                            🎤
-                        </button>
-
-
-                        <button
-                            id="sendButton"
-                            type="button"
-                            class="sendButton"
-                            title="Suchen"
-                        >
-                            ↑
-                        </button>
 
                     </div>
 
@@ -1122,23 +1020,15 @@ textarea::placeholder{
 
             </div>
 
-        </div>
 
+            <div
+                id="status"
+                class="status"
+            ></div>
 
-        <div
-            id="status"
-            class="status"
-        ></div>
-
-
-        <div class="footer">
-            Lumora kann Fehler machen. Überprüfe wichtige Informationen.
         </div>
 
     </div>
-
-</div>
-
 
 </main>
 
@@ -1147,9 +1037,9 @@ textarea::placeholder{
 
 <script>
 
-/* ======================================================
+/* =====================================================
    ELEMENTE
-====================================================== */
+===================================================== */
 
 const chat =
     document.getElementById("chat");
@@ -1157,256 +1047,89 @@ const chat =
 const chatInner =
     document.getElementById("chatInner");
 
-const messageInput =
+const input =
     document.getElementById("message");
 
-const sendButton =
+const send =
     document.getElementById("sendButton");
-
-const imageInput =
-    document.getElementById("imageInput");
-
-const preview =
-    document.getElementById("preview");
 
 const status =
     document.getElementById("status");
 
-
-let selectedImages = [];
-
-
-/* ======================================================
-   BILDER
-====================================================== */
-
-imageInput.addEventListener(
-    "change",
-    () => {
-
-        selectedImages =
-            Array.from(
-                imageInput.files
-            ).filter(
-                file =>
-                    file.type.startsWith("image/")
-            );
-
-        renderPreview();
-
-    }
-);
+const imageInput =
+    document.getElementById("imageInput");
 
 
-function renderPreview(){
+/* =====================================================
+   USER
+===================================================== */
 
-    preview.innerHTML = "";
+function addUserMessage(text){
 
-    if(
-        selectedImages.length === 0
-    ){
+    const message =
+        document.createElement("div");
 
-        preview.classList.remove(
-            "show"
-        );
-
-        return;
-    }
-
-
-    preview.classList.add(
-        "show"
-    );
-
-
-    selectedImages.forEach(
-        file => {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "previewItem";
-
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-
-            image.src =
-                URL.createObjectURL(
-                    file
-                );
-
-
-            item.appendChild(
-                image
-            );
-
-
-            preview.appendChild(
-                item
-            );
-
-        }
-    );
-
-}
-
-
-function openImagePicker(){
-
-    imageInput.click();
-
-}
-
-
-/* ======================================================
-   USER-NACHRICHT
-====================================================== */
-
-function addUserMessage(
-    text,
-    images
-){
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.className =
+    message.className =
         "message user";
 
 
     const bubble =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     bubble.className =
         "userBubble";
 
-
-    if(text){
-
-        bubble.textContent =
-            text;
-
-    }
+    bubble.textContent =
+        text;
 
 
-    if(
-        images &&
-        images.length
-    ){
-
-        const imageContainer =
-            document.createElement(
-                "div"
-            );
-
-        imageContainer.className =
-            "imageMessage";
-
-
-        images.forEach(
-            file => {
-
-                const image =
-                    document.createElement(
-                        "img"
-                    );
-
-
-                image.src =
-                    URL.createObjectURL(
-                        file
-                    );
-
-
-                imageContainer.appendChild(
-                    image
-                );
-
-            }
-        );
-
-
-        bubble.appendChild(
-            imageContainer
-        );
-
-    }
-
-
-    wrapper.appendChild(
+    message.appendChild(
         bubble
     );
 
+
     chatInner.appendChild(
-        wrapper
+        message
     );
 
 
-    scrollChat();
+    scrollDown();
 
 }
 
 
-/* ======================================================
-   AI NACHRICHT
-====================================================== */
+/* =====================================================
+   AI
+===================================================== */
 
-function createAIMessage(){
+function addAIMessage(){
 
-    const wrapper =
-        document.createElement(
-            "div"
-        );
+    const message =
+        document.createElement("div");
 
-    wrapper.className =
-        "message ai";
-
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-    box.className =
-        "aiMessage";
+    message.className =
+        "message";
 
 
     const header =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     header.className =
         "aiHeader";
 
 
     const icon =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     icon.className =
-        "aiSmallIcon";
+        "aiIcon";
 
     icon.textContent =
         "✦";
 
 
     const name =
-        document.createElement(
-            "span"
-        );
+        document.createElement("span");
 
     name.textContent =
         "Lumora";
@@ -1422,29 +1145,23 @@ function createAIMessage(){
 
 
     const content =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     content.className =
-        "aiText";
+        "aiContent";
 
 
-    box.appendChild(
+    message.appendChild(
         header
     );
 
-    box.appendChild(
+    message.appendChild(
         content
     );
 
 
-    wrapper.appendChild(
-        box
-    );
-
     chatInner.appendChild(
-        wrapper
+        message
     );
 
 
@@ -1453,23 +1170,23 @@ function createAIMessage(){
 }
 
 
-/* ======================================================
+/* =====================================================
    LOADING
-====================================================== */
+===================================================== */
 
 function showLoading(){
 
     const content =
-        createAIMessage();
+        addAIMessage();
 
 
     content.innerHTML = `
 
         <div class="loading">
 
-            <span>Ich suche im Web</span>
+            <span>Ich suche nach Informationen</span>
 
-            <div class="loadingDots">
+            <div class="dots">
 
                 <span class="dot"></span>
                 <span class="dot"></span>
@@ -1482,7 +1199,7 @@ function showLoading(){
     `;
 
 
-    scrollChat();
+    scrollDown();
 
 
     return content;
@@ -1490,268 +1207,342 @@ function showLoading(){
 }
 
 
-/* ======================================================
-   SUCHERGEBNISSE RENDERN
-====================================================== */
+/* =====================================================
+   ERGEBNISSE
+===================================================== */
 
-function renderSearchResults(
-    container,
+function renderResults(
+    content,
     data
 ){
 
-    container.innerHTML = "";
+    content.innerHTML = "";
 
 
-    const intro =
-        document.createElement(
-            "div"
-        );
+    if(data.image){
 
-    intro.className =
-        "searchIntro";
+        const image =
+            document.createElement("img");
 
+        image.className =
+            "resultImage";
 
-    intro.textContent =
-        `🔎 Ich habe nach „${data.query}“ gesucht.`;
+        image.src =
+            data.image.url;
 
-    container.appendChild(
-        intro
-    );
-
-
-    const results =
-        document.createElement(
-            "div"
-        );
-
-    results.className =
-        "searchResults";
+        image.alt =
+            data.heading ||
+            "DuckDuckGo Ergebnis";
 
 
-    if(
-        !data.results ||
-        data.results.length === 0
-    ){
-
-        const empty =
-            document.createElement(
-                "div"
-            );
-
-        empty.style.color =
-            "#888890";
-
-        empty.textContent =
-            "Keine Suchergebnisse gefunden.";
+        image.onerror =
+            () => image.remove();
 
 
-        results.appendChild(
-            empty
-        );
-
-    } else {
-
-        data.results.forEach(
-            item => {
-
-                const card =
-                    document.createElement(
-                        "a"
-                    );
-
-
-                card.className =
-                    "searchResult";
-
-
-                card.href =
-                    item.url;
-
-
-                card.target =
-                    "_blank";
-
-
-                card.rel =
-                    "noopener noreferrer";
-
-
-                const title =
-                    document.createElement(
-                        "div"
-                    );
-
-                title.className =
-                    "searchResultTitle";
-
-                title.textContent =
-                    item.title;
-
-
-                const description =
-                    document.createElement(
-                        "div"
-                    );
-
-                description.className =
-                    "searchResultDescription";
-
-                description.textContent =
-                    item.description ||
-                    "Keine Beschreibung verfügbar.";
-
-
-                const url =
-                    document.createElement(
-                        "div"
-                    );
-
-                url.className =
-                    "searchResultUrl";
-
-                url.textContent =
-                    item.url;
-
-
-                card.appendChild(
-                    title
-                );
-
-                card.appendChild(
-                    description
-                );
-
-                card.appendChild(
-                    url
-                );
-
-
-                results.appendChild(
-                    card
-                );
-
-            }
+        content.appendChild(
+            image
         );
 
     }
 
 
-    container.appendChild(
-        results
-    );
+    if(data.heading){
 
+        const heading =
+            document.createElement("div");
 
-    const info =
-        document.createElement(
-            "div"
+        heading.className =
+            "answerTitle";
+
+        heading.textContent =
+            data.heading;
+
+        content.appendChild(
+            heading
         );
 
-    info.className =
-        "searchInfo";
+    }
 
 
-    info.textContent =
-        `${data.count || 0} Ergebnisse`;
+    const answers =
+        data.results.filter(
+            item =>
+                item.type === "answer" ||
+                item.type === "abstract"
+        );
 
 
-    container.appendChild(
-        info
+    for(
+        const item of answers
+    ){
+
+        const box =
+            document.createElement("div");
+
+        box.className =
+            "answerBox";
+
+
+        const title =
+            document.createElement("div");
+
+        title.className =
+            "answerTitle";
+
+        title.textContent =
+            item.title;
+
+
+        const text =
+            document.createElement("div");
+
+        text.className =
+            "answerText";
+
+        text.textContent =
+            item.text;
+
+
+        box.appendChild(
+            title
+        );
+
+        box.appendChild(
+            text
+        );
+
+
+        if(item.source){
+
+            const source =
+                document.createElement("a");
+
+            source.className =
+                "source";
+
+            source.href =
+                item.source;
+
+            source.target =
+                "_blank";
+
+            source.rel =
+                "noopener noreferrer";
+
+            source.textContent =
+                "Quelle öffnen ↗";
+
+
+            box.appendChild(
+                source
+            );
+
+        }
+
+
+        content.appendChild(
+            box
+        );
+
+    }
+
+
+    const topics =
+        data.results.filter(
+            item =>
+                item.type === "topic"
+        );
+
+
+    if(topics.length){
+
+        const list =
+            document.createElement("div");
+
+        list.className =
+            "topicList";
+
+
+        for(
+            const topic of topics
+        ){
+
+            const link =
+                document.createElement("a");
+
+            link.className =
+                "topic";
+
+            link.href =
+                topic.source;
+
+            link.target =
+                "_blank";
+
+            link.rel =
+                "noopener noreferrer";
+
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "topicTitle";
+
+            title.textContent =
+                topic.title;
+
+
+            const text =
+                document.createElement("div");
+
+            text.className =
+                "topicText";
+
+            text.textContent =
+                topic.text;
+
+
+            link.appendChild(
+                title
+            );
+
+            link.appendChild(
+                text
+            );
+
+
+            list.appendChild(
+                link
+            );
+
+        }
+
+
+        content.appendChild(
+            list
+        );
+
+    }
+
+
+    if(
+        data.results.length === 0
+    ){
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "answerBox";
+
+        empty.textContent =
+            "DuckDuckGo hat für diese Anfrage keine Instant-Answer-Daten zurückgegeben.";
+
+        content.appendChild(
+            empty
+        );
+
+    }
+
+
+    const attribution =
+        document.createElement("div");
+
+    attribution.style.marginTop =
+        "14px";
+
+    attribution.style.color =
+        "#77777f";
+
+    attribution.style.fontSize =
+        "11px";
+
+    attribution.textContent =
+        "Informationen von DuckDuckGo Instant Answers.";
+
+    content.appendChild(
+        attribution
     );
 
 }
 
 
-/* ======================================================
+/* =====================================================
    FEHLER
-====================================================== */
+===================================================== */
 
-function renderSearchError(
-    container,
+function renderError(
+    content,
     message
 ){
 
-    container.innerHTML = "";
+    content.innerHTML = "";
 
 
-    const error =
-        document.createElement(
-            "div"
-        );
+    const box =
+        document.createElement("div");
 
-    error.className =
-        "searchError";
+    box.className =
+        "error";
 
 
     const title =
-        document.createElement(
-            "div"
-        );
-
-    title.className =
-        "searchErrorTitle";
+        document.createElement("strong");
 
     title.textContent =
-        "Websuche beendet";
+        "Suche fehlgeschlagen";
 
 
     const text =
-        document.createElement(
-            "div"
-        );
+        document.createElement("span");
 
     text.textContent =
         message;
 
 
-    error.appendChild(
+    box.appendChild(
         title
     );
 
-    error.appendChild(
+    box.appendChild(
         text
     );
 
 
-    container.appendChild(
-        error
+    content.appendChild(
+        box
     );
 
 }
 
 
-/* ======================================================
-   WEB-SUCHE
-====================================================== */
+/* =====================================================
+   SUCHE
+===================================================== */
 
-async function searchWeb(
+async function search(
     query,
-    aiContainer
+    content
 ){
 
-    try {
+    status.textContent =
+        "Suche …";
+
+
+    try{
 
         const response =
             await fetch(
                 "/api/search?q=" +
-                encodeURIComponent(query)
+                encodeURIComponent(
+                    query
+                )
             );
 
 
-        let data;
-
-
-        try {
-
-            data =
-                await response.json();
-
-        } catch {
-
-            throw new Error(
-                "Der Server hat keine gültige Antwort zurückgegeben."
-            );
-
-        }
+        const data =
+            await response.json();
 
 
         if(
@@ -1761,31 +1552,31 @@ async function searchWeb(
 
             throw new Error(
                 data.error ||
-                "Die Suche ist fehlgeschlagen."
+                "Keine Antwort vom Suchserver."
             );
 
         }
 
 
-        renderSearchResults(
-            aiContainer,
+        renderResults(
+            content,
             data
         );
 
 
         status.textContent =
-            `${data.count} Treffer gefunden`;
+            "Antwort erhalten";
 
 
-    } catch(error){
+    }catch(error){
 
         console.error(
             error
         );
 
 
-        renderSearchError(
-            aiContainer,
+        renderError(
+            content,
             error.message
         );
 
@@ -1793,39 +1584,32 @@ async function searchWeb(
         status.textContent =
             "Suche beendet";
 
-    } finally {
+    }finally{
 
-        sendButton.disabled =
+        send.disabled =
             false;
 
     }
 
 
-    scrollChat();
+    scrollDown();
 
 }
 
 
-/* ======================================================
+/* =====================================================
    SENDEN
-====================================================== */
+===================================================== */
 
 async function sendMessage(){
 
-    const text =
-        messageInput.value.trim();
+    const query =
+        input.value.trim();
 
 
-    const images =
-        [...selectedImages];
+    if(!query){
 
-
-    if(
-        !text &&
-        images.length === 0
-    ){
-
-        messageInput.focus();
+        input.focus();
 
         return;
 
@@ -1834,90 +1618,49 @@ async function sendMessage(){
 
     const start =
         document.getElementById(
-            "startScreen"
+            "start"
         );
 
 
     if(start){
 
-        start.style.display =
-            "none";
+        start.remove();
 
     }
 
 
-    /*
-      Benutzer-Nachricht anzeigen
-    */
-
     addUserMessage(
-        text,
-        images
+        query
     );
 
 
-    /*
-      Eingabe leeren
-    */
-
-    messageInput.value = "";
-
-    selectedImages = [];
-
-    imageInput.value = "";
-
-    renderPreview();
+    input.value = "";
 
 
-    /*
-      Bei Text IMMER suchen
-    */
-
-    if(text){
-
-        sendButton.disabled =
-            true;
-
-        status.textContent =
-            "Suche im Web …";
+    send.disabled =
+        true;
 
 
-        const aiContainer =
-            showLoading();
+    const ai =
+        showLoading();
 
 
-        await searchWeb(
-            text,
-            aiContainer
-        );
+    await search(
+        query,
+        ai
+    );
 
 
-    } else {
-
-        /*
-          Nur Bild
-        */
-
-        const aiContainer =
-            createAIMessage();
-
-
-        aiContainer.textContent =
-            "🖼️ Bild empfangen. Die Bildanalyse ist noch nicht angeschlossen.";
-
-    }
-
-
-    messageInput.focus();
+    input.focus();
 
 }
 
 
-/* ======================================================
+/* =====================================================
    ENTER
-====================================================== */
+===================================================== */
 
-messageInput.addEventListener(
+input.addEventListener(
     "keydown",
     event => {
 
@@ -1936,21 +1679,82 @@ messageInput.addEventListener(
 );
 
 
-/* ======================================================
+/* =====================================================
    BUTTON
-====================================================== */
+===================================================== */
 
-sendButton.addEventListener(
+send.addEventListener(
     "click",
     sendMessage
 );
 
 
-/* ======================================================
-   SCROLL
-====================================================== */
+/* =====================================================
+   IMAGE
+===================================================== */
 
-function scrollChat(){
+imageInput.addEventListener(
+    "change",
+    () => {
+
+        if(
+            imageInput.files.length
+        ){
+
+            const ai =
+                addAIMessage();
+
+            ai.textContent =
+                "🖼️ Bild ausgewählt. Die Bildanalyse ist in dieser Version noch nicht angeschlossen.";
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   NEUER CHAT
+===================================================== */
+
+function newChat(){
+
+    chatInner.innerHTML = `
+
+        <div
+            id="start"
+            class="start"
+        >
+
+            <div class="lumora">
+                Lumora
+            </div>
+
+            <div class="startText">
+                Deine kreative KI
+            </div>
+
+        </div>
+
+    `;
+
+
+    input.value = "";
+
+    status.textContent = "";
+
+    chat.scrollTop = 0;
+
+    input.focus();
+
+}
+
+
+/* =====================================================
+   SCROLL
+===================================================== */
+
+function scrollDown(){
 
     setTimeout(
         () => {
@@ -1961,49 +1765,6 @@ function scrollChat(){
         },
         50
     );
-
-}
-
-
-/* ======================================================
-   NEUER CHAT
-====================================================== */
-
-function newChat(){
-
-    chatInner.innerHTML = `
-
-        <div
-            id="startScreen"
-            class="startScreen"
-        >
-
-            <div class="aiName">
-                Lumora
-            </div>
-
-            <div class="subtitle">
-                Deine kreative KI
-            </div>
-
-        </div>
-
-    `;
-
-
-    messageInput.value = "";
-
-    selectedImages = [];
-
-    imageInput.value = "";
-
-    renderPreview();
-
-    status.textContent = "";
-
-    chat.scrollTop = 0;
-
-    messageInput.focus();
 
 }
 
