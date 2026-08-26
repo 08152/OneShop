@@ -2,932 +2,419 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Lumora AI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>RiskyLive Nachrichten</title>
 
 <style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
 }
 
-html,
-body{
-    width:100%;
-    height:100%;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f4f8;
+    color: #172033;
 }
 
-body{
-    background:#0d0d10;
-    color:#fff;
-    font-family:Arial,Helvetica,sans-serif;
-    overflow:hidden;
+button, input, textarea {
+    font: inherit;
 }
 
-
-/* =========================
-   APP
-========================= */
-
-.app{
-    width:100%;
-    height:100vh;
-    display:flex;
+.login {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
-
-/* =========================
-   SIDEBAR
-========================= */
-
-.sidebar{
-    width:245px;
-    background:#121216;
-    border-right:1px solid #29292e;
-    padding:18px;
-    flex-shrink:0;
+.login-box {
+    width: 100%;
+    max-width: 430px;
+    background: white;
+    padding: 35px;
+    border-radius: 22px;
+    box-shadow: 0 15px 50px rgba(0,0,0,.12);
 }
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:21px;
-    font-weight:bold;
-    margin-bottom:28px;
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
-.logoIcon{
-    width:38px;
-    height:38px;
-    border-radius:13px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #4285f4,
-            #9b72cb,
-            #d96570,
-            #fbbc04,
-            #34a853
-        );
-
-    background-size:400% 400%;
-
-    animation:rainbow 7s linear infinite;
+.subtitle {
+    color: #697386;
+    margin-bottom: 30px;
 }
 
-.newChat{
-    width:100%;
-    border:0;
-    border-radius:14px;
-    padding:13px;
-
-    background:#242429;
-    color:#fff;
-
-    cursor:pointer;
+input, textarea {
+    width: 100%;
+    border: 1px solid #d9dee8;
+    border-radius: 12px;
+    padding: 13px;
+    outline: none;
 }
 
-.newChat:hover{
-    background:#303036;
+input:focus, textarea:focus {
+    border-color: #667eea;
 }
 
-.sidebarTitle{
-    color:#77777f;
-    font-size:11px;
-    margin:28px 8px 10px;
+.field {
+    margin-bottom: 16px;
 }
 
-.historyItem{
-    padding:11px;
-    border-radius:10px;
-    color:#c8c8ce;
-    font-size:13px;
+.field label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
 }
 
-.historyItem:hover{
-    background:#202025;
+.login-btn,
+.send-btn,
+.save-btn {
+    border: 0;
+    background: #667eea;
+    color: white;
+    padding: 13px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-
-/* =========================
-   MAIN
-========================= */
-
-.main{
-    flex:1;
-    min-width:0;
-    height:100%;
-
-    display:flex;
-    flex-direction:column;
-
-    position:relative;
+.login-btn {
+    width: 100%;
 }
 
-
-/* =========================
-   TOPBAR
-========================= */
-
-.topbar{
-    height:65px;
-
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-
-    padding:0 24px;
+.error {
+    color: #d93025;
+    margin-top: 15px;
+    display: none;
 }
 
-
-/* =========================
-   MODE SELECTOR
-========================= */
-
-.modelSelector{
-    position:relative;
+.app {
+    display: none;
+    min-height: 100vh;
 }
 
-.modelButton{
-    border:1px solid #303037;
-
-    background:#1e1e23;
-    color:#ddd;
-
-    padding:10px 15px;
-
-    border-radius:20px;
-
-    cursor:pointer;
-
-    display:flex;
-    align-items:center;
-
-    gap:12px;
-
-    font-size:13px;
+.sidebar {
+    width: 280px;
+    background: #151a27;
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    padding: 22px;
 }
 
-.modelButton:hover{
-    background:#29292f;
+.sidebar-logo {
+    font-size: 23px;
+    font-weight: bold;
+    margin-bottom: 30px;
 }
 
-.modelMenu{
-    position:absolute;
-
-    right:0;
-    top:48px;
-
-    width:230px;
-
-    background:#18181d;
-
-    border:1px solid #303037;
-
-    border-radius:16px;
-
-    padding:7px;
-
-    display:none;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.45);
-
-    z-index:100;
+.menu-btn {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    color: #c9ceda;
+    text-align: left;
+    padding: 13px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 5px;
 }
 
-.modelMenu.open{
-    display:block;
+.menu-btn:hover,
+.menu-btn.active {
+    background: #252c40;
+    color: white;
 }
 
-.modelMenu button{
-    width:100%;
-
-    border:0;
-
-    background:transparent;
-
-    color:white;
-
-    text-align:left;
-
-    padding:12px;
-
-    border-radius:11px;
-
-    cursor:pointer;
-
-    display:flex;
-    flex-direction:column;
-
-    gap:4px;
+.main {
+    margin-left: 280px;
+    min-height: 100vh;
 }
 
-.modelMenu button:hover{
-    background:#29292f;
+.topbar {
+    height: 70px;
+    background: white;
+    border-bottom: 1px solid #e4e7ed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
 }
 
-.modelMenu strong{
-    font-size:14px;
+.user-name {
+    font-weight: bold;
 }
 
-.modelMenu small{
-    color:#85858d;
-    font-size:11px;
+.content {
+    padding: 30px;
+    max-width: 1100px;
 }
 
-
-/* =========================
-   CHAT
-========================= */
-
-.chat{
-    flex:1;
-
-    overflow-y:auto;
-
-    padding:
-        20px
-        20px
-        200px;
+.page {
+    display: none;
 }
 
-.chatInner{
-    width:min(900px,100%);
-    margin:auto;
+.page.active {
+    display: block;
 }
 
-
-/* =========================
-   START
-========================= */
-
-.start{
-    min-height:
-        calc(100vh - 200px);
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.05);
 }
 
-.lumora{
-    font-size:
-        clamp(52px,8vw,76px);
-
-    font-weight:bold;
-
-    letter-spacing:-4px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #4285f4,
-            #9b72cb,
-            #d96570,
-            #fbbc04,
-            #34a853,
-            #4285f4
-        );
-
-    background-size:500% 500%;
-
-    animation:
-        rainbow 7s linear infinite;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-
-    color:transparent;
+.chat {
+    height: calc(100vh - 170px);
+    display: flex;
+    flex-direction: column;
 }
 
-.startText{
-    color:#77777f;
-    margin-top:8px;
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
 }
 
-
-/* =========================
-   MESSAGES
-========================= */
-
-.message{
-    margin-bottom:28px;
+.message {
+    max-width: 75%;
+    padding: 13px 16px;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    line-height: 1.45;
 }
 
-.user{
-    display:flex;
-    justify-content:flex-end;
+.message.user {
+    margin-left: auto;
+    background: #667eea;
+    color: white;
+    border-bottom-right-radius: 4px;
 }
 
-.userBubble{
-    max-width:80%;
-
-    padding:
-        13px 17px;
-
-    border-radius:
-        22px 22px 5px 22px;
-
-    background:#29292f;
-
-    white-space:pre-wrap;
-
-    line-height:1.5;
+.message.ai {
+    background: #eef1f6;
+    border-bottom-left-radius: 4px;
 }
 
-.aiHeader{
-    display:flex;
-    align-items:center;
-
-    gap:9px;
-
-    margin-bottom:10px;
-
-    font-weight:bold;
+.message small {
+    display: block;
+    opacity: .7;
+    margin-bottom: 5px;
 }
 
-.aiIcon{
-    width:29px;
-    height:29px;
-
-    border-radius:9px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #4285f4,
-            #9b72cb,
-            #d96570
-        );
+.message-form {
+    display: flex;
+    gap: 10px;
+    padding-top: 15px;
 }
 
-.aiContent{
-    color:#dedee3;
-    line-height:1.7;
-
-    font-size:15px;
+.message-form textarea {
+    resize: none;
+    height: 55px;
 }
 
-
-/* =========================
-   LUMORA ANSWER
-========================= */
-
-.answer{
-    background:#17171b;
-
-    border:
-        1px solid #292930;
-
-    border-radius:18px;
-
-    padding:18px;
-
-    margin-top:5px;
+.message-form .send-btn {
+    width: 100px;
 }
 
-.answerTitle{
-    font-size:17px;
-    font-weight:bold;
-
-    margin-bottom:10px;
+.person {
+    border: 1px solid #e1e5ec;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
 }
 
-.answerText{
-    color:#dedee3;
-
-    line-height:1.7;
+.person:hover {
+    background: #f5f7fa;
 }
 
-.answerSource{
-    display:inline-block;
-
-    margin-top:14px;
-
-    color:#8ab4f8;
-
-    text-decoration:none;
-
-    font-size:12px;
+.person strong {
+    display: block;
 }
 
-.answerSource:hover{
-    text-decoration:underline;
+.badge {
+    display: inline-block;
+    background: #e8ebff;
+    color: #5263c7;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-top: 5px;
 }
 
-
-/* =========================
-   THINKING
-========================= */
-
-.loading{
-    color:#a0a0a8;
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
+textarea.data {
+    min-height: 130px;
+    resize: vertical;
 }
 
-.dots{
-    display:flex;
-    gap:4px;
+.logout {
+    position: absolute;
+    bottom: 20px;
+    left: 22px;
+    right: 22px;
+    width: calc(100% - 44px);
 }
 
-.dot{
-    width:6px;
-    height:6px;
-
-    background:#999;
-
-    border-radius:50%;
-
-    animation:
-        pulse 1s infinite alternate;
-}
-
-.dot:nth-child(2){
-    animation-delay:.2s;
-}
-
-.dot:nth-child(3){
-    animation-delay:.4s;
-}
-
-
-/* =========================
-   ERROR
-========================= */
-
-.error{
-    background:#21191b;
-
-    border:
-        1px solid #503136;
-
-    border-radius:15px;
-
-    padding:15px;
-
-    color:#ddd;
-}
-
-.errorTitle{
-    color:#f28b82;
-
-    font-weight:bold;
-
-    margin-bottom:6px;
-}
-
-
-/* =========================
-   INPUT
-========================= */
-
-.inputArea{
-    position:absolute;
-
-    left:0;
-    right:0;
-    bottom:0;
-
-    padding:
-        15px
-        20px
-        20px;
-
-    background:
-        linear-gradient(
-            to top,
-            #0d0d10 70%,
-            transparent
-        );
-}
-
-.inputWrapper{
-    width:min(850px,100%);
-    margin:auto;
-}
-
-.inputBox{
-    padding:5px;
-
-    border-radius:30px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #4285f4,
-            #9b72cb,
-            #d96570,
-            #fbbc04,
-            #34a853,
-            #4285f4
-        );
-
-    background-size:500% 500%;
-
-    animation:
-        rainbow 7s linear infinite;
-}
-
-.inputInner{
-    background:#17171b;
-
-    border-radius:26px;
-
-    padding:19px;
-
-    min-height:150px;
-}
-
-textarea{
-    width:100%;
-
-    min-height:70px;
-    max-height:130px;
-
-    resize:none;
-
-    border:0;
-    outline:0;
-
-    background:transparent;
-
-    color:#fff;
-
-    font-size:17px;
-
-    font-family:inherit;
-}
-
-textarea::placeholder{
-    color:#77777f;
-}
-
-.inputBottom{
-    display:flex;
-
-    justify-content:space-between;
-    align-items:center;
-
-    margin-top:12px;
-}
-
-.buttons{
-    display:flex;
-    gap:8px;
-}
-
-.iconButton,
-.sendButton{
-    width:42px;
-    height:42px;
-
-    border:0;
-
-    border-radius:50%;
-
-    cursor:pointer;
-
-    color:#fff;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-}
-
-.iconButton{
-    background:#27272d;
-}
-
-.iconButton:hover{
-    background:#36363d;
-}
-
-.sendButton{
-    background:
-        linear-gradient(
-            135deg,
-            #4285f4,
-            #9b72cb,
-            #d96570
-        );
-
-    font-size:19px;
-}
-
-.sendButton:disabled{
-    opacity:.5;
-    cursor:wait;
-}
-
-#imageInput{
-    display:none;
-}
-
-.status{
-    height:18px;
-
-    text-align:center;
-
-    color:#77777f;
-
-    font-size:11px;
-
-    margin-top:7px;
-}
-
-
-/* =========================
-   ANIMATIONS
-========================= */
-
-@keyframes rainbow{
-
-    0%{
-        background-position:0% 50%;
+@media(max-width:700px) {
+    .sidebar {
+        width: 70px;
+        padding: 10px;
     }
 
-    50%{
-        background-position:100% 50%;
+    .sidebar-logo {
+        font-size: 0;
     }
 
-    100%{
-        background-position:0% 50%;
+    .sidebar-logo::after {
+        content: "R";
+        font-size: 24px;
     }
 
+    .menu-btn {
+        font-size: 0;
+        text-align: center;
+    }
+
+    .menu-btn::first-letter {
+        font-size: 20px;
+    }
+
+    .main {
+        margin-left: 70px;
+    }
+
+    .content {
+        padding: 15px;
+    }
 }
-
-@keyframes pulse{
-
-    from{
-        opacity:.3;
-    }
-
-    to{
-        opacity:1;
-    }
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:700px){
-
-    .sidebar{
-        display:none;
-    }
-
-    .chat{
-        padding:
-            15px
-            12px
-            195px;
-    }
-
-    .inputArea{
-        padding:10px;
-    }
-
-    .userBubble{
-        max-width:90%;
-    }
-
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<!-- LOGIN -->
+<div class="login" id="loginScreen">
 
+    <div class="login-box">
 
-<!-- SIDEBAR -->
-
-<aside class="sidebar">
-
-    <div class="logo">
-
-        <div class="logoIcon">
-            ✦
+        <div class="logo">RiskyLive</div>
+        <div class="subtitle">
+            Nachrichten & KI-Assistent
         </div>
 
-        Lumora
+        <div class="field">
+            <label>Benutzername / E-Mail</label>
+            <input id="username" type="text"
+                   placeholder="Benutzername oder E-Mail">
+        </div>
 
-    </div>
+        <div class="field">
+            <label>PIN</label>
+            <input id="pin" type="password"
+                   placeholder="PIN">
+        </div>
 
+        <button class="login-btn" onclick="login()">
+            Anmelden
+        </button>
 
-    <button
-        class="newChat"
-        onclick="newChat()"
-    >
-        ＋ Neuer Chat
-    </button>
-
-
-    <div class="sidebarTitle">
-        VERLAUF
-    </div>
-
-
-    <div id="history">
-
-        <div class="historyItem">
-            Neuer Chat
+        <div class="error" id="loginError">
+            Benutzername oder PIN ist falsch.
         </div>
 
     </div>
 
-</aside>
+</div>
 
 
-<!-- MAIN -->
+<!-- APP -->
+<div class="app" id="app">
 
-<main class="main">
+    <aside class="sidebar">
 
-
-    <div class="topbar">
-
-        <div class="modelSelector">
-
-            <button
-                class="modelButton"
-                id="modelButton"
-                onclick="toggleModelMenu()"
-            >
-
-                <span id="modeName">
-                    Normal
-                </span>
-
-                <span>
-                    ⌄
-                </span>
-
-            </button>
-
-
-            <div
-                class="modelMenu"
-                id="modelMenu"
-            >
-
-                <button
-                    onclick="selectMode('normal')"
-                >
-
-                    <strong>
-                        Normal
-                    </strong>
-
-                    <small>
-                        Normales Denken
-                    </small>
-
-                </button>
-
-
-                <button
-                    onclick="selectMode('long')"
-                >
-
-                    <strong>
-                        Länger Denken
-                    </strong>
-
-                    <small>
-                        Mehr Zeit zum Nachdenken
-                    </small>
-
-                </button>
-
-
-                <button
-                    onclick="selectMode('instant')"
-                >
-
-                    <strong>
-                        Instant
-                    </strong>
-
-                    <small>
-                        Schnelle Antwort
-                    </small>
-
-                </button>
-
-            </div>
-
+        <div class="sidebar-logo">
+            RiskyLive
         </div>
 
-    </div>
+        <button class="menu-btn active"
+                onclick="showPage('chat', this)">
+            💬 Nachrichten
+        </button>
+
+        <button class="menu-btn"
+                onclick="showPage('people', this)"
+                id="peopleMenu">
+            👥 Personen
+        </button>
+
+        <button class="menu-btn"
+                onclick="showPage('knowledge', this)">
+            🧠 KI-Daten
+        </button>
+
+        <button class="menu-btn"
+                onclick="showPage('settings', this)">
+            ⚙️ Einstellungen
+        </button>
+
+        <button class="menu-btn logout"
+                onclick="logout()">
+            🚪 Abmelden
+        </button>
+
+    </aside>
 
 
-    <!-- CHAT -->
+    <main class="main">
 
-    <div
-        id="chat"
-        class="chat"
-    >
+        <header class="topbar">
 
-        <div
-            id="chatInner"
-            class="chatInner"
-        >
+            <span id="pageTitle">
+                Nachrichten
+            </span>
 
-            <div
-                id="start"
-                class="start"
-            >
+            <span class="user-name"
+                  id="currentUser">
+            </span>
 
-                <div class="lumora">
-                    Lumora
-                </div>
-
-                <div class="startText">
-                    Deine kreative KI
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
+        </header>
 
 
-    <!-- INPUT -->
+        <section class="content">
 
-    <div class="inputArea">
+            <!-- CHAT -->
+            <div class="page active" id="chat">
 
-        <div class="inputWrapper">
+                <div class="card chat">
 
-            <div class="inputBox">
+                    <h2>
+                        KI-Nachrichten
+                    </h2>
 
-                <div class="inputInner">
+                    <div class="messages"
+                         id="messages">
+                    </div>
 
-                    <textarea
-                        id="message"
-                        placeholder="Frag Lumora etwas …"
-                    ></textarea>
+                    <div class="message-form">
 
+                        <textarea
+                            id="messageInput"
+                            placeholder="Schreibe eine Frage..."></textarea>
 
-                    <div class="inputBottom">
-
-                        <div class="buttons">
-
-                            <label
-                                class="iconButton"
-                                for="imageInput"
-                            >
-                                🖼
-                            </label>
-
-                            <input
-                                id="imageInput"
-                                type="file"
-                                accept="image/*"
-                                multiple
-                            >
-
-                        </div>
-
-
-                        <div class="buttons">
-
-                            <button
-                                class="sendButton"
-                                id="sendButton"
-                            >
-                                ↑
-                            </button>
-
-                        </div>
+                        <button class="send-btn"
+                                onclick="sendMessage()">
+                            Senden
+                        </button>
 
                     </div>
 
@@ -936,800 +423,608 @@ textarea::placeholder{
             </div>
 
 
-            <div
-                id="status"
-                class="status"
-            ></div>
+            <!-- PERSONEN -->
+            <div class="page" id="people">
 
-        </div>
+                <div class="card">
 
-    </div>
+                    <h2>
+                        Personen
+                    </h2>
 
-</main>
+                    <p>
+                        Hier siehst du die Personen,
+                        die Fragen gestellt haben.
+                    </p>
+
+                    <div id="peopleList"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- KI-DATEN -->
+            <div class="page" id="knowledge">
+
+                <div class="card">
+
+                    <h2>
+                        Was weiß die KI?
+                    </h2>
+
+                    <p>
+                        Diese Informationen verwendet
+                        die lokale Demo für ihre Antworten.
+                    </p>
+
+                    <label>
+                        Öffnungszeiten
+                    </label>
+
+                    <textarea class="data"
+                              id="openingHours"></textarea>
+
+                    <br><br>
+
+                    <label>
+                        Weitere Informationen
+                    </label>
+
+                    <textarea class="data"
+                              id="aiKnowledge"></textarea>
+
+                    <br><br>
+
+                    <button class="save-btn"
+                            onclick="saveKnowledge()">
+                        Daten speichern
+                    </button>
+
+                    <p id="saveMessage"></p>
+
+                </div>
+
+            </div>
+
+
+            <!-- SETTINGS -->
+            <div class="page" id="settings">
+
+                <div class="card">
+
+                    <h2>
+                        Einstellungen
+                    </h2>
+
+                    <label>
+                        Benutzername
+                    </label>
+
+                    <br>
+
+                    <input id="newName"
+                           placeholder="Neuer Benutzername">
+
+                    <br><br>
+
+                    <button class="save-btn"
+                            onclick="changeName()">
+                        Speichern
+                    </button>
+
+                    <p id="settingsMessage"></p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-   ELEMENTE
-===================================================== */
+const ADMIN_EMAIL = "Riskylive@proton.me";
+const ADMIN_PIN = "081508151235180Rss#";
 
-const chat =
-    document.getElementById("chat");
+let loggedUser = "";
+let isAdmin = false;
 
-const chatInner =
-    document.getElementById("chatInner");
 
-const input =
-    document.getElementById("message");
+/* Beispieldaten */
+let conversations =
+    JSON.parse(localStorage.getItem("conversations") || "[]");
 
-const send =
-    document.getElementById("sendButton");
+let knowledge =
+    JSON.parse(localStorage.getItem("knowledge") || "null");
 
-const status =
-    document.getElementById("status");
+if (!knowledge) {
 
-const imageInput =
-    document.getElementById("imageInput");
+    knowledge = {
 
+        openingHours:
+            "Montag bis Donnerstag: 15:00–17:00\nFreitag bis Sonntag: geschlossen",
 
-/* =====================================================
-   MODI
-===================================================== */
-
-let selectedMode = "normal";
-
-
-const modes = {
-
-    normal:{
-        name:"Normal",
-        text:"Denke nach",
-        delay:700
-    },
-
-    long:{
-        name:"Länger Denken",
-        text:"Denke gründlicher nach",
-        delay:1800
-    },
-
-    instant:{
-        name:"Instant",
-        text:"Denke nach",
-        delay:100
-    }
-
-};
-
-
-/* =====================================================
-   MENÜ
-===================================================== */
-
-function toggleModelMenu(){
-
-    document
-        .getElementById("modelMenu")
-        .classList.toggle("open");
-
-}
-
-
-function selectMode(mode){
-
-    selectedMode = mode;
-
-    document
-        .getElementById("modeName")
-        .textContent =
-            modes[mode].name;
-
-    document
-        .getElementById("modelMenu")
-        .classList.remove("open");
-
-}
-
-
-document.addEventListener(
-    "click",
-    event => {
-
-        const selector =
-            document.querySelector(
-                ".modelSelector"
-            );
-
-        if(
-            selector &&
-            !selector.contains(
-                event.target
-            )
-        ){
-
-            document
-                .getElementById(
-                    "modelMenu"
-                )
-                .classList.remove(
-                    "open"
-                );
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   USER-NACHRICHT
-===================================================== */
-
-function addUserMessage(text){
-
-    const message =
-        document.createElement("div");
-
-    message.className =
-        "message user";
-
-
-    const bubble =
-        document.createElement("div");
-
-    bubble.className =
-        "userBubble";
-
-    bubble.textContent =
-        text;
-
-
-    message.appendChild(
-        bubble
-    );
-
-
-    chatInner.appendChild(
-        message
-    );
-
-
-    scrollDown();
-
-}
-
-
-/* =====================================================
-   AI-NACHRICHT
-===================================================== */
-
-function addAIMessage(){
-
-    const message =
-        document.createElement("div");
-
-    message.className =
-        "message";
-
-
-    const header =
-        document.createElement("div");
-
-    header.className =
-        "aiHeader";
-
-
-    const icon =
-        document.createElement("div");
-
-    icon.className =
-        "aiIcon";
-
-    icon.textContent =
-        "✦";
-
-
-    const name =
-        document.createElement("span");
-
-    name.textContent =
-        "Lumora";
-
-
-    header.appendChild(icon);
-    header.appendChild(name);
-
-
-    const content =
-        document.createElement("div");
-
-    content.className =
-        "aiContent";
-
-
-    message.appendChild(header);
-    message.appendChild(content);
-
-
-    chatInner.appendChild(message);
-
-
-    return content;
-
-}
-
-
-/* =====================================================
-   DENKEN
-===================================================== */
-
-function showThinking(){
-
-    const content =
-        addAIMessage();
-
-
-    const mode =
-        modes[selectedMode];
-
-
-    content.innerHTML = `
-
-        <div class="loading">
-
-            <span>
-                ${mode.text}
-            </span>
-
-            <div class="dots">
-
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-
-            </div>
-
-        </div>
-
-    `;
-
-
-    scrollDown();
-
-
-    return content;
-
-}
-
-
-/* =====================================================
-   EIGENE ANTWORT ERSTELLEN
-===================================================== */
-
-function createOwnAnswer(
-    query,
-    data
-){
-
-    /*
-       Wir nehmen nur das relevanteste
-       gefundene Ergebnis.
-
-       Keine riesige Ergebnisliste.
-    */
-
-    let best = null;
-
-
-    if(
-        data.results &&
-        data.results.length
-    ){
-
-        best =
-            data.results.find(
-                item =>
-                    item.type === "abstract"
-            ) ||
-
-            data.results.find(
-                item =>
-                    item.type === "answer"
-            ) ||
-
-            data.results.find(
-                item =>
-                    item.type === "topic"
-            );
-
-    }
-
-
-    if(!best){
-
-        return {
-
-            title:"Keine passende Information gefunden",
-
-            text:
-                "Ich konnte zu deiner Frage keine passende Information von DuckDuckGo erhalten.",
-
-            source:""
-
-        };
-
-    }
-
-
-    let text =
-        best.text || "";
-
-
-    /*
-       Kleine sprachliche Umwandlung.
-       Dadurch wird nicht einfach eine rohe
-       Trefferliste angezeigt.
-    */
-
-    text =
-        text
-            .replace(
-                /^according to/i,
-                "Nach den verfügbaren Informationen"
-            )
-            .trim();
-
-
-    if(
-        !text.endsWith(".") &&
-        !text.endsWith("!") &&
-        !text.endsWith("?")
-    ){
-
-        text += ".";
-
-    }
-
-
-    return {
-
-        title:
-            data.heading ||
-            best.title ||
-            "Antwort",
-
-        text:
-            text,
-
-        source:
-            best.source || ""
+        other:
+            "RiskyLive ist ein Nachrichten- und KI-Dienst."
 
     };
 
 }
 
 
-/* =====================================================
-   ANTWORT DARSTELLEN
-===================================================== */
+/* LOGIN */
 
-function renderAnswer(
-    content,
-    query,
-    data
-){
+function login() {
 
-    const answer =
-        createOwnAnswer(
-            query,
-            data
-        );
+    const username =
+        document.getElementById("username").value.trim();
 
+    const pin =
+        document.getElementById("pin").value;
 
-    content.innerHTML = "";
-
-
-    const box =
-        document.createElement("div");
-
-    box.className =
-        "answer";
-
-
-    const title =
-        document.createElement("div");
-
-    title.className =
-        "answerTitle";
-
-    title.textContent =
-        answer.title;
-
-
-    const text =
-        document.createElement("div");
-
-    text.className =
-        "answerText";
-
-    text.textContent =
-        answer.text;
-
-
-    box.appendChild(title);
-    box.appendChild(text);
-
-
-    if(answer.source){
-
-        const source =
-            document.createElement("a");
-
-        source.className =
-            "answerSource";
-
-        source.href =
-            answer.source;
-
-        source.target =
-            "_blank";
-
-        source.rel =
-            "noopener noreferrer";
-
-        source.textContent =
-            "Quelle ansehen ↗";
-
-
-        box.appendChild(source);
-
+    if (!username || !pin) {
+        showLoginError();
+        return;
     }
-
-
-    content.appendChild(box);
-
-
-    scrollDown();
-
-}
-
-
-/* =====================================================
-   FEHLER
-===================================================== */
-
-function renderError(
-    content,
-    message
-){
-
-    content.innerHTML = `
-
-        <div class="error">
-
-            <div class="errorTitle">
-                Es ist ein Fehler aufgetreten
-            </div>
-
-            <div>
-                ${escapeHTML(message)}
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =====================================================
-   HTML SICHER MACHEN
-===================================================== */
-
-function escapeHTML(text){
-
-    return String(text)
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   DUCKDUCKGO SUCHE
-===================================================== */
-
-async function search(
-    query,
-    content
-){
-
-    status.textContent =
-        "Denke nach …";
 
 
     /*
-       Je nach gewähltem Modus
-       kurz warten.
+       Der spezielle Account wird als
+       Administrator erkannt.
     */
 
-    await new Promise(
-        resolve =>
-            setTimeout(
-                resolve,
-                modes[selectedMode].delay
-            )
-    );
+    if (
+        username.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+        &&
+        pin === ADMIN_PIN
+    ) {
 
+        loggedUser = "111.111.111.1";
+        isAdmin = true;
 
-    try{
-
-        /*
-           Suche läuft weiterhin über
-           unseren Server zu DuckDuckGo.
-        */
-
-        const response =
-            await fetch(
-                "/api/search?q=" +
-                encodeURIComponent(
-                    query
-                )
-            );
-
-
-        const data =
-            await response.json();
-
-
-        if(
-            !response.ok ||
-            !data.success
-        ){
-
-            throw new Error(
-                data.error ||
-                "Der Suchserver hat keine gültige Antwort geliefert."
-            );
-
-        }
-
+    } else {
 
         /*
-           Nur EIN relevantes Ergebnis
-           wird in eine Lumora-Nachricht
-           umgewandelt.
+           Für normale Benutzer wird ein lokaler
+           Benutzername als Identität verwendet.
         */
 
-        renderAnswer(
-            content,
-            query,
-            data
-        );
-
-
-        status.textContent =
-            "Bereit";
-
-
-    }catch(error){
-
-        console.error(error);
-
-
-        renderError(
-            content,
-            error.message
-        );
-
-
-        status.textContent =
-            "Fehler";
-
-
-    }finally{
-
-        send.disabled =
-            false;
+        loggedUser = username;
+        isAdmin = false;
 
     }
 
 
-    scrollDown();
+    document.getElementById("loginScreen")
+        .style.display = "none";
+
+    document.getElementById("app")
+        .style.display = "block";
+
+    document.getElementById("currentUser")
+        .textContent = loggedUser;
+
+
+    document.getElementById("peopleMenu")
+        .style.display = isAdmin ? "block" : "none";
+
+
+    loadKnowledge();
+    loadMessages();
+    updatePeople();
 
 }
 
 
-/* =====================================================
-   SENDEN
-===================================================== */
+/* LOGIN FEHLER */
 
-async function sendMessage(){
+function showLoginError() {
 
-    const query =
+    const error =
+        document.getElementById("loginError");
+
+    error.style.display = "block";
+
+}
+
+
+/* SEITEN */
+
+function showPage(page, button) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document
+        .getElementById(page)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".menu-btn")
+        .forEach(b => b.classList.remove("active"));
+
+    if (button)
+        button.classList.add("active");
+
+
+    const titles = {
+
+        chat: "Nachrichten",
+        people: "Personen",
+        knowledge: "KI-Daten",
+        settings: "Einstellungen"
+
+    };
+
+    document.getElementById("pageTitle")
+        .textContent = titles[page];
+
+}
+
+
+/* NACHRICHT SENDEN */
+
+function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+    const text =
         input.value.trim();
 
+    if (!text) return;
 
-    if(!query){
 
-        input.focus();
+    const conversation = {
+
+        user: loggedUser,
+
+        question: text,
+
+        answer: generateAIAnswer(text),
+
+        time: new Date().toLocaleString("de-DE")
+
+    };
+
+
+    conversations.push(conversation);
+
+    localStorage.setItem(
+        "conversations",
+        JSON.stringify(conversations)
+    );
+
+
+    input.value = "";
+
+    loadMessages();
+    updatePeople();
+
+}
+
+
+/* NACHRICHTEN LADEN */
+
+function loadMessages() {
+
+    const container =
+        document.getElementById("messages");
+
+    container.innerHTML = "";
+
+
+    const ownMessages =
+        conversations.filter(
+            x => x.user === loggedUser
+        );
+
+
+    if (ownMessages.length === 0) {
+
+        container.innerHTML =
+            `<div class="message ai">
+                <small>KI</small>
+                Hallo! Stelle mir eine Frage.
+            </div>`;
 
         return;
 
     }
 
 
-    const start =
-        document.getElementById(
-            "start"
-        );
+    ownMessages.forEach(item => {
+
+        container.innerHTML += `
+
+            <div class="message user">
+
+                <small>Du · ${escapeHTML(item.time)}</small>
+
+                ${escapeHTML(item.question)}
+
+            </div>
+
+            <div class="message ai">
+
+                <small>KI</small>
+
+                ${escapeHTML(item.answer)}
+
+            </div>
+
+        `;
+
+    });
 
 
-    if(start){
-
-        start.remove();
-
-    }
-
-
-    addUserMessage(query);
-
-
-    input.value = "";
-
-
-    send.disabled = true;
-
-
-    const content =
-        showThinking();
-
-
-    await search(
-        query,
-        content
-    );
-
-
-    input.focus();
+    container.scrollTop =
+        container.scrollHeight;
 
 }
 
 
-/* =====================================================
-   ENTER
-===================================================== */
+/* EINFACHE LOKALE KI */
 
-input.addEventListener(
-    "keydown",
-    event => {
+function generateAIAnswer(question) {
 
-        if(
-            event.key === "Enter" &&
-            !event.shiftKey
-        ){
+    const q =
+        question.toLowerCase();
 
-            event.preventDefault();
+
+    if (
+        q.includes("öffnungszeit") ||
+        q.includes("öffnungszeiten") ||
+        q.includes("wann offen") ||
+        q.includes("geöffnet")
+    ) {
+
+        return knowledge.openingHours;
+
+    }
+
+
+    if (
+        q.includes("hallo") ||
+        q.includes("hi")
+    ) {
+
+        return "Hallo! Wie kann ich dir helfen?";
+
+    }
+
+
+    if (
+        q.includes("wer bist du")
+    ) {
+
+        return "Ich bin der KI-Assistent von RiskyLive.";
+
+    }
+
+
+    if (
+        q.includes("danke")
+    ) {
+
+        return "Gerne!";
+
+    }
+
+
+    return "Ich habe deine Frage erhalten. " +
+           "Für diese lokale Demo habe ich " +
+           "darauf noch keine spezielle Antwort. " +
+           "Ein echter KI-Server kann hier später " +
+           "angeschlossen werden.";
+
+}
+
+
+/* ADMIN: PERSONEN */
+
+function updatePeople() {
+
+    const list =
+        document.getElementById("peopleList");
+
+    if (!isAdmin) return;
+
+
+    const users =
+        [...new Set(
+            conversations.map(x => x.user)
+        )];
+
+
+    if (users.length === 0) {
+
+        list.innerHTML =
+            "<p>Noch keine Fragen vorhanden.</p>";
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    users.forEach(user => {
+
+        const count =
+            conversations.filter(
+                x => x.user === user
+            ).length;
+
+
+        list.innerHTML += `
+
+            <div class="person"
+                 onclick="showPerson('${escapeAttribute(user)}')">
+
+                <strong>
+                    ${escapeHTML(user)}
+                </strong>
+
+                <span class="badge">
+                    ${count} Frage(n)
+                </span>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+/* ADMIN: PERSON ANSEHEN */
+
+function showPerson(user) {
+
+    const questions =
+        conversations.filter(
+            x => x.user === user
+        );
+
+
+    let output =
+        "Fragen von " + user + "\\n\\n";
+
+
+    questions.forEach((q, index) => {
+
+        output +=
+            (index + 1) +
+            ". Frage: " +
+            q.question +
+            "\\n" +
+            "KI: " +
+            q.answer +
+            "\\n\\n";
+
+    });
+
+
+    alert(output);
+
+}
+
+
+/* KI-DATEN */
+
+function loadKnowledge() {
+
+    document.getElementById("openingHours")
+        .value = knowledge.openingHours;
+
+    document.getElementById("aiKnowledge")
+        .value = knowledge.other;
+
+}
+
+
+function saveKnowledge() {
+
+    knowledge.openingHours =
+        document.getElementById("openingHours").value;
+
+    knowledge.other =
+        document.getElementById("aiKnowledge").value;
+
+
+    localStorage.setItem(
+        "knowledge",
+        JSON.stringify(knowledge)
+    );
+
+
+    document.getElementById("saveMessage")
+        .textContent =
+        "✓ KI-Daten gespeichert.";
+
+}
+
+
+/* BENUTZERNAME */
+
+function changeName() {
+
+    const name =
+        document.getElementById("newName")
+            .value.trim();
+
+    if (!name) return;
+
+
+    loggedUser = name;
+
+    document.getElementById("currentUser")
+        .textContent = loggedUser;
+
+
+    document.getElementById("settingsMessage")
+        .textContent =
+        "✓ Benutzername geändert.";
+
+}
+
+
+/* LOGOUT */
+
+function logout() {
+
+    location.reload();
+
+}
+
+
+/* HTML SCHUTZ */
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function escapeAttribute(text) {
+
+    return String(text)
+        .replaceAll("'", "\\'");
+
+}
+
+
+/* ENTER SENDEN */
+
+document
+    .getElementById("messageInput")
+    .addEventListener("keydown", function(e) {
+
+        if (e.key === "Enter" && !e.shiftKey) {
+
+            e.preventDefault();
 
             sendMessage();
 
         }
 
-    }
-);
-
-
-/* =====================================================
-   SEND BUTTON
-===================================================== */
-
-send.addEventListener(
-    "click",
-    sendMessage
-);
-
-
-/* =====================================================
-   BILDER
-===================================================== */
-
-imageInput.addEventListener(
-    "change",
-    () => {
-
-        if(
-            imageInput.files.length > 0
-        ){
-
-            const content =
-                addAIMessage();
-
-
-            content.innerHTML = `
-
-                <div class="answer">
-
-                    <div class="answerTitle">
-                        Bild ausgewählt
-                    </div>
-
-                    <div class="answerText">
-                        Das Bild wurde ausgewählt.
-                        Eine echte Bildanalyse ist in dieser Version noch nicht angeschlossen.
-                    </div>
-
-                </div>
-
-            `;
-
-            scrollDown();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   NEUER CHAT
-===================================================== */
-
-function newChat(){
-
-    chatInner.innerHTML = `
-
-        <div
-            id="start"
-            class="start"
-        >
-
-            <div class="lumora">
-                Lumora
-            </div>
-
-            <div class="startText">
-                Deine kreative KI
-            </div>
-
-        </div>
-
-    `;
-
-
-    input.value = "";
-
-    status.textContent = "";
-
-    chat.scrollTop = 0;
-
-    input.focus();
-
-}
-
-
-/* =====================================================
-   SCROLL
-===================================================== */
-
-function scrollDown(){
-
-    setTimeout(
-        () => {
-
-            chat.scrollTop =
-                chat.scrollHeight;
-
-        },
-        50
-    );
-
-}
+    });
 
 </script>
 
