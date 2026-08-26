@@ -1,14 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Lumora AI</title>
 
@@ -27,79 +21,51 @@ body{
 }
 
 body{
-
     background:#0d0d10;
-
-    color:white;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
     overflow:hidden;
-
 }
 
 
-/* =====================================================
+/* =========================
    APP
-===================================================== */
+========================= */
 
 .app{
-
     width:100%;
     height:100vh;
-
     display:flex;
-
 }
 
 
-/* =====================================================
+/* =========================
    SIDEBAR
-===================================================== */
+========================= */
 
 .sidebar{
-
     width:245px;
-
     background:#121216;
-
-    border-right:
-        1px solid #29292e;
-
+    border-right:1px solid #29292e;
     padding:18px;
-
     flex-shrink:0;
-
 }
 
 .logo{
-
     display:flex;
-
     align-items:center;
-
     gap:10px;
-
     font-size:21px;
-
     font-weight:bold;
-
     margin-bottom:28px;
-
 }
 
 .logoIcon{
-
     width:38px;
     height:38px;
-
     border-radius:13px;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
@@ -115,155 +81,197 @@ body{
 
     background-size:400% 400%;
 
-    animation:
-        rainbow 7s linear infinite;
-
+    animation:rainbow 7s linear infinite;
 }
 
 .newChat{
+    width:100%;
+    border:0;
+    border-radius:14px;
+    padding:13px;
 
+    background:#242429;
+    color:#fff;
+
+    cursor:pointer;
+}
+
+.newChat:hover{
+    background:#303036;
+}
+
+.sidebarTitle{
+    color:#77777f;
+    font-size:11px;
+    margin:28px 8px 10px;
+}
+
+.historyItem{
+    padding:11px;
+    border-radius:10px;
+    color:#c8c8ce;
+    font-size:13px;
+}
+
+.historyItem:hover{
+    background:#202025;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    flex:1;
+    min-width:0;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    position:relative;
+}
+
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar{
+    height:65px;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    padding:0 24px;
+}
+
+
+/* =========================
+   MODE SELECTOR
+========================= */
+
+.modelSelector{
+    position:relative;
+}
+
+.modelButton{
+    border:1px solid #303037;
+
+    background:#1e1e23;
+    color:#ddd;
+
+    padding:10px 15px;
+
+    border-radius:20px;
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    font-size:13px;
+}
+
+.modelButton:hover{
+    background:#29292f;
+}
+
+.modelMenu{
+    position:absolute;
+
+    right:0;
+    top:48px;
+
+    width:230px;
+
+    background:#18181d;
+
+    border:1px solid #303037;
+
+    border-radius:16px;
+
+    padding:7px;
+
+    display:none;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.45);
+
+    z-index:100;
+}
+
+.modelMenu.open{
+    display:block;
+}
+
+.modelMenu button{
     width:100%;
 
     border:0;
 
-    border-radius:14px;
-
-    padding:13px;
-
-    background:#242429;
+    background:transparent;
 
     color:white;
 
+    text-align:left;
+
+    padding:12px;
+
+    border-radius:11px;
+
     cursor:pointer;
 
-}
-
-.newChat:hover{
-
-    background:#303036;
-
-}
-
-.sidebarTitle{
-
-    color:#77777f;
-
-    font-size:11px;
-
-    margin:
-        28px 8px 10px;
-
-}
-
-.historyItem{
-
-    padding:11px;
-
-    border-radius:10px;
-
-    color:#c8c8ce;
-
-    font-size:13px;
-
-}
-
-.historyItem:hover{
-
-    background:#202025;
-
-}
-
-
-/* =====================================================
-   MAIN
-===================================================== */
-
-.main{
-
-    flex:1;
-
-    min-width:0;
-
-    height:100%;
-
     display:flex;
-
     flex-direction:column;
 
-    position:relative;
+    gap:4px;
+}
 
+.modelMenu button:hover{
+    background:#29292f;
+}
+
+.modelMenu strong{
+    font-size:14px;
+}
+
+.modelMenu small{
+    color:#85858d;
+    font-size:11px;
 }
 
 
-/* =====================================================
-   TOP
-===================================================== */
-
-.topbar{
-
-    height:65px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:flex-end;
-
-    padding:
-        0 24px;
-
-}
-
-.model{
-
-    padding:
-        9px 15px;
-
-    border-radius:20px;
-
-    background:#1e1e23;
-
-    border:
-        1px solid #303037;
-
-    color:#d5d5db;
-
-    font-size:13px;
-
-}
-
-
-/* =====================================================
+/* =========================
    CHAT
-===================================================== */
+========================= */
 
 .chat{
-
     flex:1;
 
     overflow-y:auto;
 
     padding:
-        20px 20px 200px;
-
+        20px
+        20px
+        200px;
 }
 
 .chatInner{
-
-    width:
-        min(900px,100%);
-
+    width:min(900px,100%);
     margin:auto;
-
 }
 
 
-/* =====================================================
+/* =========================
    START
-===================================================== */
+========================= */
 
 .start{
-
     min-height:
         calc(100vh - 200px);
 
@@ -274,11 +282,9 @@ body{
     justify-content:center;
 
     align-items:center;
-
 }
 
 .lumora{
-
     font-size:
         clamp(52px,8vw,76px);
 
@@ -303,42 +309,31 @@ body{
         rainbow 7s linear infinite;
 
     -webkit-background-clip:text;
-
     background-clip:text;
 
     color:transparent;
-
 }
 
 .startText{
-
     color:#77777f;
-
     margin-top:8px;
-
 }
 
 
-/* =====================================================
-   MESSAGE
-===================================================== */
+/* =========================
+   MESSAGES
+========================= */
 
 .message{
-
     margin-bottom:28px;
-
 }
 
 .user{
-
     display:flex;
-
     justify-content:flex-end;
-
 }
 
 .userBubble{
-
     max-width:80%;
 
     padding:
@@ -352,13 +347,10 @@ body{
     white-space:pre-wrap;
 
     line-height:1.5;
-
 }
 
 .aiHeader{
-
     display:flex;
-
     align-items:center;
 
     gap:9px;
@@ -366,18 +358,15 @@ body{
     margin-bottom:10px;
 
     font-weight:bold;
-
 }
 
 .aiIcon{
-
     width:29px;
     height:29px;
 
     border-radius:9px;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
@@ -388,249 +377,144 @@ body{
             #9b72cb,
             #d96570
         );
-
 }
 
 .aiContent{
-
     color:#dedee3;
+    line-height:1.7;
 
-    line-height:1.6;
-
+    font-size:15px;
 }
 
 
-/* =====================================================
-   SEARCH ANSWER
-===================================================== */
+/* =========================
+   LUMORA ANSWER
+========================= */
 
-.answerBox{
-
-    padding:16px;
-
-    border-radius:17px;
-
-    background:#18181d;
+.answer{
+    background:#17171b;
 
     border:
-        1px solid #2d2d34;
+        1px solid #292930;
 
-    margin-bottom:12px;
+    border-radius:18px;
 
+    padding:18px;
+
+    margin-top:5px;
 }
 
 .answerTitle{
-
     font-size:17px;
-
     font-weight:bold;
 
-    margin-bottom:9px;
-
+    margin-bottom:10px;
 }
 
 .answerText{
+    color:#dedee3;
 
-    color:#d3d3d8;
-
-    line-height:1.6;
-
+    line-height:1.7;
 }
 
-.source{
-
+.answerSource{
     display:inline-block;
 
-    margin-top:12px;
+    margin-top:14px;
 
     color:#8ab4f8;
 
     text-decoration:none;
 
     font-size:12px;
-
 }
 
-.source:hover{
-
+.answerSource:hover{
     text-decoration:underline;
-
 }
 
 
-/* =====================================================
-   TOPICS
-===================================================== */
-
-.topicList{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:8px;
-
-}
-
-.topic{
-
-    display:block;
-
-    text-decoration:none;
-
-    background:#18181d;
-
-    border:
-        1px solid #2b2b31;
-
-    padding:14px;
-
-    border-radius:14px;
-
-}
-
-.topic:hover{
-
-    background:#202026;
-
-}
-
-.topicTitle{
-
-    color:#8ab4f8;
-
-    font-weight:bold;
-
-    margin-bottom:5px;
-
-}
-
-.topicText{
-
-    color:#bdbdc4;
-
-    font-size:13px;
-
-    line-height:1.5;
-
-}
-
-
-/* =====================================================
-   IMAGE
-===================================================== */
-
-.resultImage{
-
-    max-width:260px;
-
-    max-height:180px;
-
-    object-fit:cover;
-
-    border-radius:14px;
-
-    margin-bottom:14px;
-
-}
-
-
-/* =====================================================
-   LOADING
-===================================================== */
+/* =========================
+   THINKING
+========================= */
 
 .loading{
-
-    color:#9999a2;
+    color:#a0a0a8;
 
     display:flex;
 
     align-items:center;
 
-    gap:9px;
-
+    gap:10px;
 }
 
 .dots{
-
     display:flex;
-
     gap:4px;
-
 }
 
 .dot{
-
     width:6px;
     height:6px;
 
-    background:#888;
+    background:#999;
 
     border-radius:50%;
 
     animation:
         pulse 1s infinite alternate;
-
 }
 
 .dot:nth-child(2){
-
     animation-delay:.2s;
-
 }
 
 .dot:nth-child(3){
-
     animation-delay:.4s;
-
 }
 
 
-/* =====================================================
+/* =========================
    ERROR
-===================================================== */
+========================= */
 
 .error{
-
-    padding:15px;
-
-    border-radius:15px;
-
     background:#21191b;
 
     border:
         1px solid #503136;
 
-    color:#ddd;
+    border-radius:15px;
 
+    padding:15px;
+
+    color:#ddd;
 }
 
-.error strong{
-
-    display:block;
-
+.errorTitle{
     color:#f28b82;
 
-    margin-bottom:6px;
+    font-weight:bold;
 
+    margin-bottom:6px;
 }
 
 
-/* =====================================================
+/* =========================
    INPUT
-===================================================== */
+========================= */
 
 .inputArea{
-
     position:absolute;
-
-    bottom:0;
 
     left:0;
     right:0;
+    bottom:0;
 
     padding:
-        15px 20px 20px;
+        15px
+        20px
+        20px;
 
     background:
         linear-gradient(
@@ -638,20 +522,14 @@ body{
             #0d0d10 70%,
             transparent
         );
-
 }
 
 .inputWrapper{
-
-    width:
-        min(850px,100%);
-
+    width:min(850px,100%);
     margin:auto;
-
 }
 
 .inputBox{
-
     padding:5px;
 
     border-radius:30px;
@@ -671,11 +549,9 @@ body{
 
     animation:
         rainbow 7s linear infinite;
-
 }
 
 .inputInner{
-
     background:#17171b;
 
     border-radius:26px;
@@ -683,62 +559,48 @@ body{
     padding:19px;
 
     min-height:150px;
-
 }
 
 textarea{
-
     width:100%;
 
     min-height:70px;
-
     max-height:130px;
 
     resize:none;
 
     border:0;
-
     outline:0;
 
     background:transparent;
 
-    color:white;
+    color:#fff;
 
     font-size:17px;
 
     font-family:inherit;
-
 }
 
 textarea::placeholder{
-
     color:#77777f;
-
 }
 
 .inputBottom{
-
     display:flex;
 
     justify-content:space-between;
-
     align-items:center;
 
     margin-top:12px;
-
 }
 
 .buttons{
-
     display:flex;
-
     gap:8px;
-
 }
 
 .iconButton,
 .sendButton{
-
     width:42px;
     height:42px;
 
@@ -748,30 +610,23 @@ textarea::placeholder{
 
     cursor:pointer;
 
-    color:white;
+    color:#fff;
 
     display:flex;
 
     align-items:center;
-
     justify-content:center;
-
 }
 
 .iconButton{
-
     background:#27272d;
-
 }
 
 .iconButton:hover{
-
     background:#36363d;
-
 }
 
 .sendButton{
-
     background:
         linear-gradient(
             135deg,
@@ -781,25 +636,18 @@ textarea::placeholder{
         );
 
     font-size:19px;
-
 }
 
 .sendButton:disabled{
-
     opacity:.5;
-
     cursor:wait;
-
 }
 
 #imageInput{
-
     display:none;
-
 }
 
 .status{
-
     height:18px;
 
     text-align:center;
@@ -809,13 +657,12 @@ textarea::placeholder{
     font-size:11px;
 
     margin-top:7px;
-
 }
 
 
-/* =====================================================
-   ANIMATION
-===================================================== */
+/* =========================
+   ANIMATIONS
+========================= */
 
 @keyframes rainbow{
 
@@ -846,9 +693,9 @@ textarea::placeholder{
 }
 
 
-/* =====================================================
+/* =========================
    MOBILE
-===================================================== */
+========================= */
 
 @media(max-width:700px){
 
@@ -858,12 +705,13 @@ textarea::placeholder{
 
     .chat{
         padding:
-            15px 12px 195px;
+            15px
+            12px
+            195px;
     }
 
     .inputArea{
-        padding:
-            10px;
+        padding:10px;
     }
 
     .userBubble{
@@ -873,7 +721,6 @@ textarea::placeholder{
 }
 
 </style>
-
 </head>
 
 <body>
@@ -927,12 +774,82 @@ textarea::placeholder{
 
     <div class="topbar">
 
-        <div class="model">
-            Lumora 1.0 ▾
+        <div class="modelSelector">
+
+            <button
+                class="modelButton"
+                id="modelButton"
+                onclick="toggleModelMenu()"
+            >
+
+                <span id="modeName">
+                    Normal
+                </span>
+
+                <span>
+                    ⌄
+                </span>
+
+            </button>
+
+
+            <div
+                class="modelMenu"
+                id="modelMenu"
+            >
+
+                <button
+                    onclick="selectMode('normal')"
+                >
+
+                    <strong>
+                        Normal
+                    </strong>
+
+                    <small>
+                        Normales Denken
+                    </small>
+
+                </button>
+
+
+                <button
+                    onclick="selectMode('long')"
+                >
+
+                    <strong>
+                        Länger Denken
+                    </strong>
+
+                    <small>
+                        Mehr Zeit zum Nachdenken
+                    </small>
+
+                </button>
+
+
+                <button
+                    onclick="selectMode('instant')"
+                >
+
+                    <strong>
+                        Instant
+                    </strong>
+
+                    <small>
+                        Schnelle Antwort
+                    </small>
+
+                </button>
+
+            </div>
+
         </div>
 
     </div>
 
+
+    <!-- CHAT -->
 
     <div
         id="chat"
@@ -982,7 +899,6 @@ textarea::placeholder{
 
                     <div class="inputBottom">
 
-
                         <div class="buttons">
 
                             <label
@@ -1012,7 +928,6 @@ textarea::placeholder{
                             </button>
 
                         </div>
-
 
                     </div>
 
@@ -1061,7 +976,96 @@ const imageInput =
 
 
 /* =====================================================
-   USER
+   MODI
+===================================================== */
+
+let selectedMode = "normal";
+
+
+const modes = {
+
+    normal:{
+        name:"Normal",
+        text:"Denke nach",
+        delay:700
+    },
+
+    long:{
+        name:"Länger Denken",
+        text:"Denke gründlicher nach",
+        delay:1800
+    },
+
+    instant:{
+        name:"Instant",
+        text:"Denke nach",
+        delay:100
+    }
+
+};
+
+
+/* =====================================================
+   MENÜ
+===================================================== */
+
+function toggleModelMenu(){
+
+    document
+        .getElementById("modelMenu")
+        .classList.toggle("open");
+
+}
+
+
+function selectMode(mode){
+
+    selectedMode = mode;
+
+    document
+        .getElementById("modeName")
+        .textContent =
+            modes[mode].name;
+
+    document
+        .getElementById("modelMenu")
+        .classList.remove("open");
+
+}
+
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const selector =
+            document.querySelector(
+                ".modelSelector"
+            );
+
+        if(
+            selector &&
+            !selector.contains(
+                event.target
+            )
+        ){
+
+            document
+                .getElementById(
+                    "modelMenu"
+                )
+                .classList.remove(
+                    "open"
+                );
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   USER-NACHRICHT
 ===================================================== */
 
 function addUserMessage(text){
@@ -1099,7 +1103,7 @@ function addUserMessage(text){
 
 
 /* =====================================================
-   AI
+   AI-NACHRICHT
 ===================================================== */
 
 function addAIMessage(){
@@ -1135,13 +1139,8 @@ function addAIMessage(){
         "Lumora";
 
 
-    header.appendChild(
-        icon
-    );
-
-    header.appendChild(
-        name
-    );
+    header.appendChild(icon);
+    header.appendChild(name);
 
 
     const content =
@@ -1151,18 +1150,11 @@ function addAIMessage(){
         "aiContent";
 
 
-    message.appendChild(
-        header
-    );
-
-    message.appendChild(
-        content
-    );
+    message.appendChild(header);
+    message.appendChild(content);
 
 
-    chatInner.appendChild(
-        message
-    );
+    chatInner.appendChild(message);
 
 
     return content;
@@ -1171,20 +1163,26 @@ function addAIMessage(){
 
 
 /* =====================================================
-   LOADING
+   DENKEN
 ===================================================== */
 
-function showLoading(){
+function showThinking(){
 
     const content =
         addAIMessage();
+
+
+    const mode =
+        modes[selectedMode];
 
 
     content.innerHTML = `
 
         <div class="loading">
 
-            <span>Ich suche nach Informationen</span>
+            <span>
+                ${mode.text}
+            </span>
 
             <div class="dots">
 
@@ -1208,262 +1206,193 @@ function showLoading(){
 
 
 /* =====================================================
-   ERGEBNISSE
+   EIGENE ANTWORT ERSTELLEN
 ===================================================== */
 
-function renderResults(
-    content,
+function createOwnAnswer(
+    query,
     data
 ){
+
+    /*
+       Wir nehmen nur das relevanteste
+       gefundene Ergebnis.
+
+       Keine riesige Ergebnisliste.
+    */
+
+    let best = null;
+
+
+    if(
+        data.results &&
+        data.results.length
+    ){
+
+        best =
+            data.results.find(
+                item =>
+                    item.type === "abstract"
+            ) ||
+
+            data.results.find(
+                item =>
+                    item.type === "answer"
+            ) ||
+
+            data.results.find(
+                item =>
+                    item.type === "topic"
+            );
+
+    }
+
+
+    if(!best){
+
+        return {
+
+            title:"Keine passende Information gefunden",
+
+            text:
+                "Ich konnte zu deiner Frage keine passende Information von DuckDuckGo erhalten.",
+
+            source:""
+
+        };
+
+    }
+
+
+    let text =
+        best.text || "";
+
+
+    /*
+       Kleine sprachliche Umwandlung.
+       Dadurch wird nicht einfach eine rohe
+       Trefferliste angezeigt.
+    */
+
+    text =
+        text
+            .replace(
+                /^according to/i,
+                "Nach den verfügbaren Informationen"
+            )
+            .trim();
+
+
+    if(
+        !text.endsWith(".") &&
+        !text.endsWith("!") &&
+        !text.endsWith("?")
+    ){
+
+        text += ".";
+
+    }
+
+
+    return {
+
+        title:
+            data.heading ||
+            best.title ||
+            "Antwort",
+
+        text:
+            text,
+
+        source:
+            best.source || ""
+
+    };
+
+}
+
+
+/* =====================================================
+   ANTWORT DARSTELLEN
+===================================================== */
+
+function renderAnswer(
+    content,
+    query,
+    data
+){
+
+    const answer =
+        createOwnAnswer(
+            query,
+            data
+        );
+
 
     content.innerHTML = "";
 
 
-    if(data.image){
-
-        const image =
-            document.createElement("img");
-
-        image.className =
-            "resultImage";
-
-        image.src =
-            data.image.url;
-
-        image.alt =
-            data.heading ||
-            "DuckDuckGo Ergebnis";
-
-
-        image.onerror =
-            () => image.remove();
-
-
-        content.appendChild(
-            image
-        );
-
-    }
-
-
-    if(data.heading){
-
-        const heading =
-            document.createElement("div");
-
-        heading.className =
-            "answerTitle";
-
-        heading.textContent =
-            data.heading;
-
-        content.appendChild(
-            heading
-        );
-
-    }
-
-
-    const answers =
-        data.results.filter(
-            item =>
-                item.type === "answer" ||
-                item.type === "abstract"
-        );
-
-
-    for(
-        const item of answers
-    ){
-
-        const box =
-            document.createElement("div");
-
-        box.className =
-            "answerBox";
-
-
-        const title =
-            document.createElement("div");
-
-        title.className =
-            "answerTitle";
-
-        title.textContent =
-            item.title;
-
-
-        const text =
-            document.createElement("div");
-
-        text.className =
-            "answerText";
-
-        text.textContent =
-            item.text;
-
-
-        box.appendChild(
-            title
-        );
-
-        box.appendChild(
-            text
-        );
-
-
-        if(item.source){
-
-            const source =
-                document.createElement("a");
-
-            source.className =
-                "source";
-
-            source.href =
-                item.source;
-
-            source.target =
-                "_blank";
-
-            source.rel =
-                "noopener noreferrer";
-
-            source.textContent =
-                "Quelle öffnen ↗";
-
-
-            box.appendChild(
-                source
-            );
-
-        }
-
-
-        content.appendChild(
-            box
-        );
-
-    }
-
-
-    const topics =
-        data.results.filter(
-            item =>
-                item.type === "topic"
-        );
-
-
-    if(topics.length){
-
-        const list =
-            document.createElement("div");
-
-        list.className =
-            "topicList";
-
-
-        for(
-            const topic of topics
-        ){
-
-            const link =
-                document.createElement("a");
-
-            link.className =
-                "topic";
-
-            link.href =
-                topic.source;
-
-            link.target =
-                "_blank";
-
-            link.rel =
-                "noopener noreferrer";
-
-
-            const title =
-                document.createElement("div");
-
-            title.className =
-                "topicTitle";
-
-            title.textContent =
-                topic.title;
-
-
-            const text =
-                document.createElement("div");
-
-            text.className =
-                "topicText";
-
-            text.textContent =
-                topic.text;
-
-
-            link.appendChild(
-                title
-            );
-
-            link.appendChild(
-                text
-            );
-
-
-            list.appendChild(
-                link
-            );
-
-        }
-
-
-        content.appendChild(
-            list
-        );
-
-    }
-
-
-    if(
-        data.results.length === 0
-    ){
-
-        const empty =
-            document.createElement("div");
-
-        empty.className =
-            "answerBox";
-
-        empty.textContent =
-            "DuckDuckGo hat für diese Anfrage keine Instant-Answer-Daten zurückgegeben.";
-
-        content.appendChild(
-            empty
-        );
-
-    }
-
-
-    const attribution =
+    const box =
         document.createElement("div");
 
-    attribution.style.marginTop =
-        "14px";
+    box.className =
+        "answer";
 
-    attribution.style.color =
-        "#77777f";
 
-    attribution.style.fontSize =
-        "11px";
+    const title =
+        document.createElement("div");
 
-    attribution.textContent =
-        "Informationen von DuckDuckGo Instant Answers.";
+    title.className =
+        "answerTitle";
 
-    content.appendChild(
-        attribution
-    );
+    title.textContent =
+        answer.title;
+
+
+    const text =
+        document.createElement("div");
+
+    text.className =
+        "answerText";
+
+    text.textContent =
+        answer.text;
+
+
+    box.appendChild(title);
+    box.appendChild(text);
+
+
+    if(answer.source){
+
+        const source =
+            document.createElement("a");
+
+        source.className =
+            "answerSource";
+
+        source.href =
+            answer.source;
+
+        source.target =
+            "_blank";
+
+        source.rel =
+            "noopener noreferrer";
+
+        source.textContent =
+            "Quelle ansehen ↗";
+
+
+        box.appendChild(source);
+
+    }
+
+
+    content.appendChild(box);
+
+
+    scrollDown();
 
 }
 
@@ -1477,48 +1406,43 @@ function renderError(
     message
 ){
 
-    content.innerHTML = "";
+    content.innerHTML = `
 
+        <div class="error">
 
-    const box =
-        document.createElement("div");
+            <div class="errorTitle">
+                Es ist ein Fehler aufgetreten
+            </div>
 
-    box.className =
-        "error";
+            <div>
+                ${escapeHTML(message)}
+            </div>
 
+        </div>
 
-    const title =
-        document.createElement("strong");
-
-    title.textContent =
-        "Suche fehlgeschlagen";
-
-
-    const text =
-        document.createElement("span");
-
-    text.textContent =
-        message;
-
-
-    box.appendChild(
-        title
-    );
-
-    box.appendChild(
-        text
-    );
-
-
-    content.appendChild(
-        box
-    );
+    `;
 
 }
 
 
 /* =====================================================
-   SUCHE
+   HTML SICHER MACHEN
+===================================================== */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   DUCKDUCKGO SUCHE
 ===================================================== */
 
 async function search(
@@ -1527,10 +1451,29 @@ async function search(
 ){
 
     status.textContent =
-        "Suche …";
+        "Denke nach …";
+
+
+    /*
+       Je nach gewähltem Modus
+       kurz warten.
+    */
+
+    await new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                modes[selectedMode].delay
+            )
+    );
 
 
     try{
+
+        /*
+           Suche läuft weiterhin über
+           unseren Server zu DuckDuckGo.
+        */
 
         const response =
             await fetch(
@@ -1552,27 +1495,32 @@ async function search(
 
             throw new Error(
                 data.error ||
-                "Keine Antwort vom Suchserver."
+                "Der Suchserver hat keine gültige Antwort geliefert."
             );
 
         }
 
 
-        renderResults(
+        /*
+           Nur EIN relevantes Ergebnis
+           wird in eine Lumora-Nachricht
+           umgewandelt.
+        */
+
+        renderAnswer(
             content,
+            query,
             data
         );
 
 
         status.textContent =
-            "Antwort erhalten";
+            "Bereit";
 
 
     }catch(error){
 
-        console.error(
-            error
-        );
+        console.error(error);
 
 
         renderError(
@@ -1582,7 +1530,8 @@ async function search(
 
 
         status.textContent =
-            "Suche beendet";
+            "Fehler";
+
 
     }finally{
 
@@ -1629,25 +1578,22 @@ async function sendMessage(){
     }
 
 
-    addUserMessage(
-        query
-    );
+    addUserMessage(query);
 
 
     input.value = "";
 
 
-    send.disabled =
-        true;
+    send.disabled = true;
 
 
-    const ai =
-        showLoading();
+    const content =
+        showThinking();
 
 
     await search(
         query,
-        ai
+        content
     );
 
 
@@ -1680,7 +1626,7 @@ input.addEventListener(
 
 
 /* =====================================================
-   BUTTON
+   SEND BUTTON
 ===================================================== */
 
 send.addEventListener(
@@ -1690,7 +1636,7 @@ send.addEventListener(
 
 
 /* =====================================================
-   IMAGE
+   BILDER
 ===================================================== */
 
 imageInput.addEventListener(
@@ -1698,14 +1644,31 @@ imageInput.addEventListener(
     () => {
 
         if(
-            imageInput.files.length
+            imageInput.files.length > 0
         ){
 
-            const ai =
+            const content =
                 addAIMessage();
 
-            ai.textContent =
-                "🖼️ Bild ausgewählt. Die Bildanalyse ist in dieser Version noch nicht angeschlossen.";
+
+            content.innerHTML = `
+
+                <div class="answer">
+
+                    <div class="answerTitle">
+                        Bild ausgewählt
+                    </div>
+
+                    <div class="answerText">
+                        Das Bild wurde ausgewählt.
+                        Eine echte Bildanalyse ist in dieser Version noch nicht angeschlossen.
+                    </div>
+
+                </div>
+
+            `;
+
+            scrollDown();
 
         }
 
@@ -1771,5 +1734,4 @@ function scrollDown(){
 </script>
 
 </body>
-
 </html>
