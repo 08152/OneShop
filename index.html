@@ -2,8 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>RiskyLive Nachrichten</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RiskyLive KI Nachrichten</title>
 
 <style>
 * {
@@ -13,148 +13,168 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f1f4f8;
-    color: #172033;
+    background: #f4f6fb;
+    color: #182033;
 }
 
-button, input, textarea {
-    font: inherit;
-}
+/* LOGIN */
 
-.login {
+#loginScreen {
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    background: linear-gradient(135deg,#eef1ff,#f8f9fc);
 }
 
-.login-box {
+.loginBox {
     width: 100%;
     max-width: 430px;
     background: white;
     padding: 35px;
-    border-radius: 22px;
-    box-shadow: 0 15px 50px rgba(0,0,0,.12);
+    border-radius: 24px;
+    box-shadow: 0 20px 70px rgba(0,0,0,.12);
 }
 
 .logo {
-    font-size: 30px;
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 800;
     margin-bottom: 8px;
 }
 
+.logo span {
+    color: #667eea;
+}
+
 .subtitle {
-    color: #697386;
+    color: #737b8c;
     margin-bottom: 30px;
 }
 
-input, textarea {
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+input,
+textarea,
+select {
     width: 100%;
-    border: 1px solid #d9dee8;
+    border: 1px solid #d9deea;
     border-radius: 12px;
     padding: 13px;
     outline: none;
+    background: white;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
     border-color: #667eea;
 }
 
-.field {
-    margin-bottom: 16px;
+.formGroup {
+    margin-bottom: 17px;
 }
 
-.field label {
-    display: block;
-    margin-bottom: 7px;
-    font-weight: bold;
-}
-
-.login-btn,
-.send-btn,
-.save-btn {
+.loginButton,
+.sendButton,
+.saveButton {
     border: 0;
+    border-radius: 12px;
+    padding: 13px 18px;
     background: #667eea;
     color: white;
-    padding: 13px 18px;
-    border-radius: 12px;
-    cursor: pointer;
     font-weight: bold;
+    cursor: pointer;
 }
 
-.login-btn {
+.loginButton {
     width: 100%;
 }
 
 .error {
+    display: none;
     color: #d93025;
     margin-top: 15px;
-    display: none;
 }
 
-.app {
+/* APP */
+
+#app {
     display: none;
-    min-height: 100vh;
 }
 
 .sidebar {
-    width: 280px;
-    background: #151a27;
-    color: white;
     position: fixed;
     left: 0;
     top: 0;
     bottom: 0;
+    width: 270px;
+    background: #151a27;
+    color: white;
     padding: 22px;
 }
 
-.sidebar-logo {
-    font-size: 23px;
+.sidebarLogo {
+    font-size: 24px;
     font-weight: bold;
     margin-bottom: 30px;
 }
 
-.menu-btn {
-    width: 100%;
-    background: transparent;
-    border: 0;
-    color: #c9ceda;
-    text-align: left;
-    padding: 13px;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-bottom: 5px;
+.sidebarLogo span {
+    color: #8290ff;
 }
 
-.menu-btn:hover,
-.menu-btn.active {
-    background: #252c40;
+.menuButton {
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 6px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #c8ccda;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menuButton:hover,
+.menuButton.active {
+    background: #282f43;
     color: white;
 }
 
+.logout {
+    position: absolute;
+    bottom: 20px;
+    left: 22px;
+    width: calc(100% - 44px);
+}
+
 .main {
-    margin-left: 280px;
+    margin-left: 270px;
     min-height: 100vh;
 }
 
 .topbar {
     height: 70px;
     background: white;
-    border-bottom: 1px solid #e4e7ed;
+    border-bottom: 1px solid #e4e7ee;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 25px;
+    padding: 0 28px;
 }
 
-.user-name {
-    font-weight: bold;
+.user {
+    color: #697386;
 }
 
 .content {
     padding: 30px;
-    max-width: 1100px;
+    max-width: 1150px;
+    margin: auto;
 }
 
 .page {
@@ -168,13 +188,15 @@ input:focus, textarea:focus {
 .card {
     background: white;
     border-radius: 18px;
-    padding: 24px;
+    padding: 25px;
     margin-bottom: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,.05);
+    box-shadow: 0 5px 25px rgba(0,0,0,.05);
 }
 
+/* CHAT */
+
 .chat {
-    height: calc(100vh - 170px);
+    min-height: calc(100vh - 130px);
     display: flex;
     flex-direction: column;
 }
@@ -182,110 +204,118 @@ input:focus, textarea:focus {
 .messages {
     flex: 1;
     overflow-y: auto;
-    padding: 15px;
+    padding: 15px 0;
 }
 
 .message {
     max-width: 75%;
-    padding: 13px 16px;
-    border-radius: 16px;
+    padding: 14px 17px;
+    border-radius: 17px;
     margin-bottom: 12px;
-    line-height: 1.45;
+    line-height: 1.5;
+    white-space: pre-wrap;
 }
 
 .message.user {
     margin-left: auto;
     background: #667eea;
     color: white;
-    border-bottom-right-radius: 4px;
+    border-bottom-right-radius: 5px;
 }
 
 .message.ai {
-    background: #eef1f6;
-    border-bottom-left-radius: 4px;
+    background: #edf0f5;
+    border-bottom-left-radius: 5px;
 }
 
 .message small {
     display: block;
-    opacity: .7;
+    opacity: .65;
     margin-bottom: 5px;
 }
 
-.message-form {
+.chatInput {
     display: flex;
     gap: 10px;
-    padding-top: 15px;
 }
 
-.message-form textarea {
-    resize: none;
+.chatInput textarea {
     height: 55px;
+    resize: none;
+    flex: 1;
 }
 
-.message-form .send-btn {
+.sendButton {
     width: 100px;
 }
 
+/* KI DATEN */
+
+.dataGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+.section {
+    margin-top: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e4e7ee;
+}
+
+/* PERSONEN */
+
 .person {
-    border: 1px solid #e1e5ec;
-    border-radius: 12px;
-    padding: 15px;
+    padding: 16px;
+    border: 1px solid #e0e4ec;
+    border-radius: 13px;
     margin-bottom: 10px;
     cursor: pointer;
 }
 
 .person:hover {
-    background: #f5f7fa;
-}
-
-.person strong {
-    display: block;
+    background: #f7f8fa;
 }
 
 .badge {
     display: inline-block;
-    background: #e8ebff;
+    margin-top: 6px;
+    padding: 4px 9px;
+    background: #e9ecff;
     color: #5263c7;
-    padding: 4px 8px;
     border-radius: 20px;
     font-size: 12px;
-    margin-top: 5px;
 }
 
-textarea.data {
-    min-height: 130px;
-    resize: vertical;
-}
+/* RESPONSIVE */
 
-.logout {
-    position: absolute;
-    bottom: 20px;
-    left: 22px;
-    right: 22px;
-    width: calc(100% - 44px);
-}
+@media(max-width:800px) {
 
-@media(max-width:700px) {
     .sidebar {
         width: 70px;
         padding: 10px;
     }
 
-    .sidebar-logo {
-        font-size: 0;
-    }
-
-    .sidebar-logo::after {
-        content: "R";
-        font-size: 24px;
-    }
-
-    .menu-btn {
+    .sidebarLogo {
         font-size: 0;
         text-align: center;
     }
 
-    .menu-btn::first-letter {
+    .sidebarLogo::after {
+        content: "R";
+        font-size: 25px;
+    }
+
+    .menuButton {
+        font-size: 0;
+        text-align: center;
+    }
+
+    .menuButton::first-letter {
         font-size: 20px;
     }
 
@@ -293,8 +323,12 @@ textarea.data {
         margin-left: 70px;
     }
 
-    .content {
-        padding: 15px;
+    .dataGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .full {
+        grid-column: auto;
     }
 }
 </style>
@@ -303,33 +337,44 @@ textarea.data {
 <body>
 
 <!-- LOGIN -->
-<div class="login" id="loginScreen">
 
-    <div class="login-box">
+<div id="loginScreen">
 
-        <div class="logo">RiskyLive</div>
+    <div class="loginBox">
+
+        <div class="logo">
+            Risky<span>Live</span>
+        </div>
+
         <div class="subtitle">
-            Nachrichten & KI-Assistent
+            KI-Nachrichtenplattform
         </div>
 
-        <div class="field">
-            <label>Benutzername / E-Mail</label>
-            <input id="username" type="text"
-                   placeholder="Benutzername oder E-Mail">
+        <div class="formGroup">
+            <label>Benutzername</label>
+            <input
+                id="username"
+                placeholder="Benutzername oder E-Mail">
         </div>
 
-        <div class="field">
+        <div class="formGroup">
             <label>PIN</label>
-            <input id="pin" type="password"
-                   placeholder="PIN">
+            <input
+                id="pin"
+                type="password"
+                placeholder="PIN">
         </div>
 
-        <button class="login-btn" onclick="login()">
+        <button
+            class="loginButton"
+            onclick="login()">
             Anmelden
         </button>
 
-        <div class="error" id="loginError">
-            Benutzername oder PIN ist falsch.
+        <div
+            class="error"
+            id="loginError">
+            Falscher Benutzername oder PIN.
         </div>
 
     </div>
@@ -338,37 +383,43 @@ textarea.data {
 
 
 <!-- APP -->
-<div class="app" id="app">
+
+<div id="app">
 
     <aside class="sidebar">
 
-        <div class="sidebar-logo">
-            RiskyLive
+        <div class="sidebarLogo">
+            Risky<span>Live</span>
         </div>
 
-        <button class="menu-btn active"
-                onclick="showPage('chat', this)">
+        <button
+            class="menuButton active"
+            onclick="openPage('chat',this)">
             💬 Nachrichten
         </button>
 
-        <button class="menu-btn"
-                onclick="showPage('people', this)"
-                id="peopleMenu">
+        <button
+            class="menuButton"
+            id="peopleMenu"
+            onclick="openPage('people',this)">
             👥 Personen
         </button>
 
-        <button class="menu-btn"
-                onclick="showPage('knowledge', this)">
+        <button
+            class="menuButton"
+            onclick="openPage('knowledge',this)">
             🧠 KI-Daten
         </button>
 
-        <button class="menu-btn"
-                onclick="showPage('settings', this)">
+        <button
+            class="menuButton"
+            onclick="openPage('settings',this)">
             ⚙️ Einstellungen
         </button>
 
-        <button class="menu-btn logout"
-                onclick="logout()">
+        <button
+            class="menuButton logout"
+            onclick="logout()">
             🚪 Abmelden
         </button>
 
@@ -379,40 +430,48 @@ textarea.data {
 
         <header class="topbar">
 
-            <span id="pageTitle">
+            <strong id="pageTitle">
                 Nachrichten
-            </span>
+            </strong>
 
-            <span class="user-name"
-                  id="currentUser">
+            <span
+                class="user"
+                id="currentUser">
             </span>
 
         </header>
 
 
-        <section class="content">
+        <div class="content">
 
             <!-- CHAT -->
-            <div class="page active" id="chat">
+
+            <section
+                id="page-chat"
+                class="page active">
 
                 <div class="card chat">
 
-                    <h2>
-                        KI-Nachrichten
-                    </h2>
+                    <h2>KI-Assistent</h2>
 
-                    <div class="messages"
-                         id="messages">
+                    <p>
+                        Stelle eine Frage.
+                    </p>
+
+                    <div
+                        class="messages"
+                        id="messages">
                     </div>
 
-                    <div class="message-form">
+                    <div class="chatInput">
 
                         <textarea
                             id="messageInput"
-                            placeholder="Schreibe eine Frage..."></textarea>
+                            placeholder="Nachricht schreiben..."></textarea>
 
-                        <button class="send-btn"
-                                onclick="sendMessage()">
+                        <button
+                            class="sendButton"
+                            onclick="sendMessage()">
                             Senden
                         </button>
 
@@ -420,106 +479,340 @@ textarea.data {
 
                 </div>
 
-            </div>
+            </section>
 
 
             <!-- PERSONEN -->
-            <div class="page" id="people">
+
+            <section
+                id="page-people"
+                class="page">
 
                 <div class="card">
 
-                    <h2>
-                        Personen
-                    </h2>
+                    <h2>Personen</h2>
 
                     <p>
-                        Hier siehst du die Personen,
-                        die Fragen gestellt haben.
+                        Hier kannst du sehen, wer Fragen
+                        gestellt hat und was die KI geantwortet hat.
                     </p>
 
                     <div id="peopleList"></div>
 
                 </div>
 
-            </div>
+            </section>
 
 
-            <!-- KI-DATEN -->
-            <div class="page" id="knowledge">
+            <!-- KI DATEN -->
+
+            <section
+                id="page-knowledge"
+                class="page">
 
                 <div class="card">
 
-                    <h2>
-                        Was weiß die KI?
-                    </h2>
+                    <h2>KI-Daten</h2>
 
                     <p>
-                        Diese Informationen verwendet
-                        die lokale Demo für ihre Antworten.
+                        Hier kannst du festlegen, was die KI
+                        über dich bzw. deinen Dienst wissen soll.
                     </p>
 
-                    <label>
-                        Öffnungszeiten
-                    </label>
 
-                    <textarea class="data"
-                              id="openingHours"></textarea>
+                    <h3 class="section">
+                        👤 Allgemeine Informationen
+                    </h3>
 
-                    <br><br>
+                    <div class="dataGrid">
 
-                    <label>
-                        Weitere Informationen
-                    </label>
+                        <div class="formGroup">
+                            <label>Name</label>
+                            <input id="dataName">
+                        </div>
 
-                    <textarea class="data"
-                              id="aiKnowledge"></textarea>
+                        <div class="formGroup">
+                            <label>Organisation / Firma</label>
+                            <input id="dataCompany">
+                        </div>
 
-                    <br><br>
+                        <div class="formGroup">
+                            <label>Standort</label>
+                            <input id="dataLocation">
+                        </div>
 
-                    <button class="save-btn"
-                            onclick="saveKnowledge()">
-                        Daten speichern
+                        <div class="formGroup">
+                            <label>Sprache</label>
+                            <input id="dataLanguage">
+                        </div>
+
+                        <div class="formGroup full">
+                            <label>Beschreibung</label>
+                            <textarea id="dataDescription"></textarea>
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="section">
+                        📞 Kontakt
+                    </h3>
+
+                    <div class="dataGrid">
+
+                        <div class="formGroup">
+                            <label>Telefon</label>
+                            <input id="dataPhone">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>E-Mail</label>
+                            <input id="dataEmail">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Webseite</label>
+                            <input id="dataWebsite">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Ansprechpartner</label>
+                            <input id="dataContact">
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="section">
+                        🕐 Öffnungszeiten
+                    </h3>
+
+                    <div class="dataGrid">
+
+                        <div class="formGroup">
+                            <label>Montag</label>
+                            <input id="monday"
+                                   placeholder="z.B. 15:00–17:00">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Dienstag</label>
+                            <input id="tuesday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Mittwoch</label>
+                            <input id="wednesday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Donnerstag</label>
+                            <input id="thursday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Freitag</label>
+                            <input id="friday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Samstag</label>
+                            <input id="saturday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Sonntag</label>
+                            <input id="sunday">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Feiertage</label>
+                            <input id="holidays">
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="section">
+                        🛍️ Angebote
+                    </h3>
+
+                    <div class="dataGrid">
+
+                        <div class="formGroup full">
+                            <label>Angebote / Dienstleistungen</label>
+                            <textarea
+                                id="dataServices"
+                                placeholder="Welche Angebote gibt es?"></textarea>
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Preise</label>
+                            <textarea id="dataPrices"></textarea>
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Zahlungsmöglichkeiten</label>
+                            <textarea id="dataPayment"></textarea>
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="section">
+                        ❓ Häufige Fragen
+                    </h3>
+
+                    <div class="dataGrid">
+
+                        <div class="formGroup">
+                            <label>Frage 1</label>
+                            <input id="faq1q">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Antwort 1</label>
+                            <textarea id="faq1a"></textarea>
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Frage 2</label>
+                            <input id="faq2q">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Antwort 2</label>
+                            <textarea id="faq2a"></textarea>
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Frage 3</label>
+                            <input id="faq3q">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Antwort 3</label>
+                            <textarea id="faq3a"></textarea>
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="section">
+                        🤖 Verhalten der KI
+                    </h3>
+
+                    <div class="dataGrid">
+
+                        <div class="formGroup">
+                            <label>Wie soll die KI heißen?</label>
+                            <input
+                                id="aiName"
+                                placeholder="z.B. RiskyBot">
+                        </div>
+
+                        <div class="formGroup">
+                            <label>Ton der Antworten</label>
+
+                            <select id="aiTone">
+
+                                <option value="freundlich">
+                                    Freundlich
+                                </option>
+
+                                <option value="kurz">
+                                    Kurz und direkt
+                                </option>
+
+                                <option value="professionell">
+                                    Professionell
+                                </option>
+
+                                <option value="locker">
+                                    Locker
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="formGroup full">
+                            <label>
+                                Zusätzliche Informationen für die KI
+                            </label>
+
+                            <textarea
+                                id="dataExtra"
+                                placeholder="Alles, was die KI zusätzlich wissen soll..."></textarea>
+                        </div>
+
+                        <div class="formGroup full">
+                            <label>
+                                Was soll die KI nicht behaupten?
+                            </label>
+
+                            <textarea
+                                id="dataForbidden"
+                                placeholder="z.B. Keine Preise erfinden..."></textarea>
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        class="saveButton"
+                        onclick="saveKnowledge()">
+                        💾 KI-Daten speichern
                     </button>
 
-                    <p id="saveMessage"></p>
+                    <span
+                        id="saveStatus"
+                        class="success">
+                    </span>
 
                 </div>
 
-            </div>
+            </section>
 
 
             <!-- SETTINGS -->
-            <div class="page" id="settings">
+
+            <section
+                id="page-settings"
+                class="page">
 
                 <div class="card">
 
-                    <h2>
-                        Einstellungen
-                    </h2>
+                    <h2>Einstellungen</h2>
 
-                    <label>
-                        Benutzername
-                    </label>
+                    <div class="formGroup">
 
-                    <br>
+                        <label>
+                            Benutzername
+                        </label>
 
-                    <input id="newName"
-                           placeholder="Neuer Benutzername">
+                        <input
+                            id="newUsername"
+                            placeholder="Neuer Benutzername">
 
-                    <br><br>
+                    </div>
 
-                    <button class="save-btn"
-                            onclick="changeName()">
+                    <button
+                        class="saveButton"
+                        onclick="changeUsername()">
                         Speichern
                     </button>
 
-                    <p id="settingsMessage"></p>
+                    <span
+                        id="settingsStatus"
+                        class="success">
+                    </span>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
+        </div>
 
     </main>
 
@@ -528,55 +821,54 @@ textarea.data {
 
 <script>
 
+/* ================================
+   KONFIGURATION
+================================ */
+
 const ADMIN_EMAIL = "Riskylive@proton.me";
 const ADMIN_PIN = "081508151235180Rss#";
 
-let loggedUser = "";
+let currentUser = "";
 let isAdmin = false;
 
 
-/* Beispieldaten */
-let conversations =
-    JSON.parse(localStorage.getItem("conversations") || "[]");
+/* ================================
+   DATEN
+================================ */
+
+let messages =
+    JSON.parse(
+        localStorage.getItem("riskylive_messages") || "[]"
+    );
 
 let knowledge =
-    JSON.parse(localStorage.getItem("knowledge") || "null");
-
-if (!knowledge) {
-
-    knowledge = {
-
-        openingHours:
-            "Montag bis Donnerstag: 15:00–17:00\nFreitag bis Sonntag: geschlossen",
-
-        other:
-            "RiskyLive ist ein Nachrichten- und KI-Dienst."
-
-    };
-
-}
+    JSON.parse(
+        localStorage.getItem("riskylive_knowledge") || "{}"
+    );
 
 
-/* LOGIN */
+/* ================================
+   LOGIN
+================================ */
 
 function login() {
 
     const username =
-        document.getElementById("username").value.trim();
+        document.getElementById("username")
+        .value
+        .trim();
 
     const pin =
-        document.getElementById("pin").value;
+        document.getElementById("pin")
+        .value;
 
     if (!username || !pin) {
+
         showLoginError();
         return;
+
     }
 
-
-    /*
-       Der spezielle Account wird als
-       Administrator erkannt.
-    */
 
     if (
         username.toLowerCase() === ADMIN_EMAIL.toLowerCase()
@@ -584,17 +876,12 @@ function login() {
         pin === ADMIN_PIN
     ) {
 
-        loggedUser = "111.111.111.1";
+        currentUser = "111.111.111.1";
         isAdmin = true;
 
     } else {
 
-        /*
-           Für normale Benutzer wird ein lokaler
-           Benutzername als Identität verwendet.
-        */
-
-        loggedUser = username;
+        currentUser = username;
         isAdmin = false;
 
     }
@@ -606,12 +893,14 @@ function login() {
     document.getElementById("app")
         .style.display = "block";
 
+
     document.getElementById("currentUser")
-        .textContent = loggedUser;
+        .textContent = currentUser;
 
 
     document.getElementById("peopleMenu")
-        .style.display = isAdmin ? "block" : "none";
+        .style.display =
+        isAdmin ? "block" : "none";
 
 
     loadKnowledge();
@@ -621,40 +910,41 @@ function login() {
 }
 
 
-/* LOGIN FEHLER */
-
 function showLoginError() {
 
-    const error =
-        document.getElementById("loginError");
-
-    error.style.display = "block";
+    document.getElementById("loginError")
+        .style.display = "block";
 
 }
 
 
-/* SEITEN */
+/* ================================
+   NAVIGATION
+================================ */
 
-function showPage(page, button) {
+function openPage(page, button) {
 
     document
         .querySelectorAll(".page")
-        .forEach(p => p.classList.remove("active"));
+        .forEach(x =>
+            x.classList.remove("active")
+        );
 
     document
-        .getElementById(page)
+        .getElementById("page-" + page)
         .classList.add("active");
 
 
     document
-        .querySelectorAll(".menu-btn")
-        .forEach(b => b.classList.remove("active"));
+        .querySelectorAll(".menuButton")
+        .forEach(x =>
+            x.classList.remove("active")
+        );
 
-    if (button)
-        button.classList.add("active");
+    button.classList.add("active");
 
 
-    const titles = {
+    const names = {
 
         chat: "Nachrichten",
         people: "Personen",
@@ -664,42 +954,43 @@ function showPage(page, button) {
     };
 
     document.getElementById("pageTitle")
-        .textContent = titles[page];
+        .textContent = names[page];
 
 }
 
 
-/* NACHRICHT SENDEN */
+/* ================================
+   NACHRICHT SENDEN
+================================ */
 
 function sendMessage() {
 
     const input =
         document.getElementById("messageInput");
 
-    const text =
+    const question =
         input.value.trim();
 
-    if (!text) return;
+    if (!question) return;
 
 
-    const conversation = {
+    const answer =
+        generateAIAnswer(question);
 
-        user: loggedUser,
 
-        question: text,
+    messages.push({
 
-        answer: generateAIAnswer(text),
-
+        user: currentUser,
+        question: question,
+        answer: answer,
         time: new Date().toLocaleString("de-DE")
 
-    };
+    });
 
-
-    conversations.push(conversation);
 
     localStorage.setItem(
-        "conversations",
-        JSON.stringify(conversations)
+        "riskylive_messages",
+        JSON.stringify(messages)
     );
 
 
@@ -711,42 +1002,47 @@ function sendMessage() {
 }
 
 
-/* NACHRICHTEN LADEN */
+/* ================================
+   CHAT LADEN
+================================ */
 
 function loadMessages() {
 
-    const container =
+    const box =
         document.getElementById("messages");
 
-    container.innerHTML = "";
+    box.innerHTML = "";
 
 
-    const ownMessages =
-        conversations.filter(
-            x => x.user === loggedUser
+    const own =
+        messages.filter(
+            x => x.user === currentUser
         );
 
 
-    if (ownMessages.length === 0) {
+    if (!own.length) {
 
-        container.innerHTML =
-            `<div class="message ai">
+        box.innerHTML = `
+            <div class="message ai">
                 <small>KI</small>
                 Hallo! Stelle mir eine Frage.
-            </div>`;
+            </div>
+        `;
 
         return;
 
     }
 
 
-    ownMessages.forEach(item => {
+    own.forEach(item => {
 
-        container.innerHTML += `
+        box.innerHTML += `
 
             <div class="message user">
 
-                <small>Du · ${escapeHTML(item.time)}</small>
+                <small>
+                    Du · ${escapeHTML(item.time)}
+                </small>
 
                 ${escapeHTML(item.question)}
 
@@ -754,7 +1050,11 @@ function loadMessages() {
 
             <div class="message ai">
 
-                <small>KI</small>
+                <small>
+                    ${escapeHTML(
+                        knowledge.aiName || "KI"
+                    )}
+                </small>
 
                 ${escapeHTML(item.answer)}
 
@@ -765,19 +1065,24 @@ function loadMessages() {
     });
 
 
-    container.scrollTop =
-        container.scrollHeight;
+    box.scrollTop = box.scrollHeight;
 
 }
 
 
-/* EINFACHE LOKALE KI */
+/* ================================
+   LOKALE KI
+================================ */
 
 function generateAIAnswer(question) {
 
     const q =
         question.toLowerCase();
 
+    const k = knowledge;
+
+
+    /* Öffnungszeiten */
 
     if (
         q.includes("öffnungszeit") ||
@@ -786,14 +1091,121 @@ function generateAIAnswer(question) {
         q.includes("geöffnet")
     ) {
 
-        return knowledge.openingHours;
+        return [
+            "Öffnungszeiten:",
+            "Montag: " + (k.monday || "keine Angabe"),
+            "Dienstag: " + (k.tuesday || "keine Angabe"),
+            "Mittwoch: " + (k.wednesday || "keine Angabe"),
+            "Donnerstag: " + (k.thursday || "keine Angabe"),
+            "Freitag: " + (k.friday || "keine Angabe"),
+            "Samstag: " + (k.saturday || "keine Angabe"),
+            "Sonntag: " + (k.sunday || "keine Angabe")
+        ].join("\n");
 
     }
 
 
+    /* Kontakt */
+
+    if (
+        q.includes("telefon") ||
+        q.includes("nummer") ||
+        q.includes("erreichen")
+    ) {
+
+        return "Du erreichst uns unter: " +
+            (k.dataPhone || "Keine Telefonnummer hinterlegt.");
+
+    }
+
+
+    /* E-Mail */
+
+    if (
+        q.includes("email") ||
+        q.includes("e-mail") ||
+        q.includes("mail")
+    ) {
+
+        return "Die E-Mail-Adresse lautet: " +
+            (k.dataEmail || "Keine E-Mail-Adresse hinterlegt.");
+
+    }
+
+
+    /* Webseite */
+
+    if (
+        q.includes("webseite") ||
+        q.includes("website")
+    ) {
+
+        return "Unsere Webseite: " +
+            (k.dataWebsite || "Keine Webseite hinterlegt.");
+
+    }
+
+
+    /* Preis */
+
+    if (
+        q.includes("preis") ||
+        q.includes("kostet") ||
+        q.includes("kosten")
+    ) {
+
+        return k.dataPrices ||
+            "Es wurden noch keine Preise hinterlegt.";
+
+    }
+
+
+    /* Angebote */
+
+    if (
+        q.includes("angebot") ||
+        q.includes("angebote") ||
+        q.includes("dienstleistung")
+    ) {
+
+        return k.dataServices ||
+            "Es wurden noch keine Angebote hinterlegt.";
+
+    }
+
+
+    /* FAQs */
+
+    const faqs = [
+
+        [k.faq1q, k.faq1a],
+        [k.faq2q, k.faq2a],
+        [k.faq3q, k.faq3a]
+
+    ];
+
+
+    for (const faq of faqs) {
+
+        if (
+            faq[0] &&
+            faq[1] &&
+            q.includes(faq[0].toLowerCase())
+        ) {
+
+            return faq[1];
+
+        }
+
+    }
+
+
+    /* Begrüßung */
+
     if (
         q.includes("hallo") ||
-        q.includes("hi")
+        q.includes("hi") ||
+        q.includes("hey")
     ) {
 
         return "Hallo! Wie kann ich dir helfen?";
@@ -801,50 +1213,68 @@ function generateAIAnswer(question) {
     }
 
 
+    /* Name */
+
     if (
-        q.includes("wer bist du")
+        q.includes("wer bist du") ||
+        q.includes("wie heißt du")
     ) {
 
-        return "Ich bin der KI-Assistent von RiskyLive.";
+        return "Ich bin " +
+            (k.aiName || "der KI-Assistent") +
+            " von " +
+            (k.dataCompany || "RiskyLive") +
+            ".";
 
     }
 
 
-    if (
-        q.includes("danke")
-    ) {
+    /* Allgemeine Antwort */
 
-        return "Gerne!";
+    let answer =
+        "Ich habe deine Frage erhalten.";
+
+    if (k.dataDescription) {
+
+        answer +=
+            "\n\nInformationen:\n" +
+            k.dataDescription;
+
+    }
+
+    if (k.dataExtra) {
+
+        answer +=
+            "\n\nZusätzliche Informationen:\n" +
+            k.dataExtra;
 
     }
 
 
-    return "Ich habe deine Frage erhalten. " +
-           "Für diese lokale Demo habe ich " +
-           "darauf noch keine spezielle Antwort. " +
-           "Ein echter KI-Server kann hier später " +
-           "angeschlossen werden.";
+    return answer;
 
 }
 
 
-/* ADMIN: PERSONEN */
+/* ================================
+   PERSONEN
+================================ */
 
 function updatePeople() {
-
-    const list =
-        document.getElementById("peopleList");
 
     if (!isAdmin) return;
 
 
+    const list =
+        document.getElementById("peopleList");
+
     const users =
         [...new Set(
-            conversations.map(x => x.user)
+            messages.map(x => x.user)
         )];
 
 
-    if (users.length === 0) {
+    if (!users.length) {
 
         list.innerHTML =
             "<p>Noch keine Fragen vorhanden.</p>";
@@ -860,126 +1290,240 @@ function updatePeople() {
     users.forEach(user => {
 
         const count =
-            conversations.filter(
+            messages.filter(
                 x => x.user === user
             ).length;
 
 
-        list.innerHTML += `
+        const div =
+            document.createElement("div");
 
-            <div class="person"
-                 onclick="showPerson('${escapeAttribute(user)}')">
+        div.className = "person";
 
-                <strong>
-                    ${escapeHTML(user)}
-                </strong>
+        div.innerHTML = `
 
-                <span class="badge">
-                    ${count} Frage(n)
-                </span>
+            <strong>
+                ${escapeHTML(user)}
+            </strong>
 
+            <div class="badge">
+                ${count} Frage(n)
             </div>
 
         `;
 
+        div.onclick =
+            () => showPerson(user);
+
+        list.appendChild(div);
+
     });
 
 }
 
 
-/* ADMIN: PERSON ANSEHEN */
+/* ================================
+   PERSON ANZEIGEN
+================================ */
 
 function showPerson(user) {
 
-    const questions =
-        conversations.filter(
+    const list =
+        messages.filter(
             x => x.user === user
         );
 
 
-    let output =
-        "Fragen von " + user + "\\n\\n";
+    let text =
+        "Benutzer: " + user + "\n\n";
 
 
-    questions.forEach((q, index) => {
+    list.forEach((item,index) => {
 
-        output +=
+        text +=
+            "Frage " +
             (index + 1) +
-            ". Frage: " +
-            q.question +
-            "\\n" +
-            "KI: " +
-            q.answer +
-            "\\n\\n";
+            ":\n" +
+            item.question +
+            "\n\nKI-Antwort:\n" +
+            item.answer +
+            "\n\n";
 
     });
 
 
-    alert(output);
+    alert(text);
 
 }
 
 
-/* KI-DATEN */
-
-function loadKnowledge() {
-
-    document.getElementById("openingHours")
-        .value = knowledge.openingHours;
-
-    document.getElementById("aiKnowledge")
-        .value = knowledge.other;
-
-}
-
+/* ================================
+   KI-DATEN SPEICHERN
+================================ */
 
 function saveKnowledge() {
 
-    knowledge.openingHours =
-        document.getElementById("openingHours").value;
+    const ids = [
 
-    knowledge.other =
-        document.getElementById("aiKnowledge").value;
+        "dataName",
+        "dataCompany",
+        "dataLocation",
+        "dataLanguage",
+        "dataDescription",
+        "dataPhone",
+        "dataEmail",
+        "dataWebsite",
+        "dataContact",
+
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+        "holidays",
+
+        "dataServices",
+        "dataPrices",
+        "dataPayment",
+
+        "faq1q",
+        "faq1a",
+        "faq2q",
+        "faq2a",
+        "faq3q",
+        "faq3a",
+
+        "aiName",
+        "aiTone",
+        "dataExtra",
+        "dataForbidden"
+
+    ];
+
+
+    ids.forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (element) {
+
+            knowledge[id] =
+                element.value;
+
+        }
+
+    });
 
 
     localStorage.setItem(
-        "knowledge",
+        "riskylive_knowledge",
         JSON.stringify(knowledge)
     );
 
 
-    document.getElementById("saveMessage")
+    document.getElementById("saveStatus")
         .textContent =
-        "✓ KI-Daten gespeichert.";
+        "✓ Gespeichert";
 
 }
 
 
-/* BENUTZERNAME */
+/* ================================
+   KI-DATEN LADEN
+================================ */
 
-function changeName() {
+function loadKnowledge() {
+
+    const ids = [
+
+        "dataName",
+        "dataCompany",
+        "dataLocation",
+        "dataLanguage",
+        "dataDescription",
+        "dataPhone",
+        "dataEmail",
+        "dataWebsite",
+        "dataContact",
+
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+        "holidays",
+
+        "dataServices",
+        "dataPrices",
+        "dataPayment",
+
+        "faq1q",
+        "faq1a",
+        "faq2q",
+        "faq2a",
+        "faq3q",
+        "faq3a",
+
+        "aiName",
+        "aiTone",
+        "dataExtra",
+        "dataForbidden"
+
+    ];
+
+
+    ids.forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (element && knowledge[id] !== undefined) {
+
+            element.value =
+                knowledge[id];
+
+        }
+
+    });
+
+}
+
+
+/* ================================
+   BENUTZERNAME
+================================ */
+
+function changeUsername() {
 
     const name =
-        document.getElementById("newName")
-            .value.trim();
+        document.getElementById("newUsername")
+        .value
+        .trim();
 
     if (!name) return;
 
 
-    loggedUser = name;
+    currentUser = name;
 
     document.getElementById("currentUser")
-        .textContent = loggedUser;
+        .textContent = currentUser;
 
 
-    document.getElementById("settingsMessage")
+    document.getElementById("settingsStatus")
         .textContent =
         "✓ Benutzername geändert.";
 
 }
 
 
-/* LOGOUT */
+/* ================================
+   LOGOUT
+================================ */
 
 function logout() {
 
@@ -988,38 +1532,36 @@ function logout() {
 }
 
 
-/* HTML SCHUTZ */
+/* ================================
+   SICHERHEIT
+================================ */
 
-function escapeHTML(text) {
+function escapeHTML(value) {
 
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-function escapeAttribute(text) {
-
-    return String(text)
-        .replaceAll("'", "\\'");
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 
 }
 
 
-/* ENTER SENDEN */
+/* ================================
+   ENTER = SENDEN
+================================ */
 
 document
     .getElementById("messageInput")
-    .addEventListener("keydown", function(e) {
+    .addEventListener("keydown",function(e){
 
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (
+            e.key === "Enter" &&
+            !e.shiftKey
+        ) {
 
             e.preventDefault();
-
             sendMessage();
 
         }
