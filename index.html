@@ -2,339 +2,734 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>RiskyLive – KI Nachrichten</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Control Center</title>
 
 <style>
-*{box-sizing:border-box}
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f3f5f9;
-    color:#182033
-}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-
-#loginScreen{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:linear-gradient(135deg,#e9edff,#f8f9fc)
+:root {
+    --bg: #08090d;
+    --panel: #101219;
+    --panel-2: #0d0f14;
+    --panel-3: #0b0d12;
+    --border: #232733;
+    --text: #f5f7fb;
+    --muted: #777f8e;
+    --accent: #6675ff;
+    --green: #55df82;
+    --danger: #ff7777;
 }
 
-.loginBox{
-    width:100%;
-    max-width:430px;
-    background:#fff;
-    padding:36px;
-    border-radius:24px;
-    box-shadow:0 20px 70px rgba(0,0,0,.12)
+* {
+    box-sizing: border-box;
 }
 
-.logo{
-    font-size:32px;
-    font-weight:800;
-    margin-bottom:7px
+html,
+body {
+    width: 100%;
+    min-height: 100%;
 }
 
-.logo span{color:#667eea}
-
-.subtitle{
-    color:#737b8c;
-    margin-bottom:30px
-}
-
-.formGroup{
-    margin-bottom:17px
-}
-
-label{
-    display:block;
-    font-weight:bold;
-    margin-bottom:7px
-}
-
-input,textarea,select{
-    width:100%;
-    border:1px solid #d9deea;
-    border-radius:12px;
-    padding:13px;
-    outline:none;
-    background:white
-}
-
-input:focus,textarea:focus,select:focus{
-    border-color:#667eea
-}
-
-.loginButton,
-.sendButton,
-.saveButton{
-    border:0;
-    border-radius:12px;
-    padding:13px 18px;
-    background:#667eea;
-    color:#fff;
-    font-weight:bold
-}
-
-.loginButton{width:100%}
-
-.error{
-    display:none;
-    color:#d93025;
-    margin-top:14px
+body {
+    margin: 0;
+    font-family: Inter, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
 }
 
 /* APP */
 
-#app{display:none}
-
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:270px;
-    background:#151a27;
-    color:white;
-    padding:22px;
-    z-index:10
+.app {
+    min-height: 100vh;
+    display: flex;
 }
 
-.sidebarLogo{
-    font-size:24px;
-    font-weight:800;
-    margin-bottom:30px
+/* SIDEBAR */
+
+.sidebar {
+    width: 240px;
+    flex: 0 0 240px;
+    min-height: 100vh;
+    background: var(--panel-2);
+    border-right: 1px solid #20232c;
+    padding: 22px 16px;
 }
 
-.sidebarLogo span{color:#8290ff}
-
-.menuButton{
-    display:block;
-    width:100%;
-    padding:13px;
-    margin-bottom:6px;
-    border:0;
-    border-radius:10px;
-    background:transparent;
-    color:#c8ccda;
-    text-align:left
+.logo {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 35px;
 }
 
-.menuButton:hover,
-.menuButton.active{
-    background:#282f43;
-    color:#fff
+.logo span {
+    color: #7280ff;
 }
 
-.logout{
-    position:absolute;
-    bottom:20px;
-    left:22px;
-    width:calc(100% - 44px)
+.menu-title {
+    color: #656b78;
+    font-size: 11px;
+    text-transform: uppercase;
+    margin: 22px 10px 8px;
 }
 
-.main{
-    margin-left:270px;
-    min-height:100vh
+.menu button {
+    width: 100%;
+    display: block;
+    border: 0;
+    background: transparent;
+    color: #aeb4c0;
+    text-align: left;
+    padding: 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    font: inherit;
 }
 
-.topbar{
-    height:70px;
-    background:white;
-    border-bottom:1px solid #e4e7ee;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 28px;
-    position:sticky;
-    top:0;
-    z-index:5
+.menu button:hover,
+.menu button.active {
+    background: #191c25;
+    color: white;
 }
 
-.user{
-    color:#697386
+/* MAIN */
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 28px;
 }
 
-.content{
-    padding:30px;
-    max-width:1150px;
-    margin:auto
+/* TOPBAR */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
 }
 
-.page{display:none}
-.page.active{display:block}
-
-.card{
-    background:white;
-    border-radius:18px;
-    padding:25px;
-    margin-bottom:20px;
-    box-shadow:0 5px 25px rgba(0,0,0,.05)
+.title {
+    min-width: 0;
 }
 
-/* CHAT */
-
-.chat{
-    min-height:calc(100vh - 130px);
-    display:flex;
-    flex-direction:column
+.title h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.2;
 }
 
-.messages{
-    flex:1;
-    overflow-y:auto;
-    padding:15px 0
+.title p {
+    margin: 7px 0 0;
+    color: var(--muted);
 }
 
-.message{
-    max-width:75%;
-    padding:14px 17px;
-    border-radius:17px;
-    margin-bottom:12px;
-    line-height:1.5;
-    white-space:pre-wrap
+.right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
 }
 
-.message.user{
-    margin-left:auto;
-    background:#667eea;
-    color:white;
-    border-bottom-right-radius:5px
+.live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #77e29a;
+    font-size: 13px;
+    white-space: nowrap;
 }
 
-.message.ai{
-    background:#edf0f5;
-    border-bottom-left-radius:5px
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 12px var(--green);
 }
 
-.message small{
-    display:block;
-    opacity:.65;
-    margin-bottom:5px
+.upgrade {
+    border: 0;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    padding: 11px 18px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: .2s;
 }
 
-.chatInput{
-    display:flex;
-    gap:10px
+.upgrade:hover {
+    background: #7885ff;
 }
 
-.chatInput textarea{
-    flex:1;
-    height:55px;
-    resize:none
+/* STATS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
-.sendButton{width:105px}
-
-/* KI DATEN */
-
-.dataGrid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:18px
+.stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    min-width: 0;
 }
 
-.full{
-    grid-column:1/-1
+.stat-label {
+    color: var(--muted);
+    font-size: 13px;
 }
 
-.section{
-    margin-top:30px;
-    padding-bottom:10px;
-    border-bottom:1px solid #e4e7ee
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 8px;
 }
 
-.success{
-    color:#16803c;
-    margin-left:10px
+/* SECTION */
+
+.section-header {
+    margin-bottom: 15px;
 }
 
-/* PERSONEN */
-
-.person{
-    padding:16px;
-    border:1px solid #e0e4ec;
-    border-radius:13px;
-    margin-bottom:10px;
-    cursor:pointer
+.section-header h2 {
+    margin: 0;
+    font-size: 19px;
 }
 
-.person:hover{background:#f7f8fa}
+/* AGENTS */
 
-.badge{
-    display:inline-block;
-    margin-top:6px;
-    padding:4px 9px;
-    background:#e9ecff;
-    color:#5263c7;
-    border-radius:20px;
-    font-size:12px
+.agents {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
 }
 
-.empty{
-    color:#777;
-    padding:20px 0
+.agent {
+    min-width: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 19px;
 }
 
-@media(max-width:800px){
+.agent-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
 
-    .sidebar{
-        width:70px;
-        padding:10px
+.agent-name {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-weight: 700;
+}
+
+.agent-icon {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #1c2030;
+    font-size: 20px;
+}
+
+.status {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.idle {
+    background: #252831;
+    color: #aeb4c0;
+}
+
+.working {
+    background: #102d20;
+    color: #6be590;
+}
+
+.waiting {
+    background: #2d2712;
+    color: #e8c85c;
+}
+
+.task {
+    margin-top: 18px;
+    background: var(--panel-3);
+    border-radius: 9px;
+    padding: 13px;
+}
+
+.task-label {
+    color: #646b78;
+    font-size: 10px;
+    margin-bottom: 6px;
+}
+
+.task-text {
+    color: #dfe3eb;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    color: #686f7c;
+    font-size: 11px;
+}
+
+.agent-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.setup,
+.delete {
+    border: 1px solid #303541;
+    background: #171a22;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.setup:hover {
+    background: #202430;
+}
+
+.delete {
+    color: var(--danger);
+}
+
+.delete:hover {
+    background: #24171b;
+}
+
+/* EMPTY */
+
+.empty {
+    grid-column: 1 / -1;
+    padding: 45px 20px;
+    text-align: center;
+    background: var(--panel);
+    border: 1px dashed #292d38;
+    border-radius: 15px;
+    color: var(--muted);
+}
+
+/* MODALS */
+
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, .78);
+    backdrop-filter: blur(6px);
+}
+
+.modal-bg.show {
+    display: flex;
+}
+
+.modal {
+    width: min(720px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid #292d38;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, .55);
+    position: relative;
+    isolation: isolate;
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 8px;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border: 0;
+    background: #1c2029;
+    color: #aaa;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 19px;
+    line-height: 1;
+}
+
+.close:hover {
+    background: #292e39;
+    color: white;
+}
+
+.modal-description {
+    color: var(--muted);
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+/* UPGRADE */
+
+.upgrade-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--panel-3);
+    border: 1px solid #242833;
+    padding: 16px;
+    border-radius: 13px;
+    margin-bottom: 12px;
+}
+
+.upgrade-card:last-child {
+    margin-bottom: 0;
+}
+
+.upgrade-icon {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    background: #1c2030;
+    border-radius: 12px;
+    font-size: 24px;
+}
+
+.upgrade-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.upgrade-info h3 {
+    margin: 0 0 5px;
+    font-size: 15px;
+}
+
+.upgrade-info p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.add-agent {
+    flex-shrink: 0;
+    border: 1px solid #303646;
+    background: #171a22;
+    color: white;
+    padding: 9px 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.add-agent:hover {
+    background: #232735;
+}
+
+/* MAIL UPLOAD */
+
+.upload-area {
+    display: block;
+    width: 100%;
+    border: 2px dashed #343949;
+    border-radius: 15px;
+    padding: 35px 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: .2s;
+}
+
+.upload-area:hover {
+    border-color: var(--accent);
+    background: #11131c;
+}
+
+.upload-area input {
+    display: none;
+}
+
+.file-name {
+    margin-top: 15px;
+    color: #777f8e;
+    word-break: break-word;
+    text-align: center;
+}
+
+.start-analysis {
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.start-analysis:hover:not(:disabled) {
+    background: #7885ff;
+}
+
+.start-analysis:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* ANALYSIS */
+
+.analysis {
+    display: none;
+    margin-top: 20px;
+}
+
+.analysis.show {
+    display: block;
+}
+
+.progress {
+    width: 100%;
+    height: 7px;
+    background: #20232c;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    border-radius: inherit;
+    transition: width .35s ease;
+}
+
+.analysis-text {
+    margin-top: 12px;
+    color: #8f96a5;
+    font-size: 13px;
+}
+
+/* RESULT */
+
+.result {
+    display: none;
+    margin-top: 20px;
+}
+
+.result.show {
+    display: block;
+}
+
+.result-box {
+    background: var(--panel-3);
+    border: 1px solid #252936;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+}
+
+.result-box:last-child {
+    margin-bottom: 0;
+}
+
+.result-title {
+    color: #737b89;
+    font-size: 11px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.reply {
+    display: block;
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    background: #08090d;
+    border: 1px solid #292e3a;
+    border-radius: 10px;
+    padding: 14px;
+    color: white;
+    font-family: inherit;
+    line-height: 1.5;
+    outline: none;
+}
+
+.reply:focus {
+    border-color: var(--accent);
+}
+
+.copy {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #191d27;
+    color: white;
+    border: 1px solid #303541;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.copy:hover {
+    background: #242936;
+}
+
+/* ANIMATION */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: .4;
     }
 
-    .sidebarLogo{
-        font-size:0;
-        text-align:center
-    }
-
-    .sidebarLogo::after{
-        content:"R";
-        font-size:25px
-    }
-
-    .menuButton{
-        font-size:0;
-        text-align:center
-    }
-
-    .menuButton::first-letter{
-        font-size:20px
-    }
-
-    .main{
-        margin-left:70px
-    }
-
-    .content{
-        padding:15px
-    }
-
-    .dataGrid{
-        grid-template-columns:1fr
-    }
-
-    .full{
-        grid-column:auto
+    50% {
+        opacity: 1;
     }
 }
 
-@media(max-width:500px){
+.analyzing {
+    animation: pulse 1.2s infinite;
+}
 
-    .message{max-width:90%}
+/* RESPONSIVE */
 
-    .chatInput{
-        flex-direction:column
+@media (max-width: 1000px) {
+    .sidebar {
+        width: 210px;
+        flex-basis: 210px;
     }
 
-    .sendButton{
-        width:100%;
-        height:48px
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .agents {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 760px) {
+    .app {
+        display: block;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .main {
+        width: 100%;
+        padding: 18px;
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .right {
+        gap: 8px;
+    }
+
+    .live {
+        display: none;
+    }
+}
+
+@media (max-width: 560px) {
+    .main {
+        padding: 14px;
+    }
+
+    .topbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .right {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .upgrade {
+        width: 100%;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat {
+        padding: 14px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .agent-top {
+        align-items: flex-start;
+    }
+
+    .upgrade-card {
+        flex-wrap: wrap;
+    }
+
+    .upgrade-info {
+        flex: 1 1 calc(100% - 65px);
+    }
+
+    .add-agent {
+        width: 100%;
+    }
+
+    .modal-bg {
+        padding: 10px;
+    }
+
+    .modal {
+        max-height: calc(100vh - 20px);
+        padding: 18px;
+        border-radius: 15px;
     }
 }
 </style>
@@ -342,48 +737,183 @@ input:focus,textarea:focus,select:focus{
 
 <body>
 
-<!-- LOGIN -->
+<div class="app">
 
-<div id="loginScreen">
-
-    <div class="loginBox">
+    <aside class="sidebar">
 
         <div class="logo">
-            Risky<span>Live</span>
+            <span>AI</span> Control
         </div>
 
-        <div class="subtitle">
-            KI-Nachrichtenplattform
+        <div class="menu">
+
+            <div class="menu-title">Übersicht</div>
+
+            <button class="active" type="button">◉ Dashboard</button>
+            <button type="button">🤖 Meine KIs</button>
+            <button type="button">⚙ Aufgaben</button>
+
+            <div class="menu-title">System</div>
+
+            <button type="button">📊 Statistiken</button>
+            <button type="button">📝 Protokolle</button>
+            <button type="button">⚙ Einstellungen</button>
+
         </div>
 
-        <div class="formGroup">
-            <label>Benutzername</label>
-            <input
-                id="username"
-                type="text"
-                placeholder="Benutzername oder E-Mail"
-                autocomplete="username">
+    </aside>
+
+    <main class="main">
+
+        <div class="topbar">
+
+            <div class="title">
+                <h1>KI-Leitstand</h1>
+                <p>Überblick über deine KI-Agenten</p>
+            </div>
+
+            <div class="right">
+
+                <div class="live">
+                    <div class="live-dot"></div>
+                    System online
+                </div>
+
+                <button
+                    class="upgrade"
+                    id="upgradeButton"
+                    type="button">
+                    Upgrade
+                </button>
+
+            </div>
+
         </div>
 
-        <div class="formGroup">
-            <label>PIN</label>
-            <input
-                id="pin"
-                type="password"
-                placeholder="PIN"
-                autocomplete="current-password">
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">KIs insgesamt</div>
+                <div class="stat-value" id="total">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Gerade aktiv</div>
+                <div class="stat-value" id="active">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Warten</div>
+                <div class="stat-value" id="waiting">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">Nichts zu tun</div>
+                <div class="stat-value" id="idle">0</div>
+            </div>
+
         </div>
 
-        <button
-            class="loginButton"
-            onclick="login()">
-            Anmelden
-        </button>
+        <div class="section-header">
+            <h2>Meine KI-Agenten</h2>
+        </div>
 
-        <div
-            class="error"
-            id="loginError">
-            Bitte Benutzername und PIN eingeben.
+        <div class="agents" id="agents"></div>
+
+    </main>
+
+</div>
+
+
+<!-- UPGRADE MODAL -->
+
+<div
+    class="modal-bg"
+    id="upgradeModal"
+    aria-hidden="true">
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upgradeTitle">
+
+        <div class="modal-header">
+
+            <h2 id="upgradeTitle">🤖 KI-Agenten hinzufügen</h2>
+
+            <button
+                class="close"
+                type="button"
+                data-close="upgradeModal"
+                aria-label="Fenster schließen">
+                ×
+            </button>
+
+        </div>
+
+        <p class="modal-description">
+            Wähle einen Agenten für dein Unternehmen.
+        </p>
+
+        <div class="upgrade-card">
+
+            <div class="upgrade-icon">📧</div>
+
+            <div class="upgrade-info">
+                <h3>E-Mail-Agent</h3>
+                <p>
+                    E-Mails analysieren und Antwortvorschläge erstellen.
+                </p>
+            </div>
+
+            <button
+                class="add-agent"
+                type="button"
+                data-install="email">
+                Installieren
+            </button>
+
+        </div>
+
+        <div class="upgrade-card">
+
+            <div class="upgrade-icon">📊</div>
+
+            <div class="upgrade-info">
+                <h3>Daten-Agent</h3>
+                <p>
+                    Unternehmensdaten auswerten und Erkenntnisse liefern.
+                </p>
+            </div>
+
+            <button
+                class="add-agent"
+                type="button"
+                data-install="data">
+                Installieren
+            </button>
+
+        </div>
+
+        <div class="upgrade-card">
+
+            <div class="upgrade-icon">📄</div>
+
+            <div class="upgrade-info">
+                <h3>Dokumenten-Agent</h3>
+                <p>
+                    Dokumente analysieren und zusammenfassen.
+                </p>
+            </div>
+
+            <button
+                class="add-agent"
+                type="button"
+                data-install="document">
+                Installieren
+            </button>
+
         </div>
 
     </div>
@@ -391,1303 +921,908 @@ input:focus,textarea:focus,select:focus{
 </div>
 
 
-<!-- APP -->
-
-<div id="app">
-
-    <aside class="sidebar">
-
-        <div class="sidebarLogo">
-            Risky<span>Live</span>
-        </div>
-
-        <!-- Dieses Feld sieht JEDER -->
-
-        <button
-            class="menuButton active"
-            id="chatMenu"
-            onclick="openPage('chat',this)">
-            💬 Nachrichten
-        </button>
-
-
-        <!-- Nur Admin -->
-
-        <button
-            class="menuButton adminOnly"
-            id="peopleMenu"
-            onclick="openPage('people',this)">
-            👥 Personen
-        </button>
-
-        <button
-            class="menuButton adminOnly"
-            onclick="openPage('knowledge',this)">
-            🧠 KI-Daten
-        </button>
-
-        <button
-            class="menuButton adminOnly"
-            onclick="openPage('settings',this)">
-            ⚙️ Einstellungen
-        </button>
-
-
-        <!-- Dieses Feld sieht JEDER -->
-
-        <button
-            class="menuButton logout"
-            onclick="logout()">
-            🚪 Abmelden
-        </button>
-
-    </aside>
-
-
-    <main class="main">
-
-        <header class="topbar">
-
-            <strong id="pageTitle">
-                Nachrichten
-            </strong>
-
-            <span
-                class="user"
-                id="currentUser">
-            </span>
-
-        </header>
-
-
-        <div class="content">
-
-            <!-- NACHRICHTEN -->
-
-            <section
-                id="page-chat"
-                class="page active">
-
-                <div class="card chat">
-
-                    <h2>KI-Assistent</h2>
-
-                    <p>
-                        Stelle eine Frage an die KI.
-                    </p>
-
-                    <div
-                        class="messages"
-                        id="messages">
-                    </div>
-
-                    <div class="chatInput">
-
-                        <textarea
-                            id="messageInput"
-                            placeholder="Nachricht schreiben..."></textarea>
-
-                        <button
-                            class="sendButton"
-                            onclick="sendMessage()">
-                            Senden
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- PERSONEN – NUR ADMIN -->
-
-            <section
-                id="page-people"
-                class="page adminPage">
-
-                <div class="card">
-
-                    <h2>Personen</h2>
-
-                    <p>
-                        Hier siehst du Benutzer und ihre
-                        Fragen an die KI.
-                    </p>
-
-                    <div id="peopleList"></div>
-
-                </div>
-
-            </section>
-
-
-            <!-- KI DATEN – NUR ADMIN -->
-
-            <section
-                id="page-knowledge"
-                class="page adminPage">
-
-                <div class="card">
-
-                    <h2>KI-Daten</h2>
-
-                    <p>
-                        Hier kannst du festlegen, was die KI
-                        über RiskyLive wissen soll.
-                    </p>
-
-
-                    <h3 class="section">
-                        👤 Allgemeine Informationen
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup">
-                            <label>Name</label>
-                            <input id="dataName">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Firma / Organisation</label>
-                            <input id="dataCompany">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Standort</label>
-                            <input id="dataLocation">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Sprache</label>
-                            <input id="dataLanguage">
-                        </div>
-
-                        <div class="formGroup full">
-                            <label>Beschreibung</label>
-                            <textarea id="dataDescription"></textarea>
-                        </div>
-
-                    </div>
-
-
-                    <h3 class="section">
-                        📞 Kontakt
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup">
-                            <label>Telefon</label>
-                            <input id="dataPhone">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>E-Mail</label>
-                            <input id="dataEmail">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Webseite</label>
-                            <input id="dataWebsite">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Ansprechpartner</label>
-                            <input id="dataContact">
-                        </div>
-
-                    </div>
-
-
-                    <h3 class="section">
-                        🕐 Öffnungszeiten
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup">
-                            <label>Montag</label>
-                            <input id="monday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Dienstag</label>
-                            <input id="tuesday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Mittwoch</label>
-                            <input id="wednesday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Donnerstag</label>
-                            <input id="thursday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Freitag</label>
-                            <input id="friday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Samstag</label>
-                            <input id="saturday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Sonntag</label>
-                            <input id="sunday">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Feiertage</label>
-                            <input id="holidays">
-                        </div>
-
-                    </div>
-
-
-                    <h3 class="section">
-                        🛍️ Angebote & Preise
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup full">
-                            <label>Angebote / Dienstleistungen</label>
-                            <textarea id="dataServices"></textarea>
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Preise</label>
-                            <textarea id="dataPrices"></textarea>
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Zahlungsmöglichkeiten</label>
-                            <textarea id="dataPayment"></textarea>
-                        </div>
-
-                    </div>
-
-
-                    <h3 class="section">
-                        ❓ Häufige Fragen
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup">
-                            <label>Frage 1</label>
-                            <input id="faq1q">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Antwort 1</label>
-                            <textarea id="faq1a"></textarea>
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Frage 2</label>
-                            <input id="faq2q">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Antwort 2</label>
-                            <textarea id="faq2a"></textarea>
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Frage 3</label>
-                            <input id="faq3q">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Antwort 3</label>
-                            <textarea id="faq3a"></textarea>
-                        </div>
-
-                    </div>
-
-
-                    <h3 class="section">
-                        🤖 KI-Einstellungen
-                    </h3>
-
-                    <div class="dataGrid">
-
-                        <div class="formGroup">
-                            <label>Name der KI</label>
-                            <input
-                                id="aiName"
-                                placeholder="z.B. RiskyBot">
-                        </div>
-
-                        <div class="formGroup">
-                            <label>Antwortstil</label>
-
-                            <select id="aiTone">
-
-                                <option value="freundlich">
-                                    Freundlich
-                                </option>
-
-                                <option value="kurz">
-                                    Kurz und direkt
-                                </option>
-
-                                <option value="professionell">
-                                    Professionell
-                                </option>
-
-                                <option value="locker">
-                                    Locker
-                                </option>
-
-                            </select>
-                        </div>
-
-                        <div class="formGroup full">
-                            <label>
-                                Zusätzliche Informationen
-                            </label>
-
-                            <textarea
-                                id="dataExtra"></textarea>
-                        </div>
-
-                        <div class="formGroup full">
-                            <label>
-                                Regeln für die KI
-                            </label>
-
-                            <textarea
-                                id="dataRules"
-                                placeholder="z.B. Keine Informationen erfinden"></textarea>
-                        </div>
-
-                    </div>
-
-
-                    <button
-                        class="saveButton"
-                        onclick="saveKnowledge()">
-                        💾 KI-Daten speichern
-                    </button>
-
-                    <span
-                        class="success"
-                        id="saveStatus">
-                    </span>
-
-                </div>
-
-            </section>
-
-
-            <!-- EINSTELLUNGEN – NUR ADMIN -->
-
-            <section
-                id="page-settings"
-                class="page adminPage">
-
-                <div class="card">
-
-                    <h2>Einstellungen</h2>
-
-                    <div class="formGroup">
-
-                        <label>
-                            Angezeigter Benutzername
-                        </label>
-
-                        <input
-                            id="newUsername"
-                            placeholder="Neuer Name">
-
-                    </div>
-
-                    <button
-                        class="saveButton"
-                        onclick="changeUsername()">
-                        Speichern
-                    </button>
-
-                    <span
-                        class="success"
-                        id="settingsStatus">
-                    </span>
-
-                </div>
-
-            </section>
+<!-- EMAIL MODAL -->
+
+<div
+    class="modal-bg"
+    id="emailModal"
+    aria-hidden="true">
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="emailTitle">
+
+        <div class="modal-header">
+
+            <h2 id="emailTitle">📧 E-Mail-Agent einrichten</h2>
+
+            <button
+                class="close"
+                type="button"
+                data-close="emailModal"
+                aria-label="Fenster schließen">
+                ×
+            </button>
 
         </div>
 
-    </main>
+        <p class="modal-description">
+            Lade eine E-Mail-Datei hoch. Die KI analysiert den Inhalt
+            und erstellt anschließend einen Antwortvorschlag.
+        </p>
+
+        <label class="upload-area">
+
+            <input
+                type="file"
+                id="mailFile"
+                accept=".txt,.eml">
+
+            <div style="font-size:35px;">📤</div>
+
+            <div style="margin-top:8px;">
+                E-Mail-Datei auswählen
+            </div>
+
+            <div
+                style="font-size:12px;color:#656b78;margin-top:8px;">
+                Unterstützt: TXT und EML
+            </div>
+
+        </label>
+
+        <div
+            class="file-name"
+            id="fileName">
+            Keine Datei ausgewählt
+        </div>
+
+        <button
+            class="start-analysis"
+            id="analyzeButton"
+            type="button"
+            disabled>
+            🔍 E-Mail analysieren
+        </button>
+
+        <div
+            class="analysis"
+            id="analysis">
+
+            <div class="progress">
+                <div
+                    class="progress-bar"
+                    id="progressBar">
+                </div>
+            </div>
+
+            <div
+                class="analysis-text analyzing"
+                id="analysisText">
+                KI wird gestartet...
+            </div>
+
+        </div>
+
+        <div
+            class="result"
+            id="result">
+
+            <div class="result-box">
+
+                <div class="result-title">
+                    ANALYSE
+                </div>
+
+                <div id="analysisResult">
+                </div>
+
+            </div>
+
+            <div class="result-box">
+
+                <div class="result-title">
+                    ANTWORTSVORSCHLAG
+                </div>
+
+                <textarea
+                    class="reply"
+                    id="replyText"
+                    spellcheck="true">
+                </textarea>
+
+                <button
+                    class="copy"
+                    id="copyButton"
+                    type="button">
+                    📋 Antwort kopieren
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
 
 <script>
+"use strict";
 
-/*
-==================================================
-LOGIN
-==================================================
+/* -----------------------------
+   STATE
+----------------------------- */
 
-Nur dieser Account erhält die Admin-Oberfläche.
-
-Andere Benutzernamen/PINs werden als normale
-Benutzer behandelt und sehen ausschließlich:
-
-💬 Nachrichten
-🚪 Abmelden
-
-Für einen echten Online-Dienst sollte die
-Anmeldung später serverseitig geprüft werden.
-==================================================
-*/
-
-const ADMIN_EMAIL = "Riskylive@proton.me";
-const ADMIN_PIN = "081508151235180Rss#";
-
-let currentUser = "";
-let isAdmin = false;
+const agents = [];
+let selectedFile = null;
 
 
-/* DATEN */
+/* -----------------------------
+   AGENT TYPES
+----------------------------- */
 
-let messages =
-    JSON.parse(
-        localStorage.getItem("riskylive_messages") || "[]"
-    );
+const types = {
+    email: {
+        name: "E-Mail-Agent",
+        icon: "📧",
+        model: "Business Mail AI"
+    },
 
-let knowledge =
-    JSON.parse(
-        localStorage.getItem("riskylive_knowledge") || "{}"
-    );
+    data: {
+        name: "Daten-Agent",
+        icon: "📊",
+        model: "Business Data AI"
+    },
 
-
-/* LOGIN */
-
-function login(){
-
-    const username =
-        document.getElementById("username")
-        .value
-        .trim();
-
-    const pin =
-        document.getElementById("pin")
-        .value;
-
-    if(!username || !pin){
-
-        document.getElementById("loginError")
-            .textContent =
-            "Bitte Benutzername und PIN eingeben.";
-
-        document.getElementById("loginError")
-            .style.display = "block";
-
-        return;
+    document: {
+        name: "Dokumenten-Agent",
+        icon: "📄",
+        model: "Document AI"
     }
+};
 
 
-    /*
-    ADMIN
-    */
+/* -----------------------------
+   ELEMENTS
+----------------------------- */
 
-    if(
-        username.toLowerCase() ===
-        ADMIN_EMAIL.toLowerCase()
-        &&
-        pin === ADMIN_PIN
-    ){
+const agentsContainer =
+    document.getElementById("agents");
 
-        currentUser = "111.111.111.1";
-        isAdmin = true;
+const totalElement =
+    document.getElementById("total");
 
-    }
+const activeElement =
+    document.getElementById("active");
 
-    /*
-    NORMALER BENUTZER
+const waitingElement =
+    document.getElementById("waiting");
 
-    Jeder andere Login kommt nur zum
-    Nachrichtenbereich.
-    */
+const idleElement =
+    document.getElementById("idle");
 
-    else{
+const upgradeModal =
+    document.getElementById("upgradeModal");
 
-        currentUser = username;
-        isAdmin = false;
+const emailModal =
+    document.getElementById("emailModal");
 
-    }
+const mailFile =
+    document.getElementById("mailFile");
+
+const fileName =
+    document.getElementById("fileName");
+
+const analyzeButton =
+    document.getElementById("analyzeButton");
+
+const analysis =
+    document.getElementById("analysis");
+
+const progressBar =
+    document.getElementById("progressBar");
+
+const analysisText =
+    document.getElementById("analysisText");
+
+const result =
+    document.getElementById("result");
+
+const analysisResult =
+    document.getElementById("analysisResult");
+
+const replyText =
+    document.getElementById("replyText");
 
 
-    document.getElementById("loginScreen")
-        .style.display = "none";
+/* -----------------------------
+   MODAL SYSTEM
+----------------------------- */
 
-    document.getElementById("app")
-        .style.display = "block";
+function openModal(modal) {
+    if (!modal) return;
 
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
 
-    document.getElementById("currentUser")
-        .textContent = currentUser;
-
-
-    setupPermissions();
-
-    loadKnowledge();
-    loadMessages();
-
-    if(isAdmin){
-        updatePeople();
-    }
-
+    document.body.style.overflow = "hidden";
 }
 
+function closeModal(modal) {
+    if (!modal) return;
 
-/* RECHTE SETZEN */
+    modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
 
-function setupPermissions(){
+    const anotherModalIsOpen =
+        document.querySelector(".modal-bg.show");
 
-    const adminButtons =
-        document.querySelectorAll(".adminOnly");
-
-    const adminPages =
-        document.querySelectorAll(".adminPage");
-
-
-    adminButtons.forEach(button => {
-
-        button.style.display =
-            isAdmin ? "block" : "none";
-
-    });
-
-
-    adminPages.forEach(page => {
-
-        page.style.display =
-            isAdmin ? "" : "none";
-
-    });
-
-
-    /*
-    Normale Benutzer landen immer
-    im Nachrichtenbereich.
-    */
-
-    openPage(
-        "chat",
-        document.getElementById("chatMenu")
-    );
-
+    if (!anotherModalIsOpen) {
+        document.body.style.overflow = "";
+    }
 }
 
-
-/* NAVIGATION */
-
-function openPage(page,button){
-
-    /*
-    Sicherheitsprüfung:
-    normale Benutzer dürfen nur Chat öffnen.
-    */
-
-    if(
-        !isAdmin &&
-        page !== "chat"
-    ){
-        page = "chat";
-        button =
-            document.getElementById("chatMenu");
-    }
-
-
+function closeAllModals() {
     document
-        .querySelectorAll(".page")
-        .forEach(pageElement => {
-
-            pageElement.classList.remove("active");
-
+        .querySelectorAll(".modal-bg.show")
+        .forEach(modal => {
+            modal.classList.remove("show");
+            modal.setAttribute("aria-hidden", "true");
         });
 
-
-    const selected =
-        document.getElementById("page-" + page);
-
-    if(selected){
-        selected.classList.add("active");
-    }
-
-
-    document
-        .querySelectorAll(".menuButton")
-        .forEach(menu => {
-
-            menu.classList.remove("active");
-
-        });
-
-
-    if(button){
-        button.classList.add("active");
-    }
-
-
-    const titles = {
-
-        chat:"Nachrichten",
-        people:"Personen",
-        knowledge:"KI-Daten",
-        settings:"Einstellungen"
-
-    };
-
-
-    document.getElementById("pageTitle")
-        .textContent =
-        titles[page] || "Nachrichten";
-
+    document.body.style.overflow = "";
 }
 
 
-/* NACHRICHT SENDEN */
-
-function sendMessage(){
-
-    const input =
-        document.getElementById("messageInput");
-
-    const question =
-        input.value.trim();
-
-    if(!question) return;
-
-
-    const answer =
-        generateAIAnswer(question);
-
-
-    messages.push({
-
-        user:currentUser,
-
-        question:question,
-
-        answer:answer,
-
-        time:new Date().toLocaleString("de-DE")
-
-    });
-
-
-    localStorage.setItem(
-        "riskylive_messages",
-        JSON.stringify(messages)
-    );
-
-
-    input.value = "";
-
-    loadMessages();
-
-    if(isAdmin){
-        updatePeople();
-    }
-
-}
-
-
-/* CHAT LADEN */
-
-function loadMessages(){
-
-    const box =
-        document.getElementById("messages");
-
-    box.innerHTML = "";
-
-
-    const ownMessages =
-        messages.filter(
-            item => item.user === currentUser
-        );
-
-
-    if(!ownMessages.length){
-
-        box.innerHTML = `
-            <div class="message ai">
-                <small>
-                    ${escapeHTML(
-                        knowledge.aiName || "KI"
-                    )}
-                </small>
-                Hallo! Stelle mir eine Frage.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    ownMessages.forEach(item => {
-
-        box.innerHTML += `
-
-            <div class="message user">
-
-                <small>
-                    Du · ${escapeHTML(item.time)}
-                </small>
-
-                ${escapeHTML(item.question)}
-
-            </div>
-
-            <div class="message ai">
-
-                <small>
-                    ${escapeHTML(
-                        knowledge.aiName || "KI"
-                    )}
-                </small>
-
-                ${escapeHTML(item.answer)}
-
-            </div>
-
-        `;
-
-    });
-
-
-    box.scrollTop =
-        box.scrollHeight;
-
-}
-
-
-/* LOKALE KI */
-
-function generateAIAnswer(question){
-
-    const q =
-        question.toLowerCase();
-
-    const k = knowledge;
-
-
-    /* HALLO */
-
-    if(
-        q.includes("hallo") ||
-        q.includes("hi") ||
-        q.includes("hey")
-    ){
-
-        return "Hallo! Wie kann ich dir helfen?";
-
-    }
-
-
-    /* NAME DER KI */
-
-    if(
-        q.includes("wer bist du") ||
-        q.includes("wie heißt du")
-    ){
-
-        return "Ich bin " +
-            (k.aiName || "der KI-Assistent") +
-            ".";
-
-    }
-
-
-    /* ÖFFNUNGSZEITEN */
-
-    if(
-        q.includes("öffnungszeit") ||
-        q.includes("öffnungszeiten") ||
-        q.includes("wann offen") ||
-        q.includes("geöffnet")
-    ){
-
-        return [
-            "Öffnungszeiten:",
-            "Montag: " + (k.monday || "keine Angabe"),
-            "Dienstag: " + (k.tuesday || "keine Angabe"),
-            "Mittwoch: " + (k.wednesday || "keine Angabe"),
-            "Donnerstag: " + (k.thursday || "keine Angabe"),
-            "Freitag: " + (k.friday || "keine Angabe"),
-            "Samstag: " + (k.saturday || "keine Angabe"),
-            "Sonntag: " + (k.sunday || "keine Angabe"),
-            "Feiertage: " + (k.holidays || "keine Angabe")
-        ].join("\n");
-
-    }
-
-
-    /* TELEFON */
-
-    if(
-        q.includes("telefon") ||
-        q.includes("telefonnummer")
-    ){
-
-        return k.dataPhone ||
-            "Es wurde keine Telefonnummer hinterlegt.";
-
-    }
-
-
-    /* EMAIL */
-
-    if(
-        q.includes("email") ||
-        q.includes("e-mail") ||
-        q.includes("mail")
-    ){
-
-        return k.dataEmail ||
-            "Es wurde keine E-Mail-Adresse hinterlegt.";
-
-    }
-
-
-    /* WEBSEITE */
-
-    if(
-        q.includes("website") ||
-        q.includes("webseite")
-    ){
-
-        return k.dataWebsite ||
-            "Es wurde keine Webseite hinterlegt.";
-
-    }
-
-
-    /* PREISE */
-
-    if(
-        q.includes("preis") ||
-        q.includes("preise") ||
-        q.includes("kostet") ||
-        q.includes("kosten")
-    ){
-
-        return k.dataPrices ||
-            "Es wurden noch keine Preise hinterlegt.";
-
-    }
-
-
-    /* ANGEBOTE */
-
-    if(
-        q.includes("angebot") ||
-        q.includes("angebote") ||
-        q.includes("dienstleistung")
-    ){
-
-        return k.dataServices ||
-            "Es wurden noch keine Angebote hinterlegt.";
-
-    }
-
-
-    /* FAQ */
-
-    const faqs = [
-
-        [k.faq1q,k.faq1a],
-        [k.faq2q,k.faq2a],
-        [k.faq3q,k.faq3a]
-
-    ];
-
-
-    for(const faq of faqs){
-
-        if(
-            faq[0] &&
-            faq[1] &&
-            q.includes(
-                faq[0].toLowerCase()
-            )
-        ){
-
-            return faq[1];
-
-        }
-
-    }
-
-
-    /* ALLGEMEINE INFORMATION */
-
-    let answer =
-        "Ich habe deine Frage erhalten.";
-
-
-    if(k.dataDescription){
-
-        answer +=
-            "\n\n" +
-            k.dataDescription;
-
-    }
-
-
-    if(k.dataExtra){
-
-        answer +=
-            "\n\n" +
-            k.dataExtra;
-
-    }
-
-
-    return answer;
-
-}
-
-
-/* PERSONEN */
-
-function updatePeople(){
-
-    if(!isAdmin) return;
-
-
-    const list =
-        document.getElementById("peopleList");
-
-
-    const users =
-        [...new Set(
-            messages.map(item => item.user)
-        )];
-
-
-    if(!users.length){
-
-        list.innerHTML =
-            `<div class="empty">
-                Noch keine Fragen vorhanden.
-            </div>`;
-
-        return;
-
-    }
-
-
-    list.innerHTML = "";
-
-
-    users.forEach(user => {
-
-        const count =
-            messages.filter(
-                item => item.user === user
-            ).length;
-
-
-        const div =
-            document.createElement("div");
-
-        div.className = "person";
-
-        div.innerHTML = `
-
-            <strong>
-                ${escapeHTML(user)}
-            </strong>
-
-            <div class="badge">
-                ${count} Frage(n)
-            </div>
-
-        `;
-
-
-        div.onclick =
-            () => showPerson(user);
-
-
-        list.appendChild(div);
-
-    });
-
-}
-
-
-/* PERSON ANZEIGEN */
-
-function showPerson(user){
-
-    if(!isAdmin) return;
-
-
-    const items =
-        messages.filter(
-            item => item.user === user
-        );
-
-
-    let output =
-        "Benutzer: " +
-        user +
-        "\n\n";
-
-
-    items.forEach((item,index) => {
-
-        output +=
-            "Frage " +
-            (index + 1) +
-            ":\n" +
-            item.question +
-            "\n\n" +
-            "KI-Antwort:\n" +
-            item.answer +
-            "\n\n" +
-            "Zeit: " +
-            item.time +
-            "\n\n";
-
-    });
-
-
-    alert(output);
-
-}
-
-
-/* KI-DATEN SPEICHERN */
-
-function saveKnowledge(){
-
-    if(!isAdmin) return;
-
-
-    const ids = [
-
-        "dataName",
-        "dataCompany",
-        "dataLocation",
-        "dataLanguage",
-        "dataDescription",
-
-        "dataPhone",
-        "dataEmail",
-        "dataWebsite",
-        "dataContact",
-
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday",
-        "holidays",
-
-        "dataServices",
-        "dataPrices",
-        "dataPayment",
-
-        "faq1q",
-        "faq1a",
-        "faq2q",
-        "faq2a",
-        "faq3q",
-        "faq3a",
-
-        "aiName",
-        "aiTone",
-        "dataExtra",
-        "dataRules"
-
-    ];
-
-
-    ids.forEach(id => {
-
-        const element =
-            document.getElementById(id);
-
-        if(element){
-            knowledge[id] =
-                element.value;
-        }
-
-    });
-
-
-    localStorage.setItem(
-        "riskylive_knowledge",
-        JSON.stringify(knowledge)
-    );
-
-
-    document.getElementById("saveStatus")
-        .textContent =
-        "✓ Gespeichert";
-
-}
-
-
-/* KI-DATEN LADEN */
-
-function loadKnowledge(){
-
-    const ids = [
-
-        "dataName",
-        "dataCompany",
-        "dataLocation",
-        "dataLanguage",
-        "dataDescription",
-
-        "dataPhone",
-        "dataEmail",
-        "dataWebsite",
-        "dataContact",
-
-        "monday",
-        "tuesday",
-        "wednesday",
-        "thursday",
-        "friday",
-        "saturday",
-        "sunday",
-        "holidays",
-
-        "dataServices",
-        "dataPrices",
-        "dataPayment",
-
-        "faq1q",
-        "faq1a",
-        "faq2q",
-        "faq2a",
-        "faq3q",
-        "faq3a",
-
-        "aiName",
-        "aiTone",
-        "dataExtra",
-        "dataRules"
-
-    ];
-
-
-    ids.forEach(id => {
-
-        const element =
-            document.getElementById(id);
-
-        if(
-            element &&
-            knowledge[id] !== undefined
-        ){
-
-            element.value =
-                knowledge[id];
-
-        }
-
-    });
-
-}
-
-
-/* BENUTZERNAME ÄNDERN */
-
-function changeUsername(){
-
-    if(!isAdmin) return;
-
-
-    const value =
-        document.getElementById("newUsername")
-        .value
-        .trim();
-
-    if(!value) return;
-
-
-    currentUser = value;
-
-
-    document.getElementById("currentUser")
-        .textContent =
-        currentUser;
-
-
-    document.getElementById("settingsStatus")
-        .textContent =
-        "✓ Benutzername geändert.";
-
-}
-
-
-/* LOGOUT */
-
-function logout(){
-
-    location.reload();
-
-}
-
-
-/* HTML SCHÜTZEN */
-
-function escapeHTML(value){
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-
-}
-
-
-/* ENTER SENDEN */
+/* Upgrade öffnen */
 
 document
-    .getElementById("messageInput")
-    .addEventListener(
-        "keydown",
-        function(e){
+    .getElementById("upgradeButton")
+    .addEventListener("click", () => {
+        openModal(upgradeModal);
+    });
 
-            if(
-                e.key === "Enter" &&
-                !e.shiftKey
-            ){
 
-                e.preventDefault();
+/* Schließen */
 
-                sendMessage();
+document
+    .querySelectorAll("[data-close]")
+    .forEach(button => {
 
+        button.addEventListener("click", () => {
+
+            const id =
+                button.getAttribute("data-close");
+
+            const modal =
+                document.getElementById(id);
+
+            closeModal(modal);
+        });
+    });
+
+
+/* Klick auf dunklen Hintergrund */
+
+document
+    .querySelectorAll(".modal-bg")
+    .forEach(modal => {
+
+        modal.addEventListener("click", event => {
+
+            if (event.target === modal) {
+                closeModal(modal);
             }
 
-        }
+        });
+
+    });
+
+
+/* ESC */
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+        closeAllModals();
+    }
+
+});
+
+
+/* -----------------------------
+   INSTALL AGENT
+----------------------------- */
+
+document
+    .querySelectorAll("[data-install]")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const type =
+                button.getAttribute("data-install");
+
+            installAgent(type);
+
+        });
+
+    });
+
+
+function installAgent(type) {
+
+    if (!types[type]) {
+        return;
+    }
+
+    const alreadyExists =
+        agents.some(agent => agent.type === type);
+
+    if (alreadyExists) {
+        return;
+    }
+
+    const data = types[type];
+
+    agents.push({
+        type,
+        name: data.name,
+        icon: data.icon,
+        model: data.model,
+        status: "idle",
+        task: "Nichts zu tun"
+    });
+
+    renderAgents();
+    closeModal(upgradeModal);
+}
+
+
+/* -----------------------------
+   DELETE AGENT
+----------------------------- */
+
+function deleteAgent(index) {
+
+    if (!Number.isInteger(index)) {
+        return;
+    }
+
+    const agent = agents[index];
+
+    if (!agent) {
+        return;
+    }
+
+    const confirmed = window.confirm(
+        "Soll " + agent.name + " wirklich gelöscht werden?"
     );
 
+    if (!confirmed) {
+        return;
+    }
+
+    agents.splice(index, 1);
+
+    renderAgents();
+}
+
+
+/* -----------------------------
+   SETUP AGENT
+----------------------------- */
+
+function setupAgent(index) {
+
+    if (!Number.isInteger(index)) {
+        return;
+    }
+
+    const agent = agents[index];
+
+    if (!agent) {
+        return;
+    }
+
+    if (agent.type === "email") {
+
+        resetMailModal();
+
+        openModal(emailModal);
+
+        return;
+    }
+
+    window.alert(
+        agent.name +
+        " ist vorhanden. Die Einrichtung dieses Agenten kommt später."
+    );
+}
+
+
+/* -----------------------------
+   RENDER AGENTS
+----------------------------- */
+
+function renderAgents() {
+
+    agentsContainer.innerHTML = "";
+
+    let active = 0;
+    let waiting = 0;
+    let idle = 0;
+
+
+    if (agents.length === 0) {
+
+        agentsContainer.innerHTML = `
+            <div class="empty">
+                Noch keine KI-Agenten installiert.<br>
+                Klicke oben rechts auf <b>Upgrade</b>.
+            </div>
+        `;
+
+    }
+
+
+    agents.forEach((agent, index) => {
+
+        if (agent.status === "working") {
+            active++;
+        } else if (agent.status === "waiting") {
+            waiting++;
+        } else {
+            idle++;
+        }
+
+
+        let statusText = "Nichts zu tun";
+        let statusClass = "idle";
+
+        if (agent.status === "working") {
+            statusText = "Arbeitet";
+            statusClass = "working";
+        }
+
+        if (agent.status === "waiting") {
+            statusText = "Wartet";
+            statusClass = "waiting";
+        }
+
+
+        const card =
+            document.createElement("div");
+
+        card.className = "agent";
+
+
+        card.innerHTML = `
+            <div class="agent-top">
+
+                <div class="agent-name">
+
+                    <div class="agent-icon">
+                        ${escapeHtml(agent.icon)}
+                    </div>
+
+                    <span>
+                        ${escapeHtml(agent.name)}
+                    </span>
+
+                </div>
+
+                <div class="status ${statusClass}">
+                    ${statusText}
+                </div>
+
+            </div>
+
+            <div class="task">
+
+                <div class="task-label">
+                    AKTUELLE AUFGABE
+                </div>
+
+                <div class="task-text">
+                    ${escapeHtml(agent.task)}
+                </div>
+
+            </div>
+
+            <div class="meta">
+
+                <span>
+                    ${escapeHtml(agent.model)}
+                </span>
+
+                <span>
+                    ${
+                        agent.status === "idle"
+                            ? "Keine Aktivität"
+                            : "Gerade aktiv"
+                    }
+                </span>
+
+            </div>
+
+            <div class="agent-actions">
+
+                ${
+                    agent.status === "idle"
+                        ? `
+                        <button
+                            class="setup"
+                            type="button"
+                            data-setup-index="${index}">
+                            Einrichten
+                        </button>
+                        `
+                        : ""
+                }
+
+                <button
+                    class="delete"
+                    type="button"
+                    data-delete-index="${index}">
+                    🗑 Löschen
+                </button>
+
+            </div>
+        `;
+
+
+        agentsContainer.appendChild(card);
+
+    });
+
+
+    totalElement.textContent = agents.length;
+    activeElement.textContent = active;
+    waitingElement.textContent = waiting;
+    idleElement.textContent = idle;
+
+
+    /* Setup-Buttons */
+
+    agentsContainer
+        .querySelectorAll("[data-setup-index]")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const index =
+                    Number(button.dataset.setupIndex);
+
+                setupAgent(index);
+            });
+
+        });
+
+
+    /* Delete-Buttons */
+
+    agentsContainer
+        .querySelectorAll("[data-delete-index]")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                const index =
+                    Number(button.dataset.deleteIndex);
+
+                deleteAgent(index);
+            });
+
+        });
+
+}
+
+
+/* -----------------------------
+   FILE SELECTION
+----------------------------- */
+
+mailFile.addEventListener("change", () => {
+
+    selectedFile =
+        mailFile.files && mailFile.files.length
+            ? mailFile.files[0]
+            : null;
+
+
+    if (!selectedFile) {
+
+        fileName.textContent =
+            "Keine Datei ausgewählt";
+
+        analyzeButton.disabled = true;
+
+        return;
+    }
+
+
+    const extension =
+        selectedFile.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+    if (extension !== "txt" && extension !== "eml") {
+
+        selectedFile = null;
+        mailFile.value = "";
+
+        fileName.textContent =
+            "Nur TXT- und EML-Dateien sind erlaubt.";
+
+        analyzeButton.disabled = true;
+
+        return;
+    }
+
+
+    fileName.textContent =
+        selectedFile.name;
+
+    analyzeButton.disabled = false;
+
+});
+
+
+/* -----------------------------
+   MAIL ANALYSIS
+----------------------------- */
+
+analyzeButton.addEventListener(
+    "click",
+    analyzeMail
+);
+
+
+async function analyzeMail() {
+
+    if (!selectedFile) {
+        return;
+    }
+
+
+    analyzeButton.disabled = true;
+
+    result.classList.remove("show");
+    analysis.classList.add("show");
+
+    progressBar.style.width = "0%";
+
+    analysisText.textContent =
+        "KI wird gestartet...";
+
+
+    const steps = [
+        ["E-Mail wird gelesen...", 20],
+        ["Absender und Inhalt werden erkannt...", 40],
+        ["Anliegen wird analysiert...", 60],
+        ["Kontext wird verarbeitet...", 80],
+        ["Antwort wird erstellt...", 95]
+    ];
+
+
+    try {
+
+        for (const [message, percentage] of steps) {
+
+            analysisText.textContent = message;
+            progressBar.style.width =
+                percentage + "%";
+
+            await sleep(550);
+
+        }
+
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "mail",
+            selectedFile
+        );
+
+
+        const response =
+            await fetch(
+                "/api/analyze-mail",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Analyse fehlgeschlagen."
+            );
+
+        }
+
+
+        progressBar.style.width = "100%";
+
+        analysisText.classList.remove("analyzing");
+
+        analysisText.textContent =
+            "Analyse abgeschlossen.";
+
+
+        analysisResult.innerHTML = `
+            <strong>Betreff:</strong>
+            ${escapeHtml(data.subject || "Nicht erkannt")}
+            <br><br>
+
+            <strong>Anliegen:</strong>
+            ${escapeHtml(data.intent || "Nicht erkannt")}
+            <br><br>
+
+            <strong>Priorität:</strong>
+            ${escapeHtml(data.priority || "Normal")}
+        `;
+
+
+        replyText.value =
+            data.reply || "";
+
+
+        result.classList.add("show");
+
+
+        const emailAgent =
+            agents.find(
+                agent => agent.type === "email"
+            );
+
+
+        if (emailAgent) {
+
+            emailAgent.status = "idle";
+            emailAgent.task =
+                "Antwortvorschlag erstellt";
+
+            renderAgents();
+
+        }
+
+    }
+    catch (error) {
+
+        analysisText.classList.remove("analyzing");
+
+        analysisText.textContent =
+            "Fehler: " + error.message;
+
+        progressBar.style.width = "0%";
+
+    }
+    finally {
+
+        analyzeButton.disabled =
+            !selectedFile;
+
+    }
+
+}
+
+
+/* -----------------------------
+   COPY
+----------------------------- */
+
+document
+    .getElementById("copyButton")
+    .addEventListener("click", async () => {
+
+        const text =
+            replyText.value;
+
+        try {
+
+            await navigator.clipboard.writeText(text);
+
+            const button =
+                document.getElementById("copyButton");
+
+            const oldText =
+                button.textContent;
+
+            button.textContent =
+                "✓ Kopiert";
+
+            setTimeout(() => {
+                button.textContent = oldText;
+            }, 1500);
+
+        }
+        catch {
+
+            replyText.select();
+
+            document.execCommand("copy");
+        }
+
+    });
+
+
+/* -----------------------------
+   RESET EMAIL MODAL
+----------------------------- */
+
+function resetMailModal() {
+
+    selectedFile = null;
+
+    mailFile.value = "";
+
+    fileName.textContent =
+        "Keine Datei ausgewählt";
+
+    analyzeButton.disabled = true;
+
+    analysis.classList.remove("show");
+
+    result.classList.remove("show");
+
+    progressBar.style.width = "0%";
+
+    analysisText.classList.add("analyzing");
+
+    analysisText.textContent =
+        "KI wird gestartet...";
+
+    analysisResult.innerHTML = "";
+
+    replyText.value = "";
+
+}
+
+
+/* -----------------------------
+   UTILS
+----------------------------- */
+
+function sleep(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
+
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* -----------------------------
+   START
+----------------------------- */
+
+renderAgents();
 </script>
 
 </body>
