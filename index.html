@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>GHOST ISLAND - Chunk World</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GHOST ISLAND 3D</title>
 
 <style>
 html,body{
@@ -10,7 +11,7 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#79caff;
+    background:#75c9ff;
     font-family:Arial,sans-serif;
 }
 
@@ -22,15 +23,16 @@ canvas{
     position:absolute;
     top:15px;
     left:15px;
-    color:white;
     z-index:20;
+    color:white;
     text-shadow:0 2px 5px #000;
     pointer-events:none;
-    line-height:1.45;
+    line-height:1.5;
 }
 
-#hud b{
-    font-size:23px;
+#title{
+    font-size:24px;
+    font-weight:bold;
 }
 
 #crosshair{
@@ -41,73 +43,10 @@ canvas{
     color:white;
     font-size:25px;
     font-weight:bold;
-    text-shadow:0 0 5px #000;
     z-index:20;
+    text-shadow:0 0 5px black;
     pointer-events:none;
 }
-
-
-/* =========================
-   MENÜ
-========================= */
-
-#menu{
-    position:absolute;
-    inset:0;
-    z-index:100;
-    background:rgba(0,0,0,.6);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-#menuBox{
-    width:380px;
-    max-width:85%;
-    padding:30px;
-    background:#20252a;
-    color:white;
-    border-radius:20px;
-    text-align:center;
-    box-shadow:0 15px 70px #000;
-}
-
-#menuBox h1{
-    font-size:40px;
-    margin:0;
-}
-
-#seed{
-    margin:18px 0;
-    background:#111;
-    border-radius:8px;
-    padding:10px;
-    font-family:monospace;
-}
-
-.menuButton{
-    width:100%;
-    padding:15px;
-    margin-top:10px;
-    border:0;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-#start{
-    background:#43d45b;
-}
-
-#newWorld{
-    background:#e2a52a;
-}
-
-
-/* =========================
-   MOBILE / CHROMEBOOK BUTTONS
-========================= */
 
 #controls{
     position:absolute;
@@ -116,12 +55,8 @@ canvas{
     z-index:30;
 
     display:grid;
-
-    grid-template-columns:
-        65px 65px 65px;
-
-    grid-template-rows:
-        65px 65px 65px;
+    grid-template-columns:65px 65px 65px;
+    grid-template-rows:65px 65px 65px;
 
     gap:6px;
 
@@ -132,18 +67,16 @@ canvas{
     width:65px;
     height:65px;
 
+    border:2px solid rgba(255,255,255,.75);
     border-radius:14px;
-    border:2px solid rgba(255,255,255,.7);
 
     background:rgba(0,0,0,.4);
-
     color:white;
+
     font-size:25px;
     font-weight:bold;
 
     user-select:none;
-    -webkit-user-select:none;
-
     touch-action:none;
 }
 
@@ -172,24 +105,20 @@ canvas{
     grid-row:2;
 }
 
-
 #jump{
     position:absolute;
-
     right:25px;
     bottom:30px;
 
+    width:100px;
+    height:100px;
+
     z-index:30;
 
-    width:95px;
-    height:95px;
-
     border-radius:50%;
-
     border:2px solid white;
 
     background:rgba(0,0,0,.4);
-
     color:white;
 
     font-weight:bold;
@@ -201,44 +130,103 @@ canvas{
     transform:scale(.92);
 }
 
+#menu{
+    position:absolute;
+    inset:0;
+
+    z-index:100;
+
+    background:rgba(0,0,0,.6);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#menuBox{
+    width:380px;
+    max-width:85%;
+
+    background:#20252a;
+    color:white;
+
+    border-radius:20px;
+
+    padding:30px;
+
+    text-align:center;
+
+    box-shadow:0 20px 80px black;
+}
+
+#menuBox h1{
+    margin:0;
+    font-size:40px;
+}
+
+#seed{
+    background:#111;
+    padding:10px;
+    border-radius:8px;
+
+    font-family:monospace;
+
+    margin:18px 0;
+}
+
+.menuButton{
+    width:100%;
+    padding:15px;
+
+    margin-top:10px;
+
+    border:0;
+    border-radius:10px;
+
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+#start{
+    background:#42d35b;
+}
+
+#newWorld{
+    background:#e3a82c;
+}
 </style>
 </head>
 
 <body>
 
-
 <div id="hud">
 
-<b>GHOST ISLAND</b><br>
-
-WASD / Buttons = Laufen<br>
-SPACE = Springen<br>
-Klick = Maus<br>
-
-Chunk:
-<span id="chunk">0 / 0</span><br>
-
-Position:
-<span id="position">0 / 0</span>
-
+<div id="title">
+GHOST ISLAND
 </div>
 
+WASD / Pfeile = Bewegen<br>
+SPACE = Springen<br>
+Klick = Maus aktivieren<br>
+
+Position:
+<span id="position">0 / 0</span><br>
+
+Chunk:
+<span id="chunk">0 / 0</span>
+
+</div>
 
 <div id="crosshair">+</div>
 
 
-<!-- =========================
-     MOVEMENT
-========================= -->
-
 <div id="controls">
 
 <button class="move" id="up">▲</button>
-
 <button class="move" id="left">◀</button>
-
 <button class="move" id="down">▼</button>
-
 <button class="move" id="right">▶</button>
 
 </div>
@@ -249,10 +237,6 @@ SPRINGEN
 </button>
 
 
-<!-- =========================
-     MENU
-========================= -->
-
 <div id="menu">
 
 <div id="menuBox">
@@ -260,31 +244,27 @@ SPRINGEN
 <h1>GHOST ISLAND</h1>
 
 <p>
-Riesige gestreamte 3D-Welt
+Riesige zufällig erzeugte 3D-Welt
 </p>
 
 <p>
-Nur die benötigten Bereiche werden geladen.
+Chunks werden nur in deiner Nähe geladen.
 </p>
 
 <div id="seed">
-Seed...
+SEED
 </div>
 
 <button
 class="menuButton"
 id="start">
-
 SPIEL STARTEN
-
 </button>
 
 <button
 class="menuButton"
 id="newWorld">
-
 NEUE WELT
-
 </button>
 
 </div>
@@ -297,325 +277,306 @@ NEUE WELT
 <script>
 
 
-// ======================================================
-// WELT-SEED
-// ======================================================
+// =====================================================
+// SEED
+// =====================================================
 
-let savedSeed =
-localStorage.getItem(
-"GHOST_CHUNK_SEED"
-);
+let storedSeed =
+localStorage.getItem("GHOST_ISLAND_SEED");
 
+if(!storedSeed){
 
-if(!savedSeed){
-
-savedSeed =
+storedSeed =
+String(
 Math.floor(
 Math.random()*2147483647
+)
 );
 
 localStorage.setItem(
-"GHOST_CHUNK_SEED",
-savedSeed
+"GHOST_ISLAND_SEED",
+storedSeed
 );
 
 }
 
-
 const WORLD_SEED =
-Number(savedSeed);
+Number(storedSeed);
 
-
-document.getElementById(
-"seed"
-).innerText =
+document.getElementById("seed")
+.innerText =
 "SEED: "+WORLD_SEED;
 
 
-// ======================================================
-// HASH RANDOM
-// ======================================================
+// =====================================================
+// DETERMINISTISCHER RANDOM
+// =====================================================
 
-function hash(x,z){
+function randomHash(x,z,extra=0){
 
 let n =
-x*374761393+
-z*668265263+
-WORLD_SEED*1442695041;
+Math.sin(
+x*12.9898+
+z*78.233+
+extra*37.719+
+WORLD_SEED
+)
+*
+43758.5453123;
 
-n =
-(n^(n>>13))*
-1274126177;
-
-n =
-n^(n>>16);
-
-return (
-(n>>>0)/
-4294967295
-);
+return n-Math.floor(n);
 
 }
 
 
-// ======================================================
+// =====================================================
 // SCENE
-// ======================================================
+// =====================================================
 
 const scene =
 new THREE.Scene();
 
-
 scene.background =
-new THREE.Color(
-0x79caff
-);
-
+new THREE.Color(0x75caff);
 
 scene.fog =
 new THREE.Fog(
-0x79caff,
-500,
-2200
+0x75caff,
+600,
+2300
 );
 
 
-// ======================================================
+// =====================================================
 // CAMERA
-// ======================================================
+// =====================================================
 
 const camera =
 new THREE.PerspectiveCamera(
-
 75,
-
-innerWidth/
-innerHeight,
-
+innerWidth/innerHeight,
 0.1,
-
 5000
-
 );
 
 
-// ======================================================
+// =====================================================
 // RENDERER
-// ======================================================
+// =====================================================
 
 const renderer =
 new THREE.WebGLRenderer({
-
 antialias:true
-
 });
-
 
 renderer.setSize(
 innerWidth,
 innerHeight
 );
 
-
 renderer.setPixelRatio(
-Math.min(
-devicePixelRatio,
-1.5
-)
+Math.min(devicePixelRatio,1.4)
 );
 
-
 renderer.shadowMap.enabled=true;
-
 
 document.body.appendChild(
 renderer.domElement
 );
 
 
-// ======================================================
-// LIGHT
-// ======================================================
+// =====================================================
+// LICHT
+// =====================================================
 
 scene.add(
-
 new THREE.AmbientLight(
 0xffffff,
-1
+0.9
 )
-
 );
-
 
 const sun =
 new THREE.DirectionalLight(
 0xffffff,
-1.6
+1.5
 );
-
 
 sun.position.set(
 500,
 900,
-400
+300
 );
 
-
 sun.castShadow=true;
-
 
 scene.add(sun);
 
 
-// ======================================================
-// CHUNK SYSTEM
-// ======================================================
+// =====================================================
+// CHUNK SETTINGS
+// =====================================================
 
-const CHUNK_SIZE =
-300;
+const CHUNK_SIZE = 300;
 
+// 2 = 5x5 Chunks
+const RENDER_DISTANCE = 2;
 
-// Nur 2 Ringe laden
-const RENDER_DISTANCE =
-2;
-
-
-// aktive Chunks
-const chunks =
-new Map();
+const chunks = new Map();
 
 
-function chunkKey(cx,cz){
-
-return cx+","+cz;
-
-}
-
-
-// ======================================================
+// =====================================================
 // TERRAIN
-// ======================================================
+// =====================================================
 
 function getHeight(x,z){
 
-let h=0;
+const distance =
+Math.sqrt(
+x*x+
+z*z
+);
 
 
-h +=
-Math.sin(
-x*.002
-)*
-Math.cos(
-z*.002
-)*
-65;
+// Inselrand
+const island =
+Math.max(
+0,
+1-distance/5800
+);
 
 
-h +=
-Math.sin(
-x*.006+
-z*.004
-)*
-20;
-
-
-h +=
-Math.cos(
-x*.011-
-z*.009
-)*
-8;
+// Berge
+let h =
+Math.sin(x*.0017) *
+Math.cos(z*.0015) *
+110;
 
 
 // große Landschaft
 h +=
 Math.sin(
-x*.00065
+x*.00055+
+z*.00035
 )*
-Math.cos(
-z*.0008
-)*
-100;
+170;
 
 
-return h+15;
+// Hügel
+h +=
+Math.sin(
+x*.004+
+z*.003
+)*
+30;
+
+
+// kleine Details
+h +=
+Math.sin(
+x*.014-
+z*.011
+)*
+7;
+
+
+// Rand absenken
+h *= island;
+
+
+// leichte Grundhöhe
+h += 5;
+
+
+return h;
+}
+
+
+// =====================================================
+// CHUNK KEY
+// =====================================================
+
+function key(cx,cz){
+
+return cx+"_"+cz;
 
 }
 
 
-// ======================================================
+// =====================================================
 // CHUNK ERSTELLEN
-// ======================================================
+// =====================================================
 
 function createChunk(cx,cz){
 
-const key =
-chunkKey(cx,cz);
+const id =
+key(cx,cz);
 
-
-if(chunks.has(key))
+if(chunks.has(id))
 return;
 
 
 const group =
 new THREE.Group();
 
-
 group.userData.cx=cx;
 group.userData.cz=cz;
 
 
-// ------------------------------------------------------
+// =================================================
 // TERRAIN
-// ------------------------------------------------------
+// =================================================
 
-const geo =
+const geometry =
 new THREE.PlaneGeometry(
-
 CHUNK_SIZE,
 CHUNK_SIZE,
-
-16,
-16
-
+20,
+20
 );
 
-
-geo.rotateX(
+geometry.rotateX(
 -Math.PI/2
 );
 
 
-const pos =
-geo.attributes.position;
+const positions =
+geometry.attributes.position;
+
+
+// WICHTIG:
+// Der Chunk liegt jetzt exakt um seinen Mittelpunkt.
+
+const centerX =
+cx*CHUNK_SIZE;
+
+const centerZ =
+cz*CHUNK_SIZE;
 
 
 for(
 let i=0;
-i<pos.count;
+i<positions.count;
 i++
 ){
 
 const localX =
-pos.getX(i);
+positions.getX(i);
 
 const localZ =
-pos.getZ(i);
+positions.getZ(i);
 
 
 const worldX =
-cx*CHUNK_SIZE+
-localX+
-CHUNK_SIZE/2;
-
+centerX+
+localX;
 
 const worldZ =
-cz*CHUNK_SIZE+
-localZ+
-CHUNK_SIZE/2;
+centerZ+
+localZ;
 
 
-pos.setY(
+positions.setY(
 i,
 getHeight(
 worldX,
@@ -626,17 +587,17 @@ worldZ
 }
 
 
-geo.computeVertexNormals();
+geometry.computeVertexNormals();
 
 
 const ground =
 new THREE.Mesh(
 
-geo,
+geometry,
 
 new THREE.MeshStandardMaterial({
 
-color:0x4d9b45,
+color:0x4d9945,
 
 roughness:1
 
@@ -645,20 +606,31 @@ roughness:1
 );
 
 
+ground.position.set(
+centerX,
+0,
+centerZ
+);
+
 ground.receiveShadow=true;
 
 
 group.add(ground);
 
 
-// ------------------------------------------------------
+// =================================================
 // BÄUME
-// ------------------------------------------------------
+// =================================================
+
+const trees=[];
+
+
+// Weniger Objekte = bessere FPS
 
 const treeCount =
-6+
+7+
 Math.floor(
-hash(cx,cz)*9
+randomHash(cx,cz,10)*7
 );
 
 
@@ -669,32 +641,71 @@ i++
 ){
 
 const r1 =
-hash(
-cx*100+i,
-cz*100+i
-);
-
+randomHash(cx,cz,100+i);
 
 const r2 =
-hash(
-cx*200+i,
-cz*200+i
-);
+randomHash(cx,cz,200+i);
 
 
 const x =
-cx*CHUNK_SIZE+
-r1*CHUNK_SIZE;
+centerX+
+(r1-.5)*
+(CHUNK_SIZE-30);
 
 
 const z =
-cz*CHUNK_SIZE+
-r2*CHUNK_SIZE;
+centerZ+
+(r2-.5)*
+(CHUNK_SIZE-30);
+
+
+const y =
+getHeight(x,z);
+
+
+// Nicht unter Wasser
+if(y<7)
+continue;
+
+
+// Mindestabstand
+let tooClose=false;
+
+for(
+const p of trees
+){
+
+const dx=x-p.x;
+const dz=z-p.z;
+
+if(
+dx*dx+
+dz*dz
+<
+40*40
+){
+
+tooClose=true;
+break;
+
+}
+
+}
+
+if(tooClose)
+continue;
+
+
+trees.push({
+x:x,
+z:z
+});
 
 
 createTree(
 group,
 x,
+y,
 z,
 cx,
 cz,
@@ -704,17 +715,16 @@ i
 }
 
 
-// ------------------------------------------------------
-// FELSEN
-// ------------------------------------------------------
+// =================================================
+// STEINE
+// =================================================
+
+const rocks=[];
 
 const rockCount =
 4+
 Math.floor(
-hash(
-cx+99,
-cz+33
-)*7
+randomHash(cx,cz,400)*6
 );
 
 
@@ -725,92 +735,93 @@ i++
 ){
 
 const r1 =
-hash(
-cx*300+i,
-cz*300+i
-);
-
+randomHash(cx,cz,500+i);
 
 const r2 =
-hash(
-cx*400+i,
-cz*400+i
-);
+randomHash(cx,cz,600+i);
 
 
 const x =
-cx*CHUNK_SIZE+
-r1*CHUNK_SIZE;
-
+centerX+
+(r1-.5)*
+(CHUNK_SIZE-20);
 
 const z =
-cz*CHUNK_SIZE+
-r2*CHUNK_SIZE;
+centerZ+
+(r2-.5)*
+(CHUNK_SIZE-20);
 
 
 const y =
 getHeight(x,z);
 
 
-const size =
-3+
-hash(
-cx*500+i,
-cz*500+i
-)*12;
+if(y<7)
+continue;
 
 
-const rock =
-new THREE.Mesh(
+let tooClose=false;
 
-new THREE.DodecahedronGeometry(
-size,
-0
-),
+for(
+const p of rocks
+){
 
-new THREE.MeshStandardMaterial({
+const dx=x-p.x;
+const dz=z-p.z;
 
-color:0x777777,
-roughness:1
+if(
+dx*dx+
+dz*dz
+<
+25*25
+){
 
-})
+tooClose=true;
+break;
 
-);
+}
+
+}
 
 
-rock.position.set(
+if(tooClose)
+continue;
+
+
+rocks.push({
+x:x,
+z:z
+});
+
+
+createRock(
+group,
 x,
-y+size*.5,
-z
+y,
+z,
+cx,
+cz,
+i
 );
-
-
-rock.rotation.y =
-hash(
-cx*600+i,
-cz*600+i
-)*6;
-
-
-group.add(rock);
 
 }
 
 
 scene.add(group);
 
-chunks.set(key,group);
+chunks.set(id,group);
 
 }
 
 
-// ======================================================
-// TREE
-// ======================================================
+// =====================================================
+// BAUM
+// =====================================================
 
 function createTree(
 group,
 x,
+y,
 z,
 cx,
 cz,
@@ -822,46 +833,41 @@ new THREE.Group();
 
 
 const r =
-hash(
-cx*1000+
-index,
-cz*1000+
-index
+randomHash(
+cx,
+cz,
+1000+index
 );
 
 
-// unterschiedliche Größe
-
 const height =
-28+
-r*28;
+25+
+r*30;
 
 
 const trunkRadius =
-1.5+
-r*1.5;
+1.3+
+r*1.2;
 
 
-// ------------------------------------------------------
+// =================================================
 // STAMM
-// ------------------------------------------------------
+// =================================================
 
 const trunk =
 new THREE.Mesh(
 
 new THREE.CylinderGeometry(
-
 trunkRadius*.7,
 trunkRadius,
-
 height,
 7
-
 ),
 
 new THREE.MeshStandardMaterial({
 
-color:0x57361f,
+color:0x59381f,
+
 roughness:1
 
 })
@@ -872,67 +878,73 @@ roughness:1
 trunk.position.y =
 height/2;
 
-
 tree.add(trunk);
 
 
-// ------------------------------------------------------
+// =================================================
 // ÄSTE
-// ------------------------------------------------------
+// =================================================
 
-const branches =
+const branchCount =
 4+
-Math.floor(r*5);
+Math.floor(r*4);
 
 
 for(
 let i=0;
-i<branches;
+i<branchCount;
 i++
 ){
 
-const angle =
-hash(
-cx*2000+
-index*20+i,
-cz*2000+
-index*20+i
+const a =
+randomHash(
+cx,
+cz,
+1200+
+index*10+
+i
 )*
 Math.PI*2;
 
 
 const branchY =
-height*.35+
-hash(
-cx*3000+i,
-cz*3000+i
-)*
-height*.45;
+height*
+(
+.35+
+randomHash(
+cx,
+cz,
+1300+
+index*10+
+i
+)*.45
+);
 
 
 const length =
-7+
-hash(
-cx*4000+i,
-cz*4000+i
-)*14;
+6+
+randomHash(
+cx,
+cz,
+1400+
+index*10+
+i
+)*12;
 
 
 const branch =
 new THREE.Mesh(
 
 new THREE.CylinderGeometry(
-
-.35,
-.75,
+.3,
+.7,
 length,
 6
-
 ),
 
 new THREE.MeshStandardMaterial({
 
-color:0x583720
+color:0x59371f
 
 })
 
@@ -941,48 +953,48 @@ color:0x583720
 
 branch.position.set(
 
-Math.cos(angle)*
-length*.3,
+Math.cos(a)*length*.3,
 
 branchY,
 
-Math.sin(angle)*
-length*.3
+Math.sin(a)*length*.3
 
 );
 
 
 branch.rotation.z =
-Math.PI/2-
-.35;
-
+Math.PI/2-.4;
 
 branch.rotation.y =
--angle;
+-a;
 
 
 tree.add(branch);
 
 
-// ------------------------------------------------------
+// =================================================
 // BLÄTTER
-// ------------------------------------------------------
+// =================================================
 
 const leaves =
 new THREE.Mesh(
 
 new THREE.IcosahedronGeometry(
 4+
-hash(
-cx*5000+i,
-cz*5000+i
+randomHash(
+cx,
+cz,
+1500+
+index*10+
+i
 )*4,
 1
 ),
 
 new THREE.MeshStandardMaterial({
 
-color:0x23813a,
+color:0x277f3a,
+
 roughness:1
 
 })
@@ -992,14 +1004,11 @@ roughness:1
 
 leaves.position.set(
 
-Math.cos(angle)*
-length*.65,
+Math.cos(a)*length*.65,
 
-branchY+
-4,
+branchY+4,
 
-Math.sin(angle)*
-length*.65
+Math.sin(a)*length*.65
 
 );
 
@@ -1009,9 +1018,16 @@ tree.add(leaves);
 }
 
 
+// =================================================
+// BAUM POSITION
+// =================================================
+
+// Das ist der entscheidende Teil:
+// Der Baum steht direkt auf getHeight(x,z).
+
 tree.position.set(
 x,
-getHeight(x,z),
+y,
 z
 );
 
@@ -1019,9 +1035,8 @@ z
 tree.rotation.y =
 r*Math.PI*2;
 
-
 tree.scale.setScalar(
-.8+r*.6
+.8+r*.45
 );
 
 
@@ -1030,9 +1045,79 @@ group.add(tree);
 }
 
 
-// ======================================================
-// CHUNK UPDATE
-// ======================================================
+// =====================================================
+// STEIN
+// =====================================================
+
+function createRock(
+group,
+x,
+y,
+z,
+cx,
+cz,
+index
+){
+
+const r =
+randomHash(
+cx,
+cz,
+2000+index
+);
+
+
+const size =
+3+
+r*7;
+
+
+const rock =
+new THREE.Mesh(
+
+new THREE.DodecahedronGeometry(
+size,
+1
+),
+
+new THREE.MeshStandardMaterial({
+
+color:0x70756f,
+
+roughness:.9
+
+})
+
+);
+
+
+rock.position.set(
+x,
+y+size*.55,
+z
+);
+
+
+rock.scale.y =
+.7+
+r*.5;
+
+
+rock.rotation.x =
+r*Math.PI;
+
+rock.rotation.y =
+r*Math.PI*2;
+
+
+group.add(rock);
+
+}
+
+
+// =====================================================
+// CHUNK STREAMING
+// =====================================================
 
 let lastCX=null;
 let lastCZ=null;
@@ -1046,7 +1131,6 @@ player.position.x/
 CHUNK_SIZE
 );
 
-
 const cz =
 Math.floor(
 player.position.z/
@@ -1057,17 +1141,16 @@ CHUNK_SIZE
 if(
 cx===lastCX &&
 cz===lastCZ
-)
+){
+
 return;
+
+}
 
 
 lastCX=cx;
 lastCZ=cz;
 
-
-// ------------------------------------------------------
-// BENÖTIGTE CHUNKS
-// ------------------------------------------------------
 
 const needed =
 new Set();
@@ -1085,17 +1168,13 @@ z<=RENDER_DISTANCE;
 z++
 ){
 
-const nx =
-cx+x;
+const nx=cx+x;
+const nz=cz+z;
 
-const nz =
-cz+z;
+const id =
+key(nx,nz);
 
-
-needed.add(
-chunkKey(nx,nz)
-);
-
+needed.add(id);
 
 createChunk(
 nx,nz
@@ -1106,22 +1185,22 @@ nx,nz
 }
 
 
-// ------------------------------------------------------
-// ENTFERNTE CHUNKS LÖSCHEN
-// ------------------------------------------------------
+// =================================================
+// ENTFERNEN
+// =================================================
 
 for(
-const [key,group]
+const [id,group]
 of chunks
 ){
 
 if(
-!needed.has(key)
+!needed.has(id)
 ){
 
 scene.remove(group);
 
-chunks.delete(key);
+chunks.delete(id);
 
 }
 
@@ -1130,18 +1209,14 @@ chunks.delete(key);
 }
 
 
-// ======================================================
+// =====================================================
 // PLAYER
-// ======================================================
+// =====================================================
 
 const player =
 new THREE.Object3D();
 
-
 scene.add(player);
-
-
-// Genau wie in deinem Code
 
 camera.position.y=2;
 
@@ -1155,24 +1230,23 @@ getHeight(0,0),
 );
 
 
-// ======================================================
+// =====================================================
 // PHYSICS
-// ======================================================
+// =====================================================
 
 let velocity =
 new THREE.Vector3();
 
-
-let gravity=.03;
+let gravity=.035;
 
 let canJump=false;
 
 let keys={};
 
 
-// ======================================================
+// =====================================================
 // KEYBOARD
-// ======================================================
+// =====================================================
 
 document.onkeydown=(e)=>{
 
@@ -1204,16 +1278,13 @@ e.key.toLowerCase()
 };
 
 
-// ======================================================
+// =====================================================
 // BUTTONS
-// ======================================================
+// =====================================================
 
-function setupButton(
-id,
-key
-){
+function button(id,keyName){
 
-const button =
+const b =
 document.getElementById(id);
 
 
@@ -1221,7 +1292,7 @@ function down(e){
 
 e.preventDefault();
 
-keys[key]=true;
+keys[keyName]=true;
 
 }
 
@@ -1230,27 +1301,27 @@ function up(e){
 
 e.preventDefault();
 
-keys[key]=false;
+keys[keyName]=false;
 
 }
 
 
-button.addEventListener(
+b.addEventListener(
 "pointerdown",
 down
 );
 
-button.addEventListener(
+b.addEventListener(
 "pointerup",
 up
 );
 
-button.addEventListener(
+b.addEventListener(
 "pointercancel",
 up
 );
 
-button.addEventListener(
+b.addEventListener(
 "pointerleave",
 up
 );
@@ -1258,25 +1329,10 @@ up
 }
 
 
-setupButton(
-"up",
-"w"
-);
-
-setupButton(
-"down",
-"s"
-);
-
-setupButton(
-"left",
-"a"
-);
-
-setupButton(
-"right",
-"d"
-);
+button("up","w");
+button("down","s");
+button("left","a");
+button("right","d");
 
 
 document.getElementById(
@@ -1286,7 +1342,6 @@ document.getElementById(
 (e)=>{
 
 e.preventDefault();
-
 
 if(canJump){
 
@@ -1300,12 +1355,11 @@ canJump=false;
 );
 
 
-// ======================================================
+// =====================================================
 // MAUS
-// ======================================================
+// =====================================================
 
 let rx=0;
-
 let ry=0;
 
 
@@ -1331,7 +1385,6 @@ document.pointerLockElement
 ry -=
 e.movementX*.002;
 
-
 rx -=
 e.movementY*.002;
 
@@ -1354,9 +1407,9 @@ player.rotation.y=ry;
 };
 
 
-// ======================================================
-// UPDATE
-// ======================================================
+// =====================================================
+// PLAYER UPDATE
+// =====================================================
 
 function update(){
 
@@ -1390,17 +1443,11 @@ player.rotation.y
 );
 
 
-const speed =
-keys.shift
-? .35
-: .20;
-
-
 velocity.x +=
-dir.x*speed;
+dir.x*.18;
 
 velocity.z +=
-dir.z*speed;
+dir.z*.18;
 
 
 velocity.x*=.84;
@@ -1415,7 +1462,7 @@ velocity
 );
 
 
-// Boden
+// Bodenhöhe
 
 const ground =
 getHeight(
@@ -1438,8 +1485,6 @@ canJump=true;
 
 }
 
-
-// Chunk-Streaming
 
 updateChunks();
 
@@ -1469,9 +1514,9 @@ lastCZ;
 }
 
 
-// ======================================================
-// START
-// ======================================================
+// =====================================================
+// MENÜ
+// =====================================================
 
 document.getElementById(
 "start"
@@ -1481,47 +1526,37 @@ document.getElementById(
 "menu"
 ).style.display="none";
 
-
 document.body.requestPointerLock();
 
 };
 
 
-// ======================================================
-// NEUE WELT
-// ======================================================
-
 document.getElementById(
 "newWorld"
 ).onclick=()=>{
 
-const newSeed =
+localStorage.setItem(
+"GHOST_ISLAND_SEED",
 Math.floor(
 Math.random()*2147483647
+)
 );
-
-
-localStorage.setItem(
-"GHOST_CHUNK_SEED",
-newSeed
-);
-
 
 location.reload();
 
 };
 
 
-// ======================================================
-// START CHUNKS
-// ======================================================
+// =====================================================
+// ERSTE CHUNKS
+// =====================================================
 
 updateChunks();
 
 
-// ======================================================
+// =====================================================
 // LOOP
-// ======================================================
+// =====================================================
 
 function animate(){
 
@@ -1529,9 +1564,7 @@ requestAnimationFrame(
 animate
 );
 
-
 update();
-
 
 renderer.render(
 scene,
@@ -1540,13 +1573,12 @@ camera
 
 }
 
-
 animate();
 
 
-// ======================================================
+// =====================================================
 // RESIZE
-// ======================================================
+// =====================================================
 
 window.onresize=()=>{
 
@@ -1554,9 +1586,7 @@ camera.aspect=
 innerWidth/
 innerHeight;
 
-
 camera.updateProjectionMatrix();
-
 
 renderer.setSize(
 innerWidth,
