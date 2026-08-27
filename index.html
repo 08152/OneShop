@@ -2,2704 +2,840 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MidenCraft 2D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GHOST Island</title>
 
 <style>
-
-* {
-    box-sizing: border-box;
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#75caff;
+    font-family:Arial,sans-serif;
 }
 
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #65b8eb;
-    font-family: Arial, sans-serif;
+canvas{
+    display:block;
 }
 
-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
+#hud{
+    position:fixed;
+    top:15px;
+    left:15px;
+    color:white;
+    text-shadow:0 2px 5px #000;
+    z-index:5;
+    pointer-events:none;
 }
 
-/* =========================
-   HUD
-========================= */
-
-#hud {
-    position: fixed;
-    left: 12px;
-    top: 12px;
-
-    z-index: 20;
-
-    padding: 12px 15px;
-
-    color: white;
-    background: rgba(0,0,0,.62);
-
-    border-radius: 10px;
-
-    font-size: 14px;
-    line-height: 1.55;
-
-    user-select: none;
+#hud b{
+    font-size:22px;
 }
 
-#title {
-    font-size: 18px;
-    font-weight: bold;
+#crosshair{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    font-size:25px;
+    text-shadow:0 0 5px #000;
+    z-index:5;
+    pointer-events:none;
 }
 
-
-/* =========================
-   HERZEN
-========================= */
-
-#hearts {
-    position: fixed;
-
-    top: 12px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    z-index: 30;
-
-    display: flex;
-    gap: 3px;
-
-    user-select: none;
+#menu{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:20;
 }
 
-.heart {
-    font-size: 25px;
-
-    filter:
-        drop-shadow(0 2px 2px rgba(0,0,0,.5));
+.panel{
+    width:min(430px,90%);
+    padding:35px;
+    border-radius:20px;
+    background:rgba(20,25,30,.96);
+    color:white;
+    text-align:center;
+    box-shadow:0 15px 60px #000;
 }
 
-
-/* =========================
-   INVENTAR
-========================= */
-
-#inventory {
-
-    position: fixed;
-
-    bottom: 18px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    z-index: 30;
-
-    display: flex;
-
-    gap: 5px;
-
-    padding: 6px;
-
-    background: rgba(20,20,20,.75);
-
-    border: 2px solid #555;
-
-    border-radius: 8px;
-
-    box-shadow:
-        0 4px 15px rgba(0,0,0,.4);
-
-    user-select: none;
+.panel h1{
+    font-size:42px;
+    margin:0 0 10px;
 }
 
-.slot {
-
-    width: 52px;
-    height: 52px;
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #777,
-            #444
-        );
-
-    border: 2px solid #999;
-
-    border-radius: 4px;
-
-    font-size: 28px;
-
-    transition:
-        transform .08s,
-        border .08s;
+.panel p{
+    color:#ddd;
 }
 
-.slot.selected {
-
-    border: 3px solid white;
-
-    box-shadow:
-        0 0 8px rgba(255,255,255,.8);
-
-    transform: translateY(-3px);
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border:0;
+    border-radius:10px;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.slot-number {
-
-    position: absolute;
-
-    left: 3px;
-    top: 2px;
-
-    color: white;
-
-    font-size: 11px;
-
-    text-shadow:
-        1px 1px 2px black;
+#play{
+    background:#42c957;
 }
 
-.item-count {
-
-    position: absolute;
-
-    right: 4px;
-    bottom: 1px;
-
-    color: white;
-
-    font-size: 15px;
-    font-weight: bold;
-
-    text-shadow:
-        1px 1px 2px black;
+#newWorld{
+    background:#e5a52b;
 }
 
-
-/* =========================
-   CROSSHAIR
-========================= */
-
-#crosshair {
-
-    position: fixed;
-
-    left: 50%;
-    top: 50%;
-
-    width: 20px;
-    height: 20px;
-
-    transform:
-        translate(-50%, -50%);
-
-    pointer-events: none;
-
-    z-index: 15;
+#seed{
+    margin-top:15px;
+    padding:10px;
+    border-radius:8px;
+    background:#111;
+    font-family:monospace;
 }
-
-#crosshair::before {
-
-    content: "";
-
-    position: absolute;
-
-    left: 9px;
-    top: 0;
-
-    width: 2px;
-    height: 20px;
-
-    background: white;
-
-    box-shadow:
-        0 0 3px black;
-}
-
-#crosshair::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 9px;
-
-    width: 20px;
-    height: 2px;
-
-    background: white;
-
-    box-shadow:
-        0 0 3px black;
-}
-
-
-/* =========================
-   HILFE
-========================= */
-
-#help {
-
-    position: fixed;
-
-    left: 50%;
-    bottom: 88px;
-
-    transform:
-        translateX(-50%);
-
-    z-index: 20;
-
-    padding: 8px 14px;
-
-    color: white;
-
-    background:
-        rgba(0,0,0,.55);
-
-    border-radius: 8px;
-
-    font-size: 13px;
-
-    white-space: nowrap;
-
-    user-select: none;
-}
-
-
-/* =========================
-   GAME OVER
-========================= */
-
-#gameOver {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 100;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    background:
-        rgba(0,0,0,.75);
-
-    color: white;
-}
-
-#gameOver h1 {
-
-    font-size: 50px;
-
-    margin: 0 0 20px;
-}
-
-#restart {
-
-    padding: 12px 25px;
-
-    border: none;
-    border-radius: 8px;
-
-    background: #39a852;
-
-    color: white;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
 </style>
 </head>
 
 <body>
 
-<canvas id="game"></canvas>
-
-
-<!-- =========================
-     HUD
-========================= -->
-
 <div id="hud">
+    <b>GHOST ISLAND</b><br>
+    Seed: <span id="seedHud">...</span><br>
+    Position: <span id="pos">0 / 0</span>
+</div>
 
-    <div id="title">
-        🌱 MidenCraft 2D
+<div id="crosshair">+</div>
+
+<div id="menu">
+    <div class="panel">
+        <h1>GHOST ISLAND</h1>
+
+        <p>
+            Riesige zufällig generierte 3D-Insel.
+        </p>
+
+        <p>
+            Die Welt wird dauerhaft in diesem Browser gespeichert.
+        </p>
+
+        <div id="seed">Seed: ...</div>
+
+        <button id="play">
+            SPIEL STARTEN
+        </button>
+
+        <button id="newWorld">
+            NEUE WELT GENERIEREN
+        </button>
     </div>
-
-    X:
-    <span id="x">0</span>
-
-    <br>
-
-    Y:
-    <span id="y">0</span>
-
-    <br>
-
-    Chunk:
-    <span id="chunk">0, 0</span>
-
-    <br>
-
-    Chunks:
-    <span id="chunkCount">0</span>
-
 </div>
 
+<script type="module">
 
-<!-- =========================
-     HERZEN
-========================= -->
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
 
-<div id="hearts"></div>
-
-
-<!-- =========================
-     CROSSHAIR
-========================= -->
-
-<div id="crosshair"></div>
+import {
+    PointerLockControls
+} from
+"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/PointerLockControls.js";
 
 
-<!-- =========================
-     HILFE
-========================= -->
+// =====================================================
+// WELT-SEED
+// =====================================================
 
-<div id="help">
+let savedSeed =
+    localStorage.getItem("ghostIslandSeed");
 
-    WASD = Bewegen
-    •
-    1–9 = Slot auswählen
-    •
-    Linksklick = Abbauen
-    •
-    Rechtsklick = Platzieren
+if(!savedSeed){
 
-</div>
+    savedSeed =
+        Math.floor(
+            Math.random()*2147483647
+        ).toString();
 
-
-<!-- =========================
-     INVENTAR
-========================= -->
-
-<div id="inventory"></div>
-
-
-<!-- =========================
-     GAME OVER
-========================= -->
-
-<div id="gameOver">
-
-    <h1>💀 Game Over</h1>
-
-    <button id="restart">
-        Neu starten
-    </button>
-
-</div>
-
-
-<script>
-
-"use strict";
-
-
-/* =========================================================
-   CANVAS
-========================================================= */
-
-const canvas =
-    document.getElementById("game");
-
-const ctx =
-    canvas.getContext("2d");
-
-
-function resize() {
-
-    canvas.width =
-        window.innerWidth;
-
-    canvas.height =
-        window.innerHeight;
+    localStorage.setItem(
+        "ghostIslandSeed",
+        savedSeed
+    );
 }
 
-resize();
+let seed =
+    Number(savedSeed);
 
-window.addEventListener(
-    "resize",
-    resize
+document.getElementById("seed").textContent =
+    "Seed: " + savedSeed;
+
+document.getElementById("seedHud").textContent =
+    savedSeed;
+
+
+// =====================================================
+// SEEDED RANDOM
+// =====================================================
+
+function random(){
+
+    seed =
+        (seed * 1664525 + 1013904223)
+        >>> 0;
+
+    return seed / 4294967296;
+}
+
+
+// =====================================================
+// THREE.JS
+// =====================================================
+
+const scene =
+    new THREE.Scene();
+
+scene.background =
+    new THREE.Color(0x79caff);
+
+scene.fog =
+    new THREE.Fog(
+        0x79caff,
+        900,
+        5500
+    );
+
+
+const camera =
+    new THREE.PerspectiveCamera(
+        75,
+        innerWidth / innerHeight,
+        0.1,
+        10000
+    );
+
+
+const renderer =
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+);
+
+renderer.shadowMap.enabled = true;
+
+document.body.appendChild(
+    renderer.domElement
 );
 
 
-/* =========================================================
-   EINSTELLUNGEN
-========================================================= */
+// =====================================================
+// LICHT
+// =====================================================
 
-const TILE_SIZE = 32;
+scene.add(
+    new THREE.HemisphereLight(
+        0xffffff,
+        0x446644,
+        2
+    )
+);
 
-const CHUNK_SIZE = 16;
-
-const RENDER_DISTANCE = 3;
-
-const ISLAND_RADIUS = 95;
-
-const PLAYER_SPEED = 6;
-
-const MAX_HEALTH = 10;
-
-
-/* =========================================================
-   BLOCKS
-========================================================= */
-
-const AIR = 0;
-const GRASS = 1;
-const DIRT = 2;
-const STONE = 3;
-const WATER = 4;
-const WOOD = 5;
-const LEAVES = 6;
-const SAND = 7;
-const FLOWER = 8;
-
-
-/* =========================================================
-   BLOCK-INFOS
-========================================================= */
-
-const blockInfo = {
-
-    [GRASS]: {
-        name: "Gras",
-        icon: "🌿"
-    },
-
-    [DIRT]: {
-        name: "Erde",
-        icon: "🟫"
-    },
-
-    [STONE]: {
-        name: "Stein",
-        icon: "🪨"
-    },
-
-    [WOOD]: {
-        name: "Holz",
-        icon: "🪵"
-    },
-
-    [SAND]: {
-        name: "Sand",
-        icon: "🟨"
-    }
-
-};
-
-
-/* =========================================================
-   SEED
-========================================================= */
-
-const SEED =
-    Math.floor(
-        Math.random() *
-        2147483647
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        3
     );
 
+sun.position.set(
+    1500,
+    3000,
+    1000
+);
 
-/* =========================================================
-   RANDOM
-========================================================= */
+sun.castShadow = true;
 
-function randomHash(x, y) {
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
 
-    let n =
-        x * 374761393 +
-        y * 668265263 +
-        SEED * 1442695041;
-
-    n =
-        (n ^ (n >> 13)) *
-        1274126177;
-
-    n ^= n >> 16;
-
-    return (
-        (n >>> 0) /
-        4294967295
-    );
-}
+scene.add(sun);
 
 
-/* =========================================================
-   NOISE
-========================================================= */
+// =====================================================
+// TERRAIN
+// =====================================================
 
-function noise(x, y) {
+const WORLD = 12000;
+const SEGMENTS = 220;
+const WATER = 8;
 
-    const x0 =
-        Math.floor(x);
-
-    const y0 =
-        Math.floor(y);
-
-    const x1 =
-        x0 + 1;
-
-    const y1 =
-        y0 + 1;
-
-    const sx =
-        x - x0;
-
-    const sy =
-        y - y0;
-
-    const a =
-        randomHash(x0, y0);
-
-    const b =
-        randomHash(x1, y0);
-
-    const c =
-        randomHash(x0, y1);
-
-    const d =
-        randomHash(x1, y1);
-
-    const u =
-        sx * sx *
-        (3 - 2 * sx);
-
-    const v =
-        sy * sy *
-        (3 - 2 * sy);
-
-    const ab =
-        a + (b - a) * u;
-
-    const cd =
-        c + (d - c) * u;
-
-    return (
-        ab +
-        (cd - ab) * v
-    );
-}
-
-
-function terrainNoise(x, y) {
-
-    return (
-
-        noise(
-            x / 70,
-            y / 70
-        ) * .55
-
-        +
-
-        noise(
-            x / 30,
-            y / 30
-        ) * .30
-
-        +
-
-        noise(
-            x / 12,
-            y / 12
-        ) * .15
-    );
-}
-
-
-/* =========================================================
-   CHUNKS
-========================================================= */
-
-const chunks =
-    new Map();
-
-
-function chunkKey(cx, cy) {
-
-    return (
-        cx +
-        "," +
-        cy
-    );
-}
-
-
-/* =========================================================
-   BLOCK GENERIERUNG
-========================================================= */
-
-function generateBlock(wx, wy) {
+function height(x,z){
 
     const distance =
-        Math.sqrt(
-            wx * wx +
-            wy * wy
+        Math.sqrt(x*x + z*z);
+
+    const island =
+        Math.max(
+            0,
+            1 - distance/5700
         );
 
-
-    /*
-        Runde Welt:
-        außerhalb = Wasser
-    */
-
-    if (
-        distance >
-        ISLAND_RADIUS
-    ) {
-
-        return WATER;
-    }
-
-
-    /*
-        Strand
-    */
-
-    if (
-        distance >
-        ISLAND_RADIUS - 5
-    ) {
-
-        return SAND;
-    }
-
-
-    const n =
-        terrainNoise(
-            wx,
-            wy
-        );
-
-
-    /*
-        Seen
-    */
-
-    if (
-        n < .18 &&
-        distance <
-        ISLAND_RADIUS - 8
-    ) {
-
-        return WATER;
-    }
-
-
-    if (n < .31) {
-
-        return SAND;
-    }
-
-
-    if (n > .88) {
-
-        return STONE;
-    }
-
-
-    if (n > .73) {
-
-        return DIRT;
-    }
-
-
-    return GRASS;
-}
-
-
-/* =========================================================
-   BÄUME
-========================================================= */
-
-function addTree(
-    tiles,
-    x,
-    y
-) {
-
-    if (
-        x < 3 ||
-        y < 3 ||
-        x >= CHUNK_SIZE - 3 ||
-        y >= CHUNK_SIZE - 3
-    ) {
-
-        return;
-    }
-
-
-    if (
-        tiles[y][x] !== GRASS
-    ) {
-
-        return;
-    }
-
-
-    /*
-        Stamm
-    */
-
-    tiles[y][x] =
-        WOOD;
-
-
-    /*
-        Krone
-    */
-
-    const positions = [
-
-        [0,-1],
-
-        [-1,-1],
-        [1,-1],
-
-        [-2,0],
-        [-1,0],
-        [1,0],
-        [2,0],
-
-        [-1,1],
-        [0,1],
-        [1,1],
-
-        [0,-2]
-
-    ];
-
-
-    for (
-        const [dx,dy]
-        of positions
-    ) {
-
-        if (
-            tiles[y + dy] &&
-            tiles[y + dy][x + dx]
-            !== undefined
-        ) {
-
-            if (
-                tiles[y + dy][x + dx]
-                === GRASS
-            ) {
-
-                tiles[y + dy][x + dx]
-                    = LEAVES;
-            }
-        }
-    }
-}
-
-
-/* =========================================================
-   CHUNK GENERIEREN
-========================================================= */
-
-function generateChunk(cx, cy) {
-
-    const key =
-        chunkKey(
-            cx,
-            cy
-        );
-
-
-    if (
-        chunks.has(key)
-    ) {
-
-        return chunks.get(key);
-    }
-
-
-    const tiles = [];
-
-
-    /*
-        Boden
-    */
-
-    for (
-        let y = 0;
-        y < CHUNK_SIZE;
-        y++
-    ) {
-
-        const row = [];
-
-
-        for (
-            let x = 0;
-            x < CHUNK_SIZE;
-            x++
-        ) {
-
-            const wx =
-                cx *
-                CHUNK_SIZE +
-                x;
-
-            const wy =
-                cy *
-                CHUNK_SIZE +
-                y;
-
-
-            row.push(
-                generateBlock(
-                    wx,
-                    wy
-                )
-            );
-        }
-
-
-        tiles.push(row);
-    }
-
-
-    /*
-        Bäume
-    */
-
-    for (
-        let y = 3;
-        y < CHUNK_SIZE - 3;
-        y++
-    ) {
-
-        for (
-            let x = 3;
-            x < CHUNK_SIZE - 3;
-            x++
-        ) {
-
-            const wx =
-                cx *
-                CHUNK_SIZE +
-                x;
-
-            const wy =
-                cy *
-                CHUNK_SIZE +
-                y;
-
-
-            const r =
-                randomHash(
-                    wx * 19 + 53,
-                    wy * 31 + 91
-                );
-
-
-            const distance =
-                Math.sqrt(
-                    wx * wx +
-                    wy * wy
-                );
-
-
-            let chance =
-                .075;
-
-
-            /*
-                Waldgebiete
-            */
-
-            if (
-                distance > 25
-            ) {
-
-                chance =
-                    .105;
-            }
-
-
-            if (
-                distance > 55
-            ) {
-
-                chance =
-                    .13;
-            }
-
-
-            if (
-                tiles[y][x]
-                === GRASS &&
-
-                r < chance
-            ) {
-
-                addTree(
-                    tiles,
-                    x,
-                    y
-                );
-            }
-        }
-    }
-
-
-    /*
-        Blumen
-    */
-
-    for (
-        let y = 1;
-        y < CHUNK_SIZE - 1;
-        y++
-    ) {
-
-        for (
-            let x = 1;
-            x < CHUNK_SIZE - 1;
-            x++
-        ) {
-
-            const wx =
-                cx *
-                CHUNK_SIZE +
-                x;
-
-            const wy =
-                cy *
-                CHUNK_SIZE +
-                y;
-
-
-            if (
-                tiles[y][x]
-                === GRASS &&
-
-                randomHash(
-                    wx + 500,
-                    wy + 700
-                ) < .018
-            ) {
-
-                tiles[y][x] =
-                    FLOWER;
-            }
-        }
-    }
-
-
-    const chunk = {
-
-        cx,
-        cy,
-
-        tiles
-    };
-
-
-    chunks.set(
-        key,
-        chunk
-    );
-
-
-    return chunk;
-}
-
-
-/* =========================================================
-   BLOCK LESEN
-========================================================= */
-
-function getBlock(wx, wy) {
-
-    const cx =
-        Math.floor(
-            wx /
-            CHUNK_SIZE
-        );
-
-    const cy =
-        Math.floor(
-            wy /
-            CHUNK_SIZE
-        );
-
-
-    const lx =
-        wx -
-        cx *
-        CHUNK_SIZE;
-
-    const ly =
-        wy -
-        cy *
-        CHUNK_SIZE;
-
-
-    const chunk =
-        generateChunk(
-            cx,
-            cy
-        );
-
-
-    return chunk.tiles[ly][lx];
-}
-
-
-/* =========================================================
-   BLOCK SETZEN
-========================================================= */
-
-function setBlock(
-    wx,
-    wy,
-    block
-) {
-
-    const cx =
-        Math.floor(
-            wx /
-            CHUNK_SIZE
-        );
-
-    const cy =
-        Math.floor(
-            wy /
-            CHUNK_SIZE
-        );
-
-
-    const lx =
-        wx -
-        cx *
-        CHUNK_SIZE;
-
-    const ly =
-        wy -
-        cy *
-        CHUNK_SIZE;
-
-
-    const chunk =
-        generateChunk(
-            cx,
-            cy
-        );
-
-
-    chunk.tiles[ly][lx] =
-        block;
-}
-
-
-/* =========================================================
-   SPIELER
-========================================================= */
-
-const player = {
-
-    x: 0,
-
-    y: 0,
-
-    speed:
-        PLAYER_SPEED,
-
-    size:
-        22,
-
-    health:
-        MAX_HEALTH,
-
-    maxHealth:
-        MAX_HEALTH
-};
-
-
-/* =========================================================
-   INVENTAR
-========================================================= */
-
-const inventory = [];
-
-
-for (
-    let i = 0;
-    i < 9;
-    i++
-) {
-
-    inventory.push({
-
-        block:
-            null,
-
-        count:
-            0
-    });
-}
-
-
-let selectedSlot = 0;
-
-
-/* =========================================================
-   ITEM SAMMELN
-========================================================= */
-
-function addItem(block) {
-
-    /*
-        Blöcke, die nicht ins
-        Inventar gehören
-    */
-
-    if (
-        !blockInfo[block]
-    ) {
-
-        return;
-    }
-
-
-    /*
-        Erst vorhandenen Stack suchen
-    */
-
-    for (
-        const slot of inventory
-    ) {
-
-        if (
-            slot.block === block &&
-            slot.count < 64
-        ) {
-
-            slot.count++;
-
-            updateInventory();
-
-            return true;
-        }
-    }
-
-
-    /*
-        Freien Slot suchen
-    */
-
-    for (
-        const slot of inventory
-    ) {
-
-        if (
-            slot.block === null
-        ) {
-
-            slot.block =
-                block;
-
-            slot.count =
-                1;
-
-            updateInventory();
-
-            return true;
-        }
-    }
-
-
-    /*
-        Inventar voll
-    */
-
-    return false;
-}
-
-
-/* =========================================================
-   ITEM ENTFERNEN
-========================================================= */
-
-function removeItem(block) {
-
-    const slot =
-        inventory[selectedSlot];
-
-
-    if (
-        !slot ||
-        slot.block !== block ||
-        slot.count <= 0
-    ) {
-
-        return false;
-    }
-
-
-    slot.count--;
-
-
-    if (
-        slot.count <= 0
-    ) {
-
-        slot.block =
-            null;
-
-        slot.count =
-            0;
-    }
-
-
-    updateInventory();
-
-    return true;
-}
-
-
-/* =========================================================
-   INVENTAR UI
-========================================================= */
-
-function updateInventory() {
-
-    const container =
-        document.getElementById(
-            "inventory"
-        );
-
-
-    container.innerHTML = "";
-
-
-    inventory.forEach(
-        (slot, index) => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
-                "slot";
-
-
-            if (
-                index ===
-                selectedSlot
-            ) {
-
-                div.classList.add(
-                    "selected"
-                );
-            }
-
-
-            /*
-                Nummer
-            */
-
-            const number =
-                document.createElement(
-                    "div"
-                );
-
-            number.className =
-                "slot-number";
-
-            number.textContent =
-                index + 1;
-
-            div.appendChild(
-                number
-            );
-
-
-            /*
-                Item
-            */
-
-            if (
-                slot.block !== null
-            ) {
-
-                const item =
-                    document.createElement(
-                        "div"
-                    );
-
-                item.textContent =
-                    blockInfo[
-                        slot.block
-                    ].icon;
-
-                div.appendChild(
-                    item
-                );
-
-
-                /*
-                    Anzahl
-                */
-
-                const count =
-                    document.createElement(
-                        "div"
-                    );
-
-                count.className =
-                    "item-count";
-
-                count.textContent =
-                    slot.count;
-
-                div.appendChild(
-                    count
-                );
-            }
-
-
-            /*
-                Klick auf Slot
-            */
-
-            div.addEventListener(
-                "click",
-                () => {
-
-                    selectedSlot =
-                        index;
-
-                    updateInventory();
-                }
-            );
-
-
-            container.appendChild(
-                div
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   HERZEN UI
-========================================================= */
-
-function updateHearts() {
-
-    const hearts =
-        document.getElementById(
-            "hearts"
-        );
-
-
-    hearts.innerHTML = "";
-
-
-    for (
-        let i = 0;
-        i < player.maxHealth;
-        i++
-    ) {
-
-        const heart =
-            document.createElement(
-                "span"
-            );
-
-
-        heart.className =
-            "heart";
-
-
-        if (
-            i <
-            player.health
-        ) {
-
-            heart.textContent =
-                "❤️";
-
-        } else {
-
-            heart.textContent =
-                "🖤";
-        }
-
-
-        hearts.appendChild(
-            heart
-        );
-    }
-}
-
-
-/* =========================================================
-   SCHADEN
-========================================================= */
-
-let damageCooldown = 0;
-
-
-function damagePlayer(amount) {
-
-    if (
-        damageCooldown > 0
-    ) {
-
-        return;
-    }
-
-
-    player.health -=
-        amount;
-
-
-    if (
-        player.health < 0
-    ) {
-
-        player.health = 0;
-    }
-
-
-    damageCooldown =
-        1;
-
-
-    updateHearts();
-
-
-    if (
-        player.health <= 0
-    ) {
-
-        document
-            .getElementById(
-                "gameOver"
-            )
-            .style.display =
-                "flex";
-    }
-}
-
-
-/* =========================================================
-   TASTEN
-========================================================= */
-
-const keys = {};
-
-
-window.addEventListener(
-    "keydown",
-    e => {
-
-        const key =
-            e.key.toLowerCase();
-
-
-        keys[key] = true;
-
-
-        /*
-            Inventar 1-9
-        */
-
-        if (
-            key >= "1" &&
-            key <= "9"
-        ) {
-
-            selectedSlot =
-                Number(key) - 1;
-
-            updateInventory();
-        }
-    }
-);
-
-
-window.addEventListener(
-    "keyup",
-    e => {
-
-        keys[
-            e.key.toLowerCase()
-        ] = false;
-    }
-);
-
-
-/* =========================================================
-   KAMERA
-========================================================= */
-
-const camera = {
-
-    x: 0,
-
-    y: 0
-};
-
-
-/* =========================================================
-   BEWEGUNG
-========================================================= */
-
-function updatePlayer(dt) {
-
-    if (
-        player.health <= 0
-    ) {
-
-        return;
-    }
-
-
-    let dx = 0;
-    let dy = 0;
-
-
-    if (
-        keys["w"] ||
-        keys["arrowup"]
-    ) {
-
-        dy--;
-    }
-
-
-    if (
-        keys["s"] ||
-        keys["arrowdown"]
-    ) {
-
-        dy++;
-    }
-
-
-    if (
-        keys["a"] ||
-        keys["arrowleft"]
-    ) {
-
-        dx--;
-    }
-
-
-    if (
-        keys["d"] ||
-        keys["arrowright"]
-    ) {
-
-        dx++;
-    }
-
-
-    if (
-        dx !== 0 ||
-        dy !== 0
-    ) {
-
-        const length =
-            Math.sqrt(
-                dx * dx +
-                dy * dy
-            );
-
-
-        dx /= length;
-        dy /= length;
-
-
-        let speed =
-            player.speed;
-
-
-        const currentBlock =
-            getBlock(
-                Math.floor(
-                    player.x
-                ),
-                Math.floor(
-                    player.y
-                )
-            );
-
-
-        /*
-            Wasser langsam
-        */
-
-        if (
-            currentBlock ===
-            WATER
-        ) {
-
-            speed *= .45;
-        }
-
-
-        player.x +=
-            dx *
-            speed *
-            dt;
-
-        player.y +=
-            dy *
-            speed *
-            dt;
-    }
-
-
-    /*
-        Schaden im Wasser
-        NICHT sofort,
-        nur wenn lange darin.
-    */
-
-    if (
-        currentBlock ===
-        WATER
-    ) {
-
-        damagePlayer(.1);
-    }
-
-
-    camera.x +=
-        (
-            player.x *
-            TILE_SIZE -
-            camera.x
+    let h = 20;
+
+    h +=
+        Math.sin(
+            x * 0.0018
         ) *
-        Math.min(
-            1,
-            dt * 8
+        Math.cos(
+            z * 0.0016
+        ) * 100;
+
+    h +=
+        Math.sin(
+            x * 0.0047 +
+            z * 0.003
+        ) * 35;
+
+    h +=
+        Math.cos(
+            x * 0.011 -
+            z * 0.008
+        ) * 12;
+
+    // Berge
+    const mountain =
+        Math.max(
+            0,
+            Math.sin(x*0.0009) *
+            Math.cos(z*0.0011)
         );
 
+    h += mountain * 180;
 
-    camera.y +=
-        (
-            player.y *
-            TILE_SIZE -
-            camera.y
-        ) *
-        Math.min(
-            1,
-            dt * 8
-        );
+    h *= island;
 
-
-    if (
-        damageCooldown > 0
-    ) {
-
-        damageCooldown -=
-            dt;
-    }
+    return h;
 }
 
 
-/* =========================================================
-   BLOCK ZEICHNEN
-========================================================= */
-
-function drawBlock(
-    block,
-    wx,
-    wy
-) {
-
-    const px =
-        wx *
-        TILE_SIZE -
-        camera.x +
-        canvas.width / 2;
-
-
-    const py =
-        wy *
-        TILE_SIZE -
-        camera.y +
-        canvas.height / 2;
-
-
-    if (
-        block === GRASS
-    ) {
-
-        ctx.fillStyle =
-            "#4caf3d";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#68c455";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            5
-        );
-    }
-
-
-    else if (
-        block === DIRT
-    ) {
-
-        ctx.fillStyle =
-            "#956037";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#b77949";
-
-
-        for (
-            let i = 0;
-            i < 4;
-            i++
-        ) {
-
-            ctx.fillRect(
-                px +
-                randomHash(
-                    wx + i,
-                    wy
-                ) * 25,
-
-                py +
-                randomHash(
-                    wx,
-                    wy + i
-                ) * 25,
-
-                3,
-                3
-            );
-        }
-    }
-
-
-    else if (
-        block === STONE
-    ) {
-
-        ctx.fillStyle =
-            "#777";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#999";
-
-        ctx.fillRect(
-            px + 5,
-            py + 7,
-            5,
-            4
-        );
-
-        ctx.fillRect(
-            px + 20,
-            py + 19,
-            4,
-            5
-        );
-    }
-
-
-    else if (
-        block === WATER
-    ) {
-
-        ctx.fillStyle =
-            "#3498db";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "rgba(255,255,255,.25)";
-
-
-        ctx.fillRect(
-            px + 3,
-            py + 8,
-            14,
-            2
-        );
-
-
-        ctx.fillRect(
-            px + 18,
-            py + 19,
-            10,
-            2
-        );
-    }
-
-
-    else if (
-        block === SAND
-    ) {
-
-        ctx.fillStyle =
-            "#dfcc78";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-    }
-
-
-    else if (
-        block === WOOD
-    ) {
-
-        ctx.fillStyle =
-            "#75451f";
-
-        ctx.fillRect(
-            px + 7,
-            py,
-            18,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#a16a36";
-
-        ctx.fillRect(
-            px + 12,
-            py,
-            4,
-            TILE_SIZE
-        );
-    }
-
-
-    else if (
-        block === LEAVES
-    ) {
-
-        ctx.fillStyle =
-            "#258c36";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#3ead4c";
-
-        ctx.fillRect(
-            px + 4,
-            py + 5,
-            9,
-            8
-        );
-
-
-        ctx.fillRect(
-            px + 19,
-            py + 16,
-            8,
-            8
-        );
-    }
-
-
-    else if (
-        block === FLOWER
-    ) {
-
-        ctx.fillStyle =
-            "#4caf3d";
-
-        ctx.fillRect(
-            px,
-            py,
-            TILE_SIZE,
-            TILE_SIZE
-        );
-
-
-        ctx.fillStyle =
-            "#ffdf32";
-
-        ctx.fillRect(
-            px + 14,
-            py + 10,
-            5,
-            5
-        );
-
-
-        ctx.fillStyle =
-            "#ff6680";
-
-        ctx.fillRect(
-            px + 10,
-            py + 8,
-            5,
-            5
-        );
-
-        ctx.fillRect(
-            px + 18,
-            py + 8,
-            5,
-            5
-        );
-    }
-
-
-    /*
-        Block-Rand
-    */
-
-    ctx.strokeStyle =
-        "rgba(0,0,0,.07)";
-
-    ctx.strokeRect(
-        px,
-        py,
-        TILE_SIZE,
-        TILE_SIZE
-    );
-}
-
-
-/* =========================================================
-   WELT ZEICHNEN
-========================================================= */
-
-function drawWorld() {
-
-    ctx.fillStyle =
-        "#65b8eb";
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+const terrainGeometry =
+    new THREE.PlaneGeometry(
+        WORLD,
+        WORLD,
+        SEGMENTS,
+        SEGMENTS
     );
 
+terrainGeometry.rotateX(-Math.PI/2);
 
-    const left =
-        Math.floor(
-            (
-                camera.x -
-                canvas.width / 2
-            ) /
-            TILE_SIZE
-        ) - 1;
+const vertices =
+    terrainGeometry.attributes.position;
 
-
-    const right =
-        Math.ceil(
-            (
-                camera.x +
-                canvas.width / 2
-            ) /
-            TILE_SIZE
-        ) + 1;
-
-
-    const top =
-        Math.floor(
-            (
-                camera.y -
-                canvas.height / 2
-            ) /
-            TILE_SIZE
-        ) - 1;
-
-
-    const bottom =
-        Math.ceil(
-            (
-                camera.y +
-                canvas.height / 2
-            ) /
-            TILE_SIZE
-        ) + 1;
-
-
-    for (
-        let y = top;
-        y <= bottom;
-        y++
-    ) {
-
-        for (
-            let x = left;
-            x <= right;
-            x++
-        ) {
-
-            drawBlock(
-                getBlock(x, y),
-                x,
-                y
-            );
-        }
-    }
-}
-
-
-/* =========================================================
-   SPIELER ZEICHNEN
-========================================================= */
-
-function drawPlayer() {
+for(let i=0;i<vertices.count;i++){
 
     const x =
-        canvas.width / 2 -
-        player.size / 2;
+        vertices.getX(i);
 
+    const z =
+        vertices.getZ(i);
+
+    vertices.setY(
+        i,
+        Math.max(
+            height(x,z),
+            WATER-5
+        )
+    );
+}
+
+terrainGeometry.computeVertexNormals();
+
+
+const terrain =
+    new THREE.Mesh(
+        terrainGeometry,
+        new THREE.MeshStandardMaterial({
+            color:0x4fa447,
+            roughness:1
+        })
+    );
+
+terrain.receiveShadow = true;
+
+scene.add(terrain);
+
+
+// =====================================================
+// WASSER
+// =====================================================
+
+const water =
+    new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            15000,
+            15000
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x198bd0,
+            transparent:true,
+            opacity:.72,
+            roughness:.15
+        })
+    );
+
+water.rotation.x =
+    -Math.PI/2;
+
+water.position.y =
+    WATER;
+
+scene.add(water);
+
+
+// =====================================================
+// BÄUME
+// =====================================================
+
+function tree(x,z){
 
     const y =
-        canvas.height / 2 -
-        player.size / 2;
+        height(x,z);
 
+    if(y < WATER+5)
+        return;
 
-    /*
-        Schatten
-    */
+    const group =
+        new THREE.Group();
 
-    ctx.fillStyle =
-        "rgba(0,0,0,.25)";
 
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        canvas.width / 2,
-        y + player.size + 3,
-        12,
-        5,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /*
-        Würfel
-    */
-
-    ctx.fillStyle =
-        "#e32626";
-
-
-    ctx.fillRect(
-        x,
-        y,
-        player.size,
-        player.size
-    );
-
-
-    ctx.fillStyle =
-        "#ff5a5a";
-
-
-    ctx.fillRect(
-        x + 4,
-        y + 4,
-        7,
-        7
-    );
-
-
-    ctx.strokeStyle =
-        "#850000";
-
-    ctx.lineWidth =
-        2;
-
-
-    ctx.strokeRect(
-        x,
-        y,
-        player.size,
-        player.size
-    );
-}
-
-
-/* =========================================================
-   MOUSE → WELT
-========================================================= */
-
-function mouseToWorld(e) {
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-
-    const screenX =
-        e.clientX -
-        rect.left;
-
-
-    const screenY =
-        e.clientY -
-        rect.top;
-
-
-    return {
-
-        x: Math.floor(
-            (
-                screenX -
-                canvas.width / 2 +
-                camera.x
-            ) /
-            TILE_SIZE
-        ),
-
-        y: Math.floor(
-            (
-                screenY -
-                canvas.height / 2 +
-                camera.y
-            ) /
-            TILE_SIZE
-        )
-    };
-}
-
-
-canvas.addEventListener(
-    "contextmenu",
-    e => {
-
-        e.preventDefault();
-    }
-);
-
-
-/* =========================================================
-   MOUSE AKTIONEN
-========================================================= */
-
-canvas.addEventListener(
-    "mousedown",
-    e => {
-
-        if (
-            player.health <= 0
-        ) {
-
-            return;
-        }
-
-
-        const pos =
-            mouseToWorld(e);
-
-
-        const distance =
-            Math.hypot(
-                pos.x -
-                player.x,
-
-                pos.y -
-                player.y
-            );
-
-
-        /*
-            Reichweite
-        */
-
-        if (
-            distance > 5
-        ) {
-
-            return;
-        }
-
-
-        /*
-            LINKSKLICK
-            ABBauen
-        */
-
-        if (
-            e.button === 0
-        ) {
-
-            const block =
-                getBlock(
-                    pos.x,
-                    pos.y
-                );
-
-
-            if (
-                block !== AIR &&
-                block !== WATER &&
-                block !== LEAVES &&
-                block !== FLOWER
-            ) {
-
-                /*
-                    Nur abbauen,
-                    wenn Inventar Platz hat
-                */
-
-                if (
-                    addItem(block)
-                ) {
-
-                    setBlock(
-                        pos.x,
-                        pos.y,
-                        AIR
-                    );
-                }
-            }
-
-
-            /*
-                Blätter geben ebenfalls
-                eine kleine Chance auf Holz
-            */
-
-            else if (
-                block === LEAVES
-            ) {
-
-                setBlock(
-                    pos.x,
-                    pos.y,
-                    AIR
-                );
-
-
-                if (
-                    Math.random() < .25
-                ) {
-
-                    addItem(
-                        WOOD
-                    );
-                }
-            }
-
-
-            /*
-                Blumen verschwinden
-            */
-
-            else if (
-                block === FLOWER
-            ) {
-
-                setBlock(
-                    pos.x,
-                    pos.y,
-                    AIR
-                );
-            }
-        }
-
-
-        /*
-            RECHTSKLICK
-            BLOCK PLATZIEREN
-        */
-
-        if (
-            e.button === 2
-        ) {
-
-            const slot =
-                inventory[
-                    selectedSlot
-                ];
-
-
-            if (
-                !slot ||
-                slot.block === null ||
-                slot.count <= 0
-            ) {
-
-                return;
-            }
-
-
-            const target =
-                getBlock(
-                    pos.x,
-                    pos.y
-                );
-
-
-            /*
-                Nur auf Luft setzen
-            */
-
-            if (
-                target !== AIR
-            ) {
-
-                return;
-            }
-
-
-            /*
-                Spieler darf nicht
-                im Block stehen
-            */
-
-            if (
-                Math.hypot(
-                    pos.x -
-                    player.x,
-
-                    pos.y -
-                    player.y
-                ) < 1
-            ) {
-
-                return;
-            }
-
-
-            setBlock(
-                pos.x,
-                pos.y,
-                slot.block
-            );
-
-
-            removeItem(
-                slot.block
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   CHUNKS LADEN
-========================================================= */
-
-function updateChunks() {
-
-    const current =
-        worldToChunk(
-            player.x,
-            player.y
-        );
-
-
-    for (
-        let cy =
-            current.cy -
-            RENDER_DISTANCE;
-
-        cy <=
-            current.cy +
-            RENDER_DISTANCE;
-
-        cy++
-    ) {
-
-        for (
-            let cx =
-                current.cx -
-                RENDER_DISTANCE;
-
-            cx <=
-                current.cx +
-                RENDER_DISTANCE;
-
-            cx++
-        ) {
-
-            generateChunk(
-                cx,
-                cy
-            );
-        }
-    }
-
-
-    /*
-        Entfernte Chunks löschen
-    */
-
-    for (
-        const [
-            key,
-            chunk
-        ]
-        of chunks
-    ) {
-
-        const dx =
-            Math.abs(
-                chunk.cx -
-                current.cx
-            );
-
-
-        const dy =
-            Math.abs(
-                chunk.cy -
-                current.cy
-            );
-
-
-        if (
-            dx >
-            RENDER_DISTANCE + 1 ||
-
-            dy >
-            RENDER_DISTANCE + 1
-        ) {
-
-            chunks.delete(
-                key
-            );
-        }
-    }
-}
-
-
-function worldToChunk(x, y) {
-
-    return {
-
-        cx:
-            Math.floor(
-                x /
-                CHUNK_SIZE
+    const trunk =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                2,
+                3,
+                20,
+                7
             ),
-
-        cy:
-            Math.floor(
-                y /
-                CHUNK_SIZE
-            )
-    };
-}
-
-
-/* =========================================================
-   HUD
-========================================================= */
-
-function updateHUD() {
-
-    const c =
-        worldToChunk(
-            player.x,
-            player.y
+            new THREE.MeshStandardMaterial({
+                color:0x69452c
+            })
         );
 
+    trunk.position.y=10;
 
-    document.getElementById(
-        "x"
-    ).textContent =
-        Math.floor(
-            player.x
+    trunk.castShadow=true;
+
+    group.add(trunk);
+
+
+    const crown =
+        new THREE.Mesh(
+            new THREE.ConeGeometry(
+                16,
+                40,
+                8
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x237936
+            })
         );
 
+    crown.position.y=38;
 
-    document.getElementById(
-        "y"
-    ).textContent =
-        Math.floor(
-            player.y
-        );
+    crown.castShadow=true;
+
+    group.add(crown);
 
 
-    document.getElementById(
-        "chunk"
-    ).textContent =
-        `${c.cx}, ${c.cy}`;
-
-
-    document.getElementById(
-        "chunkCount"
-    ).textContent =
-        chunks.size;
-}
-
-
-/* =========================================================
-   NEUSTART
-========================================================= */
-
-document
-    .getElementById(
-        "restart"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            player.x = 0;
-            player.y = 0;
-
-            player.health =
-                MAX_HEALTH;
-
-            camera.x = 0;
-            camera.y = 0;
-
-            document
-                .getElementById(
-                    "gameOver"
-                )
-                .style.display =
-                    "none";
-
-            updateHearts();
-        }
+    group.position.set(
+        x,
+        y,
+        z
     );
 
-
-/* =========================================================
-   START
-========================================================= */
-
-updateChunks();
-
-updateInventory();
-
-updateHearts();
+    scene.add(group);
+}
 
 
-/* =========================================================
-   GAME LOOP
-========================================================= */
+for(let i=0;i<1100;i++){
 
-let lastTime =
-    performance.now();
+    tree(
+        (random()-.5)*10500,
+        (random()-.5)*10500
+    );
+}
 
 
-function gameLoop(time) {
+// =====================================================
+// HÄUSER
+// =====================================================
+
+function building(x,z){
+
+    const y =
+        height(x,z);
+
+    if(y < WATER+5)
+        return;
+
+    const w =
+        30 + random()*50;
+
+    const d =
+        30 + random()*50;
+
+    const h =
+        20 + random()*55;
+
+
+    const body =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                w,h,d
+            ),
+            new THREE.MeshStandardMaterial({
+                color:
+                    new THREE.Color(
+                        .25+random()*.4,
+                        .25+random()*.4,
+                        .3+random()*.35
+                    )
+            })
+        );
+
+    body.position.set(
+        x,
+        y+h/2,
+        z
+    );
+
+    body.rotation.y =
+        random()*Math.PI;
+
+    body.castShadow=true;
+    body.receiveShadow=true;
+
+    scene.add(body);
+
+
+    const roof =
+        new THREE.Mesh(
+            new THREE.ConeGeometry(
+                Math.max(w,d)*.75,
+                15,
+                4
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x34383c
+            })
+        );
+
+    roof.position.set(
+        x,
+        y+h+7,
+        z
+    );
+
+    roof.rotation.y =
+        Math.PI/4;
+
+    roof.castShadow=true;
+
+    scene.add(roof);
+}
+
+
+for(let i=0;i<100;i++){
+
+    building(
+        (random()-.5)*8500,
+        (random()-.5)*8500
+    );
+}
+
+
+// =====================================================
+// FELSEN
+// =====================================================
+
+function rock(x,z){
+
+    const y =
+        height(x,z);
+
+    if(y < WATER+3)
+        return;
+
+    const size =
+        5+random()*22;
+
+    const r =
+        new THREE.Mesh(
+            new THREE.DodecahedronGeometry(
+                size,
+                1
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x777777,
+                roughness:1
+            })
+        );
+
+    r.position.set(
+        x,
+        y+size*.5,
+        z
+    );
+
+    r.rotation.set(
+        random()*3,
+        random()*3,
+        random()*3
+    );
+
+    r.castShadow=true;
+
+    scene.add(r);
+}
+
+
+for(let i=0;i<500;i++){
+
+    rock(
+        (random()-.5)*11000,
+        (random()-.5)*11000
+    );
+}
+
+
+// =====================================================
+// SPIELER
+// =====================================================
+
+const controls =
+    new PointerLockControls(
+        camera,
+        document.body
+    );
+
+scene.add(
+    controls.getObject()
+);
+
+
+// Spawnpunkt
+controls.getObject().position.set(
+    0,
+    height(0,0)+80,
+    0
+);
+
+
+const keys={};
+
+let velocityY=0;
+let grounded=false;
+
+document.addEventListener(
+    "keydown",
+    e=>{
+
+        keys[e.code]=true;
+
+        if(
+            e.code==="Space" &&
+            grounded
+        ){
+
+            velocityY=300;
+            grounded=false;
+        }
+    }
+);
+
+document.addEventListener(
+    "keyup",
+    e=>{
+        keys[e.code]=false;
+    }
+);
+
+
+// =====================================================
+// START
+// =====================================================
+
+document.getElementById("play")
+.addEventListener(
+    "click",
+    ()=>{
+        controls.lock();
+    }
+);
+
+controls.addEventListener(
+    "lock",
+    ()=>{
+        document.getElementById("menu")
+        .style.display="none";
+    }
+);
+
+controls.addEventListener(
+    "unlock",
+    ()=>{
+        document.getElementById("menu")
+        .style.display="flex";
+    }
+);
+
+
+// =====================================================
+// NEUE WELT
+// =====================================================
+
+document.getElementById("newWorld")
+.addEventListener(
+    "click",
+    ()=>{
+
+        const newSeed =
+            Math.floor(
+                Math.random()*2147483647
+            ).toString();
+
+        localStorage.setItem(
+            "ghostIslandSeed",
+            newSeed
+        );
+
+        location.reload();
+    }
+);
+
+
+// =====================================================
+// SPIELLOOP
+// =====================================================
+
+const clock =
+    new THREE.Clock();
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
 
     const dt =
         Math.min(
-            (time - lastTime) /
-            1000,
-
+            clock.getDelta(),
             .05
         );
 
+    if(controls.isLocked){
 
-    lastTime =
-        time;
-
-
-    updatePlayer(dt);
-
-    updateChunks();
-
-    drawWorld();
-
-    drawPlayer();
-
-    updateHUD();
+        let speed =
+            keys["ShiftLeft"] ||
+            keys["ShiftRight"]
+            ? 420
+            : 250;
 
 
-    requestAnimationFrame(
-        gameLoop
+        if(keys["KeyW"])
+            controls.moveForward(
+                speed*dt
+            );
+
+        if(keys["KeyS"])
+            controls.moveForward(
+                -speed*dt
+            );
+
+        if(keys["KeyA"])
+            controls.moveRight(
+                -speed*dt
+            );
+
+        if(keys["KeyD"])
+            controls.moveRight(
+                speed*dt
+            );
+
+
+        // Schwerkraft
+        velocityY -=
+            850*dt;
+
+        controls.getObject()
+        .position.y +=
+            velocityY*dt;
+
+
+        const p =
+            controls.getObject()
+            .position;
+
+        const ground =
+            height(p.x,p.z)+70;
+
+
+        if(p.y <= ground){
+
+            p.y=ground;
+
+            velocityY=0;
+
+            grounded=true;
+        }
+
+
+        document.getElementById("pos")
+        .textContent =
+            Math.round(p.x) +
+            " / " +
+            Math.round(p.z);
+    }
+
+
+    renderer.render(
+        scene,
+        camera
     );
 }
 
+animate();
 
-requestAnimationFrame(
-    gameLoop
+
+// =====================================================
+// RESIZE
+// =====================================================
+
+addEventListener(
+    "resize",
+    ()=>{
+
+        camera.aspect =
+            innerWidth/innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+            innerWidth,
+            innerHeight
+        );
+    }
 );
 
 </script>
