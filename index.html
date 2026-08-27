@@ -2,8 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GHOST Island</title>
+<title>GHOST ISLAND 3D</title>
 
 <style>
 html,body{
@@ -12,7 +11,6 @@ html,body{
     height:100%;
     overflow:hidden;
     background:#75caff;
-    font-family:Arial,sans-serif;
 }
 
 canvas{
@@ -20,85 +18,91 @@ canvas{
 }
 
 #hud{
-    position:fixed;
-    top:15px;
-    left:15px;
+    position:absolute;
+    top:18px;
+    left:18px;
     color:white;
+    font-family:Arial,sans-serif;
+    font-size:15px;
+    z-index:10;
     text-shadow:0 2px 5px #000;
-    z-index:5;
-    pointer-events:none;
+    line-height:1.5;
 }
 
 #hud b{
-    font-size:22px;
+    font-size:24px;
 }
 
 #crosshair{
-    position:fixed;
+    position:absolute;
     left:50%;
     top:50%;
     transform:translate(-50%,-50%);
     color:white;
+    font-family:Arial;
     font-size:25px;
-    text-shadow:0 0 5px #000;
-    z-index:5;
+    font-weight:bold;
+    z-index:10;
     pointer-events:none;
+    text-shadow:0 0 5px black;
 }
 
 #menu{
-    position:fixed;
+    position:absolute;
     inset:0;
-    background:rgba(0,0,0,.55);
+    z-index:100;
+    background:rgba(0,0,0,.58);
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:20;
 }
 
-.panel{
-    width:min(430px,90%);
-    padding:35px;
-    border-radius:20px;
-    background:rgba(20,25,30,.96);
+#box{
+    width:390px;
+    max-width:88%;
+    background:#20252b;
     color:white;
+    padding:32px;
+    border-radius:20px;
     text-align:center;
-    box-shadow:0 15px 60px #000;
+    font-family:Arial;
+    box-shadow:0 15px 70px #000;
 }
 
-.panel h1{
+#box h1{
     font-size:42px;
-    margin:0 0 10px;
+    margin:0 0 8px;
 }
 
-.panel p{
+#box p{
     color:#ddd;
+}
+
+#seed{
+    background:#101214;
+    border-radius:8px;
+    padding:11px;
+    margin:18px 0 8px;
+    font-family:monospace;
 }
 
 button{
     width:100%;
-    padding:15px;
-    margin-top:10px;
     border:0;
     border-radius:10px;
+    padding:15px;
+    margin-top:10px;
     font-size:17px;
     font-weight:bold;
     cursor:pointer;
 }
 
 #play{
-    background:#42c957;
+    background:#42d15a;
 }
 
 #newWorld{
-    background:#e5a52b;
-}
-
-#seed{
-    margin-top:15px;
-    padding:10px;
-    border-radius:8px;
-    background:#111;
-    font-family:monospace;
+    background:#e5a72b;
 }
 </style>
 </head>
@@ -107,122 +111,131 @@ button{
 
 <div id="hud">
     <b>GHOST ISLAND</b><br>
-    Seed: <span id="seedHud">...</span><br>
-    Position: <span id="pos">0 / 0</span>
+    WASD = Bewegen<br>
+    SHIFT = Rennen<br>
+    SPACE = Springen<br>
+    Klick = Maus<br>
+    Position:
+    <span id="position">0 / 0</span>
 </div>
 
 <div id="crosshair">+</div>
 
 <div id="menu">
-    <div class="panel">
+
+    <div id="box">
+
         <h1>GHOST ISLAND</h1>
 
         <p>
-            Riesige zufällig generierte 3D-Insel.
+            Riesige zufällige 3D-Insel
         </p>
 
         <p>
-            Die Welt wird dauerhaft in diesem Browser gespeichert.
+            Deine Welt bleibt gespeichert.
         </p>
 
-        <div id="seed">Seed: ...</div>
+        <div id="seed">
+            Seed wird geladen...
+        </div>
 
         <button id="play">
             SPIEL STARTEN
         </button>
 
         <button id="newWorld">
-            NEUE WELT GENERIEREN
+            NEUE WELT
         </button>
+
     </div>
+
 </div>
 
-<script type="module">
 
-import * as THREE from
-"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-import {
-    PointerLockControls
-} from
-"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/PointerLockControls.js";
+<script>
 
-
-// =====================================================
+// ======================================================
 // WELT-SEED
-// =====================================================
+// ======================================================
 
 let savedSeed =
-    localStorage.getItem("ghostIslandSeed");
+localStorage.getItem("GHOST_ISLAND_SEED");
 
 if(!savedSeed){
 
     savedSeed =
-        Math.floor(
-            Math.random()*2147483647
-        ).toString();
+    Math.floor(
+        Math.random()*2147483647
+    );
 
     localStorage.setItem(
-        "ghostIslandSeed",
+        "GHOST_ISLAND_SEED",
         savedSeed
     );
 }
 
 let seed =
-    Number(savedSeed);
+Number(savedSeed);
 
 document.getElementById("seed").textContent =
-    "Seed: " + savedSeed;
-
-document.getElementById("seedHud").textContent =
-    savedSeed;
+"SEED: " + savedSeed;
 
 
-// =====================================================
+// ======================================================
 // SEEDED RANDOM
-// =====================================================
+// ======================================================
 
 function random(){
 
     seed =
-        (seed * 1664525 + 1013904223)
-        >>> 0;
+    (seed * 1664525 + 1013904223)
+    >>> 0;
 
     return seed / 4294967296;
 }
 
 
-// =====================================================
-// THREE.JS
-// =====================================================
+// ======================================================
+// SCENE
+// ======================================================
 
 const scene =
-    new THREE.Scene();
+new THREE.Scene();
 
 scene.background =
-    new THREE.Color(0x79caff);
+new THREE.Color(0x79caff);
 
 scene.fog =
-    new THREE.Fog(
-        0x79caff,
-        900,
-        5500
-    );
+new THREE.Fog(
+    0x79caff,
+    700,
+    6500
+);
 
+
+// ======================================================
+// CAMERA
+// ======================================================
 
 const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        innerWidth / innerHeight,
-        0.1,
-        10000
-    );
+new THREE.PerspectiveCamera(
+    75,
+    innerWidth/innerHeight,
+    0.1,
+    12000
+);
 
+
+// ======================================================
+// RENDERER
+// ======================================================
 
 const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true
-    });
+new THREE.WebGLRenderer({
+    antialias:true
+});
 
 renderer.setSize(
     innerWidth,
@@ -233,295 +246,830 @@ renderer.setPixelRatio(
     Math.min(devicePixelRatio,2)
 );
 
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled=true;
+
+renderer.shadowMap.type =
+THREE.PCFSoftShadowMap;
+
+renderer.outputColorSpace =
+THREE.SRGBColorSpace;
 
 document.body.appendChild(
     renderer.domElement
 );
 
 
-// =====================================================
+// ======================================================
 // LICHT
-// =====================================================
+// ======================================================
 
-scene.add(
-    new THREE.HemisphereLight(
-        0xffffff,
-        0x446644,
-        2
-    )
+const ambient =
+new THREE.AmbientLight(
+    0xffffff,
+    1.1
 );
 
+scene.add(ambient);
+
+
 const sun =
-    new THREE.DirectionalLight(
-        0xffffff,
-        3
-    );
+new THREE.DirectionalLight(
+    0xffffff,
+    2.4
+);
 
 sun.position.set(
     1500,
     3000,
-    1000
+    1200
 );
 
-sun.castShadow = true;
+sun.castShadow=true;
 
-sun.shadow.mapSize.width = 2048;
-sun.shadow.mapSize.height = 2048;
+sun.shadow.mapSize.width=2048;
+sun.shadow.mapSize.height=2048;
+
+sun.shadow.camera.left=-3000;
+sun.shadow.camera.right=3000;
+sun.shadow.camera.top=3000;
+sun.shadow.camera.bottom=-3000;
 
 scene.add(sun);
 
 
-// =====================================================
+// ======================================================
+// MAP
+// ======================================================
+
+const MAP_SIZE=12000;
+const SEGMENTS=220;
+const WATER_LEVEL=8;
+
+
+// ======================================================
 // TERRAIN
-// =====================================================
+// ======================================================
 
-const WORLD = 12000;
-const SEGMENTS = 220;
-const WATER = 8;
-
-function height(x,z){
+function terrainHeight(x,z){
 
     const distance =
-        Math.sqrt(x*x + z*z);
+    Math.sqrt(
+        x*x+z*z
+    );
 
+
+    // Inselform
     const island =
-        Math.max(
-            0,
-            1 - distance/5700
-        );
+    Math.max(
+        0,
+        1-distance/5700
+    );
 
-    let h = 20;
 
+    let h=18;
+
+
+    // große Berge
     h +=
-        Math.sin(
-            x * 0.0018
-        ) *
-        Math.cos(
-            z * 0.0016
-        ) * 100;
+    Math.sin(
+        x*.0014
+    ) *
+    Math.cos(
+        z*.0017
+    )*120;
 
+
+    // Hügel
     h +=
-        Math.sin(
-            x * 0.0047 +
-            z * 0.003
-        ) * 35;
+    Math.sin(
+        x*.0042+
+        z*.003
+    )*42;
 
+
+    // kleine Landschaft
     h +=
-        Math.cos(
-            x * 0.011 -
-            z * 0.008
-        ) * 12;
+    Math.sin(
+        x*.012-
+        z*.009
+    )*13;
 
-    // Berge
-    const mountain =
-        Math.max(
-            0,
-            Math.sin(x*0.0009) *
-            Math.cos(z*0.0011)
-        );
 
-    h += mountain * 180;
+    // Bergketten
+    const mountains =
+    Math.max(
+        0,
+        Math.sin(x*.00075) *
+        Math.cos(z*.001)
+    );
+
+    h += mountains*230;
+
 
     h *= island;
+
+
+    if(h<WATER_LEVEL)
+        h=WATER_LEVEL-5;
+
 
     return h;
 }
 
 
-const terrainGeometry =
-    new THREE.PlaneGeometry(
-        WORLD,
-        WORLD,
-        SEGMENTS,
-        SEGMENTS
-    );
+// ======================================================
+// TERRAIN MESH
+// ======================================================
 
-terrainGeometry.rotateX(-Math.PI/2);
+const terrainGeometry =
+new THREE.PlaneGeometry(
+    MAP_SIZE,
+    MAP_SIZE,
+    SEGMENTS,
+    SEGMENTS
+);
+
+terrainGeometry.rotateX(
+    -Math.PI/2
+);
+
 
 const vertices =
-    terrainGeometry.attributes.position;
+terrainGeometry.attributes.position;
+
 
 for(let i=0;i<vertices.count;i++){
 
     const x =
-        vertices.getX(i);
+    vertices.getX(i);
 
     const z =
-        vertices.getZ(i);
+    vertices.getZ(i);
 
     vertices.setY(
         i,
-        Math.max(
-            height(x,z),
-            WATER-5
-        )
+        terrainHeight(x,z)
     );
 }
+
 
 terrainGeometry.computeVertexNormals();
 
 
 const terrain =
-    new THREE.Mesh(
-        terrainGeometry,
-        new THREE.MeshStandardMaterial({
-            color:0x4fa447,
-            roughness:1
-        })
-    );
+new THREE.Mesh(
+    terrainGeometry,
+    new THREE.MeshStandardMaterial({
+        color:0x4d9d43,
+        roughness:1
+    })
+);
 
-terrain.receiveShadow = true;
+terrain.receiveShadow=true;
 
 scene.add(terrain);
 
 
-// =====================================================
+// ======================================================
 // WASSER
-// =====================================================
+// ======================================================
+
+const WATER_SIZE=15000;
+
+const waterGeometry =
+new THREE.PlaneGeometry(
+    WATER_SIZE,
+    WATER_SIZE,
+    180,
+    180
+);
+
+waterGeometry.rotateX(
+    -Math.PI/2
+);
+
+
+// Transparentes Wasser
+const waterMaterial =
+new THREE.MeshPhysicalMaterial({
+
+    color:0x258fd0,
+
+    transparent:true,
+
+    opacity:.64,
+
+    roughness:.08,
+
+    metalness:.05,
+
+    transmission:.18,
+
+    thickness:.4,
+
+    clearcoat:1,
+
+    clearcoatRoughness:.05
+});
+
 
 const water =
-    new THREE.Mesh(
-        new THREE.PlaneGeometry(
-            15000,
-            15000
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x198bd0,
-            transparent:true,
-            opacity:.72,
-            roughness:.15
-        })
-    );
-
-water.rotation.x =
-    -Math.PI/2;
+new THREE.Mesh(
+    waterGeometry,
+    waterMaterial
+);
 
 water.position.y =
-    WATER;
+WATER_LEVEL;
+
+water.receiveShadow=true;
 
 scene.add(water);
 
 
-// =====================================================
-// BÄUME
-// =====================================================
+// ======================================================
+// WASSER-WELLEN
+// ======================================================
 
-function tree(x,z){
+const waterVertices =
+waterGeometry.attributes.position;
+
+const waterBase=[];
+
+for(let i=0;i<waterVertices.count;i++){
+
+    waterBase.push({
+        x:waterVertices.getX(i),
+        z:waterVertices.getZ(i)
+    });
+}
+
+
+function updateWater(time){
+
+    for(let i=0;i<waterVertices.count;i++){
+
+        const p =
+        waterBase[i];
+
+
+        const wave1 =
+        Math.sin(
+            p.x*.018+
+            time*.0012
+        )*1.2;
+
+
+        const wave2 =
+        Math.cos(
+            p.z*.014+
+            time*.001
+        )*0.9;
+
+
+        const wave3 =
+        Math.sin(
+            (p.x+p.z)*.008+
+            time*.0008
+        )*.8;
+
+
+        waterVertices.setY(
+            i,
+            wave1+
+            wave2+
+            wave3
+        );
+    }
+
+
+    waterVertices.needsUpdate=true;
+
+    waterGeometry.computeVertexNormals();
+}
+
+
+// ======================================================
+// BÄUME
+// ======================================================
+
+function createTree(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+5)
+    if(y<WATER_LEVEL+5)
         return;
 
-    const group =
-        new THREE.Group();
 
+    const tree =
+    new THREE.Group();
+
+
+    // Größe
+    const scale =
+    .75+
+    random()*.65;
+
+
+    const treeHeight =
+    40+
+    random()*45;
+
+
+    const trunkRadius =
+    2+
+    random()*2.5;
+
+
+    // ==================================================
+    // STAMM
+    // ==================================================
 
     const trunk =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                2,
-                3,
-                20,
-                7
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x69452c
-            })
-        );
+    new THREE.Mesh(
 
-    trunk.position.y=10;
+        new THREE.CylinderGeometry(
+            trunkRadius*.75,
+            trunkRadius,
+            treeHeight,
+            9
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x57341e,
+            roughness:1
+        })
+    );
+
+    trunk.position.y =
+    treeHeight/2;
 
     trunk.castShadow=true;
 
-    group.add(trunk);
+    tree.add(trunk);
 
 
-    const crown =
+    // ==================================================
+    // WURZELN
+    // ==================================================
+
+    const roots =
+    5+
+    Math.floor(random()*4);
+
+
+    for(let i=0;i<roots;i++){
+
+        const angle =
+        random()*Math.PI*2;
+
+        const rootLength =
+        5+
+        random()*9;
+
+
+        const root =
         new THREE.Mesh(
-            new THREE.ConeGeometry(
-                16,
-                40,
-                8
+
+            new THREE.CylinderGeometry(
+                .35,
+                trunkRadius*.8,
+                rootLength,
+                7
             ),
+
             new THREE.MeshStandardMaterial({
-                color:0x237936
+                color:0x50301c
             })
         );
 
-    crown.position.y=38;
 
-    crown.castShadow=true;
+        root.position.set(
+            Math.cos(angle)*3,
+            2.5,
+            Math.sin(angle)*3
+        );
 
-    group.add(crown);
+
+        root.rotation.z =
+        Math.cos(angle)*.8;
+
+        root.rotation.x =
+        Math.sin(angle)*.8;
 
 
-    group.position.set(
+        root.castShadow=true;
+
+        tree.add(root);
+    }
+
+
+    // ==================================================
+    // HAUPTÄSTE
+    // ==================================================
+
+    const branches =
+    8+
+    Math.floor(random()*8);
+
+
+    for(let i=0;i<branches;i++){
+
+        const angle =
+        random()*Math.PI*2;
+
+
+        const branchHeight =
+        treeHeight*.25+
+        random()*treeHeight*.55;
+
+
+        const length =
+        12+
+        random()*25;
+
+
+        const thickness =
+        .65+
+        random()*1.4;
+
+
+        const branch =
+        new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+                thickness*.5,
+                thickness,
+                length,
+                7
+            ),
+
+            new THREE.MeshStandardMaterial({
+                color:0x57351f,
+                roughness:1
+            })
+        );
+
+
+        branch.position.set(
+
+            Math.cos(angle)*
+            length*.32,
+
+            branchHeight,
+
+            Math.sin(angle)*
+            length*.32
+
+        );
+
+
+        branch.rotation.z =
+        Math.PI/2-
+        (.25+random()*.55);
+
+
+        branch.rotation.y =
+        -angle;
+
+
+        branch.castShadow=true;
+
+        tree.add(branch);
+
+
+        // ==================================================
+        // KLEINE ÄSTE
+        // ==================================================
+
+        const smallBranches =
+        3+
+        Math.floor(random()*4);
+
+
+        for(let j=0;j<smallBranches;j++){
+
+            const t =
+            .35+
+            random()*.55;
+
+
+            const smallAngle =
+            angle+
+            (random()-.5)*1.5;
+
+
+            const sx =
+            Math.cos(angle)*
+            length*t;
+
+
+            const sz =
+            Math.sin(angle)*
+            length*t;
+
+
+            const sy =
+            branchHeight+
+            t*length*.35;
+
+
+            const smallLength =
+            5+
+            random()*11;
+
+
+            const small =
+            new THREE.Mesh(
+
+                new THREE.CylinderGeometry(
+                    .25,
+                    .7,
+                    smallLength,
+                    6
+                ),
+
+                new THREE.MeshStandardMaterial({
+                    color:0x603b22
+                })
+            );
+
+
+            small.position.set(
+                sx,
+                sy,
+                sz
+            );
+
+
+            small.rotation.z =
+            Math.PI/2-
+            (.35+random()*.65);
+
+
+            small.rotation.y =
+            -smallAngle;
+
+
+            small.castShadow=true;
+
+            tree.add(small);
+
+
+            // ==================================================
+            // BLÄTTER
+            // ==================================================
+
+            const leaves =
+            2+
+            Math.floor(random()*3);
+
+
+            for(let k=0;k<leaves;k++){
+
+                const leaf =
+                new THREE.Mesh(
+
+                    new THREE.IcosahedronGeometry(
+                        4+
+                        random()*6,
+                        1
+                    ),
+
+                    new THREE.MeshStandardMaterial({
+
+                        color:
+                        new THREE.Color(
+                            .05+
+                            random()*.08,
+
+                            .28+
+                            random()*.25,
+
+                            .08+
+                            random()*.10
+                        ),
+
+                        roughness:1
+                    })
+                );
+
+
+                leaf.position.set(
+
+                    sx+
+                    Math.cos(smallAngle)*
+                    smallLength*.7+
+                    (random()-.5)*5,
+
+                    sy+
+                    random()*7,
+
+                    sz+
+                    Math.sin(smallAngle)*
+                    smallLength*.7+
+                    (random()-.5)*5
+                );
+
+
+                leaf.scale.set(
+                    .8+
+                    random()*.8,
+
+                    .7+
+                    random()*.7,
+
+                    .8+
+                    random()*.8
+                );
+
+
+                leaf.castShadow=true;
+
+                tree.add(leaf);
+            }
+        }
+
+
+        // ==================================================
+        // BLÄTTER AM HAUPTAST
+        // ==================================================
+
+        const bigLeaves =
+        3+
+        Math.floor(random()*4);
+
+
+        for(let q=0;q<bigLeaves;q++){
+
+            const leaf =
+            new THREE.Mesh(
+
+                new THREE.IcosahedronGeometry(
+                    6+
+                    random()*7,
+                    1
+                ),
+
+                new THREE.MeshStandardMaterial({
+
+                    color:
+                    new THREE.Color(
+                        .05+
+                        random()*.1,
+
+                        .32+
+                        random()*.25,
+
+                        .08+
+                        random()*.1
+                    ),
+
+                    roughness:1
+                })
+            );
+
+
+            leaf.position.set(
+
+                Math.cos(angle)*
+                length*.55+
+                (random()-.5)*10,
+
+                branchHeight+
+                length*.25+
+                (random()-.5)*12,
+
+                Math.sin(angle)*
+                length*.55+
+                (random()-.5)*10
+            );
+
+
+            leaf.scale.set(
+                .9+
+                random()*.8,
+
+                .7+
+                random()*.8,
+
+                .9+
+                random()*.8
+            );
+
+
+            leaf.castShadow=true;
+
+            tree.add(leaf);
+        }
+    }
+
+
+    // ==================================================
+    // BAUM POSITIONIEREN
+    // ==================================================
+
+    tree.position.set(
         x,
         y,
         z
     );
 
-    scene.add(group);
-}
+
+    tree.rotation.y =
+    random()*Math.PI*2;
 
 
-for(let i=0;i<1100;i++){
-
-    tree(
-        (random()-.5)*10500,
-        (random()-.5)*10500
+    tree.scale.setScalar(
+        scale
     );
+
+
+    scene.add(tree);
 }
 
 
-// =====================================================
-// HÄUSER
-// =====================================================
+// ======================================================
+// BAUM-VERTEILUNG
+// ======================================================
 
-function building(x,z){
+for(let i=0;i<850;i++){
+
+    const x =
+    (random()-.5)*10500;
+
+    const z =
+    (random()-.5)*10500;
+
+    createTree(x,z);
+}
+
+
+// ======================================================
+// HÄUSER
+// ======================================================
+
+function createBuilding(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+5)
+    if(y<WATER_LEVEL+5)
         return;
 
-    const w =
-        30 + random()*50;
 
-    const d =
-        30 + random()*50;
+    const width =
+    30+
+    random()*55;
 
-    const h =
-        20 + random()*55;
+    const depth =
+    30+
+    random()*55;
+
+    const height =
+    20+
+    random()*60;
 
 
     const body =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                w,h,d
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            width,
+            height,
+            depth
+        ),
+
+        new THREE.MeshStandardMaterial({
+
+            color:
+            new THREE.Color(
+                .22+
+                random()*.4,
+
+                .22+
+                random()*.4,
+
+                .25+
+                random()*.35
             ),
-            new THREE.MeshStandardMaterial({
-                color:
-                    new THREE.Color(
-                        .25+random()*.4,
-                        .25+random()*.4,
-                        .3+random()*.35
-                    )
-            })
-        );
+
+            roughness:.9
+        })
+    );
+
 
     body.position.set(
         x,
-        y+h/2,
+        y+height/2,
         z
     );
 
+
     body.rotation.y =
-        random()*Math.PI;
+    random()*Math.PI;
+
 
     body.castShadow=true;
     body.receiveShadow=true;
@@ -529,26 +1077,33 @@ function building(x,z){
     scene.add(body);
 
 
+    // Dach
     const roof =
-        new THREE.Mesh(
-            new THREE.ConeGeometry(
-                Math.max(w,d)*.75,
-                15,
-                4
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x34383c
-            })
-        );
+    new THREE.Mesh(
+
+        new THREE.ConeGeometry(
+            Math.max(width,depth)*.75,
+            18,
+            4
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x35383d,
+            roughness:.9
+        })
+    );
+
 
     roof.position.set(
         x,
-        y+h+7,
+        y+height+9,
         z
     );
 
-    roof.rotation.y =
-        Math.PI/4;
+
+    roof.rotation.y=
+    Math.PI/4;
+
 
     roof.castShadow=true;
 
@@ -556,257 +1111,362 @@ function building(x,z){
 }
 
 
-for(let i=0;i<100;i++){
+// ======================================================
+// STÄDTE
+// ======================================================
 
-    building(
-        (random()-.5)*8500,
-        (random()-.5)*8500
-    );
+for(let city=0;city<12;city++){
+
+    const cx =
+    (random()-.5)*8000;
+
+    const cz =
+    (random()-.5)*8000;
+
+
+    const amount =
+    7+
+    Math.floor(random()*16);
+
+
+    for(let i=0;i<amount;i++){
+
+        createBuilding(
+
+            cx+
+            (random()-.5)*600,
+
+            cz+
+            (random()-.5)*600
+
+        );
+    }
 }
 
 
-// =====================================================
+// ======================================================
 // FELSEN
-// =====================================================
+// ======================================================
 
-function rock(x,z){
+function createRock(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+3)
+    if(y<WATER_LEVEL+3)
         return;
 
+
     const size =
-        5+random()*22;
+    5+
+    random()*25;
 
-    const r =
-        new THREE.Mesh(
-            new THREE.DodecahedronGeometry(
-                size,
-                1
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x777777,
-                roughness:1
-            })
-        );
 
-    r.position.set(
+    const rock =
+    new THREE.Mesh(
+
+        new THREE.DodecahedronGeometry(
+            size,
+            1
+        ),
+
+        new THREE.MeshStandardMaterial({
+            color:0x777777,
+            roughness:1
+        })
+    );
+
+
+    rock.position.set(
         x,
         y+size*.5,
         z
     );
 
-    r.rotation.set(
+
+    rock.rotation.set(
         random()*3,
         random()*3,
         random()*3
     );
 
-    r.castShadow=true;
 
-    scene.add(r);
+    rock.castShadow=true;
+
+    scene.add(rock);
 }
 
 
-for(let i=0;i<500;i++){
+for(let i=0;i<450;i++){
 
-    rock(
+    createRock(
         (random()-.5)*11000,
         (random()-.5)*11000
     );
 }
 
 
-// =====================================================
+// ======================================================
 // SPIELER
-// =====================================================
+// ======================================================
 
-const controls =
-    new PointerLockControls(
-        camera,
-        document.body
-    );
+const player =
+new THREE.Object3D();
 
-scene.add(
-    controls.getObject()
-);
+scene.add(player);
 
 
-// Spawnpunkt
-controls.getObject().position.set(
+// Genau wie in deinem funktionierenden Code
+camera.position.y=2;
+
+player.add(camera);
+
+
+// Spawn
+player.position.set(
     0,
-    height(0,0)+80,
+    terrainHeight(0,0),
     0
 );
 
 
-const keys={};
+// ======================================================
+// FPS PHYSICS
+// ======================================================
 
-let velocityY=0;
-let grounded=false;
+let velocity =
+new THREE.Vector3();
+
+let gravity=.03;
+
+let canJump=false;
+
+let keys={};
+
+
+document.onkeydown=(e)=>{
+
+    keys[e.key.toLowerCase()]=true;
+
+
+    if(
+        e.code==="Space" &&
+        canJump
+    ){
+
+        velocity.y=.9;
+
+        canJump=false;
+    }
+};
+
+
+document.onkeyup=(e)=>{
+
+    keys[e.key.toLowerCase()]=false;
+};
+
+
+// ======================================================
+// MAUS
+// ======================================================
+
+let rx=0;
+let ry=0;
+
+
+document.body.onclick=()=>{
+
+    document.body.requestPointerLock();
+};
+
+
+document.onmousemove=(e)=>{
+
+    if(document.pointerLockElement){
+
+        ry -=
+        e.movementX*.002;
+
+        rx -=
+        e.movementY*.002;
+
+
+        rx =
+        Math.max(
+            -1.5,
+            Math.min(1.5,rx)
+        );
+
+
+        camera.rotation.x=rx;
+
+        player.rotation.y=ry;
+    }
+};
+
+
+// ======================================================
+// BEWEGUNG
+// ======================================================
+
+function update(){
+
+    let dir =
+    new THREE.Vector3();
+
+
+    if(keys.w)
+        dir.z-=1;
+
+    if(keys.s)
+        dir.z+=1;
+
+    if(keys.a)
+        dir.x-=1;
+
+    if(keys.d)
+        dir.x+=1;
+
+
+    if(dir.length()>0)
+        dir.normalize();
+
+
+    dir.applyAxisAngle(
+        new THREE.Vector3(0,1,0),
+        player.rotation.y
+    );
+
+
+    const speed =
+    keys.shift
+    ? .38
+    : .22;
+
+
+    velocity.x +=
+    dir.x*speed;
+
+    velocity.z +=
+    dir.z*speed;
+
+
+    velocity.x*=.84;
+    velocity.z*=.84;
+
+
+    velocity.y-=gravity;
+
+
+    player.position.add(
+        velocity
+    );
+
+
+    // Boden
+    const ground =
+    terrainHeight(
+        player.position.x,
+        player.position.z
+    );
+
+
+    if(
+        player.position.y<
+        ground
+    ){
+
+        player.position.y=
+        ground;
+
+        velocity.y=0;
+
+        canJump=true;
+    }
+
+
+    document.getElementById(
+        "position"
+    ).innerText =
+    Math.round(player.position.x)
+    +" / "+
+    Math.round(player.position.z);
+}
+
+
+// ======================================================
+// MENÜ
+// ======================================================
+
+document.getElementById("play")
+.onclick=()=>{
+
+    document.body.requestPointerLock();
+
+    document.getElementById("menu")
+    .style.display="none";
+};
+
 
 document.addEventListener(
-    "keydown",
-    e=>{
-
-        keys[e.code]=true;
+    "pointerlockchange",
+    ()=>{
 
         if(
-            e.code==="Space" &&
-            grounded
+            document.pointerLockElement
+            !==document.body
         ){
 
-            velocityY=300;
-            grounded=false;
+            document.getElementById("menu")
+            .style.display="flex";
+
+        }else{
+
+            document.getElementById("menu")
+            .style.display="none";
         }
     }
 );
 
-document.addEventListener(
-    "keyup",
-    e=>{
-        keys[e.code]=false;
-    }
-);
 
-
-// =====================================================
-// START
-// =====================================================
-
-document.getElementById("play")
-.addEventListener(
-    "click",
-    ()=>{
-        controls.lock();
-    }
-);
-
-controls.addEventListener(
-    "lock",
-    ()=>{
-        document.getElementById("menu")
-        .style.display="none";
-    }
-);
-
-controls.addEventListener(
-    "unlock",
-    ()=>{
-        document.getElementById("menu")
-        .style.display="flex";
-    }
-);
-
-
-// =====================================================
+// ======================================================
 // NEUE WELT
-// =====================================================
+// ======================================================
 
 document.getElementById("newWorld")
-.addEventListener(
-    "click",
-    ()=>{
+.onclick=()=>{
 
-        const newSeed =
-            Math.floor(
-                Math.random()*2147483647
-            ).toString();
-
-        localStorage.setItem(
-            "ghostIslandSeed",
-            newSeed
-        );
-
-        location.reload();
-    }
-);
+    const newSeed =
+    Math.floor(
+        Math.random()*2147483647
+    );
 
 
-// =====================================================
-// SPIELLOOP
-// =====================================================
+    localStorage.setItem(
+        "GHOST_ISLAND_SEED",
+        newSeed
+    );
 
-const clock =
-    new THREE.Clock();
 
-function animate(){
+    location.reload();
+};
+
+
+// ======================================================
+// LOOP
+// ======================================================
+
+function animate(time){
 
     requestAnimationFrame(
         animate
     );
 
-    const dt =
-        Math.min(
-            clock.getDelta(),
-            .05
-        );
 
-    if(controls.isLocked){
+    update();
 
-        let speed =
-            keys["ShiftLeft"] ||
-            keys["ShiftRight"]
-            ? 420
-            : 250;
-
-
-        if(keys["KeyW"])
-            controls.moveForward(
-                speed*dt
-            );
-
-        if(keys["KeyS"])
-            controls.moveForward(
-                -speed*dt
-            );
-
-        if(keys["KeyA"])
-            controls.moveRight(
-                -speed*dt
-            );
-
-        if(keys["KeyD"])
-            controls.moveRight(
-                speed*dt
-            );
-
-
-        // Schwerkraft
-        velocityY -=
-            850*dt;
-
-        controls.getObject()
-        .position.y +=
-            velocityY*dt;
-
-
-        const p =
-            controls.getObject()
-            .position;
-
-        const ground =
-            height(p.x,p.z)+70;
-
-
-        if(p.y <= ground){
-
-            p.y=ground;
-
-            velocityY=0;
-
-            grounded=true;
-        }
-
-
-        document.getElementById("pos")
-        .textContent =
-            Math.round(p.x) +
-            " / " +
-            Math.round(p.z);
-    }
+    updateWater(time);
 
 
     renderer.render(
@@ -815,28 +1475,27 @@ function animate(){
     );
 }
 
-animate();
+
+animate(0);
 
 
-// =====================================================
+// ======================================================
 // RESIZE
-// =====================================================
+// ======================================================
 
-addEventListener(
-    "resize",
-    ()=>{
+window.onresize=()=>{
 
-        camera.aspect =
-            innerWidth/innerHeight;
+    camera.aspect =
+    innerWidth/innerHeight;
 
-        camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
-        renderer.setSize(
-            innerWidth,
-            innerHeight
-        );
-    }
-);
+
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
+};
 
 </script>
 
