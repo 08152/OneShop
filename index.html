@@ -2,8 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GHOST Island</title>
+<title>GHOST 3D Battle Royale</title>
 
 <style>
 html,body{
@@ -11,8 +10,7 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#75caff;
-    font-family:Arial,sans-serif;
+    background:#70c9ff;
 }
 
 canvas{
@@ -20,85 +18,73 @@ canvas{
 }
 
 #hud{
-    position:fixed;
-    top:15px;
-    left:15px;
+    position:absolute;
+    top:20px;
+    left:20px;
     color:white;
-    text-shadow:0 2px 5px #000;
-    z-index:5;
-    pointer-events:none;
-}
-
-#hud b{
-    font-size:22px;
+    font-family:Arial;
+    z-index:10;
+    text-shadow:0 2px 5px black;
 }
 
 #crosshair{
-    position:fixed;
+    position:absolute;
     left:50%;
     top:50%;
     transform:translate(-50%,-50%);
     color:white;
     font-size:25px;
-    text-shadow:0 0 5px #000;
-    z-index:5;
+    z-index:10;
+    text-shadow:0 0 5px black;
     pointer-events:none;
 }
 
 #menu{
-    position:fixed;
+    position:absolute;
     inset:0;
     background:rgba(0,0,0,.55);
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:20;
-}
-
-.panel{
-    width:min(430px,90%);
-    padding:35px;
-    border-radius:20px;
-    background:rgba(20,25,30,.96);
+    z-index:50;
+    font-family:Arial;
     color:white;
+}
+
+#box{
+    background:#20252a;
+    padding:35px;
+    border-radius:18px;
     text-align:center;
-    box-shadow:0 15px 60px #000;
-}
-
-.panel h1{
-    font-size:42px;
-    margin:0 0 10px;
-}
-
-.panel p{
-    color:#ddd;
+    width:350px;
+    box-shadow:0 10px 50px black;
 }
 
 button{
     width:100%;
     padding:15px;
-    margin-top:10px;
+    margin-top:12px;
     border:0;
-    border-radius:10px;
+    border-radius:9px;
     font-size:17px;
     font-weight:bold;
     cursor:pointer;
 }
 
 #play{
-    background:#42c957;
+    background:#42d35a;
 }
 
 #newWorld{
-    background:#e5a52b;
+    background:#e6a72c;
 }
 
 #seed{
-    margin-top:15px;
-    padding:10px;
-    border-radius:8px;
     background:#111;
+    padding:10px;
+    margin-top:15px;
     font-family:monospace;
+    border-radius:7px;
 }
 </style>
 </head>
@@ -107,25 +93,28 @@ button{
 
 <div id="hud">
     <b>GHOST ISLAND</b><br>
-    Seed: <span id="seedHud">...</span><br>
+    WASD = Bewegen<br>
+    SHIFT = Rennen<br>
+    SPACE = Springen<br>
+    Klick = Maus<br>
     Position: <span id="pos">0 / 0</span>
 </div>
 
 <div id="crosshair">+</div>
 
 <div id="menu">
-    <div class="panel">
+    <div id="box">
+
         <h1>GHOST ISLAND</h1>
 
         <p>
-            Riesige zufällig generierte 3D-Insel.
+            Deine dauerhaft gespeicherte,
+            zufällig generierte 3D-Insel.
         </p>
 
-        <p>
-            Die Welt wird dauerhaft in diesem Browser gespeichert.
-        </p>
-
-        <div id="seed">Seed: ...</div>
+        <div id="seed">
+            Seed wird geladen...
+        </div>
 
         <button id="play">
             SPIEL STARTEN
@@ -134,95 +123,93 @@ button{
         <button id="newWorld">
             NEUE WELT GENERIEREN
         </button>
+
     </div>
 </div>
 
-<script type="module">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-import * as THREE from
-"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+<script>
 
-import {
-    PointerLockControls
-} from
-"https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/controls/PointerLockControls.js";
-
-
-// =====================================================
-// WELT-SEED
-// =====================================================
+// ======================================================
+// DAUERHAFTER SEED
+// ======================================================
 
 let savedSeed =
-    localStorage.getItem("ghostIslandSeed");
+localStorage.getItem("GHOST_ISLAND_SEED");
 
 if(!savedSeed){
 
     savedSeed =
-        Math.floor(
-            Math.random()*2147483647
-        ).toString();
+    Math.floor(
+        Math.random()*2147483647
+    );
 
     localStorage.setItem(
-        "ghostIslandSeed",
+        "GHOST_ISLAND_SEED",
         savedSeed
     );
 }
 
-let seed =
-    Number(savedSeed);
+let seed = Number(savedSeed);
 
-document.getElementById("seed").textContent =
-    "Seed: " + savedSeed;
-
-document.getElementById("seedHud").textContent =
-    savedSeed;
+document.getElementById("seed").innerText =
+"SEED: " + savedSeed;
 
 
-// =====================================================
+// ======================================================
 // SEEDED RANDOM
-// =====================================================
+// ======================================================
 
 function random(){
 
     seed =
-        (seed * 1664525 + 1013904223)
-        >>> 0;
+    (seed * 1664525 + 1013904223)
+    >>> 0;
 
     return seed / 4294967296;
 }
 
 
-// =====================================================
-// THREE.JS
-// =====================================================
+// ======================================================
+// SCENE
+// ======================================================
 
 const scene =
-    new THREE.Scene();
+new THREE.Scene();
 
 scene.background =
-    new THREE.Color(0x79caff);
+new THREE.Color(0x75caff);
 
 scene.fog =
-    new THREE.Fog(
-        0x79caff,
-        900,
-        5500
-    );
+new THREE.Fog(
+    0x75caff,
+    800,
+    6000
+);
 
+
+// ======================================================
+// CAMERA
+// ======================================================
 
 const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        innerWidth / innerHeight,
-        0.1,
-        10000
-    );
+new THREE.PerspectiveCamera(
+    75,
+    innerWidth/innerHeight,
+    0.1,
+    10000
+);
 
+
+// ======================================================
+// RENDERER
+// ======================================================
 
 const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true
-    });
+new THREE.WebGLRenderer({
+    antialias:true
+});
 
 renderer.setSize(
     innerWidth,
@@ -233,204 +220,228 @@ renderer.setPixelRatio(
     Math.min(devicePixelRatio,2)
 );
 
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled=true;
 
 document.body.appendChild(
     renderer.domElement
 );
 
 
-// =====================================================
+// ======================================================
 // LICHT
-// =====================================================
+// ======================================================
 
 scene.add(
-    new THREE.HemisphereLight(
-        0xffffff,
-        0x446644,
-        2
-    )
-);
+new THREE.AmbientLight(
+    0xffffff,
+    1
+));
 
 const sun =
-    new THREE.DirectionalLight(
-        0xffffff,
-        3
-    );
+new THREE.DirectionalLight(
+    0xffffff,
+    2
+);
 
 sun.position.set(
-    1500,
-    3000,
+    1000,
+    2000,
     1000
 );
 
-sun.castShadow = true;
-
-sun.shadow.mapSize.width = 2048;
-sun.shadow.mapSize.height = 2048;
+sun.castShadow=true;
 
 scene.add(sun);
 
 
-// =====================================================
-// TERRAIN
-// =====================================================
+// ======================================================
+// MAP EINSTELLUNGEN
+// ======================================================
 
-const WORLD = 12000;
+const MAP_SIZE = 12000;
+
+const WATER_LEVEL = 8;
+
 const SEGMENTS = 220;
-const WATER = 8;
 
-function height(x,z){
+
+// ======================================================
+// TERRAIN HÖHE
+// ======================================================
+
+function terrainHeight(x,z){
 
     const distance =
-        Math.sqrt(x*x + z*z);
+    Math.sqrt(
+        x*x + z*z
+    );
 
+    // Inselrand
     const island =
-        Math.max(
-            0,
-            1 - distance/5700
-        );
+    Math.max(
+        0,
+        1-distance/5700
+    );
 
-    let h = 20;
+    let h=20;
 
+
+    // große Landschaft
     h +=
-        Math.sin(
-            x * 0.0018
-        ) *
-        Math.cos(
-            z * 0.0016
-        ) * 100;
+    Math.sin(
+        x*0.0015
+    ) *
+    Math.cos(
+        z*0.0017
+    ) * 120;
 
-    h +=
-        Math.sin(
-            x * 0.0047 +
-            z * 0.003
-        ) * 35;
 
+    // weitere Hügel
     h +=
-        Math.cos(
-            x * 0.011 -
-            z * 0.008
-        ) * 12;
+    Math.sin(
+        x*0.004 +
+        z*0.003
+    ) * 45;
+
+
+    // kleine Details
+    h +=
+    Math.sin(
+        x*0.012 -
+        z*0.009
+    ) * 12;
+
 
     // Berge
-    const mountain =
-        Math.max(
-            0,
-            Math.sin(x*0.0009) *
-            Math.cos(z*0.0011)
-        );
+    const mountains =
+    Math.max(
+        0,
+        Math.sin(x*.0008) *
+        Math.cos(z*.001)
+    );
 
-    h += mountain * 180;
+    h += mountains*220;
+
 
     h *= island;
+
+
+    if(h < WATER_LEVEL)
+        h = WATER_LEVEL-5;
+
 
     return h;
 }
 
 
-const terrainGeometry =
-    new THREE.PlaneGeometry(
-        WORLD,
-        WORLD,
-        SEGMENTS,
-        SEGMENTS
-    );
+// ======================================================
+// RIESIGES TERRAIN
+// ======================================================
 
-terrainGeometry.rotateX(-Math.PI/2);
+const terrainGeometry =
+new THREE.PlaneGeometry(
+    MAP_SIZE,
+    MAP_SIZE,
+    SEGMENTS,
+    SEGMENTS
+);
+
+terrainGeometry.rotateX(
+    -Math.PI/2
+);
+
 
 const vertices =
-    terrainGeometry.attributes.position;
+terrainGeometry.attributes.position;
+
 
 for(let i=0;i<vertices.count;i++){
 
     const x =
-        vertices.getX(i);
+    vertices.getX(i);
 
     const z =
-        vertices.getZ(i);
+    vertices.getZ(i);
 
     vertices.setY(
         i,
-        Math.max(
-            height(x,z),
-            WATER-5
-        )
+        terrainHeight(x,z)
     );
 }
+
 
 terrainGeometry.computeVertexNormals();
 
 
 const terrain =
-    new THREE.Mesh(
-        terrainGeometry,
-        new THREE.MeshStandardMaterial({
-            color:0x4fa447,
-            roughness:1
-        })
-    );
+new THREE.Mesh(
+    terrainGeometry,
+    new THREE.MeshStandardMaterial({
+        color:0x4f9e43,
+        roughness:1
+    })
+);
 
-terrain.receiveShadow = true;
+terrain.receiveShadow=true;
 
 scene.add(terrain);
 
 
-// =====================================================
+// ======================================================
 // WASSER
-// =====================================================
+// ======================================================
 
 const water =
-    new THREE.Mesh(
-        new THREE.PlaneGeometry(
-            15000,
-            15000
-        ),
-        new THREE.MeshStandardMaterial({
-            color:0x198bd0,
-            transparent:true,
-            opacity:.72,
-            roughness:.15
-        })
-    );
+new THREE.Mesh(
+    new THREE.PlaneGeometry(
+        15000,
+        15000
+    ),
+    new THREE.MeshStandardMaterial({
+        color:0x168bd0,
+        transparent:true,
+        opacity:.72
+    })
+);
 
 water.rotation.x =
-    -Math.PI/2;
+-Math.PI/2;
 
 water.position.y =
-    WATER;
+WATER_LEVEL;
 
 scene.add(water);
 
 
-// =====================================================
+// ======================================================
 // BÄUME
-// =====================================================
+// ======================================================
 
-function tree(x,z){
+function createTree(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+5)
+    if(y < WATER_LEVEL+5)
         return;
 
+
     const group =
-        new THREE.Group();
+    new THREE.Group();
 
 
     const trunk =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                2,
-                3,
-                20,
-                7
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x69452c
-            })
-        );
+    new THREE.Mesh(
+        new THREE.CylinderGeometry(
+            2,
+            3,
+            20,
+            7
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x654329
+        })
+    );
 
     trunk.position.y=10;
 
@@ -439,23 +450,23 @@ function tree(x,z){
     group.add(trunk);
 
 
-    const crown =
-        new THREE.Mesh(
-            new THREE.ConeGeometry(
-                16,
-                40,
-                8
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x237936
-            })
-        );
+    const leaves =
+    new THREE.Mesh(
+        new THREE.ConeGeometry(
+            17,
+            42,
+            8
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x247b35
+        })
+    );
 
-    crown.position.y=38;
+    leaves.position.y=40;
 
-    crown.castShadow=true;
+    leaves.castShadow=true;
 
-    group.add(crown);
+    group.add(leaves);
 
 
     group.position.set(
@@ -468,60 +479,65 @@ function tree(x,z){
 }
 
 
-for(let i=0;i<1100;i++){
+// Viele Bäume
+for(let i=0;i<1000;i++){
 
-    tree(
+    createTree(
         (random()-.5)*10500,
         (random()-.5)*10500
     );
 }
 
 
-// =====================================================
+// ======================================================
 // HÄUSER
-// =====================================================
+// ======================================================
 
-function building(x,z){
+function createBuilding(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+5)
+    if(y < WATER_LEVEL+5)
         return;
 
-    const w =
-        30 + random()*50;
 
-    const d =
-        30 + random()*50;
+    const width =
+    30 + random()*50;
 
-    const h =
-        20 + random()*55;
+    const depth =
+    30 + random()*50;
+
+    const height =
+    20 + random()*60;
 
 
     const body =
-        new THREE.Mesh(
-            new THREE.BoxGeometry(
-                w,h,d
-            ),
-            new THREE.MeshStandardMaterial({
-                color:
-                    new THREE.Color(
-                        .25+random()*.4,
-                        .25+random()*.4,
-                        .3+random()*.35
-                    )
-            })
-        );
+    new THREE.Mesh(
+        new THREE.BoxGeometry(
+            width,
+            height,
+            depth
+        ),
+        new THREE.MeshStandardMaterial({
+            color:
+            new THREE.Color(
+                .25+random()*.35,
+                .25+random()*.35,
+                .3+random()*.3
+            )
+        })
+    );
+
 
     body.position.set(
         x,
-        y+h/2,
+        y+height/2,
         z
     );
 
     body.rotation.y =
-        random()*Math.PI;
+    random()*Math.PI;
 
     body.castShadow=true;
     body.receiveShadow=true;
@@ -529,26 +545,28 @@ function building(x,z){
     scene.add(body);
 
 
+    // Dach
     const roof =
-        new THREE.Mesh(
-            new THREE.ConeGeometry(
-                Math.max(w,d)*.75,
-                15,
-                4
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x34383c
-            })
-        );
+    new THREE.Mesh(
+        new THREE.ConeGeometry(
+            Math.max(width,depth)*.75,
+            18,
+            4
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x333333
+        })
+    );
+
 
     roof.position.set(
         x,
-        y+h+7,
+        y+height+9,
         z
     );
 
     roof.rotation.y =
-        Math.PI/4;
+    Math.PI/4;
 
     roof.castShadow=true;
 
@@ -556,181 +574,359 @@ function building(x,z){
 }
 
 
-for(let i=0;i<100;i++){
+// ======================================================
+// STÄDTE / DÖRFER
+// ======================================================
 
-    building(
-        (random()-.5)*8500,
-        (random()-.5)*8500
-    );
+const cityCenters=[];
+
+
+// Zufällige Städte
+for(let i=0;i<12;i++){
+
+    const x =
+    (random()-.5)*8000;
+
+    const z =
+    (random()-.5)*8000;
+
+    cityCenters.push({
+        x:x,
+        z:z
+    });
 }
 
 
-// =====================================================
-// FELSEN
-// =====================================================
+for(const city of cityCenters){
 
-function rock(x,z){
+    const amount =
+    8+Math.floor(random()*15);
+
+    for(let i=0;i<amount;i++){
+
+        createBuilding(
+            city.x +
+            (random()-.5)*600,
+
+            city.z +
+            (random()-.5)*600
+        );
+    }
+}
+
+
+// ======================================================
+// FELSEN
+// ======================================================
+
+function createRock(x,z){
 
     const y =
-        height(x,z);
+    terrainHeight(x,z);
 
-    if(y < WATER+3)
+    if(y<WATER_LEVEL+3)
         return;
 
+
     const size =
-        5+random()*22;
+    5+random()*25;
 
-    const r =
-        new THREE.Mesh(
-            new THREE.DodecahedronGeometry(
-                size,
-                1
-            ),
-            new THREE.MeshStandardMaterial({
-                color:0x777777,
-                roughness:1
-            })
-        );
 
-    r.position.set(
+    const rock =
+    new THREE.Mesh(
+        new THREE.DodecahedronGeometry(
+            size,
+            1
+        ),
+        new THREE.MeshStandardMaterial({
+            color:0x777777,
+            roughness:1
+        })
+    );
+
+
+    rock.position.set(
         x,
-        y+size*.5,
+        y+size/2,
         z
     );
 
-    r.rotation.set(
+
+    rock.rotation.set(
         random()*3,
         random()*3,
         random()*3
     );
 
-    r.castShadow=true;
 
-    scene.add(r);
+    rock.castShadow=true;
+
+    scene.add(rock);
 }
 
 
-for(let i=0;i<500;i++){
+for(let i=0;i<450;i++){
 
-    rock(
+    createRock(
         (random()-.5)*11000,
         (random()-.5)*11000
     );
 }
 
 
-// =====================================================
-// SPIELER
-// =====================================================
+// ======================================================
+// PLAYER
+// ======================================================
 
-const controls =
-    new PointerLockControls(
-        camera,
-        document.body
-    );
+const player =
+new THREE.Object3D();
 
-scene.add(
-    controls.getObject()
-);
+scene.add(player);
 
 
-// Spawnpunkt
-controls.getObject().position.set(
+// Genau wie in deinem Code:
+camera.position.y=2;
+
+player.add(camera);
+
+
+// Spawn
+player.position.set(
     0,
-    height(0,0)+80,
+    terrainHeight(0,0)+2,
     0
 );
 
 
-const keys={};
+// ======================================================
+// FPS PHYSICS
+// ======================================================
 
-let velocityY=0;
-let grounded=false;
+let velocity =
+new THREE.Vector3();
+
+let gravity =
+0.03;
+
+let canJump=false;
+
+let keys={};
+
+
+document.onkeydown=(e)=>{
+
+    keys[e.key.toLowerCase()]=true;
+
+
+    if(
+        e.code==="Space" &&
+        canJump
+    ){
+
+        velocity.y=.9;
+
+        canJump=false;
+    }
+};
+
+
+document.onkeyup=(e)=>{
+
+    keys[e.key.toLowerCase()]=false;
+};
+
+
+// ======================================================
+// MAUS
+// ======================================================
+
+let rx=0;
+
+let ry=0;
+
+
+document.body.onclick=()=>{
+
+    document.body.requestPointerLock();
+};
+
+
+document.onmousemove=(e)=>{
+
+    if(
+        document.pointerLockElement
+    ){
+
+        ry -=
+        e.movementX*.002;
+
+        rx -=
+        e.movementY*.002;
+
+
+        rx =
+        Math.max(
+            -1.5,
+            Math.min(1.5,rx)
+        );
+
+
+        camera.rotation.x=rx;
+
+        player.rotation.y=ry;
+    }
+};
+
+
+// ======================================================
+// BEWEGUNG
+// ======================================================
+
+function update(){
+
+    let dir =
+    new THREE.Vector3();
+
+
+    if(keys.w)
+        dir.z-=1;
+
+    if(keys.s)
+        dir.z+=1;
+
+    if(keys.a)
+        dir.x-=1;
+
+    if(keys.d)
+        dir.x+=1;
+
+
+    if(dir.length()>0)
+        dir.normalize();
+
+
+    dir.applyAxisAngle(
+        new THREE.Vector3(0,1,0),
+        player.rotation.y
+    );
+
+
+    let speed =
+    keys.shift
+    ? .32
+    : .20;
+
+
+    velocity.x +=
+    dir.x*speed;
+
+    velocity.z +=
+    dir.z*speed;
+
+
+    velocity.x*=.82;
+
+    velocity.z*=.82;
+
+
+    // Schwerkraft
+    velocity.y-=gravity;
+
+
+    player.position.add(
+        velocity
+    );
+
+
+    // Bodenhöhe
+    const ground =
+    terrainHeight(
+        player.position.x,
+        player.position.z
+    );
+
+
+    if(
+        player.position.y <
+        ground
+    ){
+
+        player.position.y=
+        ground;
+
+        velocity.y=0;
+
+        canJump=true;
+    }
+
+
+    document.getElementById("pos")
+    .innerText =
+    Math.round(player.position.x)
+    +" / "+
+    Math.round(player.position.z);
+}
+
+
+// ======================================================
+// START
+// ======================================================
+
+document.getElementById("play")
+.onclick=()=>{
+
+    document.body.requestPointerLock();
+
+    document.getElementById("menu")
+    .style.display="none";
+};
+
 
 document.addEventListener(
-    "keydown",
-    e=>{
-
-        keys[e.code]=true;
+    "pointerlockchange",
+    ()=>{
 
         if(
-            e.code==="Space" &&
-            grounded
+            document.pointerLockElement
+            !==document.body
         ){
 
-            velocityY=300;
-            grounded=false;
+            document.getElementById("menu")
+            .style.display="flex";
+
+        }else{
+
+            document.getElementById("menu")
+            .style.display="none";
         }
     }
 );
 
-document.addEventListener(
-    "keyup",
-    e=>{
-        keys[e.code]=false;
-    }
-);
 
-
-// =====================================================
-// START
-// =====================================================
-
-document.getElementById("play")
-.addEventListener(
-    "click",
-    ()=>{
-        controls.lock();
-    }
-);
-
-controls.addEventListener(
-    "lock",
-    ()=>{
-        document.getElementById("menu")
-        .style.display="none";
-    }
-);
-
-controls.addEventListener(
-    "unlock",
-    ()=>{
-        document.getElementById("menu")
-        .style.display="flex";
-    }
-);
-
-
-// =====================================================
+// ======================================================
 // NEUE WELT
-// =====================================================
+// ======================================================
 
 document.getElementById("newWorld")
-.addEventListener(
-    "click",
-    ()=>{
+.onclick=()=>{
 
-        const newSeed =
-            Math.floor(
-                Math.random()*2147483647
-            ).toString();
+    const newSeed =
+    Math.floor(
+        Math.random()*2147483647
+    );
 
-        localStorage.setItem(
-            "ghostIslandSeed",
-            newSeed
-        );
+    localStorage.setItem(
+        "GHOST_ISLAND_SEED",
+        newSeed
+    );
 
-        location.reload();
-    }
-);
+    location.reload();
+};
 
 
-// =====================================================
-// SPIELLOOP
-// =====================================================
-
-const clock =
-    new THREE.Clock();
+// ======================================================
+// LOOP
+// ======================================================
 
 function animate(){
 
@@ -738,76 +934,7 @@ function animate(){
         animate
     );
 
-    const dt =
-        Math.min(
-            clock.getDelta(),
-            .05
-        );
-
-    if(controls.isLocked){
-
-        let speed =
-            keys["ShiftLeft"] ||
-            keys["ShiftRight"]
-            ? 420
-            : 250;
-
-
-        if(keys["KeyW"])
-            controls.moveForward(
-                speed*dt
-            );
-
-        if(keys["KeyS"])
-            controls.moveForward(
-                -speed*dt
-            );
-
-        if(keys["KeyA"])
-            controls.moveRight(
-                -speed*dt
-            );
-
-        if(keys["KeyD"])
-            controls.moveRight(
-                speed*dt
-            );
-
-
-        // Schwerkraft
-        velocityY -=
-            850*dt;
-
-        controls.getObject()
-        .position.y +=
-            velocityY*dt;
-
-
-        const p =
-            controls.getObject()
-            .position;
-
-        const ground =
-            height(p.x,p.z)+70;
-
-
-        if(p.y <= ground){
-
-            p.y=ground;
-
-            velocityY=0;
-
-            grounded=true;
-        }
-
-
-        document.getElementById("pos")
-        .textContent =
-            Math.round(p.x) +
-            " / " +
-            Math.round(p.z);
-    }
-
+    update();
 
     renderer.render(
         scene,
@@ -818,25 +945,22 @@ function animate(){
 animate();
 
 
-// =====================================================
+// ======================================================
 // RESIZE
-// =====================================================
+// ======================================================
 
-addEventListener(
-    "resize",
-    ()=>{
+window.onresize=()=>{
 
-        camera.aspect =
-            innerWidth/innerHeight;
+    camera.aspect =
+    innerWidth/innerHeight;
 
-        camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix();
 
-        renderer.setSize(
-            innerWidth,
-            innerHeight
-        );
-    }
-);
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
+};
 
 </script>
 
