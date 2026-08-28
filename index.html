@@ -3,133 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghost Writer</title>
+<title>Der letzte Server</title>
 
 <style>
     * {
         box-sizing: border-box;
     }
 
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f1f3f6;
-        color: #222;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
+    html {
+        scroll-behavior: smooth;
     }
 
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Georgia, "Times New Roman", serif;
+        background:
+            radial-gradient(circle at top, #263246 0%, #10151d 42%, #080b10 100%);
+        color: #e9edf2;
+    }
+
+    /* HEADER */
     header {
-        height: 65px;
-        background: #202124;
-        color: white;
+        height: 72px;
         display: flex;
         align-items: center;
-        padding: 0 22px;
-        gap: 15px;
+        justify-content: space-between;
+        padding: 0 7%;
+        background: rgba(8, 11, 16, 0.82);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .logo {
-        font-size: 22px;
-        font-weight: bold;
+        font-family: Arial, sans-serif;
+        font-weight: 800;
+        letter-spacing: 3px;
+        color: #fff;
     }
 
-    .spacer {
-        flex: 1;
+    .logo span {
+        color: #7dd3fc;
     }
 
-    button {
-        border: none;
-        border-radius: 8px;
-        padding: 11px 17px;
+    nav {
+        font-family: Arial, sans-serif;
+        color: #9ca8b7;
         font-size: 14px;
+    }
+
+    /* STARTSEITE */
+    .home {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px 25px 100px;
+    }
+
+    .intro {
+        text-align: center;
+        margin-bottom: 55px;
+    }
+
+    .intro .small {
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #7dd3fc;
+        margin-bottom: 18px;
+    }
+
+    .intro h1 {
+        margin: 0;
+        font-size: clamp(42px, 7vw, 78px);
+        font-weight: 500;
+        line-height: 1;
+        color: #ffffff;
+        text-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    }
+
+    .intro p {
+        max-width: 650px;
+        margin: 25px auto 0;
+        color: #aeb8c5;
+        font-family: Arial, sans-serif;
+        line-height: 1.7;
+        font-size: 16px;
+    }
+
+    /* STORY CARD */
+    .story-card {
+        max-width: 470px;
+        margin: auto;
         cursor: pointer;
-        font-weight: bold;
+        transition: transform 0.3s ease;
     }
 
-    #download {
-        background: #ffd600;
-        color: #111;
+    .story-card:hover {
+        transform: translateY(-8px);
     }
 
-    #clear {
-        background: #444;
+    .cover {
+        position: relative;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #121923;
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow:
+            0 25px 80px rgba(0,0,0,0.55),
+            0 0 0 1px rgba(125,211,252,0.03);
+    }
+
+    .cover img {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease, filter 0.5s ease;
+    }
+
+    .story-card:hover .cover img {
+        transform: scale(1.035);
+        filter: brightness(1.08);
+    }
+
+    .cover::after {
+        content: "LESEN";
+        position: absolute;
+        inset: auto 20px 20px auto;
+        padding: 10px 15px;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.72);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        font: 700 11px Arial, sans-serif;
+        letter-spacing: 2px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: 0.3s;
+    }
+
+    .story-card:hover .cover::after {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .story-title {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .story-title h2 {
+        margin: 0;
+        font-size: 31px;
+        font-weight: 500;
         color: white;
     }
 
-    main {
-        width: min(1000px, 94%);
-        margin: 25px auto;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
+    .story-title p {
+        margin: 9px 0 0;
+        color: #7f8b99;
+        font-family: Arial, sans-serif;
+        font-size: 13px;
     }
 
-    .toolbar {
-        background: white;
-        padding: 15px;
-        border-radius: 12px 12px 0 0;
-        border-bottom: 1px solid #ddd;
+    /* LESER */
+    #reader {
+        display: none;
+        min-height: 100vh;
+        background:
+            linear-gradient(rgba(9,13,19,0.94), rgba(9,13,19,0.98)),
+            radial-gradient(circle at top, #29384b, transparent 55%);
+    }
+
+    .reader-top {
+        height: 72px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
         display: flex;
         align-items: center;
-        gap: 12px;
+        justify-content: space-between;
+        padding: 0 6%;
+        background: rgba(8,11,16,0.9);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
-    #filename {
-        flex: 1;
-        border: 1px solid #ccc;
-        border-radius: 7px;
-        padding: 10px;
-        font-size: 15px;
+    .back {
+        border: 1px solid rgba(255,255,255,0.13);
+        background: rgba(255,255,255,0.05);
+        color: #dbe4ee;
+        padding: 10px 16px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-family: Arial, sans-serif;
+        transition: 0.2s;
     }
 
-    #editor {
-        width: 100%;
-        flex: 1;
-        min-height: 500px;
-        resize: none;
-        border: none;
-        outline: none;
-        padding: 28px;
-        font-size: 18px;
-        line-height: 1.65;
-        font-family: Georgia, serif;
-        background: white;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    .back:hover {
+        background: rgba(255,255,255,0.1);
     }
 
-    .status {
-        background: white;
-        border-radius: 0 0 12px 12px;
-        padding: 12px 18px;
-        color: #666;
-        font-size: 13px;
-        display: flex;
-        gap: 25px;
+    .chapter-label {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 3px;
+        color: #7dd3fc;
+        text-transform: uppercase;
+    }
+
+    .reading-area {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 75px 25px 120px;
+    }
+
+    .chapter-heading {
+        text-align: center;
+        margin-bottom: 55px;
+    }
+
+    .chapter-heading .eyebrow {
+        font-family: Arial, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-size: 11px;
+        color: #7dd3fc;
+        margin-bottom: 15px;
+    }
+
+    .chapter-heading h2 {
+        font-size: clamp(36px, 6vw, 58px);
+        font-weight: 500;
+        margin: 0;
+        color: #fff;
+    }
+
+    .chapter-heading .line {
+        width: 70px;
+        height: 1px;
+        background: #7dd3fc;
+        margin: 25px auto 0;
+        opacity: 0.7;
+    }
+
+    #storyText {
+        font-size: 20px;
+        line-height: 1.95;
+        color: #d9dee5;
+        white-space: pre-wrap;
+    }
+
+    #storyText::first-letter {
+        font-size: 4.2em;
+        float: left;
+        line-height: 0.8;
+        padding: 10px 12px 0 0;
+        color: #7dd3fc;
+    }
+
+    .reader-footer {
+        text-align: center;
+        margin-top: 90px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        color: #687585;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* FEHLER / DATEIAUSWAHL */
+    .file-box {
+        display: none;
+        margin-top: 35px;
+        padding: 20px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        font-family: Arial, sans-serif;
+    }
+
+    .file-box p {
+        color: #aeb8c5;
+        margin-top: 0;
+    }
+
+    .file-button {
+        display: inline-block;
+        padding: 11px 18px;
+        border-radius: 9px;
+        background: #7dd3fc;
+        color: #071018;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #fileInput {
+        display: none;
     }
 
     @media (max-width: 600px) {
         header {
-            padding: 0 12px;
+            padding: 0 20px;
         }
 
-        .logo {
-            font-size: 18px;
-        }
-
-        #clear {
+        nav {
             display: none;
         }
 
-        main {
-            margin: 10px auto;
-            width: 98%;
+        .home {
+            padding-top: 55px;
         }
 
-        #editor {
-            padding: 18px;
-            font-size: 16px;
+        .reading-area {
+            padding-top: 50px;
+        }
+
+        #storyText {
+            font-size: 18px;
+            line-height: 1.85;
         }
     }
 </style>
@@ -137,121 +335,198 @@
 
 <body>
 
-<header>
-    <div class="logo">👻 Ghost Writer</div>
+<!-- STARTSEITE -->
+<div id="home">
 
-    <div class="spacer"></div>
+    <header>
+        <div class="logo">GHOST<span>BOOK</span></div>
+        <nav>DEINE GESCHICHTEN</nav>
+    </header>
 
-    <button id="clear">Löschen</button>
-    <button id="download">⬇ Text herunterladen</button>
-</header>
+    <main class="home">
 
-<main>
+        <div class="intro">
+            <div class="small">Eine Geschichte</div>
+            <h1>Der letzte Server</h1>
+            <p>
+                Eine vergessene Maschine. Eine alte Verbindung.
+                Und etwas, das niemals hätte wieder online gehen dürfen.
+            </p>
+        </div>
 
-    <div class="toolbar">
-        <input
-            id="filename"
-            type="text"
-            value="mein_text"
-            placeholder="Dateiname"
-        >
+        <div class="story-card" onclick="openStory()">
+
+            <div class="cover">
+                <img src="422.png" alt="Cover von Der letzte Server"
+                     onerror="imageError()">
+            </div>
+
+            <div class="story-title">
+                <h2>Der letzte Server</h2>
+                <p>Kapitel 1 · Zum Lesen klicken</p>
+            </div>
+
+        </div>
+
+        <div class="file-box" id="fileBox">
+            <p>
+                Die Kapiteldatei konnte nicht automatisch geladen werden.
+                Du kannst sie hier auswählen:
+            </p>
+
+            <label class="file-button" for="fileInput">
+                Kapitel 1.txt auswählen
+            </label>
+
+            <input type="file"
+                   id="fileInput"
+                   accept=".txt,text/plain"
+                   onchange="loadSelectedFile(this)">
+        </div>
+
+    </main>
+</div>
+
+
+<!-- LESER -->
+<div id="reader">
+
+    <div class="reader-top">
+        <button class="back" onclick="closeStory()">← Zurück</button>
+
+        <div class="chapter-label">Der letzte Server</div>
+
+        <div style="width:80px;"></div>
     </div>
 
-    <textarea
-        id="editor"
-        placeholder="Schreibe hier deine Geschichte..."
-        spellcheck="true"
-    ></textarea>
+    <main class="reading-area">
 
-    <div class="status">
-        <span id="words">0 Wörter</span>
-        <span id="chars">0 Zeichen</span>
-        <span id="lines">0 Zeilen</span>
-    </div>
+        <div class="chapter-heading">
+            <div class="eyebrow">Kapitel 1</div>
+            <h2>Der Anfang</h2>
+            <div class="line"></div>
+        </div>
 
-</main>
+        <article id="storyText">
+            Kapitel wird geladen...
+        </article>
+
+        <div class="reader-footer">
+            DER LETZTE SERVER · KAPITEL 1
+        </div>
+
+    </main>
+
+</div>
+
 
 <script>
-const editor = document.getElementById("editor");
-const filename = document.getElementById("filename");
 
-const words = document.getElementById("words");
-const chars = document.getElementById("chars");
-const lines = document.getElementById("lines");
+let textLoaded = false;
 
-function updateStats() {
-    const text = editor.value;
 
-    const wordCount = text.trim()
-        ? text.trim().split(/\s+/).length
-        : 0;
+/* Geschichte öffnen */
+function openStory() {
 
-    const charCount = text.length;
+    document.getElementById("home").style.display = "none";
+    document.getElementById("reader").style.display = "block";
 
-    const lineCount = text
-        ? text.split("\n").length
-        : 0;
+    window.scrollTo(0, 0);
 
-    words.textContent = wordCount + " Wörter";
-    chars.textContent = charCount + " Zeichen";
-    lines.textContent = lineCount + " Zeilen";
+    if (!textLoaded) {
+        loadChapter();
+    }
 }
 
-editor.addEventListener("input", updateStats);
 
-document.getElementById("download").addEventListener("click", () => {
+/* Geschichte schließen */
+function closeStory() {
 
-    const text = editor.value;
+    document.getElementById("reader").style.display = "none";
+    document.getElementById("home").style.display = "block";
 
-    if (!text.trim()) {
-        alert("Du hast noch keinen Text geschrieben.");
-        return;
+    window.scrollTo(0, 0);
+}
+
+
+/* Kapitel automatisch laden */
+async function loadChapter() {
+
+    const textElement = document.getElementById("storyText");
+
+    try {
+
+        const response = await fetch("Kapitel 1.txt");
+
+        if (!response.ok) {
+            throw new Error("Datei nicht gefunden");
+        }
+
+        const text = await response.text();
+
+        if (!text.trim()) {
+            textElement.textContent = "Das Kapitel ist leer.";
+            return;
+        }
+
+        textElement.textContent = text;
+        textLoaded = true;
+
+    } catch (error) {
+
+        textElement.textContent =
+            "Kapitel 1.txt konnte nicht automatisch geladen werden.";
+
+        document.getElementById("fileBox").style.display = "block";
     }
+}
 
-    let name = filename.value.trim();
 
-    if (!name) {
-        name = "mein_text";
-    }
+/* Datei manuell auswählen */
+function loadSelectedFile(input) {
 
-    if (!name.toLowerCase().endsWith(".txt")) {
-        name += ".txt";
-    }
+    const file = input.files[0];
 
-    const blob = new Blob(
-        [text],
-        { type: "text/plain;charset=utf-8" }
-    );
+    if (!file) return;
 
-    const url = URL.createObjectURL(blob);
+    const reader = new FileReader();
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = name;
+    reader.onload = function(event) {
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        document.getElementById("storyText").textContent =
+            event.target.result;
 
-    URL.revokeObjectURL(url);
-});
+        textLoaded = true;
 
-document.getElementById("clear").addEventListener("click", () => {
+        document.getElementById("fileBox").style.display = "none";
+    };
 
-    if (editor.value.trim()) {
-        const confirmed = confirm(
-            "Möchtest du wirklich den gesamten Text löschen?"
-        );
+    reader.readAsText(file, "UTF-8");
+}
 
-        if (!confirmed) return;
-    }
 
-    editor.value = "";
-    updateStats();
-    editor.focus();
-});
+/* Bild fehlt */
+function imageError() {
 
-updateStats();
+    const img = document.querySelector(".cover img");
+
+    img.style.display = "none";
+
+    const cover = document.querySelector(".cover");
+
+    cover.style.aspectRatio = "3 / 4";
+
+    cover.style.display = "flex";
+    cover.style.alignItems = "center";
+    cover.style.justifyContent = "center";
+
+    cover.innerHTML =
+        '<div style="color:#7f8b99;font-family:Arial;text-align:center;">' +
+        '422.png wurde nicht gefunden<br><br>' +
+        '<small>Lege das Bild in denselben Ordner wie diese HTML-Datei.</small>' +
+        '</div>';
+}
+
 </script>
 
 </body>
