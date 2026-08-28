@@ -38,7 +38,7 @@ body{
 .login-box{
     width:100%;
     max-width:410px;
-    background:white;
+    background:#fff;
     padding:35px;
     border-radius:28px;
     border:1px solid var(--border);
@@ -95,10 +95,6 @@ body{
     font-size:16px;
     font-weight:750;
     cursor:pointer;
-}
-
-.login-button:hover{
-    background:var(--green-dark);
 }
 
 .login-error{
@@ -197,7 +193,7 @@ body{
     color:var(--muted);
 }
 
-/* NORMAL ACCOUNT */
+/* KONTO */
 
 .account-card{
     background:linear-gradient(135deg,#17231e,#28483a);
@@ -248,7 +244,7 @@ body{
     margin-top:4px;
 }
 
-/* CHART */
+/* DIAGRAMM */
 
 .chart-card,
 .salary-card,
@@ -305,10 +301,6 @@ body{
     transition:.25s;
 }
 
-.bar:hover{
-    transform:translateY(-4px);
-}
-
 .day-name{
     font-size:11px;
     color:var(--muted);
@@ -320,7 +312,11 @@ body{
     color:var(--muted);
 }
 
-/* SALARY */
+/* GEHALT */
+
+.salary-card{
+    text-align:center;
+}
 
 .salary-icon{
     width:65px;
@@ -332,10 +328,6 @@ body{
     justify-content:center;
     font-size:30px;
     margin:5px auto 18px;
-}
-
-.salary-card{
-    text-align:center;
 }
 
 .salary-title{
@@ -352,7 +344,7 @@ body{
     font-size:58px;
     font-weight:850;
     color:var(--green);
-    margin:20px 0 0;
+    margin-top:20px;
 }
 
 .days-label{
@@ -393,7 +385,6 @@ body{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:15px;
 }
 
 .user-info{
@@ -418,15 +409,11 @@ body{
     font-weight:750;
 }
 
-.user-settings{
-    margin-top:20px;
-}
-
 .setting{
     display:flex;
     flex-direction:column;
     gap:7px;
-    margin-bottom:14px;
+    margin-top:15px;
 }
 
 .setting label{
@@ -442,12 +429,7 @@ body{
     padding:0 13px;
     font-size:15px;
     outline:none;
-    background:white;
-}
-
-.setting input:focus,
-.setting select:focus{
-    border-color:var(--green);
+    background:#fff;
 }
 
 .save-button{
@@ -456,13 +438,10 @@ body{
     border:0;
     border-radius:13px;
     background:var(--green);
-    color:white;
+    color:#fff;
     font-weight:750;
     cursor:pointer;
-}
-
-.save-button:hover{
-    background:var(--green-dark);
+    margin-top:15px;
 }
 
 .status{
@@ -532,10 +511,6 @@ body{
         display:none;
     }
 
-    .logout{
-        font-size:12px;
-    }
-
     .app{
         padding:22px 14px 100px;
     }
@@ -563,7 +538,6 @@ body{
 
     .chart{
         height:200px;
-        gap:4px;
     }
 
     .bottom-nav{
@@ -609,7 +583,7 @@ body{
             id="nameInput"
             type="text"
             placeholder="Dein Name"
-            autocomplete="off">
+            autocomplete="name">
 
         <button
             class="login-button"
@@ -657,10 +631,7 @@ body{
 
 <main class="app">
 
-
-<!-- =========================
-     NORMAL HOME
-     ========================= -->
+<!-- HOME -->
 
 <section
     id="homePage"
@@ -739,9 +710,7 @@ body{
 </section>
 
 
-<!-- =========================
-     SALARY PAGE
-     ========================= -->
+<!-- GEHALT -->
 
 <section
     id="salaryPage"
@@ -787,7 +756,7 @@ body{
         <div
             class="salary-date"
             id="salaryDate">
-            Berechnung...
+            Noch 0 Tage bis zum Gehalt
         </div>
 
     </div>
@@ -795,9 +764,7 @@ body{
 </section>
 
 
-<!-- =========================
-     ADMIN PAGE
-     ========================= -->
+<!-- ADMIN -->
 
 <section
     id="adminPage"
@@ -815,7 +782,7 @@ body{
     <div class="users-card">
 
         <div class="chart-title">
-            Angemeldete Benutzer
+            Alle angemeldeten Benutzer
         </div>
 
         <div
@@ -833,77 +800,76 @@ body{
             Benutzer bearbeiten
         </div>
 
-        <div class="user-settings">
 
-            <div class="setting">
+        <div class="setting">
 
-                <label>
-                    Benutzer
-                </label>
+            <label>
+                Benutzer
+            </label>
 
-                <select id="targetUser">
-                </select>
+            <select id="targetUser"></select>
 
-            </div>
+        </div>
 
 
-            <div class="setting">
+        <div class="setting">
 
-                <label>
-                    Zeit bis zum nächsten Gehalt
-                </label>
+            <label>
+                Tage bis zum nächsten Gehalt
+            </label>
 
-                <input
-                    id="adminDays"
-                    type="number"
-                    min="0"
-                    placeholder="0">
+            <input
+                id="adminDays"
+                type="number"
+                min="0"
+                value="0">
 
-            </div>
-
-
-            <div class="setting">
-
-                <label>
-                    Preis pro Ausgabe
-                </label>
-
-                <input
-                    id="adminExpense"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0,00">
-
-            </div>
+        </div>
 
 
-            <div class="setting">
+        <div class="setting">
 
-                <label>
-                    Kontostand
-                </label>
+            <label>
+                Preis pro Ausgabe
+            </label>
 
-                <input
-                    id="adminBalance"
-                    type="number"
-                    step="0.01"
-                    placeholder="0,00">
+            <input
+                id="adminExpense"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0">
 
-            </div>
+        </div>
 
 
-            <button
-                id="saveSettings"
-                class="save-button">
-                Einstellungen speichern
-            </button>
+        <div class="setting">
 
-            <div
-                id="adminStatus"
-                class="status">
-            </div>
+            <label>
+                Kontostand
+            </label>
 
+            <input
+                id="adminBalance"
+                type="number"
+                step="0.01"
+                value="0">
+
+        </div>
+
+
+        <button
+            id="saveSettings"
+            class="save-button">
+
+            Einstellungen speichern
+
+        </button>
+
+
+        <div
+            id="adminStatus"
+            class="status">
         </div>
 
     </div>
@@ -913,18 +879,13 @@ body{
 </main>
 
 
-<!-- NAVIGATION -->
-
 <nav class="bottom-nav">
 
     <button
         class="nav-button active"
         data-page="homePage">
 
-        <span class="nav-icon">
-            ⌂
-        </span>
-
+        <span class="nav-icon">⌂</span>
         Home
 
     </button>
@@ -934,10 +895,7 @@ body{
         class="nav-button"
         data-page="salaryPage">
 
-        <span class="nav-icon">
-            💶
-        </span>
-
+        <span class="nav-icon">💶</span>
         Nächstes Gehalt
 
     </button>
@@ -948,10 +906,7 @@ body{
         class="nav-button admin-nav"
         data-page="adminPage">
 
-        <span class="nav-icon">
-            ⚙
-        </span>
-
+        <span class="nav-icon">⚙</span>
         Verwaltung
 
     </button>
@@ -963,14 +918,102 @@ body{
 
 <script>
 
-/* =========================
-   SERVER
-   ========================= */
+/*
+====================================================
+LOCAL STORAGE
+====================================================
 
-const API = "/api";
+Jeder Benutzer bekommt seinen eigenen Datensatz.
+
+Gespeichert werden:
+
+- Name
+- Kontostand
+- Gehaltstage
+- Ausgabenpreis
+- Ausgaben der letzten 7 Tage
+
+Zusätzlich wird der aktuell angemeldete
+Benutzer gespeichert.
+*/
 
 
+const STORAGE_KEY = "ghostFinanceUsers";
+const CURRENT_USER_KEY = "ghostFinanceCurrentUser";
+
+
+let users = loadUsers();
 let currentUser = null;
+
+
+/* Benutzer aus LocalStorage laden */
+
+function loadUsers(){
+
+    try{
+
+        const saved =
+            localStorage.getItem(
+                STORAGE_KEY
+            );
+
+        if(!saved){
+            return {};
+        }
+
+        return JSON.parse(saved);
+
+    }catch(error){
+
+        console.error(
+            "LocalStorage konnte nicht gelesen werden.",
+            error
+        );
+
+        return {};
+
+    }
+
+}
+
+
+/* Benutzer speichern */
+
+function saveUsers(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(users)
+    );
+
+}
+
+
+/* aktuellen Benutzer speichern */
+
+function saveCurrentUser(){
+
+    if(currentUser){
+
+        localStorage.setItem(
+            CURRENT_USER_KEY,
+            currentUser
+        );
+
+    }
+
+}
+
+
+/* gespeicherten Login laden */
+
+function loadCurrentUser(){
+
+    return localStorage.getItem(
+        CURRENT_USER_KEY
+    );
+
+}
 
 
 /* =========================
@@ -978,36 +1021,54 @@ let currentUser = null;
    ========================= */
 
 const loginScreen =
-    document.getElementById("loginScreen");
+    document.getElementById(
+        "loginScreen"
+    );
 
 const app =
-    document.getElementById("app");
+    document.getElementById(
+        "app"
+    );
 
 const nameInput =
-    document.getElementById("nameInput");
+    document.getElementById(
+        "nameInput"
+    );
 
 const loginButton =
-    document.getElementById("loginButton");
+    document.getElementById(
+        "loginButton"
+    );
 
 const loginError =
-    document.getElementById("loginError");
+    document.getElementById(
+        "loginError"
+    );
 
 
-loginButton.addEventListener("click", login);
+loginButton.addEventListener(
+    "click",
+    login
+);
 
-nameInput.addEventListener("keydown", e => {
 
-    if(e.key === "Enter"){
-        login();
+nameInput.addEventListener(
+    "keydown",
+    event => {
+
+        if(event.key === "Enter"){
+            login();
+        }
+
     }
+);
 
-});
 
-
-async function login(){
+function login(){
 
     const name =
         nameInput.value.trim();
+
 
     if(!name){
 
@@ -1016,56 +1077,50 @@ async function login(){
         );
 
         return;
+
+    }
+
+
+    /*
+        Wenn der Name noch nicht existiert,
+        wird automatisch ein neues Konto
+        im LocalStorage angelegt.
+    */
+
+    if(!users[name]){
+
+        users[name] = {
+
+            name:name,
+
+            balance:0,
+
+            salaryDays:0,
+
+            expensePrice:0,
+
+            expenses:[
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
+
+        };
+
+        saveUsers();
+
     }
 
 
-    try{
+    currentUser = name;
 
-        const response =
-            await fetch(API + "/login",{
+    saveCurrentUser();
 
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-
-                body:JSON.stringify({
-                    name:name
-                })
-
-            });
-
-
-        const data =
-            await response.json();
-
-
-        if(!response.ok){
-
-            showLoginError(
-                data.error ||
-                "Anmeldung fehlgeschlagen."
-            );
-
-            return;
-        }
-
-
-        currentUser =
-            data.user;
-
-
-        openApp();
-
-    }catch(error){
-
-        showLoginError(
-            "Server nicht erreichbar."
-        );
-
-    }
+    openApp();
 
 }
 
@@ -1087,24 +1142,41 @@ function openApp(){
     loginScreen.style.display = "none";
     app.style.display = "block";
 
+
+    const user =
+        users[currentUser];
+
+
     document.getElementById(
         "headerName"
     ).textContent =
-        currentUser.name;
+        user.name;
+
 
     document.getElementById(
         "avatar"
     ).textContent =
-        currentUser.name
+        user.name
         .charAt(0)
         .toUpperCase();
 
 
-    if(currentUser.name === "Haupt"){
+    /*
+        "Haupt" bekommt das
+        Verwaltungsmenü.
+    */
+
+    if(user.name === "Haupt"){
 
         document.getElementById(
             "adminNav"
         ).style.display = "flex";
+
+    }else{
+
+        document.getElementById(
+            "adminNav"
+        ).style.display = "none";
 
     }
 
@@ -1115,40 +1187,44 @@ function openApp(){
 
 
 /* =========================
-   USER DATEN AKTUALISIEREN
+   UI AKTUALISIEREN
    ========================= */
 
 function updateUserInterface(){
 
+    const user =
+        users[currentUser];
+
+
     document.getElementById(
         "balance"
     ).textContent =
-        formatMoney(currentUser.balance);
+        formatMoney(user.balance);
 
 
     document.getElementById(
         "salaryDays"
     ).textContent =
-        currentUser.salaryDays;
+        user.salaryDays;
 
 
     document.getElementById(
         "salaryDate"
     ).textContent =
         "Noch " +
-        currentUser.salaryDays +
+        user.salaryDays +
         " Tage bis zum Gehalt";
 
 
     drawChart(
-        currentUser.expenses || []
+        user.expenses
     );
 
 }
 
 
 /* =========================
-   GELD FORMATIEREN
+   GELD
    ========================= */
 
 function formatMoney(value){
@@ -1172,63 +1248,82 @@ function formatMoney(value){
 function drawChart(expenses){
 
     const chart =
-        document.getElementById("chart");
+        document.getElementById(
+            "chart"
+        );
+
 
     chart.innerHTML = "";
 
 
-    const values = [
-        ...expenses
-    ];
+    let values =
+        Array.isArray(expenses)
+        ? [...expenses]
+        : [];
+
 
     while(values.length < 7){
+
         values.unshift(0);
+
     }
 
-    const lastSeven =
+
+    values =
         values.slice(-7);
 
+
     const max =
-        Math.max(...lastSeven,1);
+        Math.max(...values,1);
 
 
     const today =
         new Date();
 
 
-    const names = [];
+    const dayNames = [];
 
 
     for(let i=6;i>=0;i--){
 
-        const d =
+        const date =
             new Date(today);
 
-        d.setDate(
+        date.setDate(
             today.getDate()-i
         );
 
-        names.push(
-            d.toLocaleDateString(
+
+        dayNames.push(
+            date
+            .toLocaleDateString(
                 "de-DE",
-                {weekday:"short"}
-            ).replace(".","")
+                {
+                    weekday:"short"
+                }
+            )
+            .replace(".","")
         );
 
     }
 
 
-    lastSeven.forEach(
+    values.forEach(
         (value,index)=>{
 
             const day =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
-            day.className = "day";
+            day.className =
+                "day";
 
 
             const amount =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             amount.className =
                 "bar-amount";
@@ -1238,35 +1333,43 @@ function drawChart(expenses){
 
 
             const bar =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
-            bar.className = "bar";
+            bar.className =
+                "bar";
+
 
             const height =
-                value === 0
+                value <= 0
                 ? 3
                 : Math.max(
                     5,
                     (value/max)*150
                 );
 
+
             bar.style.height =
                 height + "px";
 
 
             const label =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             label.className =
                 "day-name";
 
             label.textContent =
-                names[index];
+                dayNames[index];
 
 
             day.appendChild(amount);
             day.appendChild(bar);
             day.appendChild(label);
+
 
             chart.appendChild(day);
 
@@ -1295,17 +1398,23 @@ document
             document
             .querySelectorAll(".nav-button")
             .forEach(b =>
-                b.classList.remove("active")
+                b.classList.remove(
+                    "active"
+                )
             );
 
 
-            button.classList.add("active");
+            button.classList.add(
+                "active"
+            );
 
 
             document
             .querySelectorAll(".page")
             .forEach(page =>
-                page.classList.remove("active")
+                page.classList.remove(
+                    "active"
+                )
             );
 
 
@@ -1315,8 +1424,11 @@ document
 
 
             if(target === "adminPage"){
+
                 loadAdmin();
+
             }
+
 
             window.scrollTo({
                 top:0,
@@ -1333,39 +1445,25 @@ document
    ADMIN
    ========================= */
 
-async function loadAdmin(){
+function loadAdmin(){
 
-    if(currentUser.name !== "Haupt"){
+    if(currentUser !== "Haupt"){
         return;
     }
 
 
-    try{
-
-        const response =
-            await fetch(API + "/users");
-
-        const users =
-            await response.json();
-
-
-        renderUsers(users);
-
-    }catch(error){
-
-        console.error(error);
-
-    }
+    renderUsers();
 
 }
 
 
-function renderUsers(users){
+function renderUsers(){
 
     const list =
         document.getElementById(
             "usersList"
         );
+
 
     const select =
         document.getElementById(
@@ -1377,10 +1475,17 @@ function renderUsers(users){
     select.innerHTML = "";
 
 
-    users.forEach(user => {
+    Object.keys(users)
+    .forEach(name => {
+
+        const user =
+            users[name];
+
 
         const card =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
         card.className =
             "user-card";
@@ -1392,7 +1497,7 @@ function renderUsers(users){
 
                 <div class="user-avatar">
                     ${escapeHTML(
-                        user.name
+                        name
                         .charAt(0)
                         .toUpperCase()
                     )}
@@ -1401,7 +1506,7 @@ function renderUsers(users){
                 <div>
 
                     <strong>
-                        ${escapeHTML(user.name)}
+                        ${escapeHTML(name)}
                     </strong>
 
                     <div style="
@@ -1420,7 +1525,9 @@ function renderUsers(users){
             </div>
 
             <div class="user-balance">
-                ${formatMoney(user.balance)}
+                ${formatMoney(
+                    user.balance
+                )}
             </div>
 
         `;
@@ -1430,23 +1537,16 @@ function renderUsers(users){
 
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value =
-            user.name;
-
-        option.textContent =
-            user.name;
+        option.value = name;
+        option.textContent = name;
 
         select.appendChild(option);
 
     });
-
-
-    select.addEventListener(
-        "change",
-        loadSelectedUser
-    );
 
 
     loadSelectedUser();
@@ -1454,55 +1554,47 @@ function renderUsers(users){
 }
 
 
-async function loadSelectedUser(){
+document
+.getElementById("targetUser")
+.addEventListener(
+    "change",
+    loadSelectedUser
+);
 
-    const target =
+
+function loadSelectedUser(){
+
+    const name =
         document.getElementById(
             "targetUser"
         ).value;
 
 
-    if(!target){
+    if(!name || !users[name]){
         return;
     }
 
 
-    try{
-
-        const response =
-            await fetch(
-                API +
-                "/users/" +
-                encodeURIComponent(target)
-            );
+    const user =
+        users[name];
 
 
-        const user =
-            await response.json();
+    document.getElementById(
+        "adminDays"
+    ).value =
+        user.salaryDays;
 
 
-        document.getElementById(
-            "adminDays"
-        ).value =
-            user.salaryDays;
+    document.getElementById(
+        "adminExpense"
+    ).value =
+        user.expensePrice;
 
 
-        document.getElementById(
-            "adminExpense"
-        ).value =
-            user.expensePrice;
-
-
-        document.getElementById(
-            "adminBalance"
-        ).value =
-            user.balance;
-
-    }catch(error){
-
-        console.error(error);
-
-    }
+    document.getElementById(
+        "adminBalance"
+    ).value =
+        user.balance;
 
 }
 
@@ -1519,12 +1611,22 @@ document
 );
 
 
-async function saveAdminSettings(){
+function saveAdminSettings(){
+
+    if(currentUser !== "Haupt"){
+        return;
+    }
+
 
     const target =
         document.getElementById(
             "targetUser"
         ).value;
+
+
+    if(!target || !users[target]){
+        return;
+    }
 
 
     const days =
@@ -1535,7 +1637,7 @@ async function saveAdminSettings(){
         );
 
 
-    const price =
+    const expense =
         Number(
             document.getElementById(
                 "adminExpense"
@@ -1551,112 +1653,53 @@ async function saveAdminSettings(){
         );
 
 
-    if(!target){
-        return;
-    }
-
-
-    try{
-
-        await apiPost(
-            "/admin/salary-days",
-            {
-                name:"Haupt",
-                target:target,
-                days:days
-            }
+    users[target].salaryDays =
+        Math.max(
+            0,
+            Math.floor(
+                Number.isFinite(days)
+                ? days
+                : 0
+            )
         );
 
 
-        await apiPost(
-            "/admin/expense-price",
-            {
-                name:"Haupt",
-                target:target,
-                price:price
-            }
+    users[target].expensePrice =
+        Math.max(
+            0,
+            Number.isFinite(expense)
+            ? Number(expense.toFixed(2))
+            : 0
         );
 
 
-        await apiPost(
-            "/admin/balance",
-            {
-                name:"Haupt",
-                target:target,
-                balance:balance
-            }
-        );
+    users[target].balance =
+        Number.isFinite(balance)
+        ? Number(balance.toFixed(2))
+        : 0;
 
 
-        showAdminStatus(
-            "Einstellungen gespeichert."
-        );
+    saveUsers();
 
 
-        loadAdmin();
+    renderUsers();
 
 
-        if(
-            currentUser.name === target
-        ){
+    /*
+        Falls Haupt sich selbst bearbeitet,
+        wird die Oberfläche direkt aktualisiert.
+    */
 
-            const response =
-                await fetch(
-                    API +
-                    "/users/" +
-                    encodeURIComponent(
-                        target
-                    )
-                );
+    if(target === currentUser){
 
-            currentUser =
-                await response.json();
-
-            updateUserInterface();
-
-        }
-
-    }catch(error){
-
-        showAdminStatus(
-            "Fehler beim Speichern."
-        );
-
-    }
-
-}
-
-
-async function apiPost(url,data){
-
-    const response =
-        await fetch(
-            API + url,
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":
-                    "application/json"
-                },
-                body:JSON.stringify(data)
-            }
-        );
-
-
-    if(!response.ok){
-
-        const error =
-            await response.json();
-
-        throw new Error(
-            error.error ||
-            "Fehler"
-        );
+        updateUserInterface();
 
     }
 
 
-    return response.json();
+    showAdminStatus(
+        "Einstellungen gespeichert."
+    );
 
 }
 
@@ -1668,13 +1711,17 @@ function showAdminStatus(text){
             "adminStatus"
         );
 
+
     status.textContent = text;
     status.style.display = "block";
 
 
-    setTimeout(()=>{
-        status.style.display = "none";
-    },3000);
+    setTimeout(
+        ()=>{
+            status.style.display = "none";
+        },
+        3000
+    );
 
 }
 
@@ -1691,14 +1738,27 @@ document
 
         currentUser = null;
 
+        localStorage.removeItem(
+            CURRENT_USER_KEY
+        );
+
+
         app.style.display = "none";
-        loginScreen.style.display = "flex";
+
+        loginScreen.style.display =
+            "flex";
+
 
         nameInput.value = "";
-        loginError.style.display = "none";
+
+        loginError.style.display =
+            "none";
+
 
         document
-        .getElementById("adminNav")
+        .getElementById(
+            "adminNav"
+        )
         .style.display = "none";
 
     }
@@ -1706,7 +1766,7 @@ document
 
 
 /* =========================
-   SICHERHEIT
+   HTML SICHERN
    ========================= */
 
 function escapeHTML(text){
@@ -1717,6 +1777,27 @@ function escapeHTML(text){
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================
+   AUTOMATISCH EINLOGGEN
+   ========================= */
+
+const savedUser =
+    loadCurrentUser();
+
+
+if(
+    savedUser &&
+    users[savedUser]
+){
+
+    currentUser =
+        savedUser;
+
+    openApp();
 
 }
 
