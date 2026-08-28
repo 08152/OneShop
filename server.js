@@ -5,16 +5,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
 /*
-    DEMO-DATEN
+    Alle Dateien liegen im selben Ordner:
 
-    Für eine echte Produktionsversion sollte hier
-    eine Datenbank wie PostgreSQL verwendet werden.
+    index.html
+    server.js
+    package.json
 */
 
+app.use(express.static(__dirname));
+
+
+/* BENUTZER */
+
 const users = new Map();
+
+
+/* Standard-Benutzer */
 
 users.set("Haupt", {
     name: "Haupt",
@@ -29,7 +37,9 @@ users.set("Haupt", {
 
 app.post("/api/login", (req, res) => {
 
-    const name = String(req.body.name || "").trim();
+    const name = String(
+        req.body.name || ""
+    ).trim();
 
     if (!name) {
         return res.status(400).json({
@@ -39,213 +49,256 @@ app.post("/api/login", (req, res) => {
     }
 
     if (!users.has(name)) {
+
         users.set(name, {
-            name,
+            name: name,
             balance: 0,
             salaryDays: 0,
             expensePrice: 0,
-            expenses: [0, 0, 0, 0, 0, 0, 0]
+            expenses: [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ]
         });
-    }
 
-    const user = users.get(name);
+    }
 
     res.json({
         success: true,
-        user
+        user: users.get(name)
     });
+
 });
 
 
-/* ALLE ANGEMELDETEN */
+/* ALLE BENUTZER */
 
 app.get("/api/users", (req, res) => {
 
-    const list = [...users.values()].map(user => ({
-        name: user.name,
-        balance: user.balance,
-        salaryDays: user.salaryDays,
-        expensePrice: user.expensePrice,
-        expenses: user.expenses
-    }));
+    res.json(
+        [...users.values()]
+    );
 
-    res.json(list);
 });
 
 
-/* BENUTZER ABRUFEN */
+/* EINEN BENUTZER */
 
 app.get("/api/users/:name", (req, res) => {
 
-    const user = users.get(req.params.name);
+    const user =
+        users.get(req.params.name);
 
     if (!user) {
+
         return res.status(404).json({
             error: "Benutzer nicht gefunden."
         });
+
     }
 
     res.json(user);
+
 });
 
 
-/*
-    HAUPT:
-    Gehalts-Tage einstellen
-*/
+/* GEHALTSTAGE ÄNDERN */
 
 app.post("/api/admin/salary-days", (req, res) => {
 
-    const { name, days } = req.body;
+    if (req.body.name !== "Haupt") {
 
-    if (name !== "Haupt") {
         return res.status(403).json({
             error: "Keine Berechtigung."
         });
+
     }
 
-    const target = users.get(req.body.target);
+    const target =
+        users.get(req.body.target);
 
     if (!target) {
+
         return res.status(404).json({
             error: "Benutzer nicht gefunden."
         });
+
     }
 
-    const value = Number(days);
+    const days =
+        Number(req.body.days);
 
-    if (!Number.isFinite(value) || value < 0) {
+    if (!Number.isFinite(days) || days < 0) {
+
         return res.status(400).json({
             error: "Ungültige Anzahl."
         });
+
     }
 
-    target.salaryDays = Math.floor(value);
+    target.salaryDays =
+        Math.floor(days);
 
     res.json({
         success: true,
         user: target
     });
+
 });
 
 
-/*
-    HAUPT:
-    Preis für Ausgaben einstellen
-*/
+/* AUSGABENPREIS ÄNDERN */
 
 app.post("/api/admin/expense-price", (req, res) => {
 
-    const { name, price } = req.body;
+    if (req.body.name !== "Haupt") {
 
-    if (name !== "Haupt") {
         return res.status(403).json({
             error: "Keine Berechtigung."
         });
+
     }
 
-    const target = users.get(req.body.target);
+    const target =
+        users.get(req.body.target);
 
     if (!target) {
+
         return res.status(404).json({
             error: "Benutzer nicht gefunden."
         });
+
     }
 
-    const value = Number(price);
+    const price =
+        Number(req.body.price);
 
-    if (!Number.isFinite(value) || value < 0) {
+    if (!Number.isFinite(price) || price < 0) {
+
         return res.status(400).json({
             error: "Ungültiger Preis."
         });
+
     }
 
-    target.expensePrice = Number(value.toFixed(2));
+    target.expensePrice =
+        Number(price.toFixed(2));
 
     res.json({
         success: true,
         user: target
     });
+
 });
 
 
-/*
-    AUSGABE FÜR BENUTZER EINTRAGEN
-
-    Der Preis wird dabei automatisch
-    vom Hauptkonto festgelegt.
-*/
-
-app.post("/api/users/:name/expense", (req, res) => {
-
-    const user = users.get(req.params.name);
-
-    if (!user) {
-        return res.status(404).json({
-            error: "Benutzer nicht gefunden."
-        });
-    }
-
-    const price = user.expensePrice;
-
-    user.balance -= price;
-
-    user.expenses.shift();
-    user.expenses.push(price);
-
-    res.json({
-        success: true,
-        user
-    });
-});
-
-
-/*
-    KONTOSTAND SETZEN
-*/
+/* KONTOSTAND ÄNDERN */
 
 app.post("/api/admin/balance", (req, res) => {
 
     if (req.body.name !== "Haupt") {
+
         return res.status(403).json({
             error: "Keine Berechtigung."
         });
+
     }
 
-    const target = users.get(req.body.target);
+    const target =
+        users.get(req.body.target);
 
     if (!target) {
+
         return res.status(404).json({
             error: "Benutzer nicht gefunden."
         });
+
     }
 
-    const balance = Number(req.body.balance);
+    const balance =
+        Number(req.body.balance);
 
     if (!Number.isFinite(balance)) {
+
         return res.status(400).json({
             error: "Ungültiger Kontostand."
         });
+
     }
 
-    target.balance = Number(balance.toFixed(2));
+    target.balance =
+        Number(balance.toFixed(2));
 
     res.json({
         success: true,
         user: target
     });
+
+});
+
+
+/* AUSGABE */
+
+app.post("/api/users/:name/expense", (req, res) => {
+
+    const user =
+        users.get(req.params.name);
+
+    if (!user) {
+
+        return res.status(404).json({
+            error: "Benutzer nicht gefunden."
+        });
+
+    }
+
+    const price =
+        Number(user.expensePrice || 0);
+
+    user.balance -= price;
+
+    user.expenses.shift();
+
+    user.expenses.push(price);
+
+    res.json({
+        success: true,
+        user: user
+    });
+
 });
 
 
 /*
-    FALLBACK
+    FALLBACK FÜR INDEX.HTML
+
+    Express 5:
+    NICHT app.get("*") verwenden.
 */
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+app.use((req, res) => {
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            "index.html"
+        )
+    );
+
 });
 
 
+/* SERVER STARTEN */
+
 app.listen(PORT, () => {
-    console.log(`GHOST Finance läuft auf Port ${PORT}`);
+
+    console.log(
+        `GHOST Finance läuft auf Port ${PORT}`
+    );
+
 });
