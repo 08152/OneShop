@@ -3,15 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GHOST Island 3D Sculptor</title>
+<title>GHOST Island 3D Terrain Editor</title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 html,body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#79caff;
+    background:#86cfff;
     font-family:Arial,sans-serif;
 }
 
@@ -19,83 +23,106 @@ canvas{
     display:block;
 }
 
-#ui{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-}
-
 #topbar{
     position:absolute;
-    top:12px;
-    left:12px;
-    right:12px;
+    top:10px;
+    left:10px;
+    right:10px;
     height:58px;
+    z-index:20;
+
     display:flex;
     align-items:center;
-    gap:8px;
-    padding:0 12px;
-    background:rgba(20,25,30,.94);
+    gap:7px;
+
+    padding:7px 10px;
+
+    background:rgba(20,24,29,.96);
     color:white;
+
     border-radius:12px;
-    pointer-events:auto;
     box-shadow:0 5px 25px #0008;
+
+    overflow-x:auto;
 }
 
 #logo{
-    font-size:20px;
+    font-size:19px;
     font-weight:bold;
-    margin-right:15px;
+    white-space:nowrap;
+    margin-right:10px;
 }
 
 button{
     border:0;
     border-radius:8px;
-    padding:10px 13px;
-    background:#303943;
+    padding:9px 12px;
+
+    background:#35404a;
     color:white;
+
     font-weight:bold;
     cursor:pointer;
+    white-space:nowrap;
 }
 
 button:hover{
-    background:#45515d;
+    background:#4b5864;
 }
 
 button.active{
-    background:#e3ad29;
+    background:#e0a927;
     color:#111;
 }
 
 #newMap{
-    background:#38a955;
+    background:#35a953;
 }
 
 #save{
-    background:#287fd0;
+    background:#287fd1;
 }
 
 #load{
-    background:#704bd1;
+    background:#704bd0;
 }
 
-#side{
+#textureMode{
+    background:#9a5fd1;
+}
+
+#panel{
     position:absolute;
-    top:84px;
-    right:12px;
-    width:245px;
-    padding:16px;
-    background:rgba(20,25,30,.94);
+    top:80px;
+    right:10px;
+    bottom:10px;
+
+    width:270px;
+
+    z-index:20;
+
+    background:rgba(20,24,29,.96);
     color:white;
+
     border-radius:12px;
-    pointer-events:auto;
+
+    padding:16px;
+
+    overflow-y:auto;
+
     box-shadow:0 5px 25px #0008;
+}
+
+.section{
+    border-top:1px solid #424a52;
+    padding-top:14px;
+    margin-top:14px;
 }
 
 .title{
     font-size:18px;
     font-weight:bold;
-    margin-bottom:14px;
+    margin-bottom:12px;
 }
 
 .tool{
@@ -105,7 +132,8 @@ button.active{
 
 label{
     display:block;
-    margin-top:15px;
+    margin-top:12px;
+    margin-bottom:5px;
     color:#ccc;
     font-size:13px;
 }
@@ -114,44 +142,72 @@ input[type=range]{
     width:100%;
 }
 
+input[type=color]{
+    width:100%;
+    height:45px;
+    border:0;
+    padding:2px;
+    background:#111;
+    cursor:pointer;
+}
+
 .value{
     float:right;
     color:white;
 }
 
-.info{
-    margin-top:16px;
-    padding:10px;
+#colorPreview{
+    height:45px;
     border-radius:8px;
-    background:#111820;
-    color:#aeb8c2;
+    margin-top:8px;
+    border:1px solid #555;
+}
+
+.info{
+    color:#aaa;
     font-size:12px;
-    line-height:1.6;
+    line-height:1.55;
 }
 
 #status{
     position:absolute;
-    left:15px;
     bottom:15px;
-    padding:10px 15px;
-    background:rgba(0,0,0,.65);
+    left:15px;
+    z-index:30;
+
+    background:#000b;
     color:white;
+
+    padding:10px 14px;
+
     border-radius:8px;
 }
 
 #brush{
     position:absolute;
-    width:50px;
-    height:50px;
+
+    width:80px;
+    height:80px;
+
     border:2px solid white;
     border-radius:50%;
-    pointer-events:none;
-    display:none;
+
     transform:translate(-50%,-50%);
+
+    pointer-events:none;
+
+    display:none;
+
     z-index:50;
+
+    box-shadow:0 0 5px #000;
 }
 
 #file{
+    display:none;
+}
+
+#textureCanvas{
     display:none;
 }
 </style>
@@ -159,64 +215,105 @@ input[type=range]{
 
 <body>
 
-<div id="ui">
-
 <div id="topbar">
 
 <div id="logo">
-🌴 GHOST ISLAND 3D
+GHOST 3D ISLAND
 </div>
 
 <button id="newMap">
 Neue Insel
 </button>
 
-<button id="sculpt" class="active">
-Sculpt
+<button id="terrainMode" class="active">
+Terrain
 </button>
 
-<button id="lower">
-Absenken
-</button>
-
-<button id="smooth">
-Glätten
+<button id="textureMode">
+Textur malen
 </button>
 
 <button id="save">
-⬇ Speichern
+Map speichern
 </button>
 
 <button id="load">
-⬆ Laden
+Map laden
 </button>
 
-<input id="file" type="file" accept=".json">
+<input
+id="file"
+type="file"
+accept=".json"
+>
 
 </div>
 
 
-<div id="side">
+<div id="panel">
 
 <div class="title">
-Terrain-Werkzeuge
+Werkzeuge
 </div>
 
-<button id="raiseTool" class="tool active">
-⛰ Gelände erhöhen
+<button
+id="raise"
+class="tool active">
+⛰ Erhöhen
 </button>
 
-<button id="lowerTool" class="tool">
-🕳 Gelände absenken
+<button
+id="lower"
+class="tool">
+🕳 Absenken
 </button>
 
-<button id="smoothTool" class="tool">
-🧽 Gelände glätten
+<button
+id="smooth"
+class="tool">
+🧽 Glätten
+</button>
+
+
+<div class="section">
+
+<div class="title">
+Textur malen
+</div>
+
+<button
+id="paint"
+class="tool">
+🖌 Farbe malen
+</button>
+
+<button
+id="erasePaint"
+class="tool">
+🧹 Farbe löschen
 </button>
 
 <label>
+Farbe auswählen
+</label>
+
+<input
+id="color"
+type="color"
+value="#4ca34f"
+>
+
+<div
+id="colorPreview">
+</div>
+
+<label>
 Pinselgröße
-<span class="value" id="sizeText">12</span>
+<span
+class="value"
+id="sizeValue">
+12
+</span>
 </label>
 
 <input
@@ -229,45 +326,66 @@ value="12"
 
 <label>
 Stärke
-<span class="value" id="strengthText">0.5</span>
+<span
+class="value"
+id="strengthValue">
+0.5
+</span>
 </label>
 
 <input
 id="strength"
 type="range"
-min="0.05"
+min=".05"
 max="2"
-step="0.05"
-value="0.5"
+step=".05"
+value=".5"
 >
 
-<div class="info">
+</div>
 
-<b>3D-Steuerung</b><br><br>
 
-Linke Maustaste:
-Terrain bearbeiten<br><br>
+<div class="section">
 
-Rechte Maustaste:
-Kamera drehen<br><br>
+<div class="title">
+Kamera
+</div>
 
-Mausrad:
-Zoom<br><br>
+<button
+id="resetCamera"
+class="tool">
+🎥 Kamera zurücksetzen
+</button>
 
-Shift + Mausrad:
-schneller Zoom
+<button
+id="topCamera"
+class="tool">
+⬇ Draufsicht
+</button>
 
+<button
+id="islandCamera"
+class="tool">
+🏝 Insel anzeigen
+</button>
+
+</div>
+
+
+<div class="section">
+
+<div class="title">
+Information
 </div>
 
 <div class="info">
 
-<b>Welt</b><br>
-
 12.000 × 12.000 Meter<br>
-große zufällige Insel<br>
-Berge und Täler<br>
-Strände<br>
-Wasser
+3D-Terrain ohne Standardtextur<br>
+eigene Farben direkt auf die Insel malen<br>
+Terrain und Farben werden gespeichert.
+
+</div>
 
 </div>
 
@@ -275,79 +393,82 @@ Wasser
 
 
 <div id="status">
-Sculpt: Gelände erhöhen
+Terrain-Modus
 </div>
 
 <div id="brush"></div>
 
-</div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 
-const SIZE = 161;
+/* =========================================================
+   GHOST 3D ISLAND EDITOR
+========================================================= */
+
+const GRID = 129;
 
 const WORLD_SIZE = 12000;
 
 const SEA_LEVEL = 0;
 
+let seed =
+Math.floor(Math.random()*99999999);
+
 let heights =
 new Float32Array(
-SIZE * SIZE
+GRID*GRID
 );
 
-let seed =
-Math.floor(
-Math.random()*2147483647
-);
 
-let terrain;
-
-let geometry;
-
-let material;
-
-let water;
-
-let tool = "raise";
-
-let brushSize = 12;
-
-let strength = .5;
-
-let mouseDown = false;
-
-let mouseX = 0;
-
-let mouseY = 0;
+/*
+    Für jeden Terrainpunkt wird eine eigene
+    Farbe gespeichert.
+*/
+let paintColors =
+new Array(GRID*GRID);
 
 
-/* =========================
-   SCENE
-========================= */
+/* =========================================================
+   STANDARD FARBE
+========================================================= */
+
+for(
+    let i=0;
+    i<paintColors.length;
+    i++
+){
+
+    paintColors[i] =
+    {
+        r:0.29,
+        g:0.64,
+        b:0.31
+    };
+
+}
+
+
+/* =========================================================
+   THREE
+========================================================= */
 
 const scene =
 new THREE.Scene();
 
 scene.background =
 new THREE.Color(
-0x79caff
+0x86cfff
 );
 
 scene.fog =
 new THREE.Fog(
-0x79caff,
+0x86cfff,
 4500,
-12000
+13000
 );
 
-
-/* =========================
-   CAMERA
-========================= */
 
 const camera =
 new THREE.PerspectiveCamera(
@@ -357,174 +478,262 @@ innerWidth/innerHeight,
 30000
 );
 
-camera.position.set(
-4200,
-3600,
-4200
-);
-
-
-/* =========================
-   RENDERER
-========================= */
 
 const renderer =
 new THREE.WebGLRenderer({
     antialias:true
 });
 
+renderer.setPixelRatio(
+Math.min(
+devicePixelRatio,
+1.5
+)
+);
+
 renderer.setSize(
 innerWidth,
 innerHeight
 );
 
-renderer.setPixelRatio(
-Math.min(devicePixelRatio,1.5)
-);
-
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled=true;
 
 document.body.appendChild(
 renderer.domElement
 );
 
 
-/* =========================
-   ORBIT CAMERA
-========================= */
+/* =========================================================
+   CAMERA
+========================================================= */
 
-const controls =
-new THREE.OrbitControls(
-camera,
-renderer.domElement
+let yaw=.65;
+
+let pitch=.62;
+
+let distance=6500;
+
+let rotating=false;
+
+let lastX=0;
+
+let lastY=0;
+
+
+function updateCamera(){
+
+const x =
+Math.sin(yaw)*
+Math.cos(pitch)*
+distance;
+
+const y =
+Math.sin(pitch)*
+distance;
+
+const z =
+Math.cos(yaw)*
+Math.cos(pitch)*
+distance;
+
+camera.position.set(
+x,
+y,
+z
 );
 
-controls.target.set(
+camera.lookAt(
 0,
 100,
 0
 );
 
-controls.enableDamping = true;
+}
 
-controls.dampingFactor = .08;
-
-controls.maxDistance = 11000;
-
-controls.minDistance = 150;
-
-controls.maxPolarAngle =
-Math.PI*.48;
+updateCamera();
 
 
-/* =========================
-   LIGHT
-========================= */
+renderer.domElement.addEventListener(
+"contextmenu",
+e=>e.preventDefault()
+);
+
+
+renderer.domElement.addEventListener(
+"pointerdown",
+e=>{
+
+if(e.button===2){
+
+rotating=true;
+
+lastX=e.clientX;
+lastY=e.clientY;
+
+}
+
+});
+
+
+renderer.domElement.addEventListener(
+"pointerup",
+e=>{
+
+if(e.button===2)
+rotating=false;
+
+});
+
+
+renderer.domElement.addEventListener(
+"pointermove",
+e=>{
+
+if(!rotating)
+return;
+
+yaw -=
+(e.clientX-lastX)*.005;
+
+pitch +=
+(e.clientY-lastY)*.005;
+
+pitch =
+Math.max(
+.12,
+Math.min(
+1.48,
+pitch
+)
+);
+
+lastX=e.clientX;
+lastY=e.clientY;
+
+updateCamera();
+
+});
+
+
+renderer.domElement.addEventListener(
+"wheel",
+e=>{
+
+distance +=
+e.deltaY*5;
+
+distance =
+Math.max(
+400,
+Math.min(
+14000,
+distance
+)
+);
+
+updateCamera();
+
+});
+
+
+/* =========================================================
+   LICHT
+========================================================= */
 
 scene.add(
 new THREE.HemisphereLight(
-0xc9edff,
-0x35552d,
-1.8
+0xffffff,
+0x30452d,
+2
 )
 );
+
 
 const sun =
 new THREE.DirectionalLight(
 0xffffff,
-2.2
+2
 );
 
 sun.position.set(
-3000,
-5000,
-2000
+3500,
+6500,
+2500
 );
 
-sun.castShadow = true;
+sun.castShadow=true;
 
 scene.add(sun);
 
 
-/* =========================
+/* =========================================================
+   TERRAIN
+========================================================= */
+
+let terrain;
+
+let terrainGeometry;
+
+let terrainMaterial;
+
+
+/* =========================================================
    RANDOM
-========================= */
+========================================================= */
 
 function hash(x,z){
 
-let n =
+const value =
 Math.sin(
 x*127.1+
 z*311.7+
-seed*0.001
+seed*.013
 )*43758.5453;
 
-return n-
-Math.floor(n);
+return value -
+Math.floor(value);
 
 }
 
 
-/* =========================
-   SMOOTH NOISE
-========================= */
-
 function noise(x,z){
 
-const x0 =
-Math.floor(x);
+const x0=Math.floor(x);
 
-const z0 =
-Math.floor(z);
+const z0=Math.floor(z);
 
-const x1 =
-x0+1;
+const x1=x0+1;
 
-const z1 =
-z0+1;
+const z1=z0+1;
 
-const tx =
-x-x0;
+const tx=x-x0;
 
-const tz =
-z-z0;
+const tz=z-z0;
 
-const sx =
-tx*tx*(3-2*tx);
+const sx=tx*tx*(3-2*tx);
 
-const sz =
-tz*tz*(3-2*tz);
+const sz=tz*tz*(3-2*tz);
 
-const a =
-hash(x0,z0);
+const a=hash(x0,z0);
 
-const b =
-hash(x1,z0);
+const b=hash(x1,z0);
 
-const c =
-hash(x0,z1);
+const c=hash(x0,z1);
 
-const d =
-hash(x1,z1);
+const d=hash(x1,z1);
 
-const ab =
-a+(b-a)*sx;
+const ab=a+(b-a)*sx;
 
-const cd =
-c+(d-c)*sx;
+const cd=c+(d-c)*sx;
 
 return ab+(cd-ab)*sz;
 
 }
 
 
-/* =========================
-   FRACTAL NOISE
-========================= */
+function fbm(x,z){
 
-function terrainNoise(x,z){
-
-let value=0;
+let result=0;
 
 let amp=1;
 
@@ -532,9 +741,13 @@ let freq=1;
 
 let total=0;
 
-for(let i=0;i<5;i++){
+for(
+    let i=0;
+    i<5;
+    i++
+){
 
-value +=
+result +=
 noise(
 x*freq,
 z*freq
@@ -548,31 +761,40 @@ freq *= 2;
 
 }
 
-return value/total;
+return result/total;
 
 }
 
 
-/* =========================
-   ISLAND GENERATION
-========================= */
+/* =========================================================
+   NEUE INSEL
+========================================================= */
 
 function generateIsland(){
 
 seed =
 Math.floor(
-Math.random()*2147483647
+Math.random()*99999999
 );
 
-for(let z=0;z<SIZE;z++){
+for(
+    let z=0;
+    z<GRID;
+    z++
+){
 
-for(let x=0;x<SIZE;x++){
+for(
+    let x=0;
+    x<GRID;
+    x++
+){
 
 const nx =
-x/(SIZE-1)*2-1;
+x/(GRID-1)*2-1;
 
 const nz =
-z/(SIZE-1)*2-1;
+z/(GRID-1)*2-1;
+
 
 const distance =
 Math.sqrt(
@@ -580,9 +802,9 @@ nx*nx+nz*nz
 );
 
 
-/* Inselform */
+/* Insel */
 
-let island =
+let mask =
 1-
 Math.pow(
 distance,
@@ -590,113 +812,96 @@ distance,
 );
 
 
-/* unregelmäßige Küste */
+/* Küstenvariation */
 
-const coast =
-terrainNoise(
-nx*3+30,
-nz*3+30
-);
-
-island *=
-.80+
-coast*.38;
+mask *=
+.78+
+fbm(
+nx*3+50,
+nz*3+50
+)*.42;
 
 
-/* große Landschaft */
+/* Gelände */
 
-const large =
-terrainNoise(
-nx*2.3+100,
-nz*2.3+100
-);
+let h =
+fbm(
+nx*2.2+100,
+nz*2.2+100
+)*850;
 
-const medium =
-terrainNoise(
-nx*6+200,
-nz*6+200
-);
+h +=
+fbm(
+nx*7+200,
+nz*7+200
+)*260;
 
-const small =
-terrainNoise(
-nx*15+300,
-nz*15+300
-);
-
-
-let height =
-
-large*700+
-medium*300+
-small*80;
+h +=
+fbm(
+nx*16+300,
+nz*16+300
+)*70;
 
 
 /* Berge */
 
-const mountainA =
+h +=
 Math.exp(
 -(
-Math.pow(nx-.30,2)+
-Math.pow(nz+.22,2)
+Math.pow(nx-.3,2)+
+Math.pow(nz+.2,2)
 )*8
-);
+)*1100;
 
-const mountainB =
+h +=
 Math.exp(
 -(
-Math.pow(nx+.35,2)+
-Math.pow(nz-.20,2)
-)*10
-);
-
-const mountainC =
-Math.exp(
--(
-Math.pow(nx-.05,2)+
-Math.pow(nz+.42,2)
-)*14
-);
-
-
-height +=
-mountainA*1000;
-
-height +=
-mountainB*750;
-
-height +=
-mountainC*500;
+Math.pow(nx+.36,2)+
+Math.pow(nz-.22,2)
+)*11
+)*850;
 
 
 /* Inselrand */
 
-height *=
+h *=
 Math.max(
 0,
-island
+mask
 );
 
 
 /* Strand */
 
-height -= 35;
+h -= 35;
 
 
-/* äußerer Rand */
+/* außerhalb */
 
-if(distance > .92){
+if(
+distance>.97
+){
 
-height =
--80+
-(distance-.92)*-300;
+h=-100;
 
 }
 
 
 heights[
-z*SIZE+x
-] =
-height;
+z*GRID+x
+]=h;
+
+
+/*
+    Bei neuer Insel zunächst
+    keine aufgemalten Farben.
+    Die Farbe wird später abhängig
+    von der Höhe angezeigt.
+*/
+
+paintColors[
+z*GRID+x
+]=null;
 
 }
 
@@ -707,9 +912,9 @@ buildTerrain();
 }
 
 
-/* =========================
-   TERRAIN BUILD
-========================= */
+/* =========================================================
+   TERRAIN BAUEN
+========================================================= */
 
 function buildTerrain(){
 
@@ -717,37 +922,36 @@ if(terrain){
 
 scene.remove(terrain);
 
-geometry.dispose();
+terrainGeometry.dispose();
 
-material.dispose();
+terrainMaterial.dispose();
 
 }
 
 
-geometry =
+terrainGeometry =
 new THREE.PlaneGeometry(
 WORLD_SIZE,
 WORLD_SIZE,
-SIZE-1,
-SIZE-1
+GRID-1,
+GRID-1
 );
 
-geometry.rotateX(
+terrainGeometry.rotateX(
 -Math.PI/2
 );
 
 
 const pos =
-geometry.attributes.position;
+terrainGeometry.attributes.position;
 
-const colors =
-[];
+const colors=[];
 
 
 for(
-let i=0;
-i<pos.count;
-i++
+    let i=0;
+    i<pos.count;
+    i++
 ){
 
 pos.setY(
@@ -755,71 +959,51 @@ i,
 heights[i]
 );
 
-const h =
-heights[i];
+let color;
 
-let c;
 
-if(h < -20){
+/*
+    WICHTIG:
+    Ohne aufgemalte Textur wird
+    das Terrain zunächst schlicht
+    grau angezeigt.
+*/
 
-c =
+if(
+    paintColors[i]
+){
+
+const p =
+paintColors[i];
+
+color =
 new THREE.Color(
-0xcbb879
-);
-
-}
-else if(h < 30){
-
-c =
-new THREE.Color(
-0xe0c77a
-);
-
-}
-else if(h < 300){
-
-c =
-new THREE.Color(
-0x3f9b43
-);
-
-}
-else if(h < 650){
-
-c =
-new THREE.Color(
-0x39763c
-);
-
-}
-else if(h < 950){
-
-c =
-new THREE.Color(
-0x5d6b54
+p.r,
+p.g,
+p.b
 );
 
 }
 else{
 
-c =
+color =
 new THREE.Color(
-0xdfe3e2
+0x999999
 );
 
 }
 
 
 colors.push(
-c.r,
-c.g,
-c.b
+color.r,
+color.g,
+color.b
 );
 
 }
 
 
-geometry.setAttribute(
+terrainGeometry.setAttribute(
 "color",
 new THREE.Float32BufferAttribute(
 colors,
@@ -827,10 +1011,11 @@ colors,
 )
 );
 
-geometry.computeVertexNormals();
+
+terrainGeometry.computeVertexNormals();
 
 
-material =
+terrainMaterial =
 new THREE.MeshStandardMaterial({
 
 vertexColors:true,
@@ -844,53 +1029,42 @@ metalness:0
 
 terrain =
 new THREE.Mesh(
-geometry,
-material
+terrainGeometry,
+terrainMaterial
 );
 
-terrain.receiveShadow=true;
 
-terrain.castShadow=false;
+terrain.receiveShadow=true;
 
 scene.add(terrain);
 
 }
 
 
-/* =========================
-   WATER
-========================= */
+/* =========================================================
+   WASSER
+========================================================= */
 
-function createWater(){
+const water =
+new THREE.Mesh(
 
-if(water)
-scene.remove(water);
-
-const geo =
 new THREE.PlaneGeometry(
 WORLD_SIZE,
 WORLD_SIZE
-);
+),
 
-const mat =
 new THREE.MeshStandardMaterial({
 
-color:0x2588c4,
+color:0x228dcc,
 
 transparent:true,
 
-opacity:.72,
+opacity:.55,
 
-roughness:.12,
+roughness:.15
 
-metalness:.05
+})
 
-});
-
-water =
-new THREE.Mesh(
-geo,
-mat
 );
 
 water.rotation.x =
@@ -901,14 +1075,10 @@ SEA_LEVEL;
 
 scene.add(water);
 
-}
 
-createWater();
-
-
-/* =========================
+/* =========================================================
    RAYCAST
-========================= */
+========================================================= */
 
 const raycaster =
 new THREE.Raycaster();
@@ -924,12 +1094,16 @@ renderer.domElement
 .getBoundingClientRect();
 
 mouse.x =
-((e.clientX-rect.left)/
-rect.width)*2-1;
+(
+(e.clientX-rect.left)/
+rect.width
+)*2-1;
 
 mouse.y =
--((e.clientY-rect.top)/
-rect.height)*2+1;
+-(
+(e.clientY-rect.top)/
+rect.height
+)*2+1;
 
 raycaster.setFromCamera(
 mouse,
@@ -948,11 +1122,18 @@ return hits.length
 }
 
 
-/* =========================
-   SCULPT
-========================= */
+/* =========================================================
+   TERRAIN BEARBEITEN
+========================================================= */
+
+let editing=false;
+
 
 function editTerrain(e){
+
+if(!editing)
+return;
+
 
 const hit =
 getHit(e);
@@ -960,27 +1141,33 @@ getHit(e);
 if(!hit)
 return;
 
-const p =
-hit.point;
+
+const px =
+hit.point.x;
+
+const pz =
+hit.point.z;
+
 
 const gx =
 Math.round(
 (
-p.x+
+px+
 WORLD_SIZE/2
 )/
 WORLD_SIZE*
-(SIZE-1)
+(GRID-1)
 );
+
 
 const gz =
 Math.round(
 (
-p.z+
+pz+
 WORLD_SIZE/2
 )/
 WORLD_SIZE*
-(SIZE-1)
+(GRID-1)
 );
 
 
@@ -991,98 +1178,116 @@ brushSize
 
 
 for(
-let z=-radius;
-z<=radius;
-z++
+    let z=-radius;
+    z<=radius;
+    z++
 ){
 
 for(
-let x=-radius;
-x<=radius;
-x++
+    let x=-radius;
+    x<=radius;
+    x++
 ){
 
-const px =
+const ix =
 gx+x;
 
-const pz =
+const iz =
 gz+z;
 
+
 if(
-px<0||
-pz<0||
-px>=SIZE||
-pz>=SIZE
+ix<0||
+iz<0||
+ix>=GRID||
+iz>=GRID
 )
 continue;
 
 
-const dist =
+const d =
 Math.sqrt(
 x*x+z*z
 );
 
+
 if(
-dist>brushSize
+d>brushSize
 )
 continue;
 
 
 const falloff =
 Math.pow(
-1-dist/brushSize,
+1-d/brushSize,
 2
 );
 
 
 const index =
-pz*SIZE+px;
+iz*GRID+ix;
 
 
-if(tool==="raise"){
+/* =====================
+   TERRAIN
+===================== */
+
+if(mode==="raise"){
 
 heights[index] +=
 strength*
 falloff*
-18;
+20;
 
 }
 
-else if(tool==="lower"){
+
+if(mode==="lower"){
 
 heights[index] -=
 strength*
 falloff*
-18;
+20;
 
 }
 
-else if(tool==="smooth"){
+
+/* =====================
+   GLÄTTEN
+===================== */
+
+if(mode==="smooth"){
 
 let total=0;
 
 let count=0;
 
-for(let sy=-2;sy<=2;sy++){
+for(
+    let sy=-2;
+    sy<=2;
+    sy++
+){
 
-for(let sx=-2;sx<=2;sx++){
+for(
+    let sx=-2;
+    sx<=2;
+    sx++
+){
 
-const ix =
-px+sx;
+const ax=ix+sx;
 
-const iz =
-pz+sy;
+const az=iz+sy;
 
 if(
-ix>=0&&
-iz>=0&&
-ix<SIZE&&
-iz<SIZE
+ax>=0&&
+az>=0&&
+ax<GRID&&
+az<GRID
 ){
 
 total +=
 heights[
-iz*SIZE+ix
+az*GRID+ax
 ];
 
 count++;
@@ -1106,29 +1311,105 @@ falloff;
 
 }
 
+
+/* =====================
+   TEXTUR
+===================== */
+
+if(mode==="paint"||
+mode==="erase"){
+
+if(mode==="paint"){
+
+const hex =
+document
+.getElementById("color")
+.value;
+
+
+const r =
+parseInt(
+hex.substring(1,3),
+16
+)/255;
+
+const g =
+parseInt(
+hex.substring(3,5),
+16
+)/255;
+
+const b =
+parseInt(
+hex.substring(5,7),
+16
+)/255;
+
+
+if(
+!paintColors[index]
+){
+
+paintColors[index]={
+r:r,
+g:g,
+b:b
+};
+
+}
+else{
+
+paintColors[index].r +=
+(r-paintColors[index].r)*
+strength*
+falloff;
+
+paintColors[index].g +=
+(g-paintColors[index].g)*
+strength*
+falloff;
+
+paintColors[index].b +=
+(b-paintColors[index].b)*
+strength*
+falloff;
+
 }
 
 }
 
 
-updateMesh();
+if(mode==="erase"){
+
+paintColors[index]=null;
+
+}
+
+}
+
+}
 
 }
 
 
-/* =========================
-   UPDATE MESH
-========================= */
+updateTerrainMesh();
 
-function updateMesh(){
+}
+
+
+/* =========================================================
+   UPDATE
+========================================================= */
+
+function updateTerrainMesh(){
 
 const pos =
-geometry.attributes.position;
+terrainGeometry.attributes.position;
 
 for(
-let i=0;
-i<heights.length;
-i++
+    let i=0;
+    i<heights.length;
+    i++
 ){
 
 pos.setY(
@@ -1140,99 +1421,275 @@ heights[i]
 
 pos.needsUpdate=true;
 
-geometry.computeVertexNormals();
 
-updateColors();
+terrainGeometry.computeVertexNormals();
 
-}
-
-
-/* =========================
-   COLORS
-========================= */
-
-function updateColors(){
 
 const colors =
-geometry.attributes.color;
+terrainGeometry.attributes.color;
+
 
 for(
-let i=0;
-i<heights.length;
-i++
+    let i=0;
+    i<heights.length;
+    i++
 ){
 
-const h =
-heights[i];
+const p =
+paintColors[i];
 
-let c;
+let color;
 
-if(h < -20){
 
-c =
+if(p){
+
+color =
 new THREE.Color(
-0xcbb879
-);
-
-}
-else if(h < 30){
-
-c =
-new THREE.Color(
-0xe0c77a
-);
-
-}
-else if(h < 300){
-
-c =
-new THREE.Color(
-0x3f9b43
-);
-
-}
-else if(h < 650){
-
-c =
-new THREE.Color(
-0x39763c
-);
-
-}
-else if(h < 950){
-
-c =
-new THREE.Color(
-0x5d6b54
+p.r,
+p.g,
+p.b
 );
 
 }
 else{
 
-c =
+color =
 new THREE.Color(
-0xdfe3e2
+0x999999
 );
 
 }
+
 
 colors.setXYZ(
 i,
-c.r,
-c.g,
-c.b
+color.r,
+color.g,
+color.b
 );
 
 }
+
 
 colors.needsUpdate=true;
 
 }
 
 
-/* =========================
-   MOUSE
-========================= */
+/* =========================================================
+   MODUS
+========================================================= */
+
+function setMode(newMode){
+
+mode=newMode;
+
+
+document
+.querySelectorAll(
+".tool"
+)
+.forEach(
+b=>b.classList.remove(
+"active"
+)
+);
+
+
+if(
+newMode==="raise"
+){
+
+document
+.getElementById("raise")
+.classList.add("active");
+
+document
+.getElementById("status")
+.innerText=
+"⛰ Gelände erhöhen";
+
+}
+
+if(
+newMode==="lower"
+){
+
+document
+.getElementById("lower")
+.classList.add("active");
+
+document
+.getElementById("status")
+.innerText=
+"🕳 Gelände absenken";
+
+}
+
+if(
+newMode==="smooth"
+){
+
+document
+.getElementById("smooth")
+.classList.add("active");
+
+document
+.getElementById("status")
+.innerText=
+"🧽 Gelände glätten";
+
+}
+
+if(
+newMode==="paint"
+){
+
+document
+.getElementById("paint")
+.classList.add("active");
+
+document
+.getElementById("status")
+.innerText=
+"🖌 Eigene Farbe malen";
+
+}
+
+if(
+newMode==="erase"
+){
+
+document
+.getElementById("erasePaint")
+.classList.add("active");
+
+document
+.getElementById("status")
+.innerText=
+"🧹 Farbe löschen";
+
+}
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+document
+.getElementById("raise")
+.onclick=
+()=>setMode("raise");
+
+
+document
+.getElementById("lower")
+.onclick=
+()=>setMode("lower");
+
+
+document
+.getElementById("smooth")
+.onclick=
+()=>setMode("smooth");
+
+
+document
+.getElementById("paint")
+.onclick=
+()=>setMode("paint");
+
+
+document
+.getElementById("erasePaint")
+.onclick=
+()=>setMode("erase");
+
+
+document
+.getElementById("terrainMode")
+.onclick=
+()=>setMode("raise");
+
+
+document
+.getElementById("textureMode")
+.onclick=
+()=>setMode("paint");
+
+
+/* =========================================================
+   PINSIEL
+========================================================= */
+
+document
+.getElementById("size")
+.oninput=
+e=>{
+
+brushSize =
+Number(e.target.value);
+
+document
+.getElementById("sizeValue")
+.innerText=
+brushSize;
+
+};
+
+
+/* =========================================================
+   STÄRKE
+========================================================= */
+
+document
+.getElementById("strength")
+.oninput=
+e=>{
+
+strength =
+Number(e.target.value);
+
+document
+.getElementById("strengthValue")
+.innerText=
+strength.toFixed(2);
+
+};
+
+
+/* =========================================================
+   FARBE
+========================================================= */
+
+function updateColorPreview(){
+
+const c =
+document
+.getElementById("color")
+.value;
+
+document
+.getElementById("colorPreview")
+.style.background=
+c;
+
+}
+
+
+document
+.getElementById("color")
+.oninput=
+updateColorPreview;
+
+updateColorPreview();
+
+
+/* =========================================================
+   MAUS
+========================================================= */
 
 renderer.domElement.addEventListener(
 "pointerdown",
@@ -1240,7 +1697,7 @@ e=>{
 
 if(e.button===0){
 
-mouseDown=true;
+editing=true;
 
 editTerrain(e);
 
@@ -1254,7 +1711,7 @@ renderer.domElement.addEventListener(
 e=>{
 
 if(e.button===0)
-mouseDown=false;
+editing=false;
 
 });
 
@@ -1263,30 +1720,25 @@ renderer.domElement.addEventListener(
 "pointermove",
 e=>{
 
-mouseX=e.clientX;
-
-mouseY=e.clientY;
-
-
 const brush =
 document.getElementById(
 "brush"
 );
 
 brush.style.left =
-mouseX+"px";
+e.clientX+"px";
 
 brush.style.top =
-mouseY+"px";
+e.clientY+"px";
 
 brush.style.width =
-(brushSize*8)+"px";
+brushSize*8+"px";
 
 brush.style.height =
-(brushSize*8)+"px";
+brushSize*8+"px";
 
 
-if(mouseDown){
+if(editing){
 
 editTerrain(e);
 
@@ -1299,9 +1751,10 @@ renderer.domElement.addEventListener(
 "pointerenter",
 ()=>{
 
-document.getElementById(
-"brush"
-).style.display="block";
+document
+.getElementById("brush")
+.style.display=
+"block";
 
 });
 
@@ -1310,186 +1763,106 @@ renderer.domElement.addEventListener(
 "pointerleave",
 ()=>{
 
-document.getElementById(
-"brush"
-).style.display="none";
+document
+.getElementById("brush")
+.style.display=
+"none";
 
 });
 
 
-renderer.domElement.addEventListener(
-"contextmenu",
-e=>e.preventDefault()
-);
-
-
-/* =========================
-   TOOLS
-========================= */
-
-function setTool(t){
-
-tool=t;
-
-document
-.querySelectorAll(".tool")
-.forEach(
-b=>b.classList.remove("active")
-);
-
-
-if(t==="raise"){
-
-document
-.getElementById("raiseTool")
-.classList.add("active");
-
-document
-.getElementById("status")
-.innerText=
-"Sculpt: Gelände erhöhen";
-
-}
-
-if(t==="lower"){
-
-document
-.getElementById("lowerTool")
-.classList.add("active");
-
-document
-.getElementById("status")
-.innerText=
-"Sculpt: Gelände absenken";
-
-}
-
-if(t==="smooth"){
-
-document
-.getElementById("smoothTool")
-.classList.add("active");
-
-document
-.getElementById("status")
-.innerText=
-"Sculpt: Gelände glätten";
-
-}
-
-}
-
-
-document
-.getElementById("raiseTool")
-.onclick=()=>{
-setTool("raise");
-};
-
-
-document
-.getElementById("lowerTool")
-.onclick=()=>{
-setTool("lower");
-};
-
-
-document
-.getElementById("smoothTool")
-.onclick=()=>{
-setTool("smooth");
-};
-
-
-document
-.getElementById("sculpt")
-.onclick=()=>{
-setTool("raise");
-};
-
-
-document
-.getElementById("lower")
-.onclick=()=>{
-setTool("lower");
-};
-
-
-document
-.getElementById("smooth")
-.onclick=()=>{
-setTool("smooth");
-};
-
-
-/* =========================
-   SLIDER
-========================= */
-
-document
-.getElementById("size")
-.oninput=e=>{
-
-brushSize =
-Number(e.target.value);
-
-document
-.getElementById("sizeText")
-.innerText=
-brushSize;
-
-};
-
-
-document
-.getElementById("strength")
-.oninput=e=>{
-
-strength =
-Number(e.target.value);
-
-document
-.getElementById("strengthText")
-.innerText=
-strength.toFixed(2);
-
-};
-
-
-/* =========================
-   NEW MAP
-========================= */
+/* =========================================================
+   NEUE INSEL
+========================================================= */
 
 document
 .getElementById("newMap")
-.onclick=()=>{
+.onclick=
+()=>{
 
 generateIsland();
 
 };
 
 
-/* =========================
-   SAVE
-========================= */
+/* =========================================================
+   KAMERA RESET
+========================================================= */
+
+document
+.getElementById("resetCamera")
+.onclick=
+()=>{
+
+yaw=.65;
+
+pitch=.62;
+
+distance=6500;
+
+updateCamera();
+
+};
+
+
+document
+.getElementById("topCamera")
+.onclick=
+()=>{
+
+yaw=0;
+
+pitch=1.48;
+
+distance=8000;
+
+updateCamera();
+
+};
+
+
+document
+.getElementById("islandCamera")
+.onclick=
+()=>{
+
+yaw=.65;
+
+pitch=.62;
+
+distance=6500;
+
+updateCamera();
+
+};
+
+
+/* =========================================================
+   SPEICHERN
+========================================================= */
 
 document
 .getElementById("save")
-.onclick=()=>{
+.onclick=
+()=>{
 
-const data = {
+const data={
 
-version:1,
-
-size:SIZE,
-
-worldSize:WORLD_SIZE,
+version:2,
 
 seed:seed,
 
-heights:Array.from(
+grid:GRID,
+
+worldSize:WORLD_SIZE,
+
+heights:
+Array.from(
 heights
-)
+),
+
+paintColors:
+paintColors
 
 };
 
@@ -1508,6 +1881,7 @@ type:"application/json"
 const url =
 URL.createObjectURL(blob);
 
+
 const a =
 document.createElement("a");
 
@@ -1516,20 +1890,30 @@ a.href=url;
 a.download=
 "ghost-island-map.json";
 
+document.body.appendChild(a);
+
 a.click();
 
+a.remove();
+
+setTimeout(
+()=>{
 URL.revokeObjectURL(url);
+},
+1000
+);
 
 };
 
 
-/* =========================
-   LOAD
-========================= */
+/* =========================================================
+   LADEN
+========================================================= */
 
 document
 .getElementById("load")
-.onclick=()=>{
+.onclick=
+()=>{
 
 document
 .getElementById("file")
@@ -1540,7 +1924,8 @@ document
 
 document
 .getElementById("file")
-.onchange=e=>{
+.onchange=
+e=>{
 
 const file =
 e.target.files[0];
@@ -1548,10 +1933,13 @@ e.target.files[0];
 if(!file)
 return;
 
+
 const reader =
 new FileReader();
 
-reader.onload=()=>{
+
+reader.onload=
+()=>{
 
 try{
 
@@ -1560,30 +1948,54 @@ JSON.parse(
 reader.result
 );
 
+
 if(
-data.size!==SIZE||
+data.grid!==GRID||
 !Array.isArray(data.heights)||
-data.heights.length!==SIZE*SIZE
+data.heights.length!==GRID*GRID
 ){
 
 alert(
-"Diese Map passt nicht zu diesem Editor."
+"Diese Map passt nicht zum Editor."
 );
 
 return;
 
 }
 
+
 seed =
-data.seed||
-0;
+data.seed||0;
+
 
 heights =
 new Float32Array(
 data.heights
 );
 
+
+if(
+Array.isArray(
+data.paintColors
+)
+){
+
+paintColors =
+data.paintColors;
+
+}
+else{
+
+paintColors =
+new Array(
+GRID*GRID
+).fill(null);
+
+}
+
+
 buildTerrain();
+
 
 }
 catch(err){
@@ -1596,14 +2008,15 @@ alert(
 
 };
 
+
 reader.readAsText(file);
 
 };
 
 
-/* =========================
+/* =========================================================
    RESIZE
-========================= */
+========================================================= */
 
 window.addEventListener(
 "resize",
@@ -1623,24 +2036,22 @@ innerHeight
 });
 
 
-/* =========================
+/* =========================================================
    START
-========================= */
+========================================================= */
 
 generateIsland();
 
 
-/* =========================
+/* =========================================================
    LOOP
-========================= */
+========================================================= */
 
 function animate(){
 
 requestAnimationFrame(
 animate
 );
-
-controls.update();
 
 renderer.render(
 scene,
