@@ -2,529 +2,1722 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Der letzte Server</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GHOST Finance</title>
 
 <style>
-    * {
-        box-sizing: border-box;
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --green:#18a66a;
+    --green-dark:#0d8c57;
+    --bg:#f4f7f5;
+    --card:#fff;
+    --text:#17231e;
+    --muted:#87918c;
+    --border:#e3e9e5;
+}
+
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+/* LOGIN */
+
+#loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.login-box{
+    width:100%;
+    max-width:410px;
+    background:white;
+    padding:35px;
+    border-radius:28px;
+    border:1px solid var(--border);
+    box-shadow:0 20px 60px rgba(20,50,35,.12);
+}
+
+.login-logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:850;
+    margin-bottom:8px;
+}
+
+.login-logo span{
+    color:var(--green);
+}
+
+.login-subtitle{
+    text-align:center;
+    color:var(--muted);
+    margin-bottom:30px;
+}
+
+.login-box label{
+    display:block;
+    font-size:14px;
+    font-weight:650;
+    margin-bottom:8px;
+}
+
+.login-box input{
+    width:100%;
+    height:53px;
+    border:1px solid #dce4df;
+    border-radius:15px;
+    padding:0 16px;
+    font-size:16px;
+    outline:none;
+    margin-bottom:14px;
+}
+
+.login-box input:focus{
+    border-color:var(--green);
+    box-shadow:0 0 0 3px rgba(24,166,106,.1);
+}
+
+.login-button{
+    width:100%;
+    height:53px;
+    border:0;
+    border-radius:15px;
+    background:var(--green);
+    color:white;
+    font-size:16px;
+    font-weight:750;
+    cursor:pointer;
+}
+
+.login-button:hover{
+    background:var(--green-dark);
+}
+
+.login-error{
+    display:none;
+    color:#d65353;
+    background:#fff0f0;
+    padding:12px;
+    border-radius:12px;
+    margin-bottom:14px;
+    font-size:14px;
+}
+
+/* APP */
+
+#app{
+    display:none;
+}
+
+.header{
+    height:68px;
+    background:#fff;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:850;
+}
+
+.logo span{
+    color:var(--green);
+}
+
+.user-area{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-name{
+    font-size:14px;
+    font-weight:650;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:#17231e;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:750;
+}
+
+.logout{
+    border:0;
+    background:#f0f3f1;
+    border-radius:10px;
+    padding:8px 10px;
+    cursor:pointer;
+}
+
+.app{
+    max-width:900px;
+    margin:auto;
+    padding:28px 20px 100px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.welcome{
+    margin-bottom:22px;
+}
+
+.welcome h1{
+    font-size:30px;
+    margin-bottom:5px;
+}
+
+.welcome p{
+    color:var(--muted);
+}
+
+/* NORMAL ACCOUNT */
+
+.account-card{
+    background:linear-gradient(135deg,#17231e,#28483a);
+    color:white;
+    border-radius:25px;
+    padding:28px;
+    margin-bottom:24px;
+    box-shadow:0 15px 35px rgba(20,40,30,.15);
+}
+
+.account-top{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.bank-icon{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    background:rgba(255,255,255,.1);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+}
+
+.account-name{
+    font-size:18px;
+    font-weight:750;
+}
+
+.account-type{
+    color:#b8c8c0;
+    font-size:13px;
+    margin-top:3px;
+}
+
+.balance-label{
+    color:#b8c8c0;
+    font-size:14px;
+    margin-top:28px;
+}
+
+.balance{
+    font-size:43px;
+    font-weight:800;
+    margin-top:4px;
+}
+
+/* CHART */
+
+.chart-card,
+.salary-card,
+.admin-card,
+.users-card{
+    background:white;
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:23px;
+    margin-bottom:20px;
+}
+
+.chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.chart-title{
+    font-size:19px;
+    font-weight:750;
+}
+
+.chart-total{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.chart{
+    height:220px;
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+    margin-top:20px;
+    border-bottom:1px solid #e8edea;
+    padding:0 4px;
+}
+
+.day{
+    flex:1;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    align-items:center;
+    gap:6px;
+}
+
+.bar{
+    width:min(36px,80%);
+    background:var(--green);
+    border-radius:8px 8px 3px 3px;
+    min-height:3px;
+    transition:.25s;
+}
+
+.bar:hover{
+    transform:translateY(-4px);
+}
+
+.day-name{
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:7px;
+}
+
+.bar-amount{
+    font-size:10px;
+    color:var(--muted);
+}
+
+/* SALARY */
+
+.salary-icon{
+    width:65px;
+    height:65px;
+    border-radius:20px;
+    background:#eaf7f1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    margin:5px auto 18px;
+}
+
+.salary-card{
+    text-align:center;
+}
+
+.salary-title{
+    font-size:24px;
+    font-weight:800;
+}
+
+.salary-text{
+    color:var(--muted);
+    margin-top:8px;
+}
+
+.days{
+    font-size:58px;
+    font-weight:850;
+    color:var(--green);
+    margin:20px 0 0;
+}
+
+.days-label{
+    color:var(--muted);
+}
+
+.salary-date{
+    margin-top:20px;
+    padding:14px;
+    border-radius:14px;
+    background:#f5f8f6;
+    color:#65716b;
+}
+
+/* ADMIN */
+
+.admin-title{
+    font-size:27px;
+    font-weight:800;
+    margin-bottom:5px;
+}
+
+.admin-subtitle{
+    color:var(--muted);
+    margin-bottom:25px;
+}
+
+.users-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.user-card{
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.user-avatar{
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    background:#eaf7f1;
+    color:var(--green-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+}
+
+.user-balance{
+    font-weight:750;
+}
+
+.user-settings{
+    margin-top:20px;
+}
+
+.setting{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    margin-bottom:14px;
+}
+
+.setting label{
+    font-size:13px;
+    font-weight:700;
+}
+
+.setting input,
+.setting select{
+    height:48px;
+    border:1px solid #dce4df;
+    border-radius:13px;
+    padding:0 13px;
+    font-size:15px;
+    outline:none;
+    background:white;
+}
+
+.setting input:focus,
+.setting select:focus{
+    border-color:var(--green);
+}
+
+.save-button{
+    width:100%;
+    height:48px;
+    border:0;
+    border-radius:13px;
+    background:var(--green);
+    color:white;
+    font-weight:750;
+    cursor:pointer;
+}
+
+.save-button:hover{
+    background:var(--green-dark);
+}
+
+.status{
+    display:none;
+    margin-top:12px;
+    padding:11px;
+    border-radius:12px;
+    background:#eaf7f1;
+    color:#128653;
+    font-size:13px;
+}
+
+/* NAV */
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:74px;
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(15px);
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:center;
+    gap:70px;
+    align-items:center;
+    z-index:50;
+}
+
+.nav-button{
+    border:0;
+    background:none;
+    color:#89938e;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-size:11px;
+    min-width:80px;
+}
+
+.nav-button.active{
+    color:var(--green);
+    font-weight:700;
+}
+
+.nav-icon{
+    font-size:23px;
+}
+
+.admin-nav{
+    display:none;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    .header{
+        height:62px;
+        padding:0 15px;
     }
 
-    html {
-        scroll-behavior: smooth;
+    .user-name{
+        display:none;
     }
 
-    body {
-        margin: 0;
-        min-height: 100vh;
-        font-family: Georgia, "Times New Roman", serif;
-        background:
-            radial-gradient(circle at top, #263246 0%, #10151d 42%, #080b10 100%);
-        color: #e9edf2;
+    .logout{
+        font-size:12px;
     }
 
-    /* HEADER */
-    header {
-        height: 72px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 7%;
-        background: rgba(8, 11, 16, 0.82);
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-        backdrop-filter: blur(14px);
-        position: sticky;
-        top: 0;
-        z-index: 10;
+    .app{
+        padding:22px 14px 100px;
     }
 
-    .logo {
-        font-family: Arial, sans-serif;
-        font-weight: 800;
-        letter-spacing: 3px;
-        color: #fff;
+    .welcome h1{
+        font-size:25px;
     }
 
-    .logo span {
-        color: #7dd3fc;
+    .account-card{
+        padding:22px;
+        border-radius:21px;
     }
 
-    nav {
-        font-family: Arial, sans-serif;
-        color: #9ca8b7;
-        font-size: 14px;
+    .balance{
+        font-size:36px;
     }
 
-    /* STARTSEITE */
-    .home {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 80px 25px 100px;
+    .chart-card,
+    .salary-card,
+    .admin-card,
+    .users-card{
+        border-radius:20px;
+        padding:19px;
     }
 
-    .intro {
-        text-align: center;
-        margin-bottom: 55px;
+    .chart{
+        height:200px;
+        gap:4px;
     }
 
-    .intro .small {
-        text-transform: uppercase;
-        letter-spacing: 5px;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        color: #7dd3fc;
-        margin-bottom: 18px;
+    .bottom-nav{
+        gap:10px;
+        justify-content:space-around;
     }
 
-    .intro h1 {
-        margin: 0;
-        font-size: clamp(42px, 7vw, 78px);
-        font-weight: 500;
-        line-height: 1;
-        color: #ffffff;
-        text-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    .days{
+        font-size:52px;
     }
 
-    .intro p {
-        max-width: 650px;
-        margin: 25px auto 0;
-        color: #aeb8c5;
-        font-family: Arial, sans-serif;
-        line-height: 1.7;
-        font-size: 16px;
+    .user-card{
+        align-items:flex-start;
+        flex-direction:column;
     }
-
-    /* STORY CARD */
-    .story-card {
-        max-width: 470px;
-        margin: auto;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-    .story-card:hover {
-        transform: translateY(-8px);
-    }
-
-    .cover {
-        position: relative;
-        overflow: hidden;
-        border-radius: 18px;
-        background: #121923;
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow:
-            0 25px 80px rgba(0,0,0,0.55),
-            0 0 0 1px rgba(125,211,252,0.03);
-    }
-
-    .cover img {
-        width: 100%;
-        aspect-ratio: 3 / 4;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.5s ease, filter 0.5s ease;
-    }
-
-    .story-card:hover .cover img {
-        transform: scale(1.035);
-        filter: brightness(1.08);
-    }
-
-    .cover::after {
-        content: "LESEN";
-        position: absolute;
-        inset: auto 20px 20px auto;
-        padding: 10px 15px;
-        border-radius: 999px;
-        background: rgba(0,0,0,0.72);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white;
-        font: 700 11px Arial, sans-serif;
-        letter-spacing: 2px;
-        opacity: 0;
-        transform: translateY(8px);
-        transition: 0.3s;
-    }
-
-    .story-card:hover .cover::after {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .story-title {
-        text-align: center;
-        margin-top: 25px;
-    }
-
-    .story-title h2 {
-        margin: 0;
-        font-size: 31px;
-        font-weight: 500;
-        color: white;
-    }
-
-    .story-title p {
-        margin: 9px 0 0;
-        color: #7f8b99;
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-    }
-
-    /* LESER */
-    #reader {
-        display: none;
-        min-height: 100vh;
-        background:
-            linear-gradient(rgba(9,13,19,0.94), rgba(9,13,19,0.98)),
-            radial-gradient(circle at top, #29384b, transparent 55%);
-    }
-
-    .reader-top {
-        height: 72px;
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 6%;
-        background: rgba(8,11,16,0.9);
-        backdrop-filter: blur(16px);
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .back {
-        border: 1px solid rgba(255,255,255,0.13);
-        background: rgba(255,255,255,0.05);
-        color: #dbe4ee;
-        padding: 10px 16px;
-        border-radius: 9px;
-        cursor: pointer;
-        font-family: Arial, sans-serif;
-        transition: 0.2s;
-    }
-
-    .back:hover {
-        background: rgba(255,255,255,0.1);
-    }
-
-    .chapter-label {
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        letter-spacing: 3px;
-        color: #7dd3fc;
-        text-transform: uppercase;
-    }
-
-    .reading-area {
-        max-width: 820px;
-        margin: 0 auto;
-        padding: 75px 25px 120px;
-    }
-
-    .chapter-heading {
-        text-align: center;
-        margin-bottom: 55px;
-    }
-
-    .chapter-heading .eyebrow {
-        font-family: Arial, sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        font-size: 11px;
-        color: #7dd3fc;
-        margin-bottom: 15px;
-    }
-
-    .chapter-heading h2 {
-        font-size: clamp(36px, 6vw, 58px);
-        font-weight: 500;
-        margin: 0;
-        color: #fff;
-    }
-
-    .chapter-heading .line {
-        width: 70px;
-        height: 1px;
-        background: #7dd3fc;
-        margin: 25px auto 0;
-        opacity: 0.7;
-    }
-
-    #storyText {
-        font-size: 20px;
-        line-height: 1.95;
-        color: #d9dee5;
-        white-space: pre-wrap;
-    }
-
-    #storyText::first-letter {
-        font-size: 4.2em;
-        float: left;
-        line-height: 0.8;
-        padding: 10px 12px 0 0;
-        color: #7dd3fc;
-    }
-
-    .reader-footer {
-        text-align: center;
-        margin-top: 90px;
-        padding-top: 30px;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        color: #687585;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        letter-spacing: 1px;
-    }
-
-    /* FEHLER / DATEIAUSWAHL */
-    .file-box {
-        display: none;
-        margin-top: 35px;
-        padding: 20px;
-        border-radius: 14px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        text-align: center;
-        font-family: Arial, sans-serif;
-    }
-
-    .file-box p {
-        color: #aeb8c5;
-        margin-top: 0;
-    }
-
-    .file-button {
-        display: inline-block;
-        padding: 11px 18px;
-        border-radius: 9px;
-        background: #7dd3fc;
-        color: #071018;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    #fileInput {
-        display: none;
-    }
-
-    @media (max-width: 600px) {
-        header {
-            padding: 0 20px;
-        }
-
-        nav {
-            display: none;
-        }
-
-        .home {
-            padding-top: 55px;
-        }
-
-        .reading-area {
-            padding-top: 50px;
-        }
-
-        #storyText {
-            font-size: 18px;
-            line-height: 1.85;
-        }
-    }
+}
 </style>
 </head>
 
 <body>
 
-<!-- STARTSEITE -->
-<div id="home">
+<!-- LOGIN -->
 
-    <header>
-        <div class="logo">GHOST<span>BOOK</span></div>
-        <nav>DEINE GESCHICHTEN</nav>
-    </header>
+<div id="loginScreen">
 
-    <main class="home">
+    <div class="login-box">
 
-        <div class="intro">
-            <div class="small">Eine Geschichte</div>
-            <h1>Der letzte Server</h1>
-            <p>
-                Eine vergessene Maschine. Eine alte Verbindung.
-                Und etwas, das niemals hätte wieder online gehen dürfen.
-            </p>
+        <div class="login-logo">
+            GHOST<span>Finance</span>
         </div>
 
-        <div class="story-card" onclick="openStory()">
-
-            <div class="cover">
-                <img src="422.png" alt="Cover von Der letzte Server"
-                     onerror="imageError()">
-            </div>
-
-            <div class="story-title">
-                <h2>Der letzte Server</h2>
-                <p>Kapitel 1 · Zum Lesen klicken</p>
-            </div>
-
+        <div class="login-subtitle">
+            Melde dich mit deinem Namen an
         </div>
 
-        <div class="file-box" id="fileBox">
-            <p>
-                Die Kapiteldatei konnte nicht automatisch geladen werden.
-                Du kannst sie hier auswählen:
-            </p>
+        <div id="loginError" class="login-error"></div>
 
-            <label class="file-button" for="fileInput">
-                Kapitel 1.txt auswählen
-            </label>
+        <label for="nameInput">
+            Name
+        </label>
 
-            <input type="file"
-                   id="fileInput"
-                   accept=".txt,text/plain"
-                   onchange="loadSelectedFile(this)">
-        </div>
+        <input
+            id="nameInput"
+            type="text"
+            placeholder="Dein Name"
+            autocomplete="off">
 
-    </main>
+        <button
+            class="login-button"
+            id="loginButton">
+            Anmelden
+        </button>
+
+    </div>
+
 </div>
 
 
-<!-- LESER -->
-<div id="reader">
+<!-- APP -->
 
-    <div class="reader-top">
-        <button class="back" onclick="closeStory()">← Zurück</button>
+<div id="app">
 
-        <div class="chapter-label">Der letzte Server</div>
+<header class="header">
 
-        <div style="width:80px;"></div>
+    <div class="logo">
+        GHOST<span>Finance</span>
     </div>
 
-    <main class="reading-area">
+    <div class="user-area">
 
-        <div class="chapter-heading">
-            <div class="eyebrow">Kapitel 1</div>
-            <h2>Der Anfang</h2>
-            <div class="line"></div>
+        <span
+            class="user-name"
+            id="headerName">
+        </span>
+
+        <div
+            class="avatar"
+            id="avatar">
         </div>
 
-        <article id="storyText">
-            Kapitel wird geladen...
-        </article>
+        <button
+            class="logout"
+            id="logout">
+            ↪
+        </button>
 
-        <div class="reader-footer">
-            DER LETZTE SERVER · KAPITEL 1
+    </div>
+
+</header>
+
+
+<main class="app">
+
+
+<!-- =========================
+     NORMAL HOME
+     ========================= -->
+
+<section
+    id="homePage"
+    class="page active">
+
+    <div class="welcome">
+
+        <h1 id="welcomeTitle">
+            Guten Abend 👋
+        </h1>
+
+        <p>
+            Deine Finanzübersicht
+        </p>
+
+    </div>
+
+
+    <div class="account-card">
+
+        <div class="account-top">
+
+            <div class="bank-icon">
+                🏦
+            </div>
+
+            <div>
+
+                <div class="account-name">
+                    Girokonto
+                </div>
+
+                <div class="account-type">
+                    Hauptkonto
+                </div>
+
+            </div>
+
         </div>
 
-    </main>
+
+        <div class="balance-label">
+            Kontostand
+        </div>
+
+        <div
+            class="balance"
+            id="balance">
+            0,00 €
+        </div>
+
+    </div>
+
+
+    <div class="chart-card">
+
+        <div class="chart-header">
+
+            <div class="chart-title">
+                Ausgaben
+            </div>
+
+            <div class="chart-total">
+                Letzte 7 Tage
+            </div>
+
+        </div>
+
+        <div
+            id="chart"
+            class="chart">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SALARY PAGE
+     ========================= -->
+
+<section
+    id="salaryPage"
+    class="page">
+
+    <div class="welcome">
+
+        <h1>
+            Nächstes Gehalt
+        </h1>
+
+        <p>
+            Wann dein nächstes Gehalt kommt
+        </p>
+
+    </div>
+
+
+    <div class="salary-card">
+
+        <div class="salary-icon">
+            💶
+        </div>
+
+        <div class="salary-title">
+            Dein nächstes Gehalt
+        </div>
+
+        <div class="salary-text">
+            Noch
+        </div>
+
+        <div
+            class="days"
+            id="salaryDays">
+            0
+        </div>
+
+        <div class="days-label">
+            Tage
+        </div>
+
+        <div
+            class="salary-date"
+            id="salaryDate">
+            Berechnung...
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     ADMIN PAGE
+     ========================= -->
+
+<section
+    id="adminPage"
+    class="page">
+
+    <div class="admin-title">
+        Admin-Zentrale
+    </div>
+
+    <div class="admin-subtitle">
+        Benutzer und Finanzwerte verwalten
+    </div>
+
+
+    <div class="users-card">
+
+        <div class="chart-title">
+            Angemeldete Benutzer
+        </div>
+
+        <div
+            id="usersList"
+            class="users-list"
+            style="margin-top:15px">
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <div class="chart-title">
+            Benutzer bearbeiten
+        </div>
+
+        <div class="user-settings">
+
+            <div class="setting">
+
+                <label>
+                    Benutzer
+                </label>
+
+                <select id="targetUser">
+                </select>
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    Zeit bis zum nächsten Gehalt
+                </label>
+
+                <input
+                    id="adminDays"
+                    type="number"
+                    min="0"
+                    placeholder="0">
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    Preis pro Ausgabe
+                </label>
+
+                <input
+                    id="adminExpense"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0,00">
+
+            </div>
+
+
+            <div class="setting">
+
+                <label>
+                    Kontostand
+                </label>
+
+                <input
+                    id="adminBalance"
+                    type="number"
+                    step="0.01"
+                    placeholder="0,00">
+
+            </div>
+
+
+            <button
+                id="saveSettings"
+                class="save-button">
+                Einstellungen speichern
+            </button>
+
+            <div
+                id="adminStatus"
+                class="status">
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- NAVIGATION -->
+
+<nav class="bottom-nav">
+
+    <button
+        class="nav-button active"
+        data-page="homePage">
+
+        <span class="nav-icon">
+            ⌂
+        </span>
+
+        Home
+
+    </button>
+
+
+    <button
+        class="nav-button"
+        data-page="salaryPage">
+
+        <span class="nav-icon">
+            💶
+        </span>
+
+        Nächstes Gehalt
+
+    </button>
+
+
+    <button
+        id="adminNav"
+        class="nav-button admin-nav"
+        data-page="adminPage">
+
+        <span class="nav-icon">
+            ⚙
+        </span>
+
+        Verwaltung
+
+    </button>
+
+</nav>
 
 </div>
 
 
 <script>
 
-let textLoaded = false;
+/* =========================
+   SERVER
+   ========================= */
+
+const API = "/api";
 
 
-/* Geschichte öffnen */
-function openStory() {
+let currentUser = null;
 
-    document.getElementById("home").style.display = "none";
-    document.getElementById("reader").style.display = "block";
 
-    window.scrollTo(0, 0);
+/* =========================
+   LOGIN
+   ========================= */
 
-    if (!textLoaded) {
-        loadChapter();
+const loginScreen =
+    document.getElementById("loginScreen");
+
+const app =
+    document.getElementById("app");
+
+const nameInput =
+    document.getElementById("nameInput");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const loginError =
+    document.getElementById("loginError");
+
+
+loginButton.addEventListener("click", login);
+
+nameInput.addEventListener("keydown", e => {
+
+    if(e.key === "Enter"){
+        login();
     }
-}
+
+});
 
 
-/* Geschichte schließen */
-function closeStory() {
+async function login(){
 
-    document.getElementById("reader").style.display = "none";
-    document.getElementById("home").style.display = "block";
+    const name =
+        nameInput.value.trim();
 
-    window.scrollTo(0, 0);
-}
+    if(!name){
+
+        showLoginError(
+            "Bitte gib einen Namen ein."
+        );
+
+        return;
+    }
 
 
-/* Kapitel automatisch laden */
-async function loadChapter() {
+    try{
 
-    const textElement = document.getElementById("storyText");
+        const response =
+            await fetch(API + "/login",{
 
-    try {
+                method:"POST",
 
-        const response = await fetch("Kapitel 1.txt");
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
 
-        if (!response.ok) {
-            throw new Error("Datei nicht gefunden");
-        }
+                body:JSON.stringify({
+                    name:name
+                })
 
-        const text = await response.text();
+            });
 
-        if (!text.trim()) {
-            textElement.textContent = "Das Kapitel ist leer.";
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            showLoginError(
+                data.error ||
+                "Anmeldung fehlgeschlagen."
+            );
+
             return;
         }
 
-        textElement.textContent = text;
-        textLoaded = true;
 
-    } catch (error) {
+        currentUser =
+            data.user;
 
-        textElement.textContent =
-            "Kapitel 1.txt konnte nicht automatisch geladen werden.";
 
-        document.getElementById("fileBox").style.display = "block";
+        openApp();
+
+    }catch(error){
+
+        showLoginError(
+            "Server nicht erreichbar."
+        );
+
     }
+
 }
 
 
-/* Datei manuell auswählen */
-function loadSelectedFile(input) {
+function showLoginError(text){
 
-    const file = input.files[0];
+    loginError.textContent = text;
+    loginError.style.display = "block";
 
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-
-        document.getElementById("storyText").textContent =
-            event.target.result;
-
-        textLoaded = true;
-
-        document.getElementById("fileBox").style.display = "none";
-    };
-
-    reader.readAsText(file, "UTF-8");
 }
 
 
-/* Bild fehlt */
-function imageError() {
+/* =========================
+   APP ÖFFNEN
+   ========================= */
 
-    const img = document.querySelector(".cover img");
+function openApp(){
 
-    img.style.display = "none";
+    loginScreen.style.display = "none";
+    app.style.display = "block";
 
-    const cover = document.querySelector(".cover");
+    document.getElementById(
+        "headerName"
+    ).textContent =
+        currentUser.name;
 
-    cover.style.aspectRatio = "3 / 4";
+    document.getElementById(
+        "avatar"
+    ).textContent =
+        currentUser.name
+        .charAt(0)
+        .toUpperCase();
 
-    cover.style.display = "flex";
-    cover.style.alignItems = "center";
-    cover.style.justifyContent = "center";
 
-    cover.innerHTML =
-        '<div style="color:#7f8b99;font-family:Arial;text-align:center;">' +
-        '422.png wurde nicht gefunden<br><br>' +
-        '<small>Lege das Bild in denselben Ordner wie diese HTML-Datei.</small>' +
-        '</div>';
+    if(currentUser.name === "Haupt"){
+
+        document.getElementById(
+            "adminNav"
+        ).style.display = "flex";
+
+    }
+
+
+    updateUserInterface();
+
+}
+
+
+/* =========================
+   USER DATEN AKTUALISIEREN
+   ========================= */
+
+function updateUserInterface(){
+
+    document.getElementById(
+        "balance"
+    ).textContent =
+        formatMoney(currentUser.balance);
+
+
+    document.getElementById(
+        "salaryDays"
+    ).textContent =
+        currentUser.salaryDays;
+
+
+    document.getElementById(
+        "salaryDate"
+    ).textContent =
+        "Noch " +
+        currentUser.salaryDays +
+        " Tage bis zum Gehalt";
+
+
+    drawChart(
+        currentUser.expenses || []
+    );
+
+}
+
+
+/* =========================
+   GELD FORMATIEREN
+   ========================= */
+
+function formatMoney(value){
+
+    return Number(value || 0)
+        .toLocaleString(
+            "de-DE",
+            {
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            }
+        ) + " €";
+
+}
+
+
+/* =========================
+   DIAGRAMM
+   ========================= */
+
+function drawChart(expenses){
+
+    const chart =
+        document.getElementById("chart");
+
+    chart.innerHTML = "";
+
+
+    const values = [
+        ...expenses
+    ];
+
+    while(values.length < 7){
+        values.unshift(0);
+    }
+
+    const lastSeven =
+        values.slice(-7);
+
+    const max =
+        Math.max(...lastSeven,1);
+
+
+    const today =
+        new Date();
+
+
+    const names = [];
+
+
+    for(let i=6;i>=0;i--){
+
+        const d =
+            new Date(today);
+
+        d.setDate(
+            today.getDate()-i
+        );
+
+        names.push(
+            d.toLocaleDateString(
+                "de-DE",
+                {weekday:"short"}
+            ).replace(".","")
+        );
+
+    }
+
+
+    lastSeven.forEach(
+        (value,index)=>{
+
+            const day =
+                document.createElement("div");
+
+            day.className = "day";
+
+
+            const amount =
+                document.createElement("div");
+
+            amount.className =
+                "bar-amount";
+
+            amount.textContent =
+                formatMoney(value);
+
+
+            const bar =
+                document.createElement("div");
+
+            bar.className = "bar";
+
+            const height =
+                value === 0
+                ? 3
+                : Math.max(
+                    5,
+                    (value/max)*150
+                );
+
+            bar.style.height =
+                height + "px";
+
+
+            const label =
+                document.createElement("div");
+
+            label.className =
+                "day-name";
+
+            label.textContent =
+                names[index];
+
+
+            day.appendChild(amount);
+            day.appendChild(bar);
+            day.appendChild(label);
+
+            chart.appendChild(day);
+
+        }
+    );
+
+}
+
+
+/* =========================
+   NAVIGATION
+   ========================= */
+
+document
+.querySelectorAll(".nav-button")
+.forEach(button => {
+
+    button.addEventListener(
+        "click",
+        ()=>{
+
+            const target =
+                button.dataset.page;
+
+
+            document
+            .querySelectorAll(".nav-button")
+            .forEach(b =>
+                b.classList.remove("active")
+            );
+
+
+            button.classList.add("active");
+
+
+            document
+            .querySelectorAll(".page")
+            .forEach(page =>
+                page.classList.remove("active")
+            );
+
+
+            document
+            .getElementById(target)
+            .classList.add("active");
+
+
+            if(target === "adminPage"){
+                loadAdmin();
+            }
+
+            window.scrollTo({
+                top:0,
+                behavior:"smooth"
+            });
+
+        }
+    );
+
+});
+
+
+/* =========================
+   ADMIN
+   ========================= */
+
+async function loadAdmin(){
+
+    if(currentUser.name !== "Haupt"){
+        return;
+    }
+
+
+    try{
+
+        const response =
+            await fetch(API + "/users");
+
+        const users =
+            await response.json();
+
+
+        renderUsers(users);
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+function renderUsers(users){
+
+    const list =
+        document.getElementById(
+            "usersList"
+        );
+
+    const select =
+        document.getElementById(
+            "targetUser"
+        );
+
+
+    list.innerHTML = "";
+    select.innerHTML = "";
+
+
+    users.forEach(user => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "user-card";
+
+
+        card.innerHTML = `
+
+            <div class="user-info">
+
+                <div class="user-avatar">
+                    ${escapeHTML(
+                        user.name
+                        .charAt(0)
+                        .toUpperCase()
+                    )}
+                </div>
+
+                <div>
+
+                    <strong>
+                        ${escapeHTML(user.name)}
+                    </strong>
+
+                    <div style="
+                        color:#87918c;
+                        font-size:12px;
+                        margin-top:3px">
+
+                        Gehalt:
+                        ${user.salaryDays}
+                        Tage
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="user-balance">
+                ${formatMoney(user.balance)}
+            </div>
+
+        `;
+
+
+        list.appendChild(card);
+
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            user.name;
+
+        option.textContent =
+            user.name;
+
+        select.appendChild(option);
+
+    });
+
+
+    select.addEventListener(
+        "change",
+        loadSelectedUser
+    );
+
+
+    loadSelectedUser();
+
+}
+
+
+async function loadSelectedUser(){
+
+    const target =
+        document.getElementById(
+            "targetUser"
+        ).value;
+
+
+    if(!target){
+        return;
+    }
+
+
+    try{
+
+        const response =
+            await fetch(
+                API +
+                "/users/" +
+                encodeURIComponent(target)
+            );
+
+
+        const user =
+            await response.json();
+
+
+        document.getElementById(
+            "adminDays"
+        ).value =
+            user.salaryDays;
+
+
+        document.getElementById(
+            "adminExpense"
+        ).value =
+            user.expensePrice;
+
+
+        document.getElementById(
+            "adminBalance"
+        ).value =
+            user.balance;
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* =========================
+   ADMIN SPEICHERN
+   ========================= */
+
+document
+.getElementById("saveSettings")
+.addEventListener(
+    "click",
+    saveAdminSettings
+);
+
+
+async function saveAdminSettings(){
+
+    const target =
+        document.getElementById(
+            "targetUser"
+        ).value;
+
+
+    const days =
+        Number(
+            document.getElementById(
+                "adminDays"
+            ).value
+        );
+
+
+    const price =
+        Number(
+            document.getElementById(
+                "adminExpense"
+            ).value
+        );
+
+
+    const balance =
+        Number(
+            document.getElementById(
+                "adminBalance"
+            ).value
+        );
+
+
+    if(!target){
+        return;
+    }
+
+
+    try{
+
+        await apiPost(
+            "/admin/salary-days",
+            {
+                name:"Haupt",
+                target:target,
+                days:days
+            }
+        );
+
+
+        await apiPost(
+            "/admin/expense-price",
+            {
+                name:"Haupt",
+                target:target,
+                price:price
+            }
+        );
+
+
+        await apiPost(
+            "/admin/balance",
+            {
+                name:"Haupt",
+                target:target,
+                balance:balance
+            }
+        );
+
+
+        showAdminStatus(
+            "Einstellungen gespeichert."
+        );
+
+
+        loadAdmin();
+
+
+        if(
+            currentUser.name === target
+        ){
+
+            const response =
+                await fetch(
+                    API +
+                    "/users/" +
+                    encodeURIComponent(
+                        target
+                    )
+                );
+
+            currentUser =
+                await response.json();
+
+            updateUserInterface();
+
+        }
+
+    }catch(error){
+
+        showAdminStatus(
+            "Fehler beim Speichern."
+        );
+
+    }
+
+}
+
+
+async function apiPost(url,data){
+
+    const response =
+        await fetch(
+            API + url,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+                body:JSON.stringify(data)
+            }
+        );
+
+
+    if(!response.ok){
+
+        const error =
+            await response.json();
+
+        throw new Error(
+            error.error ||
+            "Fehler"
+        );
+
+    }
+
+
+    return response.json();
+
+}
+
+
+function showAdminStatus(text){
+
+    const status =
+        document.getElementById(
+            "adminStatus"
+        );
+
+    status.textContent = text;
+    status.style.display = "block";
+
+
+    setTimeout(()=>{
+        status.style.display = "none";
+    },3000);
+
+}
+
+
+/* =========================
+   LOGOUT
+   ========================= */
+
+document
+.getElementById("logout")
+.addEventListener(
+    "click",
+    ()=>{
+
+        currentUser = null;
+
+        app.style.display = "none";
+        loginScreen.style.display = "flex";
+
+        nameInput.value = "";
+        loginError.style.display = "none";
+
+        document
+        .getElementById("adminNav")
+        .style.display = "none";
+
+    }
+);
+
+
+/* =========================
+   SICHERHEIT
+   ========================= */
+
+function escapeHTML(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
 }
 
 </script>
