@@ -6,16 +6,20 @@
 <title>GHOST Finance</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
 
 :root{
-    --green:#18a66a;
-    --green-dark:#0d8c57;
-    --bg:#f4f7f5;
+    --green:#19a86b;
+    --green-dark:#0d8955;
+    --bg:#f3f7f5;
     --card:#fff;
     --text:#17231e;
-    --muted:#87918c;
-    --border:#e3e9e5;
+    --muted:#89938e;
+    --border:#e1e8e4;
 }
 
 body{
@@ -30,26 +34,25 @@ body{
 #loginScreen{
     min-height:100vh;
     display:flex;
-    align-items:center;
     justify-content:center;
+    align-items:center;
     padding:20px;
 }
 
 .login-box{
     width:100%;
     max-width:410px;
-    background:#fff;
-    padding:35px;
-    border-radius:28px;
+    background:white;
     border:1px solid var(--border);
+    border-radius:28px;
+    padding:35px;
     box-shadow:0 20px 60px rgba(20,50,35,.12);
 }
 
 .login-logo{
     text-align:center;
-    font-size:30px;
+    font-size:31px;
     font-weight:850;
-    margin-bottom:8px;
 }
 
 .login-logo span{
@@ -59,20 +62,21 @@ body{
 .login-subtitle{
     text-align:center;
     color:var(--muted);
+    margin-top:8px;
     margin-bottom:30px;
 }
 
 .login-box label{
     display:block;
     font-size:14px;
-    font-weight:650;
+    font-weight:700;
     margin-bottom:8px;
 }
 
 .login-box input{
     width:100%;
     height:53px;
-    border:1px solid #dce4df;
+    border:1px solid #dbe4df;
     border-radius:15px;
     padding:0 16px;
     font-size:16px;
@@ -82,7 +86,6 @@ body{
 
 .login-box input:focus{
     border-color:var(--green);
-    box-shadow:0 0 0 3px rgba(24,166,106,.1);
 }
 
 .login-button{
@@ -97,10 +100,14 @@ body{
     cursor:pointer;
 }
 
+.login-button:hover{
+    background:var(--green-dark);
+}
+
 .login-error{
     display:none;
-    color:#d65353;
     background:#fff0f0;
+    color:#d34e4e;
     padding:12px;
     border-radius:12px;
     margin-bottom:14px;
@@ -115,7 +122,7 @@ body{
 
 .header{
     height:68px;
-    background:#fff;
+    background:white;
     border-bottom:1px solid var(--border);
     display:flex;
     align-items:center;
@@ -143,7 +150,7 @@ body{
 
 .user-name{
     font-size:14px;
-    font-weight:650;
+    font-weight:700;
 }
 
 .avatar{
@@ -155,21 +162,21 @@ body{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-weight:750;
+    font-weight:800;
 }
 
 .logout{
     border:0;
-    background:#f0f3f1;
+    background:#eef2ef;
     border-radius:10px;
-    padding:8px 10px;
+    padding:9px 11px;
     cursor:pointer;
 }
 
 .app{
     max-width:900px;
     margin:auto;
-    padding:28px 20px 100px;
+    padding:28px 20px 105px;
 }
 
 .page{
@@ -179,6 +186,8 @@ body{
 .page.active{
     display:block;
 }
+
+/* HOME */
 
 .welcome{
     margin-bottom:22px;
@@ -193,10 +202,8 @@ body{
     color:var(--muted);
 }
 
-/* KONTO */
-
 .account-card{
-    background:linear-gradient(135deg,#17231e,#28483a);
+    background:linear-gradient(135deg,#17231e,#294a3b);
     color:white;
     border-radius:25px;
     padding:28px;
@@ -227,29 +234,29 @@ body{
 }
 
 .account-type{
-    color:#b8c8c0;
+    color:#b7c8bf;
     font-size:13px;
     margin-top:3px;
 }
 
 .balance-label{
-    color:#b8c8c0;
+    color:#b7c8bf;
     font-size:14px;
     margin-top:28px;
 }
 
 .balance{
     font-size:43px;
-    font-weight:800;
+    font-weight:850;
     margin-top:4px;
 }
 
-/* DIAGRAMM */
+/* CHART */
 
 .chart-card,
 .salary-card,
-.admin-card,
-.users-card{
+.users-card,
+.admin-card{
     background:white;
     border:1px solid var(--border);
     border-radius:24px;
@@ -265,7 +272,7 @@ body{
 
 .chart-title{
     font-size:19px;
-    font-weight:750;
+    font-weight:800;
 }
 
 .chart-total{
@@ -298,7 +305,6 @@ body{
     background:var(--green);
     border-radius:8px 8px 3px 3px;
     min-height:3px;
-    transition:.25s;
 }
 
 .day-name{
@@ -332,7 +338,7 @@ body{
 
 .salary-title{
     font-size:24px;
-    font-weight:800;
+    font-weight:850;
 }
 
 .salary-text{
@@ -351,8 +357,14 @@ body{
     color:var(--muted);
 }
 
-.salary-date{
+.salary-amount{
     margin-top:20px;
+    font-size:18px;
+    font-weight:750;
+}
+
+.salary-date{
+    margin-top:15px;
     padding:14px;
     border-radius:14px;
     background:#f5f8f6;
@@ -362,13 +374,13 @@ body{
 /* ADMIN */
 
 .admin-title{
-    font-size:27px;
-    font-weight:800;
-    margin-bottom:5px;
+    font-size:28px;
+    font-weight:850;
 }
 
 .admin-subtitle{
     color:var(--muted);
+    margin-top:5px;
     margin-bottom:25px;
 }
 
@@ -376,6 +388,7 @@ body{
     display:flex;
     flex-direction:column;
     gap:10px;
+    margin-top:15px;
 }
 
 .user-card{
@@ -405,8 +418,18 @@ body{
     font-weight:800;
 }
 
+.user-details strong{
+    display:block;
+}
+
+.user-details small{
+    color:var(--muted);
+    display:block;
+    margin-top:3px;
+}
+
 .user-balance{
-    font-weight:750;
+    font-weight:800;
 }
 
 .setting{
@@ -418,39 +441,45 @@ body{
 
 .setting label{
     font-size:13px;
-    font-weight:700;
+    font-weight:750;
 }
 
 .setting input,
 .setting select{
+    width:100%;
     height:48px;
     border:1px solid #dce4df;
     border-radius:13px;
     padding:0 13px;
     font-size:15px;
     outline:none;
-    background:#fff;
+    background:white;
+}
+
+.setting input:focus,
+.setting select:focus{
+    border-color:var(--green);
 }
 
 .save-button{
     width:100%;
-    height:48px;
+    height:50px;
     border:0;
-    border-radius:13px;
+    border-radius:14px;
     background:var(--green);
-    color:#fff;
-    font-weight:750;
+    color:white;
+    font-weight:800;
     cursor:pointer;
-    margin-top:15px;
+    margin-top:18px;
 }
 
 .status{
     display:none;
     margin-top:12px;
-    padding:11px;
+    padding:12px;
     border-radius:12px;
     background:#eaf7f1;
-    color:#128653;
+    color:#118653;
     font-size:13px;
 }
 
@@ -462,7 +491,7 @@ body{
     left:0;
     right:0;
     height:74px;
-    background:rgba(255,255,255,.96);
+    background:rgba(255,255,255,.97);
     backdrop-filter:blur(15px);
     border-top:1px solid var(--border);
     display:flex;
@@ -487,7 +516,7 @@ body{
 
 .nav-button.active{
     color:var(--green);
-    font-weight:700;
+    font-weight:750;
 }
 
 .nav-icon{
@@ -530,14 +559,15 @@ body{
 
     .chart-card,
     .salary-card,
-    .admin-card,
-    .users-card{
+    .users-card,
+    .admin-card{
         border-radius:20px;
         padding:19px;
     }
 
     .chart{
         height:200px;
+        gap:4px;
     }
 
     .bottom-nav{
@@ -551,7 +581,7 @@ body{
 
     .user-card{
         align-items:flex-start;
-        flex-direction:column;
+        gap:12px;
     }
 }
 </style>
@@ -586,8 +616,8 @@ body{
             autocomplete="name">
 
         <button
-            class="login-button"
-            id="loginButton">
+            id="loginButton"
+            class="login-button">
             Anmelden
         </button>
 
@@ -609,18 +639,18 @@ body{
     <div class="user-area">
 
         <span
-            class="user-name"
-            id="headerName">
+            id="headerName"
+            class="user-name">
         </span>
 
         <div
-            class="avatar"
-            id="avatar">
+            id="avatar"
+            class="avatar">
         </div>
 
         <button
-            class="logout"
-            id="logout">
+            id="logout"
+            class="logout">
             ↪
         </button>
 
@@ -640,7 +670,7 @@ body{
     <div class="welcome">
 
         <h1 id="welcomeTitle">
-            Guten Abend 👋
+            Willkommen 👋
         </h1>
 
         <p>
@@ -678,8 +708,8 @@ body{
         </div>
 
         <div
-            class="balance"
-            id="balance">
+            id="balance"
+            class="balance">
             0,00 €
         </div>
 
@@ -723,7 +753,7 @@ body{
         </h1>
 
         <p>
-            Wann dein nächstes Gehalt kommt
+            Deine nächste Auszahlung
         </p>
 
     </div>
@@ -736,7 +766,7 @@ body{
         </div>
 
         <div class="salary-title">
-            Dein nächstes Gehalt
+            Nächstes Gehalt
         </div>
 
         <div class="salary-text">
@@ -744,8 +774,8 @@ body{
         </div>
 
         <div
-            class="days"
-            id="salaryDays">
+            id="salaryDays"
+            class="days">
             0
         </div>
 
@@ -754,8 +784,14 @@ body{
         </div>
 
         <div
-            class="salary-date"
-            id="salaryDate">
+            id="salaryAmount"
+            class="salary-amount">
+            Gehalt: 0,00 €
+        </div>
+
+        <div
+            id="salaryDate"
+            class="salary-date">
             Noch 0 Tage bis zum Gehalt
         </div>
 
@@ -771,24 +807,23 @@ body{
     class="page">
 
     <div class="admin-title">
-        Admin-Zentrale
+        Verwaltung
     </div>
 
     <div class="admin-subtitle">
-        Benutzer und Finanzwerte verwalten
+        Benutzer und Gehälter verwalten
     </div>
 
 
     <div class="users-card">
 
         <div class="chart-title">
-            Alle angemeldeten Benutzer
+            Alle angemeldeten
         </div>
 
         <div
             id="usersList"
-            class="users-list"
-            style="margin-top:15px">
+            class="users-list">
         </div>
 
     </div>
@@ -830,6 +865,22 @@ body{
         <div class="setting">
 
             <label>
+                Gehalt pro Auszahlung
+            </label>
+
+            <input
+                id="adminSalary"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0">
+
+        </div>
+
+
+        <div class="setting">
+
+            <label>
                 Preis pro Ausgabe
             </label>
 
@@ -861,9 +912,7 @@ body{
         <button
             id="saveSettings"
             class="save-button">
-
-            Einstellungen speichern
-
+            Speichern
         </button>
 
 
@@ -879,13 +928,18 @@ body{
 </main>
 
 
+<!-- BOTTOM NAV -->
+
 <nav class="bottom-nav">
 
     <button
         class="nav-button active"
         data-page="homePage">
 
-        <span class="nav-icon">⌂</span>
+        <span class="nav-icon">
+            ⌂
+        </span>
+
         Home
 
     </button>
@@ -895,7 +949,10 @@ body{
         class="nav-button"
         data-page="salaryPage">
 
-        <span class="nav-icon">💶</span>
+        <span class="nav-icon">
+            💶
+        </span>
+
         Nächstes Gehalt
 
     </button>
@@ -906,7 +963,10 @@ body{
         class="nav-button admin-nav"
         data-page="adminPage">
 
-        <span class="nav-icon">⚙</span>
+        <span class="nav-icon">
+            ⚙
+        </span>
+
         Verwaltung
 
     </button>
@@ -918,27 +978,11 @@ body{
 
 <script>
 
-/*
-====================================================
-LOCAL STORAGE
-====================================================
+/* ==================================================
+   LOCAL STORAGE
+================================================== */
 
-Jeder Benutzer bekommt seinen eigenen Datensatz.
-
-Gespeichert werden:
-
-- Name
-- Kontostand
-- Gehaltstage
-- Ausgabenpreis
-- Ausgaben der letzten 7 Tage
-
-Zusätzlich wird der aktuell angemeldete
-Benutzer gespeichert.
-*/
-
-
-const STORAGE_KEY = "ghostFinanceUsers";
+const USERS_KEY = "ghostFinanceUsers";
 const CURRENT_USER_KEY = "ghostFinanceCurrentUser";
 
 
@@ -946,29 +990,26 @@ let users = loadUsers();
 let currentUser = null;
 
 
-/* Benutzer aus LocalStorage laden */
+/* ==================================================
+   DATEN LADEN
+================================================== */
 
 function loadUsers(){
 
     try{
 
-        const saved =
-            localStorage.getItem(
-                STORAGE_KEY
-            );
+        const data =
+            localStorage.getItem(USERS_KEY);
 
-        if(!saved){
+        if(!data){
             return {};
         }
 
-        return JSON.parse(saved);
+        return JSON.parse(data);
 
     }catch(error){
 
-        console.error(
-            "LocalStorage konnte nicht gelesen werden.",
-            error
-        );
+        console.error(error);
 
         return {};
 
@@ -977,73 +1018,74 @@ function loadUsers(){
 }
 
 
-/* Benutzer speichern */
+/* ==================================================
+   DATEN SPEICHERN
+================================================== */
 
 function saveUsers(){
 
     localStorage.setItem(
-        STORAGE_KEY,
+        USERS_KEY,
         JSON.stringify(users)
     );
 
 }
 
 
-/* aktuellen Benutzer speichern */
+/* ==================================================
+   STANDARDDATEN
+================================================== */
 
-function saveCurrentUser(){
+function createUser(name){
 
-    if(currentUser){
+    return {
 
-        localStorage.setItem(
-            CURRENT_USER_KEY,
-            currentUser
-        );
+        name:name,
 
-    }
+        balance:0,
+
+        salaryDays:0,
+
+        salaryAmount:0,
+
+        expensePrice:0,
+
+        expenses:[
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+
+        /*
+            Zeitstempel für den Countdown.
+            Dadurch kann der Countdown auch
+            nach dem Schließen der Seite
+            korrekt weiterlaufen.
+        */
+
+        lastDayCheck:Date.now()
+
+    };
 
 }
 
 
-/* gespeicherten Login laden */
-
-function loadCurrentUser(){
-
-    return localStorage.getItem(
-        CURRENT_USER_KEY
-    );
-
-}
-
-
-/* =========================
+/* ==================================================
    LOGIN
-   ========================= */
-
-const loginScreen =
-    document.getElementById(
-        "loginScreen"
-    );
-
-const app =
-    document.getElementById(
-        "app"
-    );
-
-const nameInput =
-    document.getElementById(
-        "nameInput"
-    );
+================================================== */
 
 const loginButton =
-    document.getElementById(
-        "loginButton"
-    );
+    document.getElementById("loginButton");
+
+const nameInput =
+    document.getElementById("nameInput");
 
 const loginError =
-    document.getElementById(
-        "loginError"
-    );
+    document.getElementById("loginError");
 
 
 loginButton.addEventListener(
@@ -1072,9 +1114,11 @@ function login(){
 
     if(!name){
 
-        showLoginError(
-            "Bitte gib einen Namen ein."
-        );
+        loginError.textContent =
+            "Bitte gib einen Namen ein.";
+
+        loginError.style.display =
+            "block";
 
         return;
 
@@ -1082,34 +1126,13 @@ function login(){
 
 
     /*
-        Wenn der Name noch nicht existiert,
-        wird automatisch ein neues Konto
-        im LocalStorage angelegt.
+        Neuen Benutzer erstellen.
     */
 
     if(!users[name]){
 
-        users[name] = {
-
-            name:name,
-
-            balance:0,
-
-            salaryDays:0,
-
-            expensePrice:0,
-
-            expenses:[
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0
-            ]
-
-        };
+        users[name] =
+            createUser(name);
 
         saveUsers();
 
@@ -1118,29 +1141,29 @@ function login(){
 
     currentUser = name;
 
-    saveCurrentUser();
+
+    localStorage.setItem(
+        CURRENT_USER_KEY,
+        name
+    );
+
 
     openApp();
 
 }
 
 
-function showLoginError(text){
-
-    loginError.textContent = text;
-    loginError.style.display = "block";
-
-}
-
-
-/* =========================
+/* ==================================================
    APP ÖFFNEN
-   ========================= */
+================================================== */
 
 function openApp(){
 
-    loginScreen.style.display = "none";
-    app.style.display = "block";
+    loginScreen.style.display =
+        "none";
+
+    app.style.display =
+        "block";
 
 
     const user =
@@ -1162,35 +1185,146 @@ function openApp(){
 
 
     /*
-        "Haupt" bekommt das
-        Verwaltungsmenü.
+        Nur "Haupt" bekommt
+        das Verwaltungsmenü.
     */
+
+    const adminNav =
+        document.getElementById(
+            "adminNav"
+        );
+
 
     if(user.name === "Haupt"){
 
-        document.getElementById(
-            "adminNav"
-        ).style.display = "flex";
+        adminNav.style.display =
+            "flex";
 
     }else{
 
-        document.getElementById(
-            "adminNav"
-        ).style.display = "none";
+        adminNav.style.display =
+            "none";
 
     }
 
 
-    updateUserInterface();
+    checkSalary();
+
+    updateInterface();
 
 }
 
 
-/* =========================
-   UI AKTUALISIEREN
-   ========================= */
+/* ==================================================
+   GEHALT AUTOMATISCH VERARBEITEN
+================================================== */
 
-function updateUserInterface(){
+function checkSalary(){
+
+    const user =
+        users[currentUser];
+
+
+    if(!user){
+        return;
+    }
+
+
+    if(typeof user.lastDayCheck !== "number"){
+
+        user.lastDayCheck =
+            Date.now();
+
+    }
+
+
+    const now =
+        Date.now();
+
+
+    const difference =
+        now - user.lastDayCheck;
+
+
+    const passedDays =
+        Math.floor(
+            difference /
+            (1000 * 60 * 60 * 24)
+        );
+
+
+    if(passedDays <= 0){
+        return;
+    }
+
+
+    user.lastDayCheck =
+        now;
+
+
+    /*
+        Countdown reduzieren.
+    */
+
+    user.salaryDays -= passedDays;
+
+
+    /*
+        Falls das Gehalt fällig ist.
+    */
+
+    while(user.salaryDays <= 0){
+
+        /*
+            Gehalt auszahlen.
+        */
+
+        user.balance +=
+            Number(
+                user.salaryAmount || 0
+            );
+
+
+        /*
+            Wenn keine gültige
+            Gehaltsdauer vorhanden ist,
+            bei 0 bleiben.
+        */
+
+        if(
+            !user.salaryInterval ||
+            user.salaryInterval <= 0
+        ){
+
+            user.salaryDays = 0;
+
+            break;
+
+        }
+
+
+        user.salaryDays +=
+            user.salaryInterval;
+
+    }
+
+
+    user.balance =
+        Number(
+            user.balance.toFixed(2)
+        );
+
+
+    saveUsers();
+
+}
+
+
+/* ==================================================
+   UI
+================================================== */
+
+function updateInterface(){
 
     const user =
         users[currentUser];
@@ -1209,23 +1343,34 @@ function updateUserInterface(){
 
 
     document.getElementById(
+        "salaryAmount"
+    ).textContent =
+        "Gehalt: " +
+        formatMoney(
+            user.salaryAmount
+        );
+
+
+    document.getElementById(
         "salaryDate"
     ).textContent =
-        "Noch " +
-        user.salaryDays +
-        " Tage bis zum Gehalt";
+        user.salaryDays === 0
+        ? "Gehalt ist heute fällig"
+        : "Noch " +
+          user.salaryDays +
+          " Tage bis zum Gehalt";
 
 
     drawChart(
-        user.expenses
+        user.expenses || []
     );
 
 }
 
 
-/* =========================
-   GELD
-   ========================= */
+/* ==================================================
+   GELD FORMATIEREN
+================================================== */
 
 function formatMoney(value){
 
@@ -1241,9 +1386,9 @@ function formatMoney(value){
 }
 
 
-/* =========================
+/* ==================================================
    DIAGRAMM
-   ========================= */
+================================================== */
 
 function drawChart(expenses){
 
@@ -1263,9 +1408,7 @@ function drawChart(expenses){
 
 
     while(values.length < 7){
-
         values.unshift(0);
-
     }
 
 
@@ -1281,7 +1424,7 @@ function drawChart(expenses){
         new Date();
 
 
-    const dayNames = [];
+    const names = [];
 
 
     for(let i=6;i>=0;i--){
@@ -1294,7 +1437,7 @@ function drawChart(expenses){
         );
 
 
-        dayNames.push(
+        names.push(
             date
             .toLocaleDateString(
                 "de-DE",
@@ -1363,7 +1506,7 @@ function drawChart(expenses){
                 "day-name";
 
             label.textContent =
-                dayNames[index];
+                names[index];
 
 
             day.appendChild(amount);
@@ -1379,9 +1522,9 @@ function drawChart(expenses){
 }
 
 
-/* =========================
+/* ==================================================
    NAVIGATION
-   ========================= */
+================================================== */
 
 document
 .querySelectorAll(".nav-button")
@@ -1391,12 +1534,14 @@ document
         "click",
         ()=>{
 
-            const target =
+            const page =
                 button.dataset.page;
 
 
             document
-            .querySelectorAll(".nav-button")
+            .querySelectorAll(
+                ".nav-button"
+            )
             .forEach(b =>
                 b.classList.remove(
                     "active"
@@ -1410,30 +1555,24 @@ document
 
 
             document
-            .querySelectorAll(".page")
-            .forEach(page =>
-                page.classList.remove(
+            .querySelectorAll(
+                ".page"
+            )
+            .forEach(p =>
+                p.classList.remove(
                     "active"
                 )
             );
 
 
             document
-            .getElementById(target)
+            .getElementById(page)
             .classList.add("active");
 
 
-            if(target === "adminPage"){
-
+            if(page === "adminPage"){
                 loadAdmin();
-
             }
-
-
-            window.scrollTo({
-                top:0,
-                behavior:"smooth"
-            });
 
         }
     );
@@ -1441,9 +1580,9 @@ document
 });
 
 
-/* =========================
+/* ==================================================
    ADMIN
-   ========================= */
+================================================== */
 
 function loadAdmin(){
 
@@ -1463,7 +1602,6 @@ function renderUsers(){
         document.getElementById(
             "usersList"
         );
-
 
     const select =
         document.getElementById(
@@ -1491,46 +1629,86 @@ function renderUsers(){
             "user-card";
 
 
-        card.innerHTML = `
+        const info =
+            document.createElement(
+                "div"
+            );
 
-            <div class="user-info">
+        info.className =
+            "user-info";
 
-                <div class="user-avatar">
-                    ${escapeHTML(
-                        name
-                        .charAt(0)
-                        .toUpperCase()
-                    )}
-                </div>
 
-                <div>
+        const avatar =
+            document.createElement(
+                "div"
+            );
 
-                    <strong>
-                        ${escapeHTML(name)}
-                    </strong>
+        avatar.className =
+            "user-avatar";
 
-                    <div style="
-                        color:#87918c;
-                        font-size:12px;
-                        margin-top:3px">
+        avatar.textContent =
+            name
+            .charAt(0)
+            .toUpperCase();
 
-                        Gehalt:
-                        ${user.salaryDays}
-                        Tage
 
-                    </div>
+        const details =
+            document.createElement(
+                "div"
+            );
 
-                </div>
+        details.className =
+            "user-details";
 
-            </div>
 
-            <div class="user-balance">
-                ${formatMoney(
-                    user.balance
-                )}
-            </div>
+        const strong =
+            document.createElement(
+                "strong"
+            );
 
-        `;
+        strong.textContent =
+            name;
+
+
+        const small =
+            document.createElement(
+                "small"
+            );
+
+        small.textContent =
+            "Gehalt: " +
+            formatMoney(
+                user.salaryAmount
+            ) +
+            " · " +
+            user.salaryDays +
+            " Tage";
+
+
+        details.appendChild(strong);
+        details.appendChild(small);
+
+
+        info.appendChild(avatar);
+        info.appendChild(details);
+
+
+        const balance =
+            document.createElement(
+                "div"
+            );
+
+        balance.className =
+            "user-balance";
+
+        balance.textContent =
+            formatMoney(
+                user.balance
+            );
+
+
+        card.appendChild(info);
+        card.appendChild(balance);
 
 
         list.appendChild(card);
@@ -1541,8 +1719,11 @@ function renderUsers(){
                 "option"
             );
 
-        option.value = name;
-        option.textContent = name;
+        option.value =
+            name;
+
+        option.textContent =
+            name;
 
         select.appendChild(option);
 
@@ -1553,6 +1734,10 @@ function renderUsers(){
 
 }
 
+
+/* ==================================================
+   BENUTZER AUSWÄHLEN
+================================================== */
 
 document
 .getElementById("targetUser")
@@ -1586,6 +1771,12 @@ function loadSelectedUser(){
 
 
     document.getElementById(
+        "adminSalary"
+    ).value =
+        user.salaryAmount;
+
+
+    document.getElementById(
         "adminExpense"
     ).value =
         user.expensePrice;
@@ -1599,19 +1790,19 @@ function loadSelectedUser(){
 }
 
 
-/* =========================
+/* ==================================================
    ADMIN SPEICHERN
-   ========================= */
+================================================== */
 
 document
 .getElementById("saveSettings")
 .addEventListener(
     "click",
-    saveAdminSettings
+    saveSettings
 );
 
 
-function saveAdminSettings(){
+function saveSettings(){
 
     if(currentUser !== "Haupt"){
         return;
@@ -1630,18 +1821,37 @@ function saveAdminSettings(){
 
 
     const days =
-        Number(
-            document.getElementById(
-                "adminDays"
-            ).value
+        Math.max(
+            0,
+            Math.floor(
+                Number(
+                    document.getElementById(
+                        "adminDays"
+                    ).value
+                ) || 0
+            )
+        );
+
+
+    const salary =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "adminSalary"
+                ).value
+            ) || 0
         );
 
 
     const expense =
-        Number(
-            document.getElementById(
-                "adminExpense"
-            ).value
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "adminExpense"
+                ).value
+            ) || 0
         );
 
 
@@ -1650,61 +1860,77 @@ function saveAdminSettings(){
             document.getElementById(
                 "adminBalance"
             ).value
+        ) || 0;
+
+
+    const user =
+        users[target];
+
+
+    /*
+        Die eingegebenen Tage werden
+        gleichzeitig als neues
+        Gehaltsintervall gespeichert.
+
+        Beispiel:
+
+        Tage: 7
+        Gehalt: 100 €
+
+        => alle 7 Tage 100 €
+    */
+
+    user.salaryDays =
+        days;
+
+    user.salaryInterval =
+        days;
+
+    user.salaryAmount =
+        Number(
+            salary.toFixed(2)
         );
 
-
-    users[target].salaryDays =
-        Math.max(
-            0,
-            Math.floor(
-                Number.isFinite(days)
-                ? days
-                : 0
-            )
+    user.expensePrice =
+        Number(
+            expense.toFixed(2)
         );
 
-
-    users[target].expensePrice =
-        Math.max(
-            0,
-            Number.isFinite(expense)
-            ? Number(expense.toFixed(2))
-            : 0
+    user.balance =
+        Number(
+            balance.toFixed(2)
         );
 
-
-    users[target].balance =
-        Number.isFinite(balance)
-        ? Number(balance.toFixed(2))
-        : 0;
+    user.lastDayCheck =
+        Date.now();
 
 
     saveUsers();
 
 
-    renderUsers();
-
-
-    /*
-        Falls Haupt sich selbst bearbeitet,
-        wird die Oberfläche direkt aktualisiert.
-    */
-
     if(target === currentUser){
 
-        updateUserInterface();
+        checkSalary();
+        updateInterface();
 
     }
 
 
-    showAdminStatus(
+    renderUsers();
+
+
+    showStatus(
         "Einstellungen gespeichert."
     );
 
 }
 
 
-function showAdminStatus(text){
+/* ==================================================
+   STATUS
+================================================== */
+
+function showStatus(text){
 
     const status =
         document.getElementById(
@@ -1712,13 +1938,17 @@ function showAdminStatus(text){
         );
 
 
-    status.textContent = text;
-    status.style.display = "block";
+    status.textContent =
+        text;
+
+    status.style.display =
+        "block";
 
 
     setTimeout(
         ()=>{
-            status.style.display = "none";
+            status.style.display =
+                "none";
         },
         3000
     );
@@ -1726,9 +1956,9 @@ function showAdminStatus(text){
 }
 
 
-/* =========================
+/* ==================================================
    LOGOUT
-   ========================= */
+================================================== */
 
 document
 .getElementById("logout")
@@ -1738,12 +1968,14 @@ document
 
         currentUser = null;
 
+
         localStorage.removeItem(
             CURRENT_USER_KEY
         );
 
 
-        app.style.display = "none";
+        app.style.display =
+            "none";
 
         loginScreen.style.display =
             "flex";
@@ -1754,39 +1986,18 @@ document
         loginError.style.display =
             "none";
 
-
-        document
-        .getElementById(
-            "adminNav"
-        )
-        .style.display = "none";
-
     }
 );
 
 
-/* =========================
-   HTML SICHERN
-   ========================= */
-
-function escapeHTML(text){
-
-    return String(text)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-
-}
-
-
-/* =========================
-   AUTOMATISCH EINLOGGEN
-   ========================= */
+/* ==================================================
+   AUTOMATISCHER LOGIN
+================================================== */
 
 const savedUser =
-    loadCurrentUser();
+    localStorage.getItem(
+        CURRENT_USER_KEY
+    );
 
 
 if(
@@ -1797,9 +2008,30 @@ if(
     currentUser =
         savedUser;
 
+    checkSalary();
     openApp();
 
 }
+
+
+/* ==================================================
+   COUNTDOWN AKTUALISIEREN
+================================================== */
+
+setInterval(
+    ()=>{
+
+        if(!currentUser){
+            return;
+        }
+
+
+        checkSalary();
+        updateInterface();
+
+    },
+    60000
+);
 
 </script>
 
