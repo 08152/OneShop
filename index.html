@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST 3D ENGINE</title>
+<title>GHOST 3D Landscape Engine</title>
 
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 html,body{
     margin:0;
@@ -17,514 +15,244 @@ html,body{
     overflow:hidden;
     background:#111;
     font-family:Arial,sans-serif;
-    color:white;
-}
-
-#app{
-    position:fixed;
-    inset:0;
 }
 
 canvas{
+    position:fixed;
+    inset:0;
     display:block;
 }
 
-/* =====================================================
-   TOPBAR
-===================================================== */
-
-#topbar{
-    position:absolute;
+#top{
+    position:fixed;
+    z-index:20;
     top:0;
     left:0;
     right:0;
-
     height:58px;
-
     display:flex;
     align-items:center;
-
-    gap:6px;
-
-    padding:8px 10px;
-
-    background:rgba(24,27,30,.97);
-
-    border-bottom:1px solid #454b50;
-
-    z-index:100;
+    gap:7px;
+    padding:8px;
+    background:rgba(22,25,30,.96);
+    border-bottom:1px solid #444;
+    overflow-x:auto;
 }
 
 .logo{
-    font-size:20px;
-    font-weight:bold;
-
-    color:#ffd52d;
-
-    margin-right:10px;
-
+    color:white;
+    font-size:19px;
+    font-weight:900;
+    margin:0 12px 0 5px;
     white-space:nowrap;
 }
 
-.topButton{
+button{
+    border:1px solid #555d66;
+    background:#292e35;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#3a4048;
+}
+
+.topBtn{
     height:40px;
-
-    padding:0 12px;
-
-    background:#30363b;
-
-    color:white;
-
-    border:1px solid #515960;
-
-    border-radius:7px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    user-select:none;
-    -webkit-user-select:none;
+    padding:0 13px;
+    white-space:nowrap;
 }
 
-.topButton:hover{
-    background:#3d454b;
+.active{
+    background:#e9c300!important;
+    color:#111!important;
+    border-color:#ffe96b!important;
 }
 
-.topButton:active{
-    transform:scale(.96);
+#gravity.active{
+    background:#6849e8!important;
+    color:white!important;
 }
 
-.topButton.active{
-    background:#d49a18;
-    color:#111;
-    border-color:#ffd044;
+#play.active{
+    background:#c83c45!important;
+    color:white!important;
 }
 
-#playButton{
-    margin-left:auto;
-
-    background:#35b956;
-
-    color:#071108;
-
-    border-color:#68df82;
-}
-
-/* =====================================================
-   LEFT PANEL
-===================================================== */
-
-#leftPanel{
-    position:absolute;
-
+#left{
+    position:fixed;
+    z-index:20;
+    top:70px;
     left:10px;
-    top:68px;
-    bottom:10px;
-
-    width:220px;
-
-    background:rgba(24,27,30,.97);
-
-    border:1px solid #454b50;
-
-    border-radius:10px;
-
-    z-index:90;
-
-    padding:10px;
-
+    width:210px;
+    max-height:calc(100vh - 82px);
     overflow:auto;
-
-    box-shadow:0 8px 30px #0009;
-}
-
-.panelTitle{
-    color:#9da7af;
-
-    font-size:12px;
-
-    font-weight:bold;
-
-    margin:5px 0 8px;
-
-    text-transform:uppercase;
-}
-
-.toolButton{
-    width:100%;
-
-    min-height:42px;
-
-    margin-bottom:6px;
-
-    background:#30363b;
-
-    color:white;
-
-    border:1px solid #4d555c;
-
-    border-radius:7px;
-
-    font-weight:bold;
-
-    cursor:pointer;
-
-    text-align:left;
-
-    padding:0 12px;
-}
-
-.toolButton:hover{
-    background:#3c444a;
-}
-
-.toolButton.active{
-    background:#d49a18;
-    color:#111;
-    border-color:#ffd044;
-}
-
-hr{
-    border:0;
-
-    border-top:1px solid #42484e;
-
-    margin:13px 0;
-}
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-.setting{
-    color:#aeb7bd;
-
-    font-size:12px;
-
-    margin:10px 0 4px;
-}
-
-.settingValue{
-    float:right;
-
-    color:white;
-}
-
-input[type="range"]{
-    width:100%;
-}
-
-input[type="color"]{
-    width:100%;
-
-    height:35px;
-
-    border:1px solid #555;
-
-    background:#111;
-
-    border-radius:6px;
-}
-
-/* =====================================================
-   RIGHT INSPECTOR
-===================================================== */
-
-#rightPanel{
-    position:absolute;
-
-    top:68px;
-    right:10px;
-    bottom:10px;
-
-    width:260px;
-
-    background:rgba(24,27,30,.97);
-
-    border:1px solid #454b50;
-
-    border-radius:10px;
-
-    z-index:90;
-
     padding:12px;
-
-    overflow:auto;
-
-    box-shadow:0 8px 30px #0009;
+    border-radius:12px;
+    background:rgba(24,28,33,.96);
+    border:1px solid #454c55;
+    color:white;
 }
 
-.inspectorTitle{
-    font-size:18px;
-
-    font-weight:bold;
-
-    margin-bottom:12px;
-}
-
-#noObject{
-    color:#8d979f;
-
-    font-size:13px;
-
-    line-height:1.5;
-}
-
-#objectInspector{
-    display:none;
-}
-
-.fieldTitle{
-    color:#aeb7bd;
-
+.title{
     font-size:11px;
-
-    margin-top:10px;
+    color:#aeb5bd;
+    font-weight:bold;
+    letter-spacing:1px;
+    margin:3px 0 9px;
 }
 
-input[type="text"],
-input[type="number"],
+.tool{
+    width:100%;
+    height:42px;
+    margin-bottom:7px;
+    font-size:13px;
+}
+
+.section{
+    border-top:1px solid #41474f;
+    margin-top:12px;
+    padding-top:12px;
+}
+
+.label{
+    display:flex;
+    justify-content:space-between;
+    color:#ddd;
+    font-size:12px;
+    margin-bottom:5px;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+#right{
+    position:fixed;
+    z-index:20;
+    top:70px;
+    right:10px;
+    width:245px;
+    max-height:calc(100vh - 82px);
+    overflow:auto;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(24,28,33,.96);
+    border:1px solid #454c55;
+    color:white;
+}
+
+input[type=text],
+input[type=number],
 textarea{
     width:100%;
-
-    background:#111518;
-
+    background:#11151a;
     color:white;
-
-    border:1px solid #485159;
-
+    border:1px solid #505761;
     border-radius:6px;
-
     padding:8px;
-
     outline:none;
 }
 
-input:focus,
-textarea:focus{
-    border-color:#e1a620;
-}
-
-.vec{
+.row{
     display:grid;
-
-    grid-template-columns:
-        1fr 1fr 1fr;
-
-    gap:4px;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-bottom:7px;
 }
 
-.vec input{
-    min-width:0;
+.small{
+    width:100%;
+    height:35px;
+    margin-top:6px;
 }
 
 textarea{
-    min-height:180px;
-
+    min-height:110px;
     resize:vertical;
-
     font-family:monospace;
-
     font-size:12px;
-
-    line-height:1.4;
 }
-
-.actionButton{
-    width:100%;
-
-    margin-top:7px;
-
-    padding:9px;
-
-    background:#30373d;
-
-    color:white;
-
-    border:1px solid #4e565d;
-
-    border-radius:6px;
-
-    cursor:pointer;
-
-    font-weight:bold;
-}
-
-.actionButton:hover{
-    background:#3d464d;
-}
-
-.danger{
-    background:#933434;
-    border-color:#b94b4b;
-}
-
-.danger:hover{
-    background:#b13d3d;
-}
-
-/* =====================================================
-   STATUS
-===================================================== */
 
 #status{
-    position:absolute;
-
-    bottom:18px;
-    left:245px;
-
-    z-index:80;
-
-    background:rgba(15,17,19,.9);
-
-    border:1px solid #454b50;
-
-    border-radius:7px;
-
-    padding:8px 12px;
-
+    position:fixed;
+    z-index:30;
+    left:12px;
+    bottom:12px;
+    background:rgba(20,24,29,.9);
+    border:1px solid #444;
+    border-radius:8px;
+    padding:8px 11px;
+    color:white;
     font-size:12px;
-
-    color:#d3d8dc;
-
     pointer-events:none;
 }
 
-/* =====================================================
-   BRUSH CURSOR
-===================================================== */
-
-#brushCursor{
-    position:absolute;
-
-    width:50px;
-    height:50px;
-
-    border:2px solid #ffd22e;
-
-    border-radius:50%;
-
-    transform:translate(-50%,-50%);
-
-    pointer-events:none;
-
-    z-index:50;
-
-    display:none;
-}
-
-/* =====================================================
-   PLAY INDICATOR
-===================================================== */
-
-#playIndicator{
-    position:absolute;
-
-    top:70px;
+#help{
+    position:fixed;
+    z-index:30;
     left:50%;
-
     transform:translateX(-50%);
-
-    background:#35b956;
-
-    color:#071108;
-
-    padding:7px 14px;
-
-    border-radius:20px;
-
+    bottom:12px;
+    background:rgba(20,24,29,.9);
+    border:1px solid #444;
+    border-radius:8px;
+    padding:8px 12px;
+    color:#ddd;
     font-size:12px;
-
-    font-weight:bold;
-
-    display:none;
-
-    z-index:120;
-
-    box-shadow:0 3px 12px #0008;
+    pointer-events:none;
 }
 
-/* =====================================================
-   MODAL
-===================================================== */
-
-#modal{
-    position:absolute;
-
+#start{
+    position:fixed;
     inset:0;
-
-    background:rgba(0,0,0,.65);
-
-    display:none;
-
+    z-index:100;
+    display:flex;
     align-items:center;
     justify-content:center;
-
-    z-index:300;
+    background:rgba(0,0,0,.5);
 }
 
-.modalBox{
-    width:440px;
-
+.startBox{
+    width:370px;
     max-width:90%;
-
-    background:#22272c;
-
-    border:1px solid #555e66;
-
-    border-radius:12px;
-
-    padding:20px;
-
-    box-shadow:0 20px 70px #000;
+    background:#20252b;
+    border:1px solid #555d66;
+    border-radius:18px;
+    padding:28px;
+    color:white;
+    text-align:center;
+    box-shadow:0 20px 80px #000;
 }
 
-.modalBox h2{
-    margin-top:0;
+.startBox h1{
+    margin:0 0 8px;
 }
 
-.modalBox button{
+.startBox button{
     width:100%;
-
-    padding:11px;
-
-    margin-top:10px;
-
+    height:48px;
+    margin-top:15px;
+    background:#e9c300;
+    color:#111;
     border:0;
-
-    border-radius:6px;
-
-    cursor:pointer;
-
-    font-weight:bold;
+    font-size:17px;
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+@media(max-width:800px){
+    #left{
+        width:165px;
+    }
 
-@media(max-width:850px){
+    #right{
+        width:190px;
+    }
 
-    .logo{
+    #help{
         display:none;
-    }
-
-    .topButton{
-        padding:0 7px;
-        font-size:11px;
-    }
-
-    #leftPanel{
-        width:180px;
-    }
-
-    #rightPanel{
-        width:210px;
-    }
-
-    #status{
-        left:195px;
     }
 }
 </style>
@@ -532,514 +260,287 @@ textarea{
 
 <body>
 
-<div id="app"></div>
+<div id="top">
 
-<!-- =====================================================
-     TOPBAR
-===================================================== -->
+    <div class="logo">GHOST 3D</div>
 
-<div id="topbar">
-
-    <div class="logo">
-        GHOST 3D
-    </div>
-
-    <button
-        class="topButton active"
-        id="handTool">
+    <button class="topBtn active" id="hand">
         ✋ HAND
     </button>
 
-    <button
-        class="topButton"
-        id="raiseTool">
-        ⬆ ERHÖHEN
+    <button class="topBtn" id="select">
+        ↖ AUSWAHL
     </button>
 
-    <button
-        class="topButton"
-        id="lowerTool">
-        ⬇ SENKEN
+    <button class="topBtn" id="move">
+        ↔ MOVE
     </button>
 
-    <button
-        class="topButton"
-        id="smoothTool">
-        ≈ GLÄTTEN
+    <button class="topBtn" id="rotate">
+        ⟳ ROTATE
     </button>
 
-    <button
-        class="topButton"
-        id="paintTool">
-        🎨 FARBE
+    <button class="topBtn" id="scale">
+        ⤢ SCALE
     </button>
 
-    <button
-        class="topButton"
-        id="selectTool">
-        🖱 AUSWAHL
+    <button class="topBtn" id="gravity">
+        🪐 SCHWERKRAFT
     </button>
 
-    <button
-        class="topButton"
-        id="moveTool">
-        W
+    <button class="topBtn" id="newMap">
+        🌍 NEUE INSEL
     </button>
 
-    <button
-        class="topButton"
-        id="rotateTool">
-        E
+    <button class="topBtn" id="save">
+        💾 SPEICHERN
     </button>
 
-    <button
-        class="topButton"
-        id="scaleTool">
-        R
+    <button class="topBtn" id="load">
+        📂 LADEN
     </button>
 
-    <button
-        class="topButton"
-        id="addCube">
-        ＋ CUBE
-    </button>
-
-    <button
-        class="topButton"
-        id="addSphere">
-        ＋ KUGEL
-    </button>
-
-    <button
-        class="topButton"
-        id="addCylinder">
-        ＋ ZYLINDER
-    </button>
-
-    <button
-        class="topButton"
-        id="playButton">
+    <button class="topBtn" id="play">
         ▶ PLAY
     </button>
 
 </div>
 
-<!-- =====================================================
-     LEFT PANEL
-===================================================== -->
 
-<div id="leftPanel">
+<div id="left">
 
-    <div class="panelTitle">
-        TERRAIN
-    </div>
+    <div class="title">LANDSCAPE</div>
 
-    <button
-        class="toolButton active"
-        id="handSide">
-        ✋ Hand / Kamera
+    <button class="tool active" id="raise">
+        ⬆ ERHÖHEN
     </button>
 
-    <button
-        class="toolButton"
-        id="raiseSide">
-        ⬆ Terrain erhöhen
+    <button class="tool" id="lower">
+        ⬇ SENKEN
     </button>
 
-    <button
-        class="toolButton"
-        id="lowerSide">
-        ⬇ Terrain senken
+    <button class="tool" id="smooth">
+        ◯ GLÄTTEN
     </button>
 
-    <button
-        class="toolButton"
-        id="smoothSide">
-        ≈ Terrain glätten
+    <button class="tool" id="flatten">
+        ▬ EBENEN
     </button>
 
-    <button
-        class="toolButton"
-        id="paintSide">
-        🎨 Terrain färben
-    </button>
+    <div class="section">
 
-    <div class="setting">
-        Pinselgröße
-        <span
-            class="settingValue"
-            id="brushSizeValue">
-            30
-        </span>
-    </div>
+        <div class="title">BRUSH</div>
 
-    <input
-        type="range"
-        id="brushSize"
-        min="5"
-        max="100"
-        value="30">
-
-    <div class="setting">
-        Stärke
-        <span
-            class="settingValue"
-            id="brushStrengthValue">
-            5
-        </span>
-    </div>
-
-    <input
-        type="range"
-        id="brushStrength"
-        min="1"
-        max="20"
-        value="5">
-
-    <div class="setting">
-        Terrain-Farbe
-    </div>
-
-    <input
-        type="color"
-        id="terrainColor"
-        value="#ffffff">
-
-    <hr>
-
-    <div class="panelTitle">
-        OBJEKTE
-    </div>
-
-    <button
-        class="toolButton"
-        id="deleteObject">
-        🗑 Objekt löschen
-    </button>
-
-    <button
-        class="toolButton"
-        id="duplicateObject">
-        ⧉ Objekt duplizieren
-    </button>
-
-    <button
-        class="toolButton"
-        id="focusObject">
-        ◎ Kamera auf Objekt
-    </button>
-
-    <hr>
-
-    <div class="panelTitle">
-        PROJEKT
-    </div>
-
-    <button
-        class="toolButton"
-        id="saveProject">
-        💾 Projekt speichern
-    </button>
-
-    <button
-        class="toolButton"
-        id="loadProject">
-        📂 Projekt laden
-    </button>
-
-    <button
-        class="toolButton"
-        id="undo">
-        ↶ Undo
-    </button>
-
-    <button
-        class="toolButton"
-        id="redo">
-        ↷ Redo
-    </button>
-
-    <hr>
-
-    <div
-        style="
-        font-size:11px;
-        color:#89939b;
-        line-height:1.6;
-        ">
-        <b style="color:#ddd">
-        Kamera:
-        </b><br>
-        Hand → Kamera bewegen<br>
-        Mausrad → Zoom<br><br>
-
-        <b style="color:#ddd">
-        Terrain:
-        </b><br>
-        Tool auswählen → klicken/ziehen<br>
-        Kamera bleibt dabei fest.<br><br>
-
-        <b style="color:#ddd">
-        Scripts:
-        </b><br>
-        Script im Inspector eintragen<br>
-        → PLAY drücken
-    </div>
-
-</div>
-
-<!-- =====================================================
-     RIGHT PANEL
-===================================================== -->
-
-<div id="rightPanel">
-
-    <div class="inspectorTitle">
-        INSPECTOR
-    </div>
-
-    <div id="noObject">
-        Kein Objekt ausgewählt.<br><br>
-        Erstelle z. B. einen Cube oder eine Kugel und klicke ihn anschließend mit AUSWAHL an.
-    </div>
-
-    <div id="objectInspector">
-
-        <div class="fieldTitle">
-            NAME
+        <div class="label">
+            <span>Größe</span>
+            <b id="sizeValue">25</b>
         </div>
 
         <input
-            type="text"
-            id="objectName"
-            value="Objekt">
+            id="brushSize"
+            type="range"
+            min="5"
+            max="100"
+            value="25"
+        >
 
-        <div class="fieldTitle">
-            POSITION X / Y / Z
+        <div class="label" style="margin-top:10px">
+            <span>Stärke</span>
+            <b id="strengthValue">5</b>
         </div>
 
-        <div class="vec">
+        <input
+            id="strength"
+            type="range"
+            min="1"
+            max="30"
+            value="5"
+        >
 
-            <input
-                type="number"
-                step=".1"
-                id="posX">
+    </div>
 
-            <input
-                type="number"
-                step=".1"
-                id="posY">
 
-            <input
-                type="number"
-                step=".1"
-                id="posZ">
+    <div class="section">
 
-        </div>
+        <div class="title">OBJECTS</div>
 
-        <div class="fieldTitle">
-            ROTATION X / Y / Z
-        </div>
-
-        <div class="vec">
-
-            <input
-                type="number"
-                step="1"
-                id="rotX">
-
-            <input
-                type="number"
-                step="1"
-                id="rotY">
-
-            <input
-                type="number"
-                step="1"
-                id="rotZ">
-
-        </div>
-
-        <div class="fieldTitle">
-            SKALIERUNG X / Y / Z
-        </div>
-
-        <div class="vec">
-
-            <input
-                type="number"
-                step=".01"
-                id="scaleX">
-
-            <input
-                type="number"
-                step=".01"
-                id="scaleY">
-
-            <input
-                type="number"
-                step=".01"
-                id="scaleZ">
-
-        </div>
-
-        <button
-            class="actionButton"
-            id="applyTransform">
-            Änderungen übernehmen
+        <button class="tool" id="cube">
+            + WÜRFEL
         </button>
 
-        <hr>
-
-        <div class="fieldTitle">
-            OBJEKT-SCRIPT
-        </div>
-
-        <textarea
-            id="scriptEditor"
-            spellcheck="false"
-            placeholder="// Beispiel:
-
-object.rotation.y += delta;
-
-// object = dein Objekt
-// THREE = Three.js
-// delta = Zeit seit letztem Frame"></textarea>
-
-        <button
-            class="actionButton"
-            id="saveScript">
-            📜 Script speichern
-        </button>
-
-        <button
-            class="actionButton"
-            id="testScript">
-            ▶ Script testen
-        </button>
-
-        <hr>
-
-        <button
-            class="actionButton"
-            id="deleteInspector">
-            🗑 Löschen
+        <button class="tool" id="sphere">
+            + KUGEL
         </button>
 
     </div>
 
 </div>
 
-<!-- =====================================================
-     STATUS
-===================================================== -->
+
+<div id="right">
+
+    <div class="title">INSPECTOR</div>
+
+    <label>Objektname</label>
+    <input id="name" type="text">
+
+    <div class="section">
+
+        <div class="title">POSITION</div>
+
+        <div class="row">
+            <div>
+                <label>X</label>
+                <input id="px" type="number" step=".1">
+            </div>
+
+            <div>
+                <label>Y</label>
+                <input id="py" type="number" step=".1">
+            </div>
+        </div>
+
+        <label>Z</label>
+        <input id="pz" type="number" step=".1">
+
+    </div>
+
+
+    <div class="section">
+
+        <div class="title">ROTATION</div>
+
+        <div class="row">
+            <div>
+                <label>X</label>
+                <input id="rx" type="number" step="1">
+            </div>
+
+            <div>
+                <label>Y</label>
+                <input id="ry" type="number" step="1">
+            </div>
+        </div>
+
+        <label>Z</label>
+        <input id="rz" type="number" step="1">
+
+    </div>
+
+
+    <div class="section">
+
+        <div class="title">SCALE</div>
+
+        <input id="scaleValue" type="number" value="1" min=".05" step=".05">
+
+    </div>
+
+
+    <button class="small" id="apply">
+        ÜBERNEHMEN
+    </button>
+
+    <button class="small" id="duplicate">
+        DUPLIZIEREN
+    </button>
+
+    <button class="small" id="delete">
+        LÖSCHEN
+    </button>
+
+
+    <div class="section">
+
+        <div class="title">SCRIPT</div>
+
+        <textarea id="script"></textarea>
+
+        <button class="small" id="applyScript">
+            SCRIPT ÜBERNEHMEN
+        </button>
+
+    </div>
+
+</div>
+
 
 <div id="status">
-    Hand-Modus | Keine WASD-Steuerung
+    HAND
 </div>
 
-<div id="brushCursor"></div>
-
-<div id="playIndicator">
-    ▶ PLAY-MODUS
+<div id="help">
+    HAND: Maus = Umschauen · WASD = Bewegen · Mausrad = Zoom · Sculpt = Terrain bearbeiten
 </div>
 
-<div id="modal">
 
-    <div class="modalBox">
+<div id="start">
 
-        <h2 id="modalTitle">
-            GHOST 3D
-        </h2>
+    <div class="startBox">
 
-        <div id="modalText"></div>
+        <h1>GHOST 3D</h1>
 
-        <button
-            id="modalClose"
-            style="
-            background:#d49a18;
-            color:#111;
-            ">
-            OK
+        <p>
+            Unreal-inspirierte Landscape-Engine
+        </p>
+
+        <p>
+            Große zusammenhängende Landschaft ohne Chunks.
+        </p>
+
+        <button id="startButton">
+            ENGINE STARTEN
         </button>
 
     </div>
 
 </div>
 
-<input
-    type="file"
-    id="projectFile"
-    accept=".json"
-    style="display:none">
 
-<!-- =====================================================
-     THREE
-===================================================== -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-<script type="importmap">
-{
-    "imports":{
-        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-}
-</script>
+<script>
 
-<script type="module">
-
-import * as THREE from "three";
-
-import {
-    OrbitControls
-} from
-"three/addons/controls/OrbitControls.js";
-
-import {
-    TransformControls
-} from
-"three/addons/controls/TransformControls.js";
-
-/* =====================================================
+/* =========================================================
    SCENE
-===================================================== */
+========================================================= */
 
-const scene =
-    new THREE.Scene();
+const scene = new THREE.Scene();
 
 scene.background =
-    new THREE.Color(
-        0x75caff
-    );
+    new THREE.Color(0x68c3ed);
 
 scene.fog =
     new THREE.Fog(
-        0x75caff,
-        700,
-        2200
+        0x68c3ed,
+        600,
+        3000
     );
 
-/* =====================================================
+
+/* =========================================================
    CAMERA
-===================================================== */
+========================================================= */
 
 const camera =
     new THREE.PerspectiveCamera(
         65,
         innerWidth / innerHeight,
         .1,
-        5000
+        10000
     );
 
+
 camera.position.set(
-    420,
-    300,
-    420
+    0,
+    180,
+    500
 );
 
-/* =====================================================
+
+/* =========================================================
    RENDERER
-===================================================== */
+========================================================= */
 
 const renderer =
     new THREE.WebGLRenderer({
@@ -1052,40 +553,35 @@ renderer.setSize(
 );
 
 renderer.setPixelRatio(
-    Math.min(
-        devicePixelRatio,
-        1.5
-    )
+    Math.min(devicePixelRatio,1.5)
 );
 
-renderer.shadowMap.enabled=true;
+renderer.shadowMap.enabled = true;
 
 renderer.shadowMap.type =
     THREE.PCFSoftShadowMap;
 
-renderer.outputColorSpace =
-    THREE.SRGBColorSpace;
+document.body.appendChild(
+    renderer.domElement
+);
 
-document
-    .getElementById("app")
-    .appendChild(renderer.domElement);
 
-/* =====================================================
+/* =========================================================
    LIGHT
-===================================================== */
+========================================================= */
 
-const ambient =
-    new THREE.AmbientLight(
+scene.add(
+    new THREE.HemisphereLight(
         0xffffff,
-        1.4
-    );
-
-scene.add(ambient);
+        0x6d8590,
+        1.7
+    )
+);
 
 const sun =
     new THREE.DirectionalLight(
         0xffffff,
-        1.8
+        2.2
     );
 
 sun.position.set(
@@ -1094,207 +590,425 @@ sun.position.set(
     300
 );
 
-sun.castShadow=true;
+sun.castShadow = true;
 
 scene.add(sun);
 
-/* =====================================================
-   ORBIT CAMERA
-===================================================== */
 
-const controls =
-    new OrbitControls(
-        camera,
-        renderer.domElement
+/* =========================================================
+   RANDOM SEED
+========================================================= */
+
+let seed =
+    Math.floor(
+        Math.random()*2147483647
     );
 
-controls.enableDamping=true;
 
-controls.dampingFactor=.08;
-
-controls.target.set(
-    0,
-    0,
-    0
-);
-
-controls.minDistance=10;
-
-controls.maxDistance=1800;
-
-controls.maxPolarAngle =
-    Math.PI*.49;
-
-/*
-    WICHTIG:
-
-    Die Kamera darf nur im Hand-Modus
-    bedient werden.
-*/
-
-controls.enabled=true;
-
-/* =====================================================
-   TRANSFORM CONTROLS
-===================================================== */
-
-const transform =
-    new TransformControls(
-        camera,
-        renderer.domElement
-    );
-
-transform.setSize(.8);
-
-scene.add(transform);
-
-transform.addEventListener(
-    "dragging-changed",
-    event=>{
-
-        if(
-            currentTool==="select" ||
-            currentTool==="move" ||
-            currentTool==="rotate" ||
-            currentTool==="scale"
-        ){
-
-            controls.enabled =
-                !event.value &&
-                currentTool==="hand";
-        }
-    }
-);
-
-/* =====================================================
+/* =========================================================
    TERRAIN
-===================================================== */
+========================================================= */
 
-const TERRAIN_SIZE=1800;
+const SIZE = 1200;
 
-const SEGMENTS=90;
+const SEGMENTS = 180;
 
-const terrainGeometry =
+const HALF = SIZE/2;
+
+const geometry =
     new THREE.PlaneGeometry(
-        TERRAIN_SIZE,
-        TERRAIN_SIZE,
+        SIZE,
+        SIZE,
         SEGMENTS,
         SEGMENTS
     );
 
-terrainGeometry.rotateX(
-    -Math.PI/2
-);
+geometry.rotateX(-Math.PI/2);
 
-const terrainMaterial =
-    new THREE.MeshStandardMaterial({
 
-        color:0xffffff,
+const position =
+    geometry.attributes.position;
 
-        roughness:.9,
 
-        metalness:0,
-
-        vertexColors:true
-    });
-
-const terrain =
-    new THREE.Mesh(
-        terrainGeometry,
-        terrainMaterial
-    );
-
-terrain.receiveShadow=true;
-
-terrain.userData.isTerrain=true;
-
-scene.add(terrain);
-
-/* =====================================================
-   TERRAIN COLORS
-===================================================== */
-
-const terrainPositions =
-    terrainGeometry.attributes.position;
-
-const terrainColors =
+const heights =
     new Float32Array(
-        terrainPositions.count*3
+        position.count
     );
+
+
+/* =========================================================
+   NOISE
+========================================================= */
+
+function random2(x,z){
+
+    let n =
+        Math.sin(
+            x*127.1 +
+            z*311.7 +
+            seed*.00001
+        ) *
+        43758.5453123;
+
+    return n -
+        Math.floor(n);
+}
+
+
+function noise(x,z){
+
+    const x0 =
+        Math.floor(x);
+
+    const z0 =
+        Math.floor(z);
+
+    const x1 =
+        x0+1;
+
+    const z1 =
+        z0+1;
+
+    const sx =
+        x-x0;
+
+    const sz =
+        z-z0;
+
+    const u =
+        sx*sx*(3-2*sx);
+
+    const v =
+        sz*sz*(3-2*sz);
+
+    const a =
+        random2(x0,z0);
+
+    const b =
+        random2(x1,z0);
+
+    const c =
+        random2(x0,z1);
+
+    const d =
+        random2(x1,z1);
+
+    return (
+        a+(b-a)*u
+    ) +
+    (
+        c+(d-c)*u
+    -
+        (a+(b-a)*u)
+    )*v;
+}
+
+
+/* =========================================================
+   UNREAL-STYLE LANDSCAPE HEIGHT
+========================================================= */
+
+function landscapeHeight(x,z){
+
+    const nx =
+        x/(SIZE*.47);
+
+    const nz =
+        z/(SIZE*.47);
+
+    const dist =
+        Math.sqrt(
+            nx*nx+nz*nz
+        );
+
+
+    /*
+       Große Inselbasis
+    */
+
+    let island =
+        Math.max(
+            0,
+            1-Math.pow(dist,1.55)
+        );
+
+
+    /*
+       Unregelmäßige Küste
+    */
+
+    const coast =
+        noise(
+            x*.012,
+            z*.012
+        );
+
+    island +=
+        (coast-.5)*
+        .25*
+        Math.max(
+            0,
+            1-dist
+        );
+
+
+    island =
+        Math.max(
+            0,
+            island
+        );
+
+
+    /*
+       Multi-Layer Landscape Noise
+    */
+
+    const large =
+        noise(
+            x*.004,
+            z*.004
+        );
+
+    const medium =
+        noise(
+            x*.012,
+            z*.012
+        );
+
+    const small =
+        noise(
+            x*.035,
+            z*.035
+        );
+
+
+    let h =
+
+        island*70
+
+        +
+
+        large*
+        45*
+        island
+
+        +
+
+        medium*
+        22*
+        island
+
+        +
+
+        small*
+        8*
+        island;
+
+
+    /*
+       Berge im Inselinneren
+    */
+
+    const mountain =
+        Math.max(
+            0,
+            1-dist*1.8
+        );
+
+    h +=
+        mountain *
+        Math.pow(
+            large,
+            2
+        ) *
+        80;
+
+
+    /*
+       Küste
+    */
+
+    h -=
+        Math.max(
+            0,
+            dist-.72
+        )*35;
+
+
+    return h;
+}
+
+
+/* =========================================================
+   CREATE TERRAIN
+========================================================= */
 
 for(
     let i=0;
-    i<terrainPositions.count;
+    i<position.count;
     i++
 ){
 
-    terrainColors[i*3]=1;
-    terrainColors[i*3+1]=1;
-    terrainColors[i*3+2]=1;
+    const x =
+        position.getX(i);
+
+    const z =
+        position.getZ(i);
+
+    const h =
+        landscapeHeight(
+            x,
+            z
+        );
+
+    position.setY(
+        i,
+        h
+    );
+
+    heights[i] = h;
 }
 
-terrainGeometry.setAttribute(
-    "color",
-    new THREE.BufferAttribute(
-        terrainColors,
-        3
-    )
-);
 
-/* =====================================================
+geometry.computeVertexNormals();
+
+
+const terrain =
+    new THREE.Mesh(
+        geometry,
+        new THREE.MeshStandardMaterial({
+            color:0xffffff,
+            roughness:1,
+            metalness:0
+        })
+    );
+
+
+terrain.receiveShadow = true;
+
+scene.add(terrain);
+
+
+/* =========================================================
    WATER
-===================================================== */
+========================================================= */
 
 const waterGeometry =
     new THREE.PlaneGeometry(
-        TERRAIN_SIZE,
-        TERRAIN_SIZE
+        3000,
+        3000
     );
 
 waterGeometry.rotateX(
     -Math.PI/2
 );
 
-const waterMaterial =
-    new THREE.MeshStandardMaterial({
-
-        color:0x1677d2,
-
-        transparent:true,
-
-        opacity:.78,
-
-        roughness:.15,
-
-        metalness:.05
-    });
 
 const water =
     new THREE.Mesh(
         waterGeometry,
-        waterMaterial
+        new THREE.MeshStandardMaterial({
+            color:0x168ed0,
+            roughness:.2,
+            metalness:.1
+        })
     );
 
-water.position.y=-4;
-
-water.receiveShadow=true;
+water.position.y = -1;
 
 scene.add(water);
 
-/* =====================================================
-   TOOLS
-===================================================== */
 
-let currentTool="hand";
+/* =========================================================
+   TERRAIN HEIGHT
+========================================================= */
 
-let brushSize=30;
+function getHeight(x,z){
 
-let brushStrength=5;
+    if(
+        x < -HALF ||
+        x > HALF ||
+        z < -HALF ||
+        z > HALF
+    ){
+        return -2;
+    }
 
-let painting=false;
+    const fx =
+        (x+HALF)/SIZE*
+        SEGMENTS;
 
-let brushPoint =
-    new THREE.Vector3();
+    const fz =
+        (z+HALF)/SIZE*
+        SEGMENTS;
+
+    let ix =
+        Math.floor(fx);
+
+    let iz =
+        Math.floor(fz);
+
+    ix =
+        Math.max(
+            0,
+            Math.min(
+                SEGMENTS-1,
+                ix
+            )
+        );
+
+    iz =
+        Math.max(
+            0,
+            Math.min(
+                SEGMENTS-1,
+                iz
+            )
+        );
+
+    const tx =
+        fx-ix;
+
+    const tz =
+        fz-iz;
+
+    const i00 =
+        iz*(SEGMENTS+1)+ix;
+
+    const i10 =
+        i00+1;
+
+    const i01 =
+        i00+(SEGMENTS+1);
+
+    const i11 =
+        i01+1;
+
+    const a =
+        heights[i00];
+
+    const b =
+        heights[i10];
+
+    const c =
+        heights[i01];
+
+    const d =
+        heights[i11];
+
+    const ab =
+        a+(b-a)*tx;
+
+    const cd =
+        c+(d-c)*tx;
+
+    return ab+(cd-ab)*tz;
+}
+
+
+/* =========================================================
+   RAYCAST
+========================================================= */
 
 const raycaster =
     new THREE.Raycaster();
@@ -1302,343 +1016,738 @@ const raycaster =
 const mouse =
     new THREE.Vector2();
 
-/* =====================================================
-   EDITOR OBJECTS
-===================================================== */
+let mouseX=0;
+let mouseY=0;
+
+
+function setMouse(e){
+
+    mouseX=e.clientX;
+    mouseY=e.clientY;
+
+    mouse.x =
+        (e.clientX/innerWidth)*2-1;
+
+    mouse.y =
+        -(e.clientY/innerHeight)*2+1;
+}
+
+
+/* =========================================================
+   TOOLS
+========================================================= */
+
+let currentTool = "hand";
+
+const topTools = {
+    hand:document.getElementById("hand"),
+    select:document.getElementById("select"),
+    move:document.getElementById("move"),
+    rotate:document.getElementById("rotate"),
+    scale:document.getElementById("scale")
+};
+
+
+const sculptTools = {
+    raise:document.getElementById("raise"),
+    lower:document.getElementById("lower"),
+    smooth:document.getElementById("smooth"),
+    flatten:document.getElementById("flatten")
+};
+
+
+function setTool(name){
+
+    currentTool=name;
+
+    Object.values(topTools)
+        .forEach(
+            b=>b.classList.remove("active")
+        );
+
+    Object.values(sculptTools)
+        .forEach(
+            b=>b.classList.remove("active")
+        );
+
+    if(topTools[name]){
+        topTools[name]
+            .classList.add("active");
+    }
+
+    if(sculptTools[name]){
+        sculptTools[name]
+            .classList.add("active");
+    }
+
+    document.getElementById("status")
+        .innerText =
+        name.toUpperCase();
+}
+
+
+for(
+    const [name,button]
+    of Object.entries(topTools)
+){
+
+    button.onclick=()=>{
+        setTool(name);
+    };
+
+}
+
+
+for(
+    const [name,button]
+    of Object.entries(sculptTools)
+){
+
+    button.onclick=()=>{
+        setTool(name);
+    };
+
+}
+
+
+/* =========================================================
+   BRUSH
+========================================================= */
+
+let brushSize=25;
+
+let brushStrength=5;
+
+let mouseDown=false;
+
+
+document.getElementById("brushSize")
+    .oninput=e=>{
+
+        brushSize =
+            Number(e.target.value);
+
+        document.getElementById(
+            "sizeValue"
+        ).innerText =
+            brushSize;
+
+    };
+
+
+document.getElementById("strength")
+    .oninput=e=>{
+
+        brushStrength =
+            Number(e.target.value);
+
+        document.getElementById(
+            "strengthValue"
+        ).innerText =
+            brushStrength;
+
+    };
+
+
+/* =========================================================
+   SCULPT TERRAIN
+========================================================= */
+
+function sculpt(){
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const hit =
+        raycaster.intersectObject(
+            terrain
+        )[0];
+
+    if(!hit)
+        return;
+
+
+    const point =
+        hit.point;
+
+
+    const radius =
+        brushSize;
+
+
+    const minX =
+        Math.max(
+            -HALF,
+            point.x-radius
+        );
+
+    const maxX =
+        Math.min(
+            HALF,
+            point.x+radius
+        );
+
+    const minZ =
+        Math.max(
+            -HALF,
+            point.z-radius
+        );
+
+    const maxZ =
+        Math.min(
+            HALF,
+            point.z+radius
+        );
+
+
+    const step =
+        SIZE/SEGMENTS;
+
+
+    const startX =
+        Math.floor(
+            (minX+HALF)/step
+        );
+
+    const endX =
+        Math.ceil(
+            (maxX+HALF)/step
+        );
+
+    const startZ =
+        Math.floor(
+            (minZ+HALF)/step
+        );
+
+    const endZ =
+        Math.ceil(
+            (maxZ+HALF)/step
+        );
+
+
+    const centerHeight =
+        getHeight(
+            point.x,
+            point.z
+        );
+
+
+    for(
+        let iz=startZ;
+        iz<=endZ;
+        iz++
+    ){
+
+        if(
+            iz<0 ||
+            iz>SEGMENTS
+        )
+            continue;
+
+
+        for(
+            let ix=startX;
+            ix<=endX;
+            ix++
+        ){
+
+            if(
+                ix<0 ||
+                ix>SEGMENTS
+            )
+                continue;
+
+
+            const x =
+                -HALF+
+                ix*step;
+
+            const z =
+                -HALF+
+                iz*step;
+
+
+            const dx =
+                x-point.x;
+
+            const dz =
+                z-point.z;
+
+            const distance =
+                Math.sqrt(
+                    dx*dx+
+                    dz*dz
+                );
+
+
+            if(
+                distance>radius
+            )
+                continue;
+
+
+            let falloff =
+                1-
+                distance/radius;
+
+
+            falloff =
+                falloff*
+                falloff;
+
+
+            const index =
+                iz*(SEGMENTS+1)+ix;
+
+
+            if(currentTool==="raise"){
+
+                heights[index] +=
+                    brushStrength*
+                    .12*
+                    falloff;
+
+            }
+
+
+            if(currentTool==="lower"){
+
+                heights[index] -=
+                    brushStrength*
+                    .12*
+                    falloff;
+
+            }
+
+
+            if(currentTool==="smooth"){
+
+                heights[index] +=
+                    (
+                        centerHeight-
+                        heights[index]
+                    )*
+                    .08*
+                    falloff;
+
+            }
+
+
+            if(currentTool==="flatten"){
+
+                heights[index] +=
+                    (
+                        centerHeight-
+                        heights[index]
+                    )*
+                    .18*
+                    falloff;
+
+            }
+
+        }
+
+    }
+
+
+    for(
+        let i=0;
+        i<position.count;
+        i++
+    ){
+
+        position.setY(
+            i,
+            heights[i]
+        );
+
+    }
+
+
+    position.needsUpdate=true;
+
+    geometry.computeVertexNormals();
+
+    geometry.attributes.normal
+        .needsUpdate=true;
+}
+
+
+/* =========================================================
+   MOUSE
+========================================================= */
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    e=>{
+
+        mouseDown=true;
+
+        setMouse(e);
+
+        if(
+            currentTool!=="hand" &&
+            currentTool!=="select" &&
+            currentTool!=="move" &&
+            currentTool!=="rotate" &&
+            currentTool!=="scale"
+        ){
+
+            sculpt();
+        }
+
+        if(
+            currentTool==="select"
+        ){
+
+            selectObject();
+        }
+
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointermove",
+    e=>{
+
+        setMouse(e);
+
+        if(
+            mouseDown &&
+            ["raise","lower","smooth","flatten"]
+            .includes(currentTool)
+        ){
+
+            sculpt();
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "pointerup",
+    ()=>{
+        mouseDown=false;
+    }
+);
+
+
+/* =========================================================
+   CAMERA / HAND
+========================================================= */
+
+let yaw=0;
+
+let pitch=-.35;
+
+let cameraDistance=500;
+
+let looking=false;
+
+let lastMouseX=0;
+
+let lastMouseY=0;
+
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    e=>{
+
+        if(currentTool==="hand"){
+
+            looking=true;
+
+            lastMouseX=e.clientX;
+            lastMouseY=e.clientY;
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "pointerup",
+    ()=>{
+        looking=false;
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointermove",
+    e=>{
+
+        if(
+            !looking ||
+            currentTool!=="hand"
+        )
+            return;
+
+
+        const dx =
+            e.clientX-lastMouseX;
+
+        const dy =
+            e.clientY-lastMouseY;
+
+
+        yaw -= dx*.006;
+
+        pitch -= dy*.005;
+
+
+        pitch =
+            Math.max(
+                -1.45,
+                Math.min(
+                    1.45,
+                    pitch
+                )
+            );
+
+
+        lastMouseX=e.clientX;
+        lastMouseY=e.clientY;
+
+    }
+);
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+renderer.domElement.addEventListener(
+    "wheel",
+    e=>{
+
+        e.preventDefault();
+
+        cameraDistance *=
+            Math.exp(
+                e.deltaY*.0012
+            );
+
+        cameraDistance =
+            Math.max(
+                2,
+                Math.min(
+                    5000,
+                    cameraDistance
+                )
+            );
+
+    },
+    {passive:false}
+);
+
+
+/* =========================================================
+   WASD
+========================================================= */
+
+const keys={};
+
+window.addEventListener(
+    "keydown",
+    e=>{
+        keys[e.key.toLowerCase()]=true;
+    }
+);
+
+window.addEventListener(
+    "keyup",
+    e=>{
+        keys[e.key.toLowerCase()]=false;
+    }
+);
+
+
+/* =========================================================
+   CAMERA TARGET
+========================================================= */
+
+const target =
+    new THREE.Vector3(
+        0,
+        0,
+        0
+    );
+
+
+function updateCamera(){
+
+    if(currentTool==="hand"){
+
+        const speed=3;
+
+        const forward =
+            new THREE.Vector3(
+                Math.sin(yaw),
+                0,
+                Math.cos(yaw)
+            );
+
+        const right =
+            new THREE.Vector3(
+                Math.cos(yaw),
+                0,
+                -Math.sin(yaw)
+            );
+
+
+        if(keys.w)
+            target.addScaledVector(
+                forward,
+                speed
+            );
+
+        if(keys.s)
+            target.addScaledVector(
+                forward,
+                -speed
+            );
+
+        if(keys.a)
+            target.addScaledVector(
+                right,
+                -speed
+            );
+
+        if(keys.d)
+            target.addScaledVector(
+                right,
+                speed
+            );
+
+    }
+
+
+    const x =
+        target.x+
+        Math.sin(yaw)*
+        Math.cos(pitch)*
+        cameraDistance;
+
+    const y =
+        target.y+
+        Math.sin(pitch)*
+        cameraDistance;
+
+    const z =
+        target.z+
+        Math.cos(yaw)*
+        Math.cos(pitch)*
+        cameraDistance;
+
+
+    camera.position.set(
+        x,
+        y,
+        z
+    );
+
+    camera.lookAt(target);
+
+}
+
+
+/* =========================================================
+   OBJECT SYSTEM
+========================================================= */
 
 const objects=[];
 
 let selected=null;
 
-/* =====================================================
-   TOOL SET
-===================================================== */
 
-function setTool(tool){
+function addObject(mesh){
 
-    currentTool=tool;
+    mesh.castShadow=true;
 
-    /*
-       Kamera nur im Hand-Modus aktiv.
-    */
+    mesh.receiveShadow=true;
 
-    controls.enabled =
-        tool==="hand";
+    mesh.userData.script="";
 
-    /*
-       Transform ausblenden,
-       wenn kein Objekt-Transform.
-    */
+    mesh.userData.name=
+        "Object_"+(objects.length+1);
 
-    if(
-        tool!=="select" &&
-        tool!=="move" &&
-        tool!=="rotate" &&
-        tool!=="scale"
-    ){
+    scene.add(mesh);
 
-        transform.detach();
-    }
+    objects.push(mesh);
 
-    document
-        .querySelectorAll(".topButton")
-        .forEach(
-            button=>{
-                button.classList.remove(
-                    "active"
-                );
-            }
-        );
+    selected=mesh;
 
-    document
-        .querySelectorAll(".toolButton")
-        .forEach(
-            button=>{
-                button.classList.remove(
-                    "active"
-                );
-            }
-        );
+    updateInspector();
 
-    const map={
-        hand:[
-            "handTool",
-            "handSide"
-        ],
-
-        raise:[
-            "raiseTool",
-            "raiseSide"
-        ],
-
-        lower:[
-            "lowerTool",
-            "lowerSide"
-        ],
-
-        smooth:[
-            "smoothTool",
-            "smoothSide"
-        ],
-
-        paint:[
-            "paintTool",
-            "paintSide"
-        ],
-
-        select:[
-            "selectTool"
-        ],
-
-        move:[
-            "moveTool"
-        ],
-
-        rotate:[
-            "rotateTool"
-        ],
-
-        scale:[
-            "scaleTool"
-        ]
-    };
-
-    if(map[tool]){
-
-        map[tool].forEach(
-            id=>{
-                const element=
-                    document.getElementById(id);
-
-                if(element)
-                    element.classList.add(
-                        "active"
-                    );
-            }
-        );
-    }
-
-    document.getElementById(
-        "status"
-    ).innerText =
-        tool==="hand"
-        ? "Hand-Modus | Kamera frei"
-        : tool==="raise"
-        ? "Erhöhen | Kamera gesperrt"
-        : tool==="lower"
-        ? "Senken | Kamera gesperrt"
-        : tool==="smooth"
-        ? "Glätten | Kamera gesperrt"
-        : tool==="paint"
-        ? "Farbe | Kamera gesperrt"
-        : tool==="select"
-        ? "Auswahl"
-        : "Transform: "+tool;
-
-    document.getElementById(
-        "brushCursor"
-    ).style.display =
-        (
-            tool==="raise" ||
-            tool==="lower" ||
-            tool==="smooth" ||
-            tool==="paint"
-        )
-        ? "block"
-        : "none";
-
-    if(
-        tool==="move" &&
-        selected
-    ){
-
-        transform.attach(
-            selected
-        );
-
-        transform.setMode(
-            "translate"
-        );
-    }
-
-    if(
-        tool==="rotate" &&
-        selected
-    ){
-
-        transform.attach(
-            selected
-        );
-
-        transform.setMode(
-            "rotate"
-        );
-    }
-
-    if(
-        tool==="scale" &&
-        selected
-    ){
-
-        transform.attach(
-            selected
-        );
-
-        transform.setMode(
-            "scale"
-        );
-    }
 }
 
-/* =====================================================
-   BUTTONS
-===================================================== */
 
-document.getElementById(
-    "handTool"
-).onclick=()=>{
-    setTool("hand");
+document.getElementById("cube").onclick=()=>{
+
+    const cube =
+        new THREE.Mesh(
+            new THREE.BoxGeometry(
+                30,
+                30,
+                30
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0xffaa22
+            })
+        );
+
+    cube.position.set(
+        target.x,
+        getHeight(
+            target.x,
+            target.z
+        )+15,
+        target.z
+    );
+
+    addObject(cube);
 };
 
-document.getElementById(
-    "handSide"
-).onclick=()=>{
-    setTool("hand");
+
+document.getElementById("sphere").onclick=()=>{
+
+    const sphere =
+        new THREE.Mesh(
+            new THREE.SphereGeometry(
+                18,
+                32,
+                20
+            ),
+            new THREE.MeshStandardMaterial({
+                color:0x55aaff
+            })
+        );
+
+    sphere.position.set(
+        target.x,
+        getHeight(
+            target.x,
+            target.z
+        )+18,
+        target.z
+    );
+
+    addObject(sphere);
 };
 
-document.getElementById(
-    "raiseTool"
-).onclick=()=>{
-    setTool("raise");
-};
 
-document.getElementById(
-    "raiseSide"
-).onclick=()=>{
-    setTool("raise");
-};
+/* =========================================================
+   SELECT
+========================================================= */
 
-document.getElementById(
-    "lowerTool"
-).onclick=()=>{
-    setTool("lower");
-};
-
-document.getElementById(
-    "lowerSide"
-).onclick=()=>{
-    setTool("lower");
-};
-
-document.getElementById(
-    "smoothTool"
-).onclick=()=>{
-    setTool("smooth");
-};
-
-document.getElementById(
-    "smoothSide"
-).onclick=()=>{
-    setTool("smooth");
-};
-
-document.getElementById(
-    "paintTool"
-).onclick=()=>{
-    setTool("paint");
-};
-
-document.getElementById(
-    "paintSide"
-).onclick=()=>{
-    setTool("paint");
-};
-
-document.getElementById(
-    "selectTool"
-).onclick=()=>{
-    setTool("select");
-};
-
-document.getElementById(
-    "moveTool"
-).onclick=()=>{
-    setTool("move");
-};
-
-document.getElementById(
-    "rotateTool"
-).onclick=()=>{
-    setTool("rotate");
-};
-
-document.getElementById(
-    "scaleTool"
-).onclick=()=>{
-    setTool("scale");
-};
-
-/* =====================================================
-   BRUSH SETTINGS
-===================================================== */
-
-document.getElementById(
-    "brushSize"
-).oninput=e=>{
-
-    brushSize=
-        Number(e.target.value);
-
-    document.getElementById(
-        "brushSizeValue"
-    ).innerText=
-        brushSize;
-
-    updateBrushCursor();
-};
-
-document.getElementById(
-    "brushStrength"
-).oninput=e=>{
-
-    brushStrength=
-        Number(e.target.value);
-
-    document.getElementById(
-        "brushStrengthValue"
-    ).innerText=
-        brushStrength;
-};
-
-/* =====================================================
-   MOUSE POSITION
-===================================================== */
-
-function updateMouse(event){
-
-    const rect =
-        renderer
-            .domElement
-            .getBoundingClientRect();
-
-    mouse.x =
-        (
-            (event.clientX-rect.left)/
-            rect.width
-        )*2-1;
-
-    mouse.y =
-        -(
-            (event.clientY-rect.top)/
-            rect.height
-        )*2+1;
-}
-
-/* =====================================================
-   TERRAIN HIT
-===================================================== */
-
-function terrainHit(){
+function selectObject(){
 
     raycaster.setFromCamera(
         mouse,
@@ -1646,1675 +1755,780 @@ function terrainHit(){
     );
 
     const hits =
-        raycaster.intersectObject(
-            terrain,
-            false
-        );
-
-    if(hits.length)
-        return hits[0];
-
-    return null;
-}
-
-/* =====================================================
-   BRUSH CURSOR
-===================================================== */
-
-function updateBrushCursor(){
-
-    const cursor =
-        document.getElementById(
-            "brushCursor"
-        );
-
-    cursor.style.width=
-        brushSize*2+"px";
-
-    cursor.style.height=
-        brushSize*2+"px";
-}
-
-renderer.domElement.addEventListener(
-    "pointermove",
-    event=>{
-
-        updateMouse(event);
-
-        if(
-            currentTool==="raise" ||
-            currentTool==="lower" ||
-            currentTool==="smooth" ||
-            currentTool==="paint"
-        ){
-
-            const hit=
-                terrainHit();
-
-            if(hit){
-
-                const p=
-                    hit.point;
-
-                brushPoint.copy(p);
-
-                const rect=
-                    renderer
-                        .domElement
-                        .getBoundingClientRect();
-
-                const screen =
-                    p.clone()
-                     .project(camera);
-
-                const sx=
-                    rect.left+
-                    (screen.x+1)/2*
-                    rect.width;
-
-                const sy=
-                    rect.top+
-                    (-screen.y+1)/2*
-                    rect.height;
-
-                const cursor=
-                    document.getElementById(
-                        "brushCursor"
-                    );
-
-                cursor.style.left=
-                    sx+"px";
-
-                cursor.style.top=
-                    sy+"px";
-            }
-        }
-
-        if(
-            painting &&
-            currentTool!=="hand"
-        ){
-
-            editTerrain();
-        }
-    }
-);
-
-/* =====================================================
-   TERRAIN EDIT
-===================================================== */
-
-function editTerrain(){
-
-    const hit=
-        terrainHit();
-
-    if(!hit)
-        return;
-
-    const point=
-        hit.point;
-
-    const positions=
-        terrainGeometry.attributes.position;
-
-    const radius=
-        brushSize;
-
-    const strength=
-        brushStrength*.18;
-
-    const color=
-        new THREE.Color(
-            document.getElementById(
-                "terrainColor"
-            ).value
-        );
-
-    for(
-        let i=0;
-        i<positions.count;
-        i++
-    ){
-
-        const x=
-            positions.getX(i);
-
-        const z=
-            positions.getZ(i);
-
-        const dx=
-            x-point.x;
-
-        const dz=
-            z-point.z;
-
-        const distance=
-            Math.sqrt(
-                dx*dx+
-                dz*dz
-            );
-
-        if(
-            distance>radius
-        )
-            continue;
-
-        const falloff=
-            Math.pow(
-                1-distance/radius,
-                2
-            );
-
-        if(
-            currentTool==="raise"
-        ){
-
-            positions.setY(
-                i,
-                positions.getY(i)+
-                strength*
-                falloff
-            );
-        }
-
-        if(
-            currentTool==="lower"
-        ){
-
-            positions.setY(
-                i,
-                positions.getY(i)-
-                strength*
-                falloff
-            );
-        }
-
-        if(
-            currentTool==="smooth"
-        ){
-
-            const y=
-                positions.getY(i);
-
-            const target=
-                0;
-
-            positions.setY(
-                i,
-                THREE.MathUtils.lerp(
-                    y,
-                    target,
-                    .015*
-                    falloff
-                )
-            );
-        }
-
-        if(
-            currentTool==="paint"
-        ){
-
-            const old=
-                new THREE.Color(
-                    terrainColors[i*3],
-                    terrainColors[i*3+1],
-                    terrainColors[i*3+2]
-                );
-
-            old.lerp(
-                color,
-                .12*falloff
-            );
-
-            terrainColors[i*3]=old.r;
-            terrainColors[i*3+1]=old.g;
-            terrainColors[i*3+2]=old.b;
-        }
-    }
-
-    positions.needsUpdate=true;
-
-    terrainGeometry
-        .getAttribute("color")
-        .needsUpdate=true;
-
-    terrainGeometry.computeVertexNormals();
-}
-
-/* =====================================================
-   TERRAIN MOUSE
-===================================================== */
-
-renderer.domElement.addEventListener(
-    "pointerdown",
-    event=>{
-
-        if(event.button!==0)
-            return;
-
-        if(
-            currentTool==="raise" ||
-            currentTool==="lower" ||
-            currentTool==="smooth" ||
-            currentTool==="paint"
-        ){
-
-            painting=true;
-
-            editTerrain();
-        }
-
-        if(
-            currentTool==="select"
-        ){
-
-            selectAtMouse();
-        }
-    }
-);
-
-window.addEventListener(
-    "pointerup",
-    ()=>{
-
-        if(painting){
-
-            painting=false;
-
-            saveHistory();
-        }
-    }
-);
-
-/* =====================================================
-   CREATE OBJECT
-===================================================== */
-
-function addPrimitive(
-    type
-){
-
-    let geometry;
-
-    if(type==="cube"){
-
-        geometry=
-            new THREE.BoxGeometry(
-                30,
-                30,
-                30
-            );
-    }
-
-    if(type==="sphere"){
-
-        geometry=
-            new THREE.SphereGeometry(
-                18,
-                32,
-                20
-            );
-    }
-
-    if(type==="cylinder"){
-
-        geometry=
-            new THREE.CylinderGeometry(
-                15,
-                15,
-                35,
-                32
-            );
-    }
-
-    const material=
-        new THREE.MeshStandardMaterial({
-            color:0xb5b5b5,
-            roughness:.65
-        });
-
-    const object=
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
-    object.position.set(
-        controls.target.x,
-        terrainHeightAt(
-            controls.target.x,
-            controls.target.z
-        )+
-        (
-            type==="sphere"
-            ? 18
-            : type==="cylinder"
-            ? 17
-            : 15
-        ),
-        controls.target.z
-    );
-
-    object.castShadow=true;
-
-    object.receiveShadow=true;
-
-    object.userData.editorObject=true;
-
-    object.userData.primitive=
-        type;
-
-    object.userData.script="";
-
-    object.userData.name=
-        type==="cube"
-        ? "Cube"
-        : type==="sphere"
-        ? "Kugel"
-        : "Zylinder";
-
-    object.name=
-        object.userData.name;
-
-    scene.add(object);
-
-    objects.push(object);
-
-    selectObject(object);
-
-    saveHistory();
-}
-
-/* =====================================================
-   TERRAIN HEIGHT HELPER
-===================================================== */
-
-function terrainHeightAt(x,z){
-
-    const positions=
-        terrainGeometry
-            .attributes
-            .position;
-
-    let nearestY=0;
-
-    let nearestDistance=Infinity;
-
-    for(
-        let i=0;
-        i<positions.count;
-        i++
-    ){
-
-        const px=
-            positions.getX(i);
-
-        const pz=
-            positions.getZ(i);
-
-        const d=
-            Math.abs(px-x)+
-            Math.abs(pz-z);
-
-        if(d<nearestDistance){
-
-            nearestDistance=d;
-
-            nearestY=
-                positions.getY(i);
-        }
-    }
-
-    return nearestY;
-}
-
-/* =====================================================
-   ADD BUTTONS
-===================================================== */
-
-document.getElementById(
-    "addCube"
-).onclick=()=>{
-    addPrimitive("cube");
-};
-
-document.getElementById(
-    "addSphere"
-).onclick=()=>{
-    addPrimitive("sphere");
-};
-
-document.getElementById(
-    "addCylinder"
-).onclick=()=>{
-    addPrimitive("cylinder");
-};
-
-/* =====================================================
-   SELECT OBJECT
-===================================================== */
-
-function selectObject(object){
-
-    if(!object)
-        return;
-
-    selected=object;
-
-    transform.attach(
-        selected
-    );
-
-    transform.setMode(
-        "translate"
-    );
-
-    showInspector();
-
-    updateInspector();
-
-    setTool("select");
-
-    statusText(
-        "Objekt ausgewählt: "+
-        object.name
-    );
-}
-
-function selectAtMouse(){
-
-    updateMouse(
-        window.event
-    );
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-    const hits=
         raycaster.intersectObjects(
             objects,
             true
         );
 
-    if(!hits.length){
+    if(!hits.length)
+        return;
 
-        selected=null;
+    let obj=hits[0].object;
 
-        transform.detach();
+    while(
+        obj.parent &&
+        obj.parent!==scene
+    ){
 
-        hideInspector();
+        if(
+            objects.includes(obj)
+        )
+            break;
+
+        obj=obj.parent;
+    }
+
+    if(objects.includes(obj)){
+
+        selected=obj;
+
+        updateInspector();
+
+    }
+}
+
+
+/* =========================================================
+   INSPECTOR
+========================================================= */
+
+function updateInspector(){
+
+    if(!selected){
+
+        document.getElementById("name")
+            .value="";
 
         return;
     }
 
-    let object=
-        hits[0].object;
 
-    while(
-        object.parent &&
-        !object.userData.editorObject
-    ){
+    document.getElementById("name")
+        .value=
+        selected.userData.name || "";
 
-        object=
-            object.parent;
-    }
 
-    if(
-        object.userData.editorObject
-    ){
+    document.getElementById("px")
+        .value=selected.position.x.toFixed(2);
 
-        selectObject(
-            object
-        );
-    }
+    document.getElementById("py")
+        .value=selected.position.y.toFixed(2);
+
+    document.getElementById("pz")
+        .value=selected.position.z.toFixed(2);
+
+
+    document.getElementById("rx")
+        .value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.x
+        ).toFixed(1);
+
+    document.getElementById("ry")
+        .value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.y
+        ).toFixed(1);
+
+    document.getElementById("rz")
+        .value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.z
+        ).toFixed(1);
+
+
+    document.getElementById("scaleValue")
+        .value=
+        selected.scale.x.toFixed(2);
+
+
+    document.getElementById("script")
+        .value=
+        selected.userData.script || "";
 }
 
-/* =====================================================
-   BETTER POINTER SELECT
-===================================================== */
+
+document.getElementById("apply")
+.onclick=()=>{
+
+    if(!selected)
+        return;
+
+    selected.userData.name =
+        document.getElementById("name")
+            .value;
+
+
+    selected.position.set(
+        Number(document.getElementById("px").value),
+        Number(document.getElementById("py").value),
+        Number(document.getElementById("pz").value)
+    );
+
+
+    selected.rotation.set(
+        THREE.MathUtils.degToRad(
+            Number(document.getElementById("rx").value)
+        ),
+        THREE.MathUtils.degToRad(
+            Number(document.getElementById("ry").value)
+        ),
+        THREE.MathUtils.degToRad(
+            Number(document.getElementById("rz").value)
+        )
+    );
+
+
+    const s =
+        Number(
+            document.getElementById("scaleValue").value
+        );
+
+    selected.scale.setScalar(s);
+
+};
+
+
+/* =========================================================
+   TRANSFORM WITH MOUSE
+========================================================= */
+
+let transformStart=null;
+
+let transformMouseX=0;
+
 
 renderer.domElement.addEventListener(
     "pointerdown",
-    event=>{
+    e=>{
 
         if(
-            event.button!==0
+            !["move","rotate","scale"]
+            .includes(currentTool)
         )
             return;
 
-        if(
-            currentTool!=="select"
-        )
-            return;
-
-        updateMouse(event);
 
         raycaster.setFromCamera(
             mouse,
             camera
         );
 
-        const hits=
+        const hits =
             raycaster.intersectObjects(
                 objects,
                 true
             );
 
-        if(hits.length){
+        if(!hits.length)
+            return;
 
-            let object=
-                hits[0].object;
+        let obj=hits[0].object;
 
-            while(
-                object.parent &&
-                !object.userData.editorObject
-            ){
-
-                object=
-                    object.parent;
-            }
-
-            if(
-                object.userData.editorObject
-            ){
-
-                selectObject(
-                    object
-                );
-            }
+        while(
+            obj.parent &&
+            obj.parent!==scene &&
+            !objects.includes(obj)
+        ){
+            obj=obj.parent;
         }
+
+        if(
+            !objects.includes(obj)
+        )
+            return;
+
+        selected=obj;
+
+        transformStart={
+            position:obj.position.clone(),
+            rotation:obj.rotation.clone(),
+            scale:obj.scale.clone()
+        };
+
+        transformMouseX=e.clientX;
+
     }
 );
 
-/* =====================================================
-   INSPECTOR
-===================================================== */
 
-function showInspector(){
-
-    document.getElementById(
-        "noObject"
-    ).style.display="none";
-
-    document.getElementById(
-        "objectInspector"
-    ).style.display="block";
-}
-
-function hideInspector(){
-
-    document.getElementById(
-        "noObject"
-    ).style.display="block";
-
-    document.getElementById(
-        "objectInspector"
-    ).style.display="none";
-}
-
-function updateInspector(){
-
-    if(!selected)
-        return;
-
-    document.getElementById(
-        "objectName"
-    ).value=
-        selected.name;
-
-    document.getElementById(
-        "posX"
-    ).value=
-        selected.position.x.toFixed(2);
-
-    document.getElementById(
-        "posY"
-    ).value=
-        selected.position.y.toFixed(2);
-
-    document.getElementById(
-        "posZ"
-    ).value=
-        selected.position.z.toFixed(2);
-
-    document.getElementById(
-        "rotX"
-    ).value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.x
-        ).toFixed(1);
-
-    document.getElementById(
-        "rotY"
-    ).value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.y
-        ).toFixed(1);
-
-    document.getElementById(
-        "rotZ"
-    ).value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.z
-        ).toFixed(1);
-
-    document.getElementById(
-        "scaleX"
-    ).value=
-        selected.scale.x.toFixed(2);
-
-    document.getElementById(
-        "scaleY"
-    ).value=
-        selected.scale.y.toFixed(2);
-
-    document.getElementById(
-        "scaleZ"
-    ).value=
-        selected.scale.z.toFixed(2);
-
-    document.getElementById(
-        "scriptEditor"
-    ).value=
-        selected.userData.script ||
-        "";
-}
-
-/* =====================================================
-   APPLY INSPECTOR
-===================================================== */
-
-document.getElementById(
-    "applyTransform"
-).onclick=()=>{
-
-    if(!selected)
-        return;
-
-    selected.name=
-        document.getElementById(
-            "objectName"
-        ).value ||
-        "Objekt";
-
-    selected.userData.name=
-        selected.name;
-
-    selected.position.set(
-
-        Number(
-            document.getElementById(
-                "posX"
-            ).value
-        ),
-
-        Number(
-            document.getElementById(
-                "posY"
-            ).value
-        ),
-
-        Number(
-            document.getElementById(
-                "posZ"
-            ).value
-        )
-    );
-
-    selected.rotation.set(
-
-        THREE.MathUtils.degToRad(
-            Number(
-                document.getElementById(
-                    "rotX"
-                ).value
-            )
-        ),
-
-        THREE.MathUtils.degToRad(
-            Number(
-                document.getElementById(
-                    "rotY"
-                ).value
-            )
-        ),
-
-        THREE.MathUtils.degToRad(
-            Number(
-                document.getElementById(
-                    "rotZ"
-                ).value
-            )
-        )
-    );
-
-    selected.scale.set(
-
-        Number(
-            document.getElementById(
-                "scaleX"
-            ).value
-        ),
-
-        Number(
-            document.getElementById(
-                "scaleY"
-            ).value
-        ),
-
-        Number(
-            document.getElementById(
-                "scaleZ"
-            ).value
-        )
-    );
-
-    saveHistory();
-
-    statusText(
-        "Inspector aktualisiert"
-    );
-};
-
-/* =====================================================
-   SCRIPT
-===================================================== */
-
-document.getElementById(
-    "saveScript"
-).onclick=()=>{
-
-    if(!selected)
-        return;
-
-    selected.userData.script=
-        document.getElementById(
-            "scriptEditor"
-        ).value;
-
-    saveHistory();
-
-    statusText(
-        "Script gespeichert"
-    );
-};
-
-/* =====================================================
-   SCRIPT TEST
-===================================================== */
-
-document.getElementById(
-    "testScript"
-).onclick=()=>{
-
-    if(!selected)
-        return;
-
-    const code=
-        document.getElementById(
-            "scriptEditor"
-        ).value;
-
-    if(!code.trim()){
-
-        showModal(
-            "Kein Script",
-            "Das Script-Feld ist leer."
-        );
-
-        return;
-    }
-
-    try{
-
-        const fn=
-            new Function(
-                "object",
-                "THREE",
-                "delta",
-                code
-            );
-
-        fn(
-            selected,
-            THREE,
-            1/60
-        );
-
-        statusText(
-            "Script erfolgreich getestet"
-        );
-
-    }catch(error){
-
-        console.error(error);
-
-        showModal(
-            "Script-Fehler",
-            "<pre style='white-space:pre-wrap;color:#ff7777'>"+
-            escapeHTML(
-                error.message
-            )+
-            "</pre>"
-        );
-    }
-};
-
-/* =====================================================
-   PLAY SYSTEM
-===================================================== */
-
-let playing=false;
-
-document.getElementById(
-    "playButton"
-).onclick=()=>{
-
-    playing=!playing;
-
-    document.getElementById(
-        "playButton"
-    ).innerText=
-        playing
-        ? "■ STOP"
-        : "▶ PLAY";
-
-    document.getElementById(
-        "playIndicator"
-    ).style.display=
-        playing
-        ? "block"
-        : "none";
-
-    statusText(
-        playing
-        ? "PLAY-Modus aktiv – Scripts laufen"
-        : "Editor-Modus"
-    );
-};
-
-/* =====================================================
-   SCRIPT EXECUTION
-===================================================== */
-
-function executeScripts(delta){
-
-    if(!playing)
-        return;
-
-    for(
-        const object
-        of objects
-    ){
+renderer.domElement.addEventListener(
+    "pointermove",
+    e=>{
 
         if(
-            !object ||
-            !object.parent
+            !transformStart ||
+            !selected
         )
-            continue;
+            return;
 
-        const code=
-            object.userData.script;
 
-        if(
-            !code ||
-            !code.trim()
-        )
-            continue;
+        const dx =
+            e.clientX-transformMouseX;
 
-        /*
-           Das Script erhält:
 
-           object = Objekt
-           THREE  = Three.js
-           delta  = Sekunden seit letztem Frame
-        */
+        if(currentTool==="move"){
 
-        try{
+            selected.position.x =
+                transformStart.position.x+
+                dx*.15;
 
-            const fn=
-                new Function(
-                    "object",
-                    "THREE",
-                    "delta",
-                    code
+            selected.position.y =
+                transformStart.position.y;
+
+        }
+
+
+        if(currentTool==="rotate"){
+
+            selected.rotation.y =
+                transformStart.rotation.y+
+                dx*.01;
+
+        }
+
+
+        if(currentTool==="scale"){
+
+            const s =
+                Math.max(
+                    .05,
+                    transformStart.scale.x+
+                    dx*.01
                 );
 
-            fn(
-                object,
-                THREE,
-                delta
-            );
+            selected.scale.setScalar(s);
 
-        }catch(error){
-
-            console.error(
-                "Script-Fehler in "+
-                object.name+
-                ":",
-                error
-            );
-
-            object.userData.scriptError=
-                error.message;
         }
+
+
+        updateInspector();
+
     }
-}
+);
 
-/* =====================================================
-   DELETE
-===================================================== */
 
-function deleteSelected(){
-
-    if(!selected)
-        return;
-
-    transform.detach();
-
-    scene.remove(
-        selected
-    );
-
-    const index=
-        objects.indexOf(
-            selected
-        );
-
-    if(index!==-1){
-
-        objects.splice(
-            index,
-            1
-        );
+window.addEventListener(
+    "pointerup",
+    ()=>{
+        transformStart=null;
     }
+);
 
-    selected=null;
 
-    hideInspector();
-
-    saveHistory();
-
-    statusText(
-        "Objekt gelöscht"
-    );
-}
-
-document.getElementById(
-    "deleteObject"
-).onclick=
-    deleteSelected;
-
-document.getElementById(
-    "deleteInspector"
-).onclick=
-    deleteSelected;
-
-/* =====================================================
+/* =========================================================
    DUPLICATE
-===================================================== */
+========================================================= */
 
-function duplicateSelected(){
+document.getElementById("duplicate")
+.onclick=()=>{
 
     if(!selected)
         return;
 
-    const clone=
+    const clone =
         selected.clone(true);
 
-    clone.position.x+=20;
+    clone.position.x+=30;
 
-    clone.position.z+=20;
+    clone.userData =
+        {...selected.userData};
 
-    clone.userData=
-        JSON.parse(
-            JSON.stringify(
-                selected.userData
-            )
-        );
-
-    clone.userData.editorObject=
-        true;
-
-    clone.name=
-        selected.name+
-        " Kopie";
-
-    clone.userData.name=
-        clone.name;
-
-    clone.traverse(
-        object=>{
-
-            if(object.isMesh){
-
-                if(
-                    Array.isArray(
-                        object.material
-                    )
-                ){
-
-                    object.material=
-                        object.material.map(
-                            m=>m.clone()
-                        );
-
-                }else if(
-                    object.material
-                ){
-
-                    object.material=
-                        object.material.clone();
-                }
-            }
-        }
-    );
+    clone.userData.name =
+        selected.userData.name+
+        "_Copy";
 
     scene.add(clone);
 
     objects.push(clone);
 
-    selectObject(clone);
+    selected=clone;
 
-    saveHistory();
+    updateInspector();
+};
 
-    statusText(
-        "Objekt dupliziert"
-    );
-}
 
-document.getElementById(
-    "duplicateObject"
-).onclick=
-    duplicateSelected;
+/* =========================================================
+   DELETE
+========================================================= */
 
-/* =====================================================
-   FOCUS
-===================================================== */
-
-document.getElementById(
-    "focusObject"
-).onclick=()=>{
+document.getElementById("delete")
+.onclick=()=>{
 
     if(!selected)
         return;
 
-    const box=
-        new THREE.Box3()
-            .setFromObject(
-                selected
-            );
+    scene.remove(selected);
 
-    const center=
-        box.getCenter(
-            new THREE.Vector3()
-        );
+    const i =
+        objects.indexOf(selected);
 
-    const size=
-        box.getSize(
-            new THREE.Vector3()
-        );
-
-    const distance=
-        Math.max(
-            size.x,
-            size.y,
-            size.z
-        )*3+30;
-
-    controls.target.copy(
-        center
-    );
-
-    camera.position.copy(
-        center
-    ).add(
-        new THREE.Vector3(
-            1,
-            .7,
-            1
-        ).normalize()
-        .multiplyScalar(
-            distance
-        )
-    );
-
-    controls.update();
-};
-
-/* =====================================================
-   HISTORY
-===================================================== */
-
-let undoStack=[];
-
-let redoStack=[];
-
-function sceneState(){
-
-    return JSON.stringify(
-        objects.map(
-            object=>({
-
-                type:
-                    object.userData.primitive ||
-                    "cube",
-
-                name:
-                    object.name,
-
-                position:[
-                    object.position.x,
-                    object.position.y,
-                    object.position.z
-                ],
-
-                rotation:[
-                    object.rotation.x,
-                    object.rotation.y,
-                    object.rotation.z
-                ],
-
-                scale:[
-                    object.scale.x,
-                    object.scale.y,
-                    object.scale.z
-                ],
-
-                script:
-                    object.userData.script ||
-                    ""
-            })
-        )
-    );
-}
-
-function saveHistory(){
-
-    const state=
-        sceneState();
-
-    if(
-        undoStack.length &&
-        undoStack[
-            undoStack.length-1
-        ]===state
-    )
-        return;
-
-    undoStack.push(
-        state
-    );
-
-    if(
-        undoStack.length>40
-    ){
-
-        undoStack.shift();
-    }
-
-    redoStack=[];
-}
-
-function restoreState(state){
-
-    let data;
-
-    try{
-
-        data=
-            JSON.parse(state);
-
-    }catch{
-
-        return;
-    }
-
-    objects
-        .slice()
-        .forEach(
-            object=>{
-                scene.remove(
-                    object
-                );
-            }
-        );
-
-    objects.length=0;
+    if(i!==-1)
+        objects.splice(i,1);
 
     selected=null;
 
-    transform.detach();
+    updateInspector();
+};
 
-    hideInspector();
+
+/* =========================================================
+   SCRIPT
+========================================================= */
+
+document.getElementById("applyScript")
+.onclick=()=>{
+
+    if(!selected)
+        return;
+
+    selected.userData.script =
+        document.getElementById("script")
+            .value;
+};
+
+
+/* =========================================================
+   PLAY MODE
+========================================================= */
+
+let playing=false;
+
+
+document.getElementById("play")
+.onclick=()=>{
+
+    playing=!playing;
+
+    document.getElementById("play")
+        .classList.toggle(
+            "active",
+            playing
+        );
+
+    document.getElementById("play")
+        .innerText =
+        playing
+        ? "■ STOP"
+        : "▶ PLAY";
+};
+
+
+function runScripts(){
+
+    if(!playing)
+        return;
 
     for(
-        const item
-        of data
+        const object of objects
     ){
 
-        let geometry;
+        const code =
+            object.userData.script;
 
-        if(
-            item.type==="sphere"
-        ){
+        if(!code)
+            continue;
 
-            geometry=
-                new THREE.SphereGeometry(
-                    18,
-                    32,
-                    20
-                );
+        try{
 
-        }else if(
-            item.type==="cylinder"
-        ){
-
-            geometry=
-                new THREE.CylinderGeometry(
-                    15,
-                    15,
-                    35,
-                    32
-                );
-
-        }else{
-
-            geometry=
-                new THREE.BoxGeometry(
-                    30,
-                    30,
-                    30
-                );
-        }
-
-        const material=
-            new THREE.MeshStandardMaterial({
-                color:0xb5b5b5,
-                roughness:.65
-            });
-
-        const object=
-            new THREE.Mesh(
-                geometry,
-                material
+            new Function(
+                "object",
+                "THREE",
+                code
+            )(
+                object,
+                THREE
             );
 
-        object.name=
-            item.name;
+        }catch(err){
 
-        object.userData.editorObject=
-            true;
+            console.warn(
+                "Script error:",
+                err
+            );
 
-        object.userData.primitive=
-            item.type;
+        }
 
-        object.userData.name=
-            item.name;
-
-        object.userData.script=
-            item.script || "";
-
-        object.position.fromArray(
-            item.position
-        );
-
-        object.rotation.set(
-            item.rotation[0],
-            item.rotation[1],
-            item.rotation[2]
-        );
-
-        object.scale.fromArray(
-            item.scale
-        );
-
-        object.castShadow=true;
-
-        object.receiveShadow=true;
-
-        scene.add(object);
-
-        objects.push(object);
     }
 }
 
-document.getElementById(
-    "undo"
-).onclick=()=>{
 
-    if(
-        undoStack.length<=1
-    )
-        return;
+/* =========================================================
+   GRAVITY
+========================================================= */
 
-    const current=
-        undoStack.pop();
+let gravityEnabled=false;
 
-    redoStack.push(
-        current
-    );
+let verticalVelocity=0;
 
-    restoreState(
-        undoStack[
-            undoStack.length-1
-        ]
-    );
 
-    statusText("Undo");
+document.getElementById("gravity")
+.onclick=()=>{
+
+    gravityEnabled=
+        !gravityEnabled;
+
+    document.getElementById("gravity")
+        .classList.toggle(
+            "active",
+            gravityEnabled
+        );
+
 };
 
-document.getElementById(
-    "redo"
-).onclick=()=>{
 
-    if(!redoStack.length)
+function updateGravity(){
+
+    if(!gravityEnabled)
         return;
 
-    const state=
-        redoStack.pop();
 
-    undoStack.push(
-        state
-    );
+    verticalVelocity-=.45;
 
-    restoreState(
-        state
-    );
+    target.y+=
+        verticalVelocity;
 
-    statusText("Redo");
-};
 
-/* =====================================================
-   SAVE PROJECT
-===================================================== */
+    const ground =
+        getHeight(
+            target.x,
+            target.z
+        );
 
-document.getElementById(
-    "saveProject"
-).onclick=()=>{
 
-    const project={
+    const minHeight =
+        ground+30;
 
-        engine:
-            "GHOST 3D ENGINE",
 
-        version:2,
+    if(target.y<minHeight){
 
-        objects:
-            JSON.parse(
-                sceneState()
-            ),
+        target.y=minHeight;
+
+        verticalVelocity=0;
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+document.getElementById("save")
+.onclick=()=>{
+
+    const data={
+
+        seed:seed,
+
+        heights:Array.from(
+            heights
+        ),
 
         camera:{
-            position:[
-                camera.position.x,
-                camera.position.y,
-                camera.position.z
-            ],
 
             target:[
-                controls.target.x,
-                controls.target.y,
-                controls.target.z
-            ]
-        }
+                target.x,
+                target.y,
+                target.z
+            ],
+
+            yaw:yaw,
+            pitch:pitch,
+            distance:cameraDistance
+
+        },
+
+        objects:
+            objects.map(
+                o=>({
+
+                    name:o.userData.name,
+
+                    type:
+                        o.geometry
+                            instanceof
+                            THREE.SphereGeometry
+                        ? "sphere"
+                        : "cube",
+
+                    position:[
+                        o.position.x,
+                        o.position.y,
+                        o.position.z
+                    ],
+
+                    rotation:[
+                        o.rotation.x,
+                        o.rotation.y,
+                        o.rotation.z
+                    ],
+
+                    scale:[
+                        o.scale.x,
+                        o.scale.y,
+                        o.scale.z
+                    ],
+
+                    script:
+                        o.userData.script || ""
+
+                })
+            )
+
     };
 
-    const blob=
+
+    const blob =
         new Blob(
-            [
-                JSON.stringify(
-                    project,
-                    null,
-                    2
-                )
-            ],
+            [JSON.stringify(data)],
             {
-                type:
-                    "application/json"
+                type:"application/json"
             }
         );
 
-    const url=
-        URL.createObjectURL(
-            blob
-        );
 
-    const a=
-        document.createElement(
-            "a"
-        );
+    const a =
+        document.createElement("a");
 
-    a.href=url;
+    a.href =
+        URL.createObjectURL(blob);
 
     a.download=
-        "ghost-project.json";
+        "ghost-landscape.json";
 
     a.click();
 
     URL.revokeObjectURL(
-        url
+        a.href
     );
 
-    statusText(
-        "Projekt gespeichert"
-    );
 };
 
-/* =====================================================
-   LOAD PROJECT
-===================================================== */
 
-document.getElementById(
-    "loadProject"
-).onclick=()=>{
+/* =========================================================
+   LOAD
+========================================================= */
 
-    document.getElementById(
-        "projectFile"
-    ).click();
+const fileInput =
+    document.createElement("input");
+
+fileInput.type="file";
+
+fileInput.accept=".json";
+
+
+document.getElementById("load")
+.onclick=()=>{
+    fileInput.click();
 };
 
-document.getElementById(
-    "projectFile"
-).addEventListener(
-    "change",
-    event=>{
 
-        const file=
-            event.target.files[0];
+fileInput.onchange=e=>{
 
-        if(!file)
-            return;
+    const file=
+        e.target.files[0];
 
-        const reader=
-            new FileReader();
+    if(!file)
+        return;
 
-        reader.onload=()=>{
+    const reader=
+        new FileReader();
 
-            try{
 
-                const project=
-                    JSON.parse(
-                        reader.result
-                    );
+    reader.onload=()=>{
 
-                if(
-                    !project.objects
-                )
-                    throw new Error(
-                        "Keine Objekte"
-                    );
+        try{
 
-                restoreState(
-                    JSON.stringify(
-                        project.objects
-                    )
+            const data=
+                JSON.parse(
+                    reader.result
                 );
 
-                if(
-                    project.camera
+
+            if(
+                Array.isArray(
+                    data.heights
+                )
+            ){
+
+                for(
+                    let i=0;
+                    i<heights.length;
+                    i++
                 ){
 
-                    camera.position.fromArray(
-                        project.camera.position
+                    heights[i]=
+                        data.heights[i] ??
+                        heights[i];
+
+                    position.setY(
+                        i,
+                        heights[i]
                     );
 
-                    controls.target.fromArray(
-                        project.camera.target
-                    );
-
-                    controls.update();
                 }
 
-                saveHistory();
+                position.needsUpdate=true;
 
-                statusText(
-                    "Projekt geladen"
-                );
+                geometry.computeVertexNormals();
 
-            }catch(error){
-
-                showModal(
-                    "Ladefehler",
-                    "Die Projektdatei ist ungültig."
-                );
             }
-        };
 
-        reader.readAsText(
-            file
-        );
 
-        event.target.value="";
-    }
-);
+            if(data.camera){
 
-/* =====================================================
-   KEYBOARD
-===================================================== */
+                target.set(
+                    data.camera.target[0],
+                    data.camera.target[1],
+                    data.camera.target[2]
+                );
 
-window.addEventListener(
-    "keydown",
-    event=>{
+                yaw=
+                    data.camera.yaw;
 
-        /*
-           Nur Werkzeug-Tastenkürzel.
-           KEINE WASD-Bewegung.
-        */
+                pitch=
+                    data.camera.pitch;
 
-        if(
-            event.target.tagName==="INPUT" ||
-            event.target.tagName==="TEXTAREA"
-        )
-            return;
+                cameraDistance=
+                    data.camera.distance;
 
-        if(
-            event.key.toLowerCase()==="w"
-        ){
+            }
 
-            setTool("move");
+
+            for(
+                const o of objects
+            )
+                scene.remove(o);
+
+            objects.length=0;
+
+            selected=null;
+
+
+            if(
+                Array.isArray(
+                    data.objects
+                )
+            ){
+
+                for(
+                    const d of data.objects
+                ){
+
+                    let mesh;
+
+
+                    if(
+                        d.type==="sphere"
+                    ){
+
+                        mesh=
+                            new THREE.Mesh(
+                                new THREE.SphereGeometry(
+                                    18,
+                                    32,
+                                    20
+                                ),
+                                new THREE.MeshStandardMaterial({
+                                    color:0x55aaff
+                                })
+                            );
+
+                    }else{
+
+                        mesh=
+                            new THREE.Mesh(
+                                new THREE.BoxGeometry(
+                                    30,
+                                    30,
+                                    30
+                                ),
+                                new THREE.MeshStandardMaterial({
+                                    color:0xffaa22
+                                })
+                            );
+
+                    }
+
+
+                    mesh.position.fromArray(
+                        d.position
+                    );
+
+                    mesh.rotation.set(
+                        d.rotation[0],
+                        d.rotation[1],
+                        d.rotation[2]
+                    );
+
+                    mesh.scale.fromArray(
+                        d.scale
+                    );
+
+                    mesh.castShadow=true;
+
+                    mesh.receiveShadow=true;
+
+                    mesh.userData.name=
+                        d.name;
+
+                    mesh.userData.script=
+                        d.script || "";
+
+                    scene.add(mesh);
+
+                    objects.push(mesh);
+
+                }
+
+            }
+
+        }catch(err){
+
+            alert(
+                "Projekt konnte nicht geladen werden."
+            );
+
         }
 
-        if(
-            event.key.toLowerCase()==="e"
-        ){
+    };
 
-            setTool("rotate");
-        }
 
-        if(
-            event.key.toLowerCase()==="r"
-        ){
+    reader.readAsText(file);
 
-            setTool("scale");
-        }
-
-        if(
-            event.key==="Escape"
-        ){
-
-            setTool("hand");
-        }
-    }
-);
-
-/* =====================================================
-   MODAL
-===================================================== */
-
-function showModal(
-    title,
-    text
-){
-
-    document.getElementById(
-        "modalTitle"
-    ).innerText=title;
-
-    document.getElementById(
-        "modalText"
-    ).innerHTML=text;
-
-    document.getElementById(
-        "modal"
-    ).style.display="flex";
-}
-
-document.getElementById(
-    "modalClose"
-).onclick=()=>{
-
-    document.getElementById(
-        "modal"
-    ).style.display="none";
 };
 
-/* =====================================================
-   STATUS
-===================================================== */
 
-function statusText(text){
+/* =========================================================
+   NEW RANDOM ISLAND
+========================================================= */
 
-    document.getElementById(
-        "status"
-    ).innerText=text;
-}
+document.getElementById("newMap")
+.onclick=()=>{
 
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
+    location.reload();
 
-function escapeHTML(text){
+};
 
-    return String(text)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
 
-/* =====================================================
+/* =========================================================
+   START
+========================================================= */
+
+document.getElementById("startButton")
+.onclick=()=>{
+
+    document.getElementById("start")
+        .style.display="none";
+
+};
+
+
+/* =========================================================
    RESIZE
-===================================================== */
+========================================================= */
 
 window.addEventListener(
     "resize",
@@ -3330,25 +2544,14 @@ window.addEventListener(
             innerWidth,
             innerHeight
         );
+
     }
 );
 
-/* =====================================================
-   START
-===================================================== */
 
-setTool("hand");
-
-updateBrushCursor();
-
-saveHistory();
-
-/* =====================================================
-   GAME LOOP
-===================================================== */
-
-let lastTime=
-    performance.now();
+/* =========================================================
+   LOOP
+========================================================= */
 
 function animate(){
 
@@ -3356,44 +2559,21 @@ function animate(){
         animate
     );
 
-    const now=
-        performance.now();
 
-    const delta=
-        Math.min(
-            (now-lastTime)/1000,
-            .1
-        );
+    updateGravity();
 
-    lastTime=now;
+    updateCamera();
 
-    /*
-       Scripts laufen hier.
-       Beispiel:
-       object.rotation.y += delta;
-    */
+    runScripts();
 
-    executeScripts(
-        delta
-    );
-
-    /*
-       Kamera wird nur im Hand-Modus
-       aktualisiert.
-    */
-
-    if(
-        currentTool==="hand"
-    ){
-
-        controls.update();
-    }
 
     renderer.render(
         scene,
         camera
     );
+
 }
+
 
 animate();
 
