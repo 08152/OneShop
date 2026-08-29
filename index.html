@@ -15,9 +15,13 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#79caff;
     font-family:Arial,sans-serif;
+    background:#79caff;
 }
+
+/* =====================================================
+   3D VIEWPORT
+===================================================== */
 
 #viewport{
     position:absolute;
@@ -25,81 +29,171 @@ html,body{
     right:300px;
     top:58px;
     bottom:0;
+
     overflow:hidden;
+
+    z-index:1;
+
+    background:#79caff;
+
+    pointer-events:auto;
 }
 
 #viewport canvas{
-    display:block;
+    position:absolute;
+    left:0;
+    top:0;
+
     width:100%;
     height:100%;
+
+    display:block;
+
+    z-index:1;
+
+    pointer-events:auto;
 }
+
+
+/* =====================================================
+   TOPBAR
+===================================================== */
 
 #topbar{
     position:absolute;
+
     top:0;
     left:0;
     right:0;
+
     height:58px;
+
     background:#17191e;
+
     border-bottom:1px solid #333;
+
     display:flex;
     align-items:center;
+
     gap:7px;
+
     padding:7px;
+
     z-index:1000;
+
+    pointer-events:auto;
 }
 
 .logo{
     color:#ffd400;
-    font-weight:bold;
+
     font-size:19px;
+    font-weight:bold;
+
     margin-right:15px;
+
+    white-space:nowrap;
 }
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
 
 button{
     border:1px solid #444;
+
     background:#252830;
-    color:#fff;
+
+    color:white;
+
     border-radius:6px;
+
     padding:9px 12px;
+
     cursor:pointer;
+
     user-select:none;
+
+    -webkit-user-select:none;
+
+    pointer-events:auto;
 }
 
 button:hover{
     background:#343842;
 }
 
+button:active{
+    transform:scale(.97);
+}
+
 button.active{
     background:#d6aa00;
+
     color:#111;
+
+    border-color:#ffd400;
 }
+
+
+/* =====================================================
+   LEFT BAR
+===================================================== */
 
 #leftbar{
     position:absolute;
+
     top:58px;
     left:0;
     bottom:0;
+
     width:220px;
+
     background:#181a1f;
+
     border-right:1px solid #333;
-    z-index:900;
+
+    z-index:1000;
+
     padding:10px;
+
     overflow-y:auto;
+
+    pointer-events:auto;
 }
+
+
+/* =====================================================
+   RIGHT BAR
+===================================================== */
 
 #rightbar{
     position:absolute;
+
     top:58px;
     right:0;
     bottom:0;
+
     width:300px;
+
     background:#181a1f;
+
     border-left:1px solid #333;
-    z-index:900;
+
+    z-index:1000;
+
     padding:12px;
+
     overflow-y:auto;
+
+    pointer-events:auto;
 }
+
+
+/* =====================================================
+   UI
+===================================================== */
 
 .section{
     margin-bottom:18px;
@@ -107,21 +201,29 @@ button.active{
 
 .section h3{
     font-size:13px;
+
     margin:0 0 8px;
+
     color:#ddd;
 }
 
 .tool{
     width:100%;
+
     margin-bottom:6px;
+
     text-align:left;
 }
 
 label{
     display:block;
+
     color:#aaa;
+
     font-size:12px;
+
     margin-top:9px;
+
     margin-bottom:4px;
 }
 
@@ -133,74 +235,161 @@ input[type=number],
 input[type=text],
 textarea{
     width:100%;
-    background:#0f1115;
-    border:1px solid #393c44;
-    color:#fff;
-    border-radius:5px;
-    padding:7px;
-}
 
-textarea{
-    min-height:150px;
-    resize:vertical;
-    font-family:monospace;
-    font-size:12px;
+    background:#0f1115;
+
+    border:1px solid #393c44;
+
+    color:white;
+
+    border-radius:5px;
+
+    padding:7px;
 }
 
 input[type=color]{
     width:100%;
+
     height:38px;
-    border:0;
-    background:none;
+
+    background:#0f1115;
+
+    border:1px solid #393c44;
+
+    border-radius:5px;
+
+    padding:3px;
+}
+
+textarea{
+    min-height:150px;
+
+    resize:vertical;
+
+    font-family:monospace;
+
+    font-size:12px;
 }
 
 .small{
     color:#888;
+
     font-size:11px;
+
     line-height:1.5;
 }
 
 hr{
     border:0;
+
     border-top:1px solid #30333a;
+
     margin:12px 0;
 }
 
+
+/* =====================================================
+   BRUSH
+===================================================== */
+
 #brushCursor{
     position:fixed;
+
     pointer-events:none;
+
     border:2px solid #ffd400;
+
     border-radius:50%;
+
     z-index:2000;
+
     display:none;
+
     transform:translate(-50%,-50%);
+
+    box-shadow:
+        0 0 4px #000;
 }
+
+
+/* =====================================================
+   STATUS
+===================================================== */
 
 #status{
     position:absolute;
+
     left:235px;
+
     bottom:12px;
+
     z-index:100;
+
     background:rgba(0,0,0,.65);
+
     padding:7px 10px;
+
     border-radius:6px;
+
     color:white;
+
     font-size:12px;
+
     pointer-events:none;
 }
 
+
+/* =====================================================
+   COLORS
+===================================================== */
+
+.colorGrid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    gap:5px;
+}
+
+.color{
+    height:28px;
+
+    border-radius:5px;
+
+    border:2px solid #555;
+
+    cursor:pointer;
+}
+
+.color:hover{
+    border-color:white;
+}
+
+
+/* =====================================================
+   OBJECT LIST
+===================================================== */
+
 #objectList{
     background:#101216;
+
     border:1px solid #30333a;
+
     border-radius:5px;
+
     max-height:220px;
+
     overflow-y:auto;
 }
 
 .objectItem{
     padding:8px;
+
     border-bottom:1px solid #292c32;
+
     font-size:12px;
+
     cursor:pointer;
 }
 
@@ -212,359 +401,743 @@ hr{
     background:#665400;
 }
 
-.colorGrid{
-    display:grid;
-    grid-template-columns:repeat(6,1fr);
-    gap:5px;
-}
 
-.color{
-    height:28px;
-    border-radius:5px;
-    border:2px solid #555;
-    cursor:pointer;
-}
+/* =====================================================
+   DROPZONE
+===================================================== */
 
 #dropZone{
     border:2px dashed #444;
+
     border-radius:6px;
+
     padding:15px;
+
     text-align:center;
+
     color:#999;
+
     margin-bottom:7px;
 }
 
+#dropZone.drag{
+    border-color:#ffd400;
+
+    color:#fff;
+
+    background:#252000;
+}
+
+
+/* =====================================================
+   PLAY
+===================================================== */
+
 #playMode{
     position:absolute;
+
     left:220px;
     right:300px;
+
     top:58px;
     bottom:0;
+
     z-index:500;
+
     pointer-events:none;
+
     display:none;
 }
 
 #playLabel{
     position:absolute;
+
     top:15px;
     left:50%;
+
     transform:translateX(-50%);
+
     background:rgba(0,0,0,.7);
+
     padding:8px 18px;
+
     border-radius:7px;
+
     color:#70ff70;
+
     font-weight:bold;
+}
+
+
+/* =====================================================
+   CHECKBOX
+===================================================== */
+
+input[type=checkbox]{
+    width:16px;
+    height:16px;
+    vertical-align:middle;
 }
 </style>
 </head>
 
 <body>
 
+
+<!-- =====================================================
+     TOP
+===================================================== -->
+
 <div id="topbar">
 
-<div class="logo">GHOST ENGINE</div>
+    <div class="logo">
+        GHOST ENGINE
+    </div>
 
-<button id="mapBtn">🗺 MAP</button>
-<button id="decorateBtn">🌳 SCHMUCK</button>
-<button id="selectBtn">🖱 AUSWAHL</button>
+    <button id="mapBtn">
+        🗺 MAP
+    </button>
 
-<button id="importBtn">📦 GLB IMPORT</button>
-<input id="glbInput" type="file" accept=".glb,.gltf" hidden>
+    <button id="decorateBtn">
+        🌳 SCHMUCK
+    </button>
 
-<button id="playBtn">▶ PLAY</button>
+    <button id="selectBtn">
+        🖱 AUSWAHL
+    </button>
 
-<button id="saveBtn">💾 SPEICHERN</button>
-<button id="loadBtn">📂 LADEN</button>
-<input id="loadInput" type="file" accept=".json" hidden>
+    <button id="importBtn">
+        📦 GLB IMPORT
+    </button>
+
+    <input
+        id="glbInput"
+        type="file"
+        accept=".glb,.gltf"
+        hidden
+    >
+
+    <button id="playBtn">
+        ▶ PLAY
+    </button>
+
+    <button id="saveBtn">
+        💾 SPEICHERN
+    </button>
+
+    <button id="loadBtn">
+        📂 LADEN
+    </button>
+
+    <input
+        id="loadInput"
+        type="file"
+        accept=".json"
+        hidden
+    >
 
 </div>
 
+
+<!-- =====================================================
+     LEFT
+===================================================== -->
 
 <div id="leftbar">
 
-<div id="mapPanel">
 
-<div class="section">
+    <!-- MAP -->
 
-<h3>MAP TOOL</h3>
+    <div id="mapPanel">
 
-<button id="raiseBtn" class="tool active">
-⬆ ERHÖHEN
-</button>
+        <div class="section">
 
-<button id="lowerBtn" class="tool">
-⬇ SENKEN
-</button>
+            <h3>
+                MAP TOOL
+            </h3>
 
-<button id="paintTerrainBtn" class="tool">
-🎨 TERRAIN FÄRBEN
-</button>
+            <button
+                id="raiseBtn"
+                class="tool active"
+            >
+                ⬆ ERHÖHEN
+            </button>
 
-<label>Pinselgröße</label>
+            <button
+                id="lowerBtn"
+                class="tool"
+            >
+                ⬇ SENKEN
+            </button>
 
-<input
-id="brushSize"
-type="range"
-min="5"
-max="100"
-value="25">
+            <button
+                id="paintTerrainBtn"
+                class="tool"
+            >
+                🎨 TERRAIN FÄRBEN
+            </button>
 
-<div class="small">
-Größe: <span id="brushSizeText">25</span>
+
+            <label>
+                Pinselgröße
+            </label>
+
+            <input
+                id="brushSize"
+                type="range"
+                min="5"
+                max="100"
+                value="25"
+            >
+
+            <div class="small">
+                Größe:
+                <span id="brushSizeText">
+                    25
+                </span>
+            </div>
+
+
+            <label>
+                Stärke
+            </label>
+
+            <input
+                id="brushStrength"
+                type="range"
+                min="0.01"
+                max="1"
+                step="0.01"
+                value="0.25"
+            >
+
+            <div class="small">
+                Stärke:
+                <span id="brushStrengthText">
+                    0.25
+                </span>
+            </div>
+
+
+            <hr>
+
+
+            <h3>
+                TERRAIN-FARBE
+            </h3>
+
+            <div class="colorGrid">
+
+                <div
+                    class="color"
+                    data-color="#3c8f35"
+                    style="background:#3c8f35"
+                ></div>
+
+                <div
+                    class="color"
+                    data-color="#70b84a"
+                    style="background:#70b84a"
+                ></div>
+
+                <div
+                    class="color"
+                    data-color="#9a8148"
+                    style="background:#9a8148"
+                ></div>
+
+                <div
+                    class="color"
+                    data-color="#777777"
+                    style="background:#777777"
+                ></div>
+
+                <div
+                    class="color"
+                    data-color="#d0c58e"
+                    style="background:#d0c58e"
+                ></div>
+
+                <div
+                    class="color"
+                    data-color="#ffffff"
+                    style="background:#ffffff"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SCHMUCK -->
+
+    <div
+        id="decoratePanel"
+        style="display:none"
+    >
+
+        <div class="section">
+
+            <h3>
+                SCHMUCK TOOL
+            </h3>
+
+
+            <div id="dropZone">
+
+                GLB hier hineinziehen
+
+                <br>
+
+                oder unten auswählen
+
+            </div>
+
+
+            <button
+                id="chooseModelBtn"
+                class="tool"
+            >
+                📦 GLB AUSWÄHLEN
+            </button>
+
+            <input
+                id="modelInput"
+                type="file"
+                accept=".glb"
+                hidden
+            >
+
+
+            <label>
+                Objektgröße
+            </label>
+
+            <input
+                id="objectScale"
+                type="range"
+                min="0.1"
+                max="5"
+                step="0.1"
+                value="1"
+            >
+
+
+            <label>
+
+                <input
+                    id="randomRotation"
+                    type="checkbox"
+                    checked
+                >
+
+                Zufällige Rotation
+
+            </label>
+
+
+            <label>
+
+                <input
+                    id="randomScale"
+                    type="checkbox"
+                >
+
+                Zufällige Größe
+
+            </label>
+
+
+            <hr>
+
+
+            <div class="small">
+
+                Klicke mit dem Pinsel auf
+                das Terrain.
+
+                <br><br>
+
+                Bei jedem Klick wird
+                ein neues GLB platziert.
+
+            </div>
+
+
+            <hr>
+
+
+            <button
+                id="clearObjects"
+                class="tool"
+            >
+                🗑 ALLE OBJEKTE LÖSCHEN
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- AUSWAHL -->
+
+    <div
+        id="selectPanel"
+        style="display:none"
+    >
+
+        <div class="section">
+
+            <h3>
+                AUSWAHL
+            </h3>
+
+            <div class="small">
+
+                Doppelklick auf ein
+                Objekt.
+
+                <br><br>
+
+                W = Verschieben
+
+                <br>
+
+                E = Drehen
+
+                <br>
+
+                R = Skalieren
+
+            </div>
+
+
+            <hr>
+
+
+            <button
+                id="deleteBtn"
+                class="tool"
+            >
+                🗑 LÖSCHEN
+            </button>
+
+
+            <button
+                id="duplicateBtn"
+                class="tool"
+            >
+                📑 DUPLIZIEREN
+            </button>
+
+        </div>
+
+    </div>
+
+
 </div>
 
-<label>Stärke</label>
 
-<input
-id="brushStrength"
-type="range"
-min="0.01"
-max="1"
-step="0.01"
-value="0.25">
-
-<div class="small">
-Stärke: <span id="brushStrengthText">0.25</span>
-</div>
-
-<hr>
-
-<h3>Terrain-Farbe</h3>
-
-<div class="colorGrid">
-
-<div class="color" data-color="#3c8f35" style="background:#3c8f35"></div>
-<div class="color" data-color="#70b84a" style="background:#70b84a"></div>
-<div class="color" data-color="#9a8148" style="background:#9a8148"></div>
-<div class="color" data-color="#777777" style="background:#777777"></div>
-<div class="color" data-color="#d0c58e" style="background:#d0c58e"></div>
-<div class="color" data-color="#ffffff" style="background:#ffffff"></div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div id="decoratePanel" style="display:none">
-
-<div class="section">
-
-<h3>SCHMUCK TOOL</h3>
-
-<div id="dropZone">
-GLB hier hineinziehen
-<br>
-oder unten auswählen
-</div>
-
-<button id="chooseModelBtn" class="tool">
-📦 GLB auswählen
-</button>
-
-<input id="modelInput" type="file" accept=".glb" hidden>
-
-<label>Größe</label>
-
-<input
-id="objectScale"
-type="range"
-min="0.1"
-max="5"
-step="0.1"
-value="1">
-
-<div class="small">
-Mit dem Pinsel auf das Terrain klicken.
-Bei jedem Klick wird ein neues Modell erzeugt.
-</div>
-
-<label>
-<input id="randomRotation" type="checkbox" checked>
- Zufällige Rotation
-</label>
-
-<label>
-<input id="randomScale" type="checkbox">
- Zufällige Größe
-</label>
-
-<hr>
-
-<button id="clearObjects" class="tool">
-🗑 ALLE SCHMUCKOBJEKTE LÖSCHEN
-</button>
-
-</div>
-
-</div>
-
-
-<div id="selectPanel" style="display:none">
-
-<div class="section">
-
-<h3>AUSWAHL</h3>
-
-<div class="small">
-Doppelklick auf ein Objekt.
-<br><br>
-W = Verschieben<br>
-E = Drehen<br>
-R = Skalieren
-</div>
-
-<hr>
-
-<button id="deleteBtn" class="tool">
-🗑 LÖSCHEN
-</button>
-
-<button id="duplicateBtn" class="tool">
-📑 DUPLIZIEREN
-</button>
-
-</div>
-
-</div>
-
-</div>
-
+<!-- =====================================================
+     RIGHT
+===================================================== -->
 
 <div id="rightbar">
 
-<div class="section">
+    <div class="section">
 
-<h3>INSPEKTOR</h3>
+        <h3>
+            INSPEKTOR
+        </h3>
 
-<div id="nothingSelected" class="small">
-Kein Objekt ausgewählt.
+
+        <div
+            id="nothingSelected"
+            class="small"
+        >
+            Kein Objekt ausgewählt.
+        </div>
+
+
+        <div
+            id="inspector"
+            style="display:none"
+        >
+
+            <label>
+                Name
+            </label>
+
+            <input
+                id="objectName"
+                type="text"
+            >
+
+
+            <label>
+                Position X
+            </label>
+
+            <input
+                id="posX"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Position Y
+            </label>
+
+            <input
+                id="posY"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Position Z
+            </label>
+
+            <input
+                id="posZ"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Rotation X
+            </label>
+
+            <input
+                id="rotX"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Rotation Y
+            </label>
+
+            <input
+                id="rotY"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Rotation Z
+            </label>
+
+            <input
+                id="rotZ"
+                type="number"
+                step="0.1"
+            >
+
+
+            <label>
+                Skalierung
+            </label>
+
+            <input
+                id="scaleInput"
+                type="number"
+                step="0.1"
+            >
+
+
+            <hr>
+
+
+            <label>
+                Objektfarbe
+            </label>
+
+            <input
+                id="objectColor"
+                type="color"
+                value="#ffffff"
+            >
+
+
+            <hr>
+
+
+            <h3>
+                SCRIPT
+            </h3>
+
+
+            <div class="small">
+
+                Das Script wird im
+                Play-Modus ausgeführt.
+
+                <br><br>
+
+                Verfügbar:
+
+                <br>
+
+                <code>object</code>
+
+                <br>
+
+                <code>THREE</code>
+
+            </div>
+
+
+            <textarea id="scriptInput">
+/* Beispiel */
+
+object.rotation.y += 0.01;
+            </textarea>
+
+
+            <button
+                id="applyScript"
+                class="tool"
+            >
+                📜 SCRIPT ANWENDEN
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="section">
+
+        <h3>
+            OBJEKTE
+        </h3>
+
+        <div id="objectList"></div>
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="section">
+
+        <h3>
+            ENGINE
+        </h3>
+
+        <div class="small">
+
+            3D-Welt: aktiv
+
+            <br>
+
+            Chunks: deaktiviert
+
+            <br>
+
+            Terrain: ein großes Mesh
+
+            <br>
+
+            GLB: aktiv
+
+            <br>
+
+            Terrain Painting: aktiv
+
+            <br>
+
+            Schmuck-Pinsel: aktiv
+
+        </div>
+
+    </div>
+
 </div>
 
-<div id="inspector" style="display:none">
 
-<label>Name</label>
-
-<input id="objectName" type="text">
-
-<label>Position X</label>
-<input id="posX" type="number" step="0.1">
-
-<label>Position Y</label>
-<input id="posY" type="number" step="0.1">
-
-<label>Position Z</label>
-<input id="posZ" type="number" step="0.1">
-
-<label>Rotation X</label>
-<input id="rotX" type="number" step="0.1">
-
-<label>Rotation Y</label>
-<input id="rotY" type="number" step="0.1">
-
-<label>Rotation Z</label>
-<input id="rotZ" type="number" step="0.1">
-
-<label>Skalierung</label>
-<input id="scaleInput" type="number" step="0.1">
-
-<hr>
-
-<label>Objektfarbe</label>
-
-<input id="objectColor" type="color" value="#ffffff">
-
-<hr>
-
-<h3>SCRIPT</h3>
-
-<div class="small">
-Das Script läuft im PLAY-Modus.
-<br><br>
-Verfügbare Variablen:
-<br>
-object
-<br>
-THREE
-</div>
-
-<textarea id="scriptInput">// Beispiel:
-//
-// object.rotation.y += 0.01;</textarea>
-
-<button id="applyScript" class="tool">
-📜 SCRIPT ANWENDEN
-</button>
-
-</div>
-
-</div>
-
-<hr>
-
-<div class="section">
-
-<h3>OBJEKTE</h3>
-
-<div id="objectList"></div>
-
-</div>
-
-<hr>
-
-<div class="section">
-
-<h3>ENGINE</h3>
-
-<div class="small">
-3D-Welt: aktiv<br>
-Chunks: deaktiviert<br>
-Terrain: ein zusammenhängendes Mesh<br>
-GLB: aktiv<br>
-Terrain Painting: aktiv<br>
-Object Painting: aktiv
-</div>
-
-</div>
-
-</div>
-
+<!-- =====================================================
+     VIEWPORT
+===================================================== -->
 
 <div id="viewport"></div>
 
+
 <div id="brushCursor"></div>
 
+
 <div id="status">
-Bereit
+    Bereit
 </div>
+
 
 <div id="playMode">
-<div id="playLabel">
-▶ PLAY MODE
-</div>
+
+    <div id="playLabel">
+        ▶ PLAY MODE
+    </div>
+
 </div>
 
+
+<!-- =====================================================
+     THREE.JS
+===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
+
 <script type="module">
 
-import {OrbitControls}
-from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-
-import {GLTFLoader}
-from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-
-import {TransformControls}
-from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
+import {
+    OrbitControls
+}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 
 
-const THREE_GLOBAL = window.THREE;
+import {
+    GLTFLoader
+}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
+
+import {
+    TransformControls
+}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
+
+
+/* =====================================================
+   THREE
+===================================================== */
+
+const THREE =
+window.THREE;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
 
 const viewport =
-document.getElementById("viewport");
+document.getElementById(
+    "viewport"
+);
 
 
 /* =====================================================
@@ -572,16 +1145,20 @@ document.getElementById("viewport");
 ===================================================== */
 
 const scene =
-new THREE_GLOBAL.Scene();
+new THREE.Scene();
+
 
 scene.background =
-new THREE_GLOBAL.Color(0x79caff);
+new THREE.Color(
+    0x79caff
+);
+
 
 scene.fog =
-new THREE_GLOBAL.Fog(
-0x79caff,
-500,
-2200
+new THREE.Fog(
+    0x79caff,
+    500,
+    2200
 );
 
 
@@ -590,18 +1167,19 @@ new THREE_GLOBAL.Fog(
 ===================================================== */
 
 const camera =
-new THREE_GLOBAL.PerspectiveCamera(
-75,
-viewport.clientWidth /
-viewport.clientHeight,
-0.1,
-5000
+new THREE.PerspectiveCamera(
+    75,
+    viewport.clientWidth /
+    viewport.clientHeight,
+    0.1,
+    5000
 );
 
+
 camera.position.set(
-180,
-180,
-180
+    180,
+    180,
+    180
 );
 
 
@@ -610,47 +1188,52 @@ camera.position.set(
 ===================================================== */
 
 const renderer =
-new THREE_GLOBAL.WebGLRenderer({
-antialias:true
+new THREE.WebGLRenderer({
+    antialias:true
 });
 
+
 renderer.setPixelRatio(
-Math.min(
-window.devicePixelRatio,
-1.5
-)
+    Math.min(
+        window.devicePixelRatio,
+        1.5
+    )
 );
 
+
 renderer.setSize(
-viewport.clientWidth,
-viewport.clientHeight
+    viewport.clientWidth,
+    viewport.clientHeight
 );
+
 
 renderer.shadowMap.enabled=true;
 
+
 viewport.appendChild(
-renderer.domElement
+    renderer.domElement
 );
 
 
 /* =====================================================
-   CAMERA CONTROL
+   CAMERA CONTROLS
 ===================================================== */
 
 const controls =
 new OrbitControls(
-camera,
-renderer.domElement
+    camera,
+    renderer.domElement
 );
+
 
 controls.enableDamping=true;
 
-controls.dampingFactor=.08;
+controls.dampingFactor=0.08;
 
 controls.target.set(
-0,
-0,
-0
+    0,
+    0,
+    0
 );
 
 
@@ -658,158 +1241,205 @@ controls.target.set(
    LIGHT
 ===================================================== */
 
-scene.add(
-new THREE_GLOBAL.AmbientLight(
-0xffffff,
-1
-)
+const ambient =
+new THREE.HemisphereLight(
+    0xffffff,
+    0x445544,
+    1.7
 );
+
+
+scene.add(
+    ambient
+);
+
 
 const sun =
-new THREE_GLOBAL.DirectionalLight(
-0xffffff,
-1.6
+new THREE.DirectionalLight(
+    0xffffff,
+    2
 );
 
+
 sun.position.set(
-500,
-900,
-400
+    400,
+    700,
+    300
 );
+
 
 sun.castShadow=true;
 
-scene.add(sun);
+
+scene.add(
+    sun
+);
 
 
 /* =====================================================
    TERRAIN
-   EIN großes Mesh - KEINE CHUNKS
 ===================================================== */
 
-const TERRAIN_SIZE=800;
+const TERRAIN_SIZE =
+800;
 
-const SEGMENTS=180;
 
-const geometry =
-new THREE_GLOBAL.PlaneGeometry(
-TERRAIN_SIZE,
-TERRAIN_SIZE,
-SEGMENTS,
-SEGMENTS
+const SEGMENTS =
+180;
+
+
+const terrainGeometry =
+new THREE.PlaneGeometry(
+    TERRAIN_SIZE,
+    TERRAIN_SIZE,
+    SEGMENTS,
+    SEGMENTS
 );
 
-geometry.rotateX(
--Math.PI/2
+
+terrainGeometry.rotateX(
+    -Math.PI/2
 );
+
 
 const position =
-geometry.attributes.position;
+terrainGeometry.attributes.position;
+
 
 const vertexCount =
 position.count;
 
+
 const heights =
 new Float32Array(
-vertexCount
+    vertexCount
 );
+
 
 const colors =
 new Float32Array(
-vertexCount*3
+    vertexCount*3
 );
 
 
-/* Anfangsfarbe */
+/* =====================================================
+   INITIAL TERRAIN
+===================================================== */
 
-for(let i=0;i<vertexCount;i++){
+function initialHeight(
+    x,
+    z
+){
 
-colors[i*3]=.30;
-colors[i*3+1]=.60;
-colors[i*3+2]=.25;
-
-}
-
-
-/* Terrain-Höhe */
-
-function initialHeight(x,z){
-
-let h=0;
-
-h +=
-Math.sin(x*.002) *
-Math.cos(z*.002) *
-35;
-
-h +=
-Math.sin(x*.006+z*.004) *
-12;
-
-h +=
-Math.cos(x*.011-z*.009) *
-5;
-
-h +=
-Math.sin(x*.00065) *
-Math.cos(z*.0008) *
-55;
-
-return h+15;
-
-}
+    let h=0;
 
 
-for(let i=0;i<vertexCount;i++){
+    h +=
+        Math.sin(x*0.002) *
+        Math.cos(z*0.002) *
+        35;
 
-const x=
-position.getX(i);
 
-const z=
-position.getZ(i);
+    h +=
+        Math.sin(
+            x*0.006+
+            z*0.004
+        ) * 12;
 
-const h=
-initialHeight(x,z);
 
-heights[i]=h;
+    h +=
+        Math.cos(
+            x*0.011-
+            z*0.009
+        ) * 5;
 
-position.setY(i,h);
+
+    h +=
+        Math.sin(x*0.00065) *
+        Math.cos(z*0.0008) *
+        55;
+
+
+    return h+15;
 
 }
 
 
-geometry.setAttribute(
-"color",
-new THREE_GLOBAL.BufferAttribute(
-colors,
-3
-)
+for(
+    let i=0;
+    i<vertexCount;
+    i++
+){
+
+    const x =
+        position.getX(i);
+
+    const z =
+        position.getZ(i);
+
+
+    const h =
+        initialHeight(
+            x,
+            z
+        );
+
+
+    heights[i]=h;
+
+
+    position.setY(
+        i,
+        h
+    );
+
+
+    colors[i*3]=0.30;
+
+    colors[i*3+1]=0.60;
+
+    colors[i*3+2]=0.25;
+
+}
+
+
+terrainGeometry.setAttribute(
+    "color",
+    new THREE.BufferAttribute(
+        colors,
+        3
+    )
 );
 
-geometry.computeVertexNormals();
+
+terrainGeometry.computeVertexNormals();
 
 
 const terrainMaterial =
-new THREE_GLOBAL.MeshStandardMaterial({
+new THREE.MeshStandardMaterial({
 
-vertexColors:true,
+    vertexColors:true,
 
-roughness:1,
+    roughness:1,
 
-metalness:0
+    metalness:0
 
 });
 
 
 const terrain =
-new THREE_GLOBAL.Mesh(
-geometry,
-terrainMaterial
+new THREE.Mesh(
+    terrainGeometry,
+    terrainMaterial
 );
+
 
 terrain.receiveShadow=true;
 
-scene.add(terrain);
+
+scene.add(
+    terrain
+);
 
 
 /* =====================================================
@@ -817,218 +1447,319 @@ scene.add(terrain);
 ===================================================== */
 
 const raycaster =
-new THREE_GLOBAL.Raycaster();
+new THREE.Raycaster();
+
 
 const mouse =
-new THREE_GLOBAL.Vector2();
+new THREE.Vector2();
 
 
-function getTerrainPoint(event){
+function getTerrainPoint(
+    event
+){
 
-const rect =
-renderer.domElement.getBoundingClientRect();
+    const rect =
+        renderer.domElement
+        .getBoundingClientRect();
 
-mouse.x =
-((event.clientX-rect.left) /
-rect.width)*2-1;
 
-mouse.y =
--((event.clientY-rect.top) /
-rect.height)*2+1;
+    mouse.x =
+        (
+            (event.clientX -
+            rect.left) /
+            rect.width
+        ) * 2 - 1;
 
-raycaster.setFromCamera(
-mouse,
-camera
-);
 
-const hit =
-raycaster.intersectObject(
-terrain,
-false
-);
+    mouse.y =
+        -(
+            (event.clientY -
+            rect.top) /
+            rect.height
+        ) * 2 + 1;
 
-if(hit.length)
-return hit[0].point;
 
-return null;
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+
+    const hits =
+        raycaster.intersectObject(
+            terrain,
+            false
+        );
+
+
+    if(hits.length)
+        return hits[0].point;
+
+
+    return null;
 
 }
 
 
 /* =====================================================
-   TOOLS
+   MAP TOOL
 ===================================================== */
 
-let currentTool="raise";
-
-let currentTerrainColor="#3c8f35";
-
-let painting=false;
+let currentTool =
+    "raise";
 
 
-function setTool(tool){
+let currentTerrainColor =
+    "#3c8f35";
 
-currentTool=tool;
 
-document
-.querySelectorAll("#leftbar button")
-.forEach(b=>{
-b.classList.remove("active");
-});
+let painting =
+    false;
 
-if(tool==="raise")
-document
-.getElementById("raiseBtn")
-.classList.add("active");
 
-if(tool==="lower")
-document
-.getElementById("lowerBtn")
-.classList.add("active");
+function setMapTool(
+    tool
+){
 
-if(tool==="paint")
-document
-.getElementById("paintTerrainBtn")
-.classList.add("active");
+    currentTool =
+        tool;
+
+
+    document
+        .querySelectorAll(
+            "#mapPanel button"
+        )
+        .forEach(
+            b=>{
+                b.classList.remove(
+                    "active"
+                );
+            }
+        );
+
+
+    if(tool==="raise"){
+
+        document
+            .getElementById(
+                "raiseBtn"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if(tool==="lower"){
+
+        document
+            .getElementById(
+                "lowerBtn"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
+
+
+    if(tool==="paint"){
+
+        document
+            .getElementById(
+                "paintTerrainBtn"
+            )
+            .classList.add(
+                "active"
+            );
+
+    }
 
 }
 
 
 document
-.getElementById("raiseBtn")
-.onclick=()=>{
-setTool("raise");
-};
+    .getElementById(
+        "raiseBtn"
+    )
+    .onclick=()=>{
+        setMapTool("raise");
+    };
 
 
 document
-.getElementById("lowerBtn")
-.onclick=()=>{
-setTool("lower");
-};
+    .getElementById(
+        "lowerBtn"
+    )
+    .onclick=()=>{
+        setMapTool("lower");
+    };
 
 
 document
-.getElementById("paintTerrainBtn")
-.onclick=()=>{
-setTool("paint");
-};
+    .getElementById(
+        "paintTerrainBtn"
+    )
+    .onclick=()=>{
+        setMapTool("paint");
+    };
 
 
 /* =====================================================
-   TERRAIN SCULPT
+   SCULPT
 ===================================================== */
 
-function terrainSculpt(
-point,
-direction
+function sculptTerrain(
+    point,
+    direction
 ){
 
-const brushSize =
-Number(
-document.getElementById(
-"brushSize"
-).value
-);
-
-const strength =
-Number(
-document.getElementById(
-"brushStrength"
-).value
-);
-
-const centerX =
-Math.round(
-((point.x+TERRAIN_SIZE/2) /
-TERRAIN_SIZE)*
-SEGMENTS
-);
-
-const centerZ =
-Math.round(
-((point.z+TERRAIN_SIZE/2) /
-TERRAIN_SIZE)*
-SEGMENTS
-);
-
-const radius =
-brushSize/TERRAIN_SIZE*SEGMENTS;
-
-const count=SEGMENTS+1;
+    const brushSize =
+        Number(
+            document.getElementById(
+                "brushSize"
+            ).value
+        );
 
 
-for(
-let z=Math.floor(centerZ-radius);
-z<=Math.ceil(centerZ+radius);
-z++
-){
-
-for(
-let x=Math.floor(centerX-radius);
-x<=Math.ceil(centerX+radius);
-x++
-){
-
-if(
-x<0 ||
-z<0 ||
-x>=count ||
-z>=count
-)
-continue;
+    const strength =
+        Number(
+            document.getElementById(
+                "brushStrength"
+            ).value
+        );
 
 
-const dx=x-centerX;
-const dz=z-centerZ;
-
-const distance =
-Math.sqrt(
-dx*dx+dz*dz
-);
-
-if(distance>radius)
-continue;
+    const centerX =
+        Math.round(
+            (
+                (point.x +
+                TERRAIN_SIZE/2) /
+                TERRAIN_SIZE
+            ) * SEGMENTS
+        );
 
 
-const falloff =
-1-distance/radius;
+    const centerZ =
+        Math.round(
+            (
+                (point.z +
+                TERRAIN_SIZE/2) /
+                TERRAIN_SIZE
+            ) * SEGMENTS
+        );
 
 
-const index =
-z*count+x;
+    const radius =
+        brushSize /
+        TERRAIN_SIZE *
+        SEGMENTS;
 
 
-heights[index] +=
-direction*
-strength*
-falloff*
-2;
+    const count =
+        SEGMENTS+1;
 
 
-heights[index]=
-Math.max(
--60,
-Math.min(
-160,
-heights[index]
-)
-);
+    for(
+        let z=
+            Math.floor(
+                centerZ-radius
+            );
+
+        z<=
+            Math.ceil(
+                centerZ+radius
+            );
+
+        z++
+    ){
+
+        for(
+            let x=
+                Math.floor(
+                    centerX-radius
+                );
+
+            x<=
+                Math.ceil(
+                    centerX+radius
+                );
+
+            x++
+        ){
+
+            if(
+                x<0 ||
+                z<0 ||
+                x>=count ||
+                z>=count
+            )
+                continue;
 
 
-position.setY(
-index,
-heights[index]
-);
-
-}
-
-}
+            const dx =
+                x-centerX;
 
 
-position.needsUpdate=true;
+            const dz =
+                z-centerZ;
 
-geometry.computeVertexNormals();
+
+            const distance =
+                Math.sqrt(
+                    dx*dx+
+                    dz*dz
+                );
+
+
+            if(
+                distance>radius
+            )
+                continue;
+
+
+            const falloff =
+                1 -
+                distance/radius;
+
+
+            const index =
+                z*count+x;
+
+
+            heights[index] +=
+                direction *
+                strength *
+                falloff *
+                2;
+
+
+            heights[index] =
+                Math.max(
+                    -60,
+                    Math.min(
+                        160,
+                        heights[index]
+                    )
+                );
+
+
+            position.setY(
+                index,
+                heights[index]
+            );
+
+        }
+
+    }
+
+
+    position.needsUpdate=true;
+
+
+    terrainGeometry
+        .computeVertexNormals();
 
 }
 
@@ -1037,313 +1768,417 @@ geometry.computeVertexNormals();
    TERRAIN PAINT
 ===================================================== */
 
-function paintTerrain(point){
-
-const brushSize =
-Number(
-document.getElementById(
-"brushSize"
-).value
-);
-
-const strength =
-Number(
-document.getElementById(
-"brushStrength"
-).value
-);
-
-const centerX =
-Math.round(
-((point.x+TERRAIN_SIZE/2) /
-TERRAIN_SIZE)*
-SEGMENTS
-);
-
-const centerZ =
-Math.round(
-((point.z+TERRAIN_SIZE/2) /
-TERRAIN_SIZE)*
-SEGMENTS
-);
-
-const radius =
-brushSize/TERRAIN_SIZE*SEGMENTS;
-
-const count=SEGMENTS+1;
-
-const target =
-new THREE_GLOBAL.Color(
-currentTerrainColor
-);
-
-
-for(
-let z=Math.floor(centerZ-radius);
-z<=Math.ceil(centerZ+radius);
-z++
+function paintTerrain(
+    point
 ){
 
-for(
-let x=Math.floor(centerX-radius);
-x<=Math.ceil(centerX+radius);
-x++
-){
-
-if(
-x<0 ||
-z<0 ||
-x>=count ||
-z>=count
-)
-continue;
+    const brushSize =
+        Number(
+            document.getElementById(
+                "brushSize"
+            ).value
+        );
 
 
-const dx=x-centerX;
-const dz=z-centerZ;
-
-const distance =
-Math.sqrt(
-dx*dx+dz*dz
-);
-
-if(distance>radius)
-continue;
+    const strength =
+        Number(
+            document.getElementById(
+                "brushStrength"
+            ).value
+        );
 
 
-const falloff =
-1-distance/radius;
-
-const amount =
-strength*falloff;
-
-const index =
-z*count+x;
-
-
-colors[index*3] =
-THREE_GLOBAL.MathUtils.lerp(
-colors[index*3],
-target.r,
-amount
-);
-
-colors[index*3+1] =
-THREE_GLOBAL.MathUtils.lerp(
-colors[index*3+1],
-target.g,
-amount
-);
-
-colors[index*3+2] =
-THREE_GLOBAL.MathUtils.lerp(
-colors[index*3+2],
-target.b,
-amount
-);
-
-}
-
-}
+    const centerX =
+        Math.round(
+            (
+                (point.x +
+                TERRAIN_SIZE/2) /
+                TERRAIN_SIZE
+            ) * SEGMENTS
+        );
 
 
-geometry.attributes.color.needsUpdate=true;
+    const centerZ =
+        Math.round(
+            (
+                (point.z +
+                TERRAIN_SIZE/2) /
+                TERRAIN_SIZE
+            ) * SEGMENTS
+        );
+
+
+    const radius =
+        brushSize /
+        TERRAIN_SIZE *
+        SEGMENTS;
+
+
+    const count =
+        SEGMENTS+1;
+
+
+    const target =
+        new THREE.Color(
+            currentTerrainColor
+        );
+
+
+    for(
+        let z=
+            Math.floor(
+                centerZ-radius
+            );
+
+        z<=
+            Math.ceil(
+                centerZ+radius
+            );
+
+        z++
+    ){
+
+        for(
+            let x=
+                Math.floor(
+                    centerX-radius
+                );
+
+            x<=
+                Math.ceil(
+                    centerX+radius
+                );
+
+            x++
+        ){
+
+            if(
+                x<0 ||
+                z<0 ||
+                x>=count ||
+                z>=count
+            )
+                continue;
+
+
+            const dx =
+                x-centerX;
+
+
+            const dz =
+                z-centerZ;
+
+
+            const distance =
+                Math.sqrt(
+                    dx*dx+
+                    dz*dz
+                );
+
+
+            if(
+                distance>radius
+            )
+                continue;
+
+
+            const falloff =
+                1-distance/radius;
+
+
+            const amount =
+                strength*falloff;
+
+
+            const index =
+                z*count+x;
+
+
+            colors[index*3] =
+                THREE.MathUtils.lerp(
+                    colors[index*3],
+                    target.r,
+                    amount
+                );
+
+
+            colors[index*3+1] =
+                THREE.MathUtils.lerp(
+                    colors[index*3+1],
+                    target.g,
+                    amount
+                );
+
+
+            colors[index*3+2] =
+                THREE.MathUtils.lerp(
+                    colors[index*3+2],
+                    target.b,
+                    amount
+                );
+
+        }
+
+    }
+
+
+    terrainGeometry
+        .attributes
+        .color
+        .needsUpdate=true;
 
 }
 
 
 /* =====================================================
-   MOUSE PAINT
+   BRUSH
 ===================================================== */
 
-renderer.domElement.addEventListener(
-"pointerdown",
-event=>{
-
-if(
-currentTool==="raise" ||
-currentTool==="lower" ||
-currentTool==="paint"
+function useBrush(
+    event
 ){
 
-painting=true;
+    const point =
+        getTerrainPoint(
+            event
+        );
 
-useBrush(event);
+
+    if(!point)
+        return;
+
+
+    if(
+        currentTool==="raise"
+    ){
+
+        sculptTerrain(
+            point,
+            1
+        );
+
+    }
+
+
+    if(
+        currentTool==="lower"
+    ){
+
+        sculptTerrain(
+            point,
+            -1
+        );
+
+    }
+
+
+    if(
+        currentTool==="paint"
+    ){
+
+        paintTerrain(
+            point
+        );
+
+    }
 
 }
 
-}
-);
+
+/* =====================================================
+   MOUSE EVENTS
+===================================================== */
+
+renderer.domElement
+    .addEventListener(
+        "pointerdown",
+        event=>{
+
+            if(
+                currentTool==="raise" ||
+                currentTool==="lower" ||
+                currentTool==="paint"
+            ){
+
+                painting=true;
+
+                useBrush(event);
+
+            }
+
+        }
+    );
 
 
-renderer.domElement.addEventListener(
-"pointermove",
-event=>{
+renderer.domElement
+    .addEventListener(
+        "pointermove",
+        event=>{
 
-updateBrushCursor(event);
+            updateBrush(
+                event
+            );
 
-if(
-painting &&
-(
-currentTool==="raise" ||
-currentTool==="lower" ||
-currentTool==="paint"
-)
-){
 
-useBrush(event);
+            if(
+                painting &&
+                (
+                    currentTool==="raise" ||
+                    currentTool==="lower" ||
+                    currentTool==="paint"
+                )
+            ){
 
-}
+                useBrush(event);
 
-}
-);
+            }
+
+        }
+    );
 
 
 window.addEventListener(
-"pointerup",
-()=>{
-painting=false;
-}
+    "pointerup",
+    ()=>{
+        painting=false;
+    }
 );
-
-
-function useBrush(event){
-
-const point =
-getTerrainPoint(event);
-
-if(!point)
-return;
-
-if(currentTool==="raise")
-terrainSculpt(
-point,
-1
-);
-
-if(currentTool==="lower")
-terrainSculpt(
-point,
--1
-);
-
-if(currentTool==="paint")
-paintTerrain(
-point
-);
-
-}
 
 
 /* =====================================================
    BRUSH CURSOR
 ===================================================== */
 
-function updateBrushCursor(event){
-
-if(
-currentTool!=="raise" &&
-currentTool!=="lower" &&
-currentTool!=="paint" &&
-currentTool!=="decorate"
+function updateBrush(
+    event
 ){
 
-document
-.getElementById("brushCursor")
-.style.display="none";
+    if(
+        currentTool!=="raise" &&
+        currentTool!=="lower" &&
+        currentTool!=="paint" &&
+        currentTool!=="decorate"
+    ){
 
-return;
+        document
+            .getElementById(
+                "brushCursor"
+            )
+            .style.display="none";
 
-}
+        return;
 
-
-const cursor =
-document.getElementById(
-"brushCursor"
-);
-
-cursor.style.display="block";
-
-cursor.style.left=
-event.clientX+"px";
-
-cursor.style.top=
-event.clientY+"px";
+    }
 
 
-const size =
-Number(
-document.getElementById(
-"brushSize"
-).value
-);
+    const cursor =
+        document.getElementById(
+            "brushCursor"
+        );
 
-const visual =
-Math.max(
-20,
-size*2
-);
 
-cursor.style.width=
-visual+"px";
+    cursor.style.display=
+        "block";
 
-cursor.style.height=
-visual+"px";
+
+    cursor.style.left=
+        event.clientX+"px";
+
+
+    cursor.style.top=
+        event.clientY+"px";
+
+
+    const size =
+        Number(
+            document.getElementById(
+                "brushSize"
+            ).value
+        );
+
+
+    const visualSize =
+        Math.max(
+            20,
+            size*2
+        );
+
+
+    cursor.style.width=
+        visualSize+"px";
+
+
+    cursor.style.height=
+        visualSize+"px";
 
 }
 
 
 /* =====================================================
-   COLOR
+   TERRAIN COLORS
 ===================================================== */
 
 document
-.querySelectorAll(".color")
-.forEach(color=>{
+    .querySelectorAll(
+        ".color"
+    )
+    .forEach(
+        color=>{
 
-color.addEventListener(
-"click",
-()=>{
+            color.addEventListener(
+                "click",
+                ()=>{
 
-currentTerrainColor=
-color.dataset.color;
+                    currentTerrainColor =
+                        color.dataset.color;
 
-}
-);
+                }
+            );
 
-});
+        }
+    );
 
 
 /* =====================================================
-   SLIDER
+   SLIDERS
 ===================================================== */
 
 document
-.getElementById("brushSize")
-.addEventListener(
-"input",
-e=>{
+    .getElementById(
+        "brushSize"
+    )
+    .addEventListener(
+        "input",
+        event=>{
+
+            document
+                .getElementById(
+                    "brushSizeText"
+                )
+                .textContent =
+                    event.target.value;
+
+        }
+    );
+
 
 document
-.getElementById("brushSizeText")
-.textContent=e.target.value;
+    .getElementById(
+        "brushStrength"
+    )
+    .addEventListener(
+        "input",
+        event=>{
 
-}
-);
+            document
+                .getElementById(
+                    "brushStrengthText"
+                )
+                .textContent =
+                    event.target.value;
 
-
-document
-.getElementById("brushStrength")
-.addEventListener(
-"input",
-e=>{
-
-document
-.getElementById("brushStrengthText")
-.textContent=e.target.value;
-
-}
-);
+        }
+    );
 
 
 /* =====================================================
@@ -1351,304 +2186,486 @@ document
 ===================================================== */
 
 const loader =
-new GLTFLoader();
-
-let sourceModel=null;
-
-let objectCounter=0;
-
-const objects=[];
+    new GLTFLoader();
 
 
-function removeTextures(root){
-
-root.traverse(
-child=>{
-
-if(!child.isMesh)
-return;
-
-const material =
-new THREE_GLOBAL.MeshStandardMaterial({
-color:0xffffff,
-roughness:.85,
-metalness:0
-});
-
-child.material=material;
-
-child.castShadow=true;
-
-child.receiveShadow=true;
-
-}
-);
-
-}
+let sourceModel =
+    null;
 
 
-function loadModel(file){
+let objectCounter =
+    0;
 
-const url =
-URL.createObjectURL(file);
 
-loader.load(
-url,
-gltf=>{
+const objects =
+    [];
 
-sourceModel =
-gltf.scene;
 
-removeTextures(
-sourceModel
-);
+function removeTextures(
+    root
+){
 
-sourceModel.visible=false;
+    root.traverse(
+        child=>{
 
-scene.add(
-sourceModel
-);
+            if(
+                !child.isMesh
+            )
+                return;
 
-document
-.getElementById("status")
-.textContent=
-"GLB geladen: "+file.name;
 
-URL.revokeObjectURL(url);
+            child.material =
+                new THREE.MeshStandardMaterial({
 
-},
-undefined,
-error=>{
+                    color:0xffffff,
 
-console.error(error);
+                    roughness:.85,
 
-alert(
-"Fehler beim Laden des GLB."
-);
+                    metalness:0
 
-}
-);
+                });
+
+
+            child.castShadow=true;
+
+            child.receiveShadow=true;
+
+        }
+    );
 
 }
 
 
-document
-.getElementById("importBtn")
-.onclick=()=>{
+function loadModel(
+    file
+){
 
-document
-.getElementById("glbInput")
-.click();
-
-};
+    if(!file)
+        return;
 
 
-document
-.getElementById("glbInput")
-.onchange=e=>{
-
-if(e.target.files[0])
-loadModel(
-e.target.files[0]
-);
-
-};
+    const url =
+        URL.createObjectURL(
+            file
+        );
 
 
-document
-.getElementById("chooseModelBtn")
-.onclick=()=>{
+    loader.load(
 
-document
-.getElementById("modelInput")
-.click();
+        url,
 
-};
+        gltf=>{
+
+            sourceModel =
+                gltf.scene;
 
 
-document
-.getElementById("modelInput")
-.onchange=e=>{
+            removeTextures(
+                sourceModel
+            );
 
-if(e.target.files[0])
-loadModel(
-e.target.files[0]
-);
 
-};
+            sourceModel.visible=false;
+
+
+            scene.add(
+                sourceModel
+            );
+
+
+            document
+                .getElementById(
+                    "status"
+                )
+                .textContent =
+                    "GLB geladen: "+
+                    file.name;
+
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+
+        undefined,
+
+        error=>{
+
+            console.error(
+                error
+            );
+
+
+            alert(
+                "GLB konnte nicht geladen werden."
+            );
+
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        }
+
+    );
+
+}
 
 
 /* =====================================================
-   SCHMUCK
+   GLB BUTTONS
 ===================================================== */
 
 document
-.getElementById("decorateBtn")
-.onclick=()=>{
+    .getElementById(
+        "importBtn"
+    )
+    .onclick=()=>{
 
-currentTool="decorate";
+        document
+            .getElementById(
+                "glbInput"
+            )
+            .click();
 
-document
-.getElementById("mapPanel")
-.style.display="none";
-
-document
-.getElementById("decoratePanel")
-.style.display="block";
-
-document
-.getElementById("selectPanel")
-.style.display="none";
-
-};
+    };
 
 
 document
-.getElementById("mapBtn")
-.onclick=()=>{
+    .getElementById(
+        "glbInput"
+    )
+    .addEventListener(
+        "change",
+        event=>{
 
-setTool("raise");
+            if(
+                event.target.files[0]
+            ){
+
+                loadModel(
+                    event.target.files[0]
+                );
+
+            }
+
+        }
+    );
+
 
 document
-.getElementById("mapPanel")
-.style.display="block";
+    .getElementById(
+        "chooseModelBtn"
+    )
+    .onclick=()=>{
+
+        document
+            .getElementById(
+                "modelInput"
+            )
+            .click();
+
+    };
+
 
 document
-.getElementById("decoratePanel")
-.style.display="none";
+    .getElementById(
+        "modelInput"
+    )
+    .addEventListener(
+        "change",
+        event=>{
+
+            if(
+                event.target.files[0]
+            ){
+
+                loadModel(
+                    event.target.files[0]
+                );
+
+            }
+
+        }
+    );
+
+
+/* =====================================================
+   SCHMUCK TOOL
+===================================================== */
 
 document
-.getElementById("selectPanel")
-.style.display="none";
+    .getElementById(
+        "decorateBtn"
+    )
+    .onclick=()=>{
 
-};
+        currentTool="decorate";
 
+
+        document
+            .getElementById(
+                "mapPanel"
+            )
+            .style.display=
+                "none";
+
+
+        document
+            .getElementById(
+                "decoratePanel"
+            )
+            .style.display=
+                "block";
+
+
+        document
+            .getElementById(
+                "selectPanel"
+            )
+            .style.display=
+                "none";
+
+    };
+
+
+/* =====================================================
+   MAP BUTTON
+===================================================== */
 
 document
-.getElementById("selectBtn")
-.onclick=()=>{
+    .getElementById(
+        "mapBtn"
+    )
+    .onclick=()=>{
 
-currentTool="select";
+        setMapTool(
+            "raise"
+        );
+
+
+        document
+            .getElementById(
+                "mapPanel"
+            )
+            .style.display=
+                "block";
+
+
+        document
+            .getElementById(
+                "decoratePanel"
+            )
+            .style.display=
+                "none";
+
+
+        document
+            .getElementById(
+                "selectPanel"
+            )
+            .style.display=
+                "none";
+
+    };
+
+
+/* =====================================================
+   SELECT BUTTON
+===================================================== */
 
 document
-.getElementById("mapPanel")
-.style.display="none";
+    .getElementById(
+        "selectBtn"
+    )
+    .onclick=()=>{
 
-document
-.getElementById("decoratePanel")
-.style.display="none";
-
-document
-.getElementById("selectPanel")
-.style.display="block";
-
-document
-.getElementById("brushCursor")
-.style.display="none";
-
-};
+        currentTool=
+            "select";
 
 
-renderer.domElement.addEventListener(
-"click",
-event=>{
-
-if(currentTool!=="decorate")
-return;
-
-placeObject(event);
-
-}
-);
+        document
+            .getElementById(
+                "mapPanel"
+            )
+            .style.display=
+                "none";
 
 
-function placeObject(event){
-
-if(!sourceModel){
-
-alert(
-"Bitte zuerst ein GLB importieren."
-);
-
-return;
-
-}
+        document
+            .getElementById(
+                "decoratePanel"
+            )
+            .style.display=
+                "none";
 
 
-const point =
-getTerrainPoint(event);
-
-if(!point)
-return;
-
-
-const object =
-sourceModel.clone(true);
-
-object.visible=true;
-
-object.position.copy(point);
-
-object.position.y+=.2;
+        document
+            .getElementById(
+                "selectPanel"
+            )
+            .style.display=
+                "block";
 
 
-let scale =
-Number(
-document.getElementById(
-"objectScale"
-).value
-);
+        document
+            .getElementById(
+                "brushCursor"
+            )
+            .style.display=
+                "none";
+
+    };
 
 
-if(
-document.getElementById(
-"randomScale"
-).checked
+/* =====================================================
+   PLACE OBJECT
+===================================================== */
+
+function placeObject(
+    event
 ){
 
-scale *=
-THREE_GLOBAL.MathUtils.randFloat(
-.75,
-1.25
-);
+    if(!sourceModel){
+
+        alert(
+            "Bitte zuerst ein GLB importieren."
+        );
+
+        return;
+
+    }
+
+
+    const point =
+        getTerrainPoint(
+            event
+        );
+
+
+    if(!point)
+        return;
+
+
+    const object =
+        sourceModel.clone(
+            true
+        );
+
+
+    object.visible=true;
+
+
+    object.position.copy(
+        point
+    );
+
+
+    object.position.y +=
+        0.2;
+
+
+    let scale =
+        Number(
+            document
+                .getElementById(
+                    "objectScale"
+                )
+                .value
+        );
+
+
+    if(
+        document
+            .getElementById(
+                "randomScale"
+            )
+            .checked
+    ){
+
+        scale *=
+            THREE.MathUtils.randFloat(
+                .75,
+                1.25
+            );
+
+    }
+
+
+    object.scale.setScalar(
+        scale
+    );
+
+
+    if(
+        document
+            .getElementById(
+                "randomRotation"
+            )
+            .checked
+    ){
+
+        object.rotation.y =
+            Math.random() *
+            Math.PI*2;
+
+    }
+
+
+    objectCounter++;
+
+
+    object.name =
+        "Object_"+objectCounter;
+
+
+    object.userData.script =
+        "";
+
+
+    object.userData.color =
+        "#ffffff";
+
+
+    scene.add(
+        object
+    );
+
+
+    objects.push(
+        object
+    );
+
+
+    addObjectToList(
+        object
+    );
 
 }
 
 
-object.scale.setScalar(
-scale
-);
+/* =====================================================
+   DECORATE CLICK
+===================================================== */
 
+renderer.domElement
+    .addEventListener(
+        "click",
+        event=>{
 
-if(
-document.getElementById(
-"randomRotation"
-).checked
-){
+            if(
+                currentTool==="decorate"
+            ){
 
-object.rotation.y=
-Math.random()*
-Math.PI*2;
+                placeObject(
+                    event
+                );
 
-}
+            }
 
-
-objectCounter++;
-
-object.name=
-"Object_"+objectCounter;
-
-object.userData.script="";
-
-object.userData.color="#ffffff";
-
-scene.add(object);
-
-objects.push(object);
-
-addObjectList(object);
-
-}
+        }
+    );
 
 
 /* =====================================================
@@ -1656,29 +2673,43 @@ addObjectList(object);
 ===================================================== */
 
 const objectList =
-document.getElementById(
-"objectList"
-);
+    document.getElementById(
+        "objectList"
+    );
 
 
-function addObjectList(object){
+function addObjectToList(
+    object
+){
 
-const item =
-document.createElement("div");
+    const item =
+        document.createElement(
+            "div"
+        );
 
-item.className=
-"objectItem";
 
-item.textContent=
-object.name;
+    item.className =
+        "objectItem";
 
-item.onclick=()=>{
-selectObject(object);
-};
 
-object.userData.item=item;
+    item.textContent =
+        object.name;
 
-objectList.appendChild(item);
+
+    item.onclick=()=>{
+        selectObject(
+            object
+        );
+    };
+
+
+    object.userData.item =
+        item;
+
+
+    objectList.appendChild(
+        item
+    );
 
 }
 
@@ -1687,250 +2718,342 @@ objectList.appendChild(item);
    OBJECT SELECTION
 ===================================================== */
 
-let selectedObject=null;
-
-let transformControls=null;
-
-
-renderer.domElement.addEventListener(
-"dblclick",
-event=>{
-
-if(currentTool!=="select")
-return;
+let selectedObject =
+    null;
 
 
-const rect =
-renderer.domElement.getBoundingClientRect();
-
-mouse.x =
-((event.clientX-rect.left) /
-rect.width)*2-1;
-
-mouse.y =
--((event.clientY-rect.top) /
-rect.height)*2+1;
+let transformControls =
+    null;
 
 
-raycaster.setFromCamera(
-mouse,
-camera
-);
+renderer.domElement
+    .addEventListener(
+        "dblclick",
+        event=>{
+
+            if(
+                currentTool!=="select"
+            )
+                return;
 
 
-const meshes=[];
+            const rect =
+                renderer.domElement
+                .getBoundingClientRect();
 
 
-for(
-const object of objects
-){
-
-object.traverse(
-child=>{
-
-if(child.isMesh)
-meshes.push(child);
-
-}
-);
-
-}
+            mouse.x =
+                (
+                    (event.clientX -
+                    rect.left) /
+                    rect.width
+                ) * 2 - 1;
 
 
-const hits =
-raycaster.intersectObjects(
-meshes,
-true
-);
+            mouse.y =
+                -(
+                    (event.clientY -
+                    rect.top) /
+                    rect.height
+                ) * 2 + 1;
 
 
-if(!hits.length)
-return;
+            raycaster.setFromCamera(
+                mouse,
+                camera
+            );
 
 
-let object =
-hits[0].object;
+            const meshes=[];
 
 
-while(
-object.parent &&
-!objects.includes(object)
-){
+            for(
+                const object
+                of objects
+            ){
 
-object=object.parent;
+                object.traverse(
+                    child=>{
 
-}
+                        if(
+                            child.isMesh
+                        ){
+
+                            meshes.push(
+                                child
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
 
 
-if(
-objects.includes(object)
-){
+            const hits =
+                raycaster.intersectObjects(
+                    meshes,
+                    true
+                );
 
-selectObject(object);
 
-}
+            if(!hits.length)
+                return;
 
-}
-);
+
+            let object =
+                hits[0].object;
+
+
+            while(
+                object.parent &&
+                !objects.includes(
+                    object
+                )
+            ){
+
+                object =
+                    object.parent;
+
+            }
+
+
+            if(
+                objects.includes(
+                    object
+                )
+            ){
+
+                selectObject(
+                    object
+                );
+
+            }
+
+        }
+    );
 
 
 /* =====================================================
-   SELECT OBJECT
+   SELECT
 ===================================================== */
 
-function selectObject(object){
+function selectObject(
+    object
+){
 
-selectedObject=object;
-
-
-document
-.querySelectorAll(".objectItem")
-.forEach(
-item=>
-item.classList.remove("selected")
-);
+    selectedObject =
+        object;
 
 
-if(object.userData.item)
-object.userData.item
-.classList.add("selected");
+    document
+        .querySelectorAll(
+            ".objectItem"
+        )
+        .forEach(
+            item=>{
+                item.classList.remove(
+                    "selected"
+                );
+            }
+        );
 
 
-document
-.getElementById("nothingSelected")
-.style.display="none";
+    if(
+        object.userData.item
+    ){
 
-document
-.getElementById("inspector")
-.style.display="block";
+        object.userData.item
+            .classList.add(
+                "selected"
+            );
 
-
-document
-.getElementById("objectName")
-.value=
-object.name;
+    }
 
 
-document
-.getElementById("posX")
-.value=
-object.position.x;
+    document
+        .getElementById(
+            "nothingSelected"
+        )
+        .style.display=
+            "none";
 
 
-document
-.getElementById("posY")
-.value=
-object.position.y;
+    document
+        .getElementById(
+            "inspector"
+        )
+        .style.display=
+            "block";
 
 
-document
-.getElementById("posZ")
-.value=
-object.position.z;
+    document
+        .getElementById(
+            "objectName"
+        )
+        .value=
+            object.name;
 
 
-document
-.getElementById("rotX")
-.value=
-object.rotation.x;
+    document
+        .getElementById(
+            "posX"
+        )
+        .value=
+            object.position.x;
 
 
-document
-.getElementById("rotY")
-.value=
-object.rotation.y;
+    document
+        .getElementById(
+            "posY"
+        )
+        .value=
+            object.position.y;
 
 
-document
-.getElementById("rotZ")
-.value=
-object.rotation.z;
+    document
+        .getElementById(
+            "posZ"
+        )
+        .value=
+            object.position.z;
 
 
-document
-.getElementById("scaleInput")
-.value=
-object.scale.x;
+    document
+        .getElementById(
+            "rotX"
+        )
+        .value=
+            object.rotation.x;
 
 
-document
-.getElementById("objectColor")
-.value=
-object.userData.color ||
-"#ffffff";
+    document
+        .getElementById(
+            "rotY"
+        )
+        .value=
+            object.rotation.y;
 
 
-document
-.getElementById("scriptInput")
-.value=
-object.userData.script ||
-"";
+    document
+        .getElementById(
+            "rotZ"
+        )
+        .value=
+            object.rotation.z;
 
 
-if(transformControls){
-
-scene.remove(
-transformControls
-);
-
-transformControls.dispose();
-
-}
+    document
+        .getElementById(
+            "scaleInput"
+        )
+        .value=
+            object.scale.x;
 
 
-transformControls =
-new TransformControls(
-camera,
-renderer.domElement
-);
+    document
+        .getElementById(
+            "objectColor"
+        )
+        .value=
+            object.userData.color ||
+            "#ffffff";
 
-transformControls.attach(
-object
-);
 
-transformControls.setMode(
-"translate"
-);
+    document
+        .getElementById(
+            "scriptInput"
+        )
+        .value=
+            object.userData.script ||
+            "";
 
-transformControls.addEventListener(
-"objectChange",
-updateInspector
-);
 
-scene.add(
-transformControls
-);
+    if(transformControls){
+
+        scene.remove(
+            transformControls
+        );
+
+        transformControls.dispose();
+
+    }
+
+
+    transformControls =
+        new TransformControls(
+            camera,
+            renderer.domElement
+        );
+
+
+    transformControls.attach(
+        object
+    );
+
+
+    transformControls.setMode(
+        "translate"
+    );
+
+
+    transformControls.addEventListener(
+        "objectChange",
+        updateInspector
+    );
+
+
+    scene.add(
+        transformControls
+    );
 
 }
 
 
 /* =====================================================
-   W / E / R
+   TRANSFORM SHORTCUTS
 ===================================================== */
 
 window.addEventListener(
-"keydown",
-event=>{
+    "keydown",
+    event=>{
 
-if(!transformControls)
-return;
+        if(!transformControls)
+            return;
 
-if(event.key.toLowerCase()==="w")
-transformControls.setMode(
-"translate"
-);
 
-if(event.key.toLowerCase()==="e")
-transformControls.setMode(
-"rotate"
-);
+        const key =
+            event.key.toLowerCase();
 
-if(event.key.toLowerCase()==="r")
-transformControls.setMode(
-"scale"
-);
 
-}
+        if(key==="w"){
+
+            transformControls.setMode(
+                "translate"
+            );
+
+        }
+
+
+        if(key==="e"){
+
+            transformControls.setMode(
+                "rotate"
+            );
+
+        }
+
+
+        if(key==="r"){
+
+            transformControls.setMode(
+                "scale"
+            );
+
+        }
+
+    }
 );
 
 
@@ -1940,98 +3063,143 @@ transformControls.setMode(
 
 function updateInspector(){
 
-if(!selectedObject)
-return;
+    if(!selectedObject)
+        return;
 
 
-selectedObject.name=
-document
-.getElementById("objectName")
-.value;
+    selectedObject.name =
+        document
+            .getElementById(
+                "objectName"
+            )
+            .value;
 
 
-selectedObject.position.x=
-Number(
-document
-.getElementById("posX")
-.value
-);
-
-selectedObject.position.y=
-Number(
-document
-.getElementById("posY")
-.value
-);
-
-selectedObject.position.z=
-Number(
-document
-.getElementById("posZ")
-.value
-);
+    selectedObject.position.x =
+        Number(
+            document
+                .getElementById(
+                    "posX"
+                )
+                .value
+        );
 
 
-selectedObject.rotation.x=
-Number(
-document
-.getElementById("rotX")
-.value
-);
-
-selectedObject.rotation.y=
-Number(
-document
-.getElementById("rotY")
-.value
-);
-
-selectedObject.rotation.z=
-Number(
-document
-.getElementById("rotZ")
-.value
-);
+    selectedObject.position.y =
+        Number(
+            document
+                .getElementById(
+                    "posY"
+                )
+                .value
+        );
 
 
-const scale=
-Number(
-document
-.getElementById("scaleInput")
-.value
-);
-
-selectedObject.scale.setScalar(
-scale
-);
+    selectedObject.position.z =
+        Number(
+            document
+                .getElementById(
+                    "posZ"
+                )
+                .value
+        );
 
 
-if(selectedObject.userData.item)
-selectedObject.userData.item.textContent=
-selectedObject.name;
+    selectedObject.rotation.x =
+        Number(
+            document
+                .getElementById(
+                    "rotX"
+                )
+                .value
+        );
+
+
+    selectedObject.rotation.y =
+        Number(
+            document
+                .getElementById(
+                    "rotY"
+                )
+                .value
+        );
+
+
+    selectedObject.rotation.z =
+        Number(
+            document
+                .getElementById(
+                    "rotZ"
+                )
+                .value
+        );
+
+
+    const scale =
+        Number(
+            document
+                .getElementById(
+                    "scaleInput"
+                )
+                .value
+        );
+
+
+    if(
+        Number.isFinite(scale)
+    ){
+
+        selectedObject.scale
+            .setScalar(
+                Math.max(
+                    .01,
+                    scale
+                )
+            );
+
+    }
+
+
+    if(
+        selectedObject.userData.item
+    ){
+
+        selectedObject.userData.item
+            .textContent =
+                selectedObject.name;
+
+    }
 
 }
 
 
+/* =====================================================
+   INSPECTOR INPUTS
+===================================================== */
+
 [
-"objectName",
-"posX",
-"posY",
-"posZ",
-"rotX",
-"rotY",
-"rotZ",
-"scaleInput"
-].forEach(id=>{
+    "objectName",
+    "posX",
+    "posY",
+    "posZ",
+    "rotX",
+    "rotY",
+    "rotZ",
+    "scaleInput"
+].forEach(
+    id=>{
 
-document
-.getElementById(id)
-.addEventListener(
-"input",
-updateInspector
+        document
+            .getElementById(
+                id
+            )
+            .addEventListener(
+                "input",
+                updateInspector
+            );
+
+    }
 );
-
-});
 
 
 /* =====================================================
@@ -2039,41 +3207,47 @@ updateInspector
 ===================================================== */
 
 document
-.getElementById("objectColor")
-.addEventListener(
-"input",
-event=>{
+    .getElementById(
+        "objectColor"
+    )
+    .addEventListener(
+        "input",
+        event=>{
 
-if(!selectedObject)
-return;
-
-
-const color =
-new THREE_GLOBAL.Color(
-event.target.value
-);
+            if(!selectedObject)
+                return;
 
 
-selectedObject.traverse(
-child=>{
-
-if(child.isMesh){
-
-child.material.color.copy(
-color
-);
-
-}
-
-}
-);
+            const color =
+                new THREE.Color(
+                    event.target.value
+                );
 
 
-selectedObject.userData.color=
-event.target.value;
+            selectedObject.traverse(
+                child=>{
 
-}
-);
+                    if(
+                        child.isMesh &&
+                        child.material
+                    ){
+
+                        child.material.color
+                            .copy(
+                                color
+                            );
+
+                    }
+
+                }
+            );
+
+
+            selectedObject.userData.color =
+                event.target.value;
+
+        }
+    );
 
 
 /* =====================================================
@@ -2081,47 +3255,62 @@ event.target.value;
 ===================================================== */
 
 document
-.getElementById("applyScript")
-.onclick=()=>{
+    .getElementById(
+        "applyScript"
+    )
+    .onclick=()=>{
 
-if(!selectedObject)
-return;
+        if(!selectedObject){
+
+            alert(
+                "Bitte zuerst ein Objekt auswählen."
+            );
+
+            return;
+
+        }
 
 
-const code =
-document
-.getElementById("scriptInput")
-.value;
+        const code =
+            document
+                .getElementById(
+                    "scriptInput"
+                )
+                .value;
 
 
-selectedObject.userData.script=
-code;
+        try{
+
+            selectedObject.userData.script =
+                code;
 
 
-try{
+            selectedObject.userData.compiled =
+                new Function(
+                    "object",
+                    "THREE",
+                    code
+                );
 
-selectedObject.userData.compiled=
-new Function(
-"object",
-"THREE",
-code
-);
 
-document
-.getElementById("status")
-.textContent=
-"Script angewendet.";
+            document
+                .getElementById(
+                    "status"
+                )
+                .textContent =
+                    "Script angewendet.";
 
-}catch(error){
+        }
+        catch(error){
 
-alert(
-"Script-Fehler:\n"+
-error.message
-);
+            alert(
+                "Script-Fehler:\n"+
+                error.message
+            );
 
-}
+        }
 
-};
+    };
 
 
 /* =====================================================
@@ -2129,59 +3318,78 @@ error.message
 ===================================================== */
 
 document
-.getElementById("deleteBtn")
-.onclick=()=>{
+    .getElementById(
+        "deleteBtn"
+    )
+    .onclick=()=>{
 
-if(!selectedObject)
-return;
-
-
-scene.remove(
-selectedObject
-);
+        if(!selectedObject)
+            return;
 
 
-const index =
-objects.indexOf(
-selectedObject
-);
-
-if(index>=0)
-objects.splice(
-index,
-1
-);
+        scene.remove(
+            selectedObject
+        );
 
 
-if(selectedObject.userData.item)
-selectedObject.userData.item.remove();
+        const index =
+            objects.indexOf(
+                selectedObject
+            );
 
 
-if(transformControls){
+        if(index>=0){
 
-scene.remove(
-transformControls
-);
+            objects.splice(
+                index,
+                1
+            );
 
-transformControls.dispose();
-
-transformControls=null;
-
-}
+        }
 
 
-selectedObject=null;
+        if(
+            selectedObject.userData.item
+        ){
+
+            selectedObject.userData.item
+                .remove();
+
+        }
 
 
-document
-.getElementById("inspector")
-.style.display="none";
+        if(transformControls){
 
-document
-.getElementById("nothingSelected")
-.style.display="block";
+            scene.remove(
+                transformControls
+            );
 
-};
+            transformControls.dispose();
+
+            transformControls=null;
+
+        }
+
+
+        selectedObject=null;
+
+
+        document
+            .getElementById(
+                "inspector"
+            )
+            .style.display=
+                "none";
+
+
+        document
+            .getElementById(
+                "nothingSelected"
+            )
+            .style.display=
+                "block";
+
+    };
 
 
 /* =====================================================
@@ -2189,143 +3397,272 @@ document
 ===================================================== */
 
 document
-.getElementById("duplicateBtn")
-.onclick=()=>{
+    .getElementById(
+        "duplicateBtn"
+    )
+    .onclick=()=>{
 
-if(!selectedObject)
-return;
+        if(!selectedObject){
 
+            alert(
+                "Bitte zuerst ein Objekt auswählen."
+            );
 
-const clone =
-selectedObject.clone(true);
+            return;
 
-objectCounter++;
-
-clone.name=
-"Object_"+objectCounter;
-
-clone.position.x+=5;
-
-clone.userData={
-script:selectedObject.userData.script || "",
-color:selectedObject.userData.color || "#ffffff",
-item:null
-};
+        }
 
 
-scene.add(clone);
+        const clone =
+            selectedObject.clone(
+                true
+            );
 
-objects.push(clone);
 
-addObjectList(clone);
+        objectCounter++;
 
-};
+
+        clone.name =
+            "Object_"+objectCounter;
+
+
+        clone.position.x +=
+            5;
+
+
+        clone.userData = {
+
+            script:
+                selectedObject
+                .userData
+                .script ||
+                "",
+
+            color:
+                selectedObject
+                .userData
+                .color ||
+                "#ffffff",
+
+            item:null
+
+        };
+
+
+        scene.add(
+            clone
+        );
+
+
+        objects.push(
+            clone
+        );
+
+
+        addObjectToList(
+            clone
+        );
+
+    };
 
 
 /* =====================================================
-   CLEAR
+   CLEAR OBJECTS
 ===================================================== */
 
 document
-.getElementById("clearObjects")
-.onclick=()=>{
+    .getElementById(
+        "clearObjects"
+    )
+    .onclick=()=>{
 
-for(
-const object of objects
-){
+        for(
+            const object
+            of objects
+        ){
 
-scene.remove(object);
+            scene.remove(
+                object
+            );
 
-if(object.userData.item)
-object.userData.item.remove();
 
-}
+            if(
+                object.userData.item
+            ){
 
-objects.length=0;
+                object.userData.item
+                    .remove();
 
-selectedObject=null;
+            }
 
-};
+        }
+
+
+        objects.length=0;
+
+
+        selectedObject=null;
+
+
+        if(transformControls){
+
+            scene.remove(
+                transformControls
+            );
+
+            transformControls.dispose();
+
+            transformControls=null;
+
+        }
+
+
+        document
+            .getElementById(
+                "inspector"
+            )
+            .style.display=
+                "none";
+
+
+        document
+            .getElementById(
+                "nothingSelected"
+            )
+            .style.display=
+                "block";
+
+    };
 
 
 /* =====================================================
-   PLAY
+   PLAY MODE
 ===================================================== */
 
-let playMode=false;
+let playMode =
+    false;
 
 
 document
-.getElementById("playBtn")
-.onclick=()=>{
+    .getElementById(
+        "playBtn"
+    )
+    .onclick=()=>{
 
-playMode=!playMode;
+        playMode =
+            !playMode;
 
 
-if(playMode){
+        if(playMode){
 
-document
-.getElementById("playBtn")
-.textContent="■ STOP";
+            document
+                .getElementById(
+                    "playBtn"
+                )
+                .textContent =
+                    "■ STOP";
 
-document
-.getElementById("playMode")
-.style.display="block";
 
-}else{
+            document
+                .getElementById(
+                    "playMode"
+                )
+                .style.display =
+                    "block";
 
-document
-.getElementById("playBtn")
-.textContent="▶ PLAY";
+        }
+        else{
 
-document
-.getElementById("playMode")
-.style.display="none";
+            document
+                .getElementById(
+                    "playBtn"
+                )
+                .textContent =
+                    "▶ PLAY";
 
-}
 
-};
+            document
+                .getElementById(
+                    "playMode"
+                )
+                .style.display =
+                    "none";
+
+        }
+
+    };
 
 
 /* =====================================================
-   DRAG & DROP GLB
+   DROPZONE
 ===================================================== */
 
 const dropZone =
-document.getElementById(
-"dropZone"
+    document.getElementById(
+        "dropZone"
+    );
+
+
+dropZone.addEventListener(
+    "dragover",
+    event=>{
+
+        event.preventDefault();
+
+        dropZone.classList.add(
+            "drag"
+        );
+
+    }
 );
 
 
 dropZone.addEventListener(
-"dragover",
-event=>{
-event.preventDefault();
-}
+    "dragleave",
+    ()=>{
+
+        dropZone.classList.remove(
+            "drag"
+        );
+
+    }
 );
 
 
 dropZone.addEventListener(
-"drop",
-event=>{
+    "drop",
+    event=>{
 
-event.preventDefault();
+        event.preventDefault();
 
-const file=
-event.dataTransfer.files[0];
+        dropZone.classList.remove(
+            "drag"
+        );
 
-if(
-file &&
-file.name
-.toLowerCase()
-.endsWith(".glb")
-){
 
-loadModel(file);
+        const file =
+            event.dataTransfer.files[0];
 
-}
 
-}
+        if(
+            file &&
+            (
+                file.name
+                    .toLowerCase()
+                    .endsWith(".glb") ||
+                file.name
+                    .toLowerCase()
+                    .endsWith(".gltf")
+            )
+        ){
+
+            loadModel(
+                file
+            );
+
+        }
+
+    }
 );
 
 
@@ -2334,80 +3671,102 @@ loadModel(file);
 ===================================================== */
 
 document
-.getElementById("saveBtn")
-.onclick=()=>{
+    .getElementById(
+        "saveBtn"
+    )
+    .onclick=()=>{
 
-const data={
+        const data={
 
-terrain:Array.from(
-heights
-),
+            terrain:
+                Array.from(
+                    heights
+                ),
 
-terrainColors:Array.from(
-colors
-),
+            terrainColors:
+                Array.from(
+                    colors
+                ),
 
-objects:objects.map(
-object=>({
+            objects:
+                objects.map(
+                    object=>({
 
-name:object.name,
+                        name:
+                            object.name,
 
-position:[
-object.position.x,
-object.position.y,
-object.position.z
-],
+                        position:[
+                            object.position.x,
+                            object.position.y,
+                            object.position.z
+                        ],
 
-rotation:[
-object.rotation.x,
-object.rotation.y,
-object.rotation.z
-],
+                        rotation:[
+                            object.rotation.x,
+                            object.rotation.y,
+                            object.rotation.z
+                        ],
 
-scale:object.scale.x,
+                        scale:
+                            object.scale.x,
 
-color:object.userData.color,
+                        color:
+                            object.userData.color ||
+                            "#ffffff",
 
-script:object.userData.script
+                        script:
+                            object.userData.script ||
+                            ""
 
-})
-)
+                    })
+                )
 
-};
-
-
-const blob =
-new Blob(
-[
-JSON.stringify(
-data,
-null,
-2
-)
-],
-{
-type:"application/json"
-}
-);
+        };
 
 
-const url=
-URL.createObjectURL(blob);
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    )
+                ],
+                {
+                    type:
+                        "application/json"
+                }
+            );
 
 
-const a=
-document.createElement("a");
+        const url =
+            URL.createObjectURL(
+                blob
+            );
 
-a.href=url;
 
-a.download=
-"ghost-engine-project.json";
+        const a =
+            document.createElement(
+                "a"
+            );
 
-a.click();
 
-URL.revokeObjectURL(url);
+        a.href=url;
 
-};
+
+        a.download =
+            "ghost-engine-project.json";
+
+
+        a.click();
+
+
+        URL.revokeObjectURL(
+            url
+        );
+
+    };
 
 
 /* =====================================================
@@ -2415,109 +3774,149 @@ URL.revokeObjectURL(url);
 ===================================================== */
 
 document
-.getElementById("loadBtn")
-.onclick=()=>{
+    .getElementById(
+        "loadBtn"
+    )
+    .onclick=()=>{
 
-document
-.getElementById("loadInput")
-.click();
+        document
+            .getElementById(
+                "loadInput"
+            )
+            .click();
 
-};
-
-
-document
-.getElementById("loadInput")
-.onchange=e=>{
-
-const file=
-e.target.files[0];
-
-if(!file)
-return;
-
-
-const reader=
-new FileReader();
-
-
-reader.onload=()=>{
-
-try{
-
-const data=
-JSON.parse(
-reader.result
-);
-
-
-/* Terrain */
-
-if(data.terrain){
-
-for(
-let i=0;
-i<data.terrain.length;
-i++
-){
-
-heights[i]=
-data.terrain[i];
-
-position.setY(
-i,
-heights[i]
-);
-
-}
-
-position.needsUpdate=true;
-
-geometry.computeVertexNormals();
-
-}
-
-
-/* Farben */
-
-if(data.terrainColors){
-
-for(
-let i=0;
-i<data.terrainColors.length;
-i++
-){
-
-colors[i]=
-data.terrainColors[i];
-
-}
-
-geometry.attributes
-.color
-.needsUpdate=true;
-
-}
+    };
 
 
 document
-.getElementById("status")
-.textContent=
-"Projekt geladen.";
+    .getElementById(
+        "loadInput"
+    )
+    .addEventListener(
+        "change",
+        event=>{
 
-}catch(error){
-
-alert(
-"Projekt konnte nicht geladen werden."
-);
-
-}
-
-};
+            const file =
+                event.target.files[0];
 
 
-reader.readAsText(file);
+            if(!file)
+                return;
 
-};
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload=()=>{
+
+                try{
+
+                    const data =
+                        JSON.parse(
+                            reader.result
+                        );
+
+
+                    if(
+                        Array.isArray(
+                            data.terrain
+                        )
+                    ){
+
+                        for(
+                            let i=0;
+
+                            i<
+                            Math.min(
+                                data.terrain.length,
+                                heights.length
+                            );
+
+                            i++
+                        ){
+
+                            heights[i] =
+                                data.terrain[i];
+
+
+                            position.setY(
+                                i,
+                                heights[i]
+                            );
+
+                        }
+
+
+                        position.needsUpdate=true;
+
+                        terrainGeometry
+                            .computeVertexNormals();
+
+                    }
+
+
+                    if(
+                        Array.isArray(
+                            data.terrainColors
+                        )
+                    ){
+
+                        for(
+                            let i=0;
+
+                            i<
+                            Math.min(
+                                data.terrainColors.length,
+                                colors.length
+                            );
+
+                            i++
+                        ){
+
+                            colors[i] =
+                                data.terrainColors[i];
+
+                        }
+
+
+                        terrainGeometry
+                            .attributes
+                            .color
+                            .needsUpdate=true;
+
+                    }
+
+
+                    document
+                        .getElementById(
+                            "status"
+                        )
+                        .textContent =
+                            "Projekt geladen.";
+
+                }
+                catch(error){
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "Projekt konnte nicht geladen werden."
+                    );
+
+                }
+
+            };
+
+
+            reader.readAsText(
+                file
+            );
+
+        }
+    );
 
 
 /* =====================================================
@@ -2525,21 +3924,30 @@ reader.readAsText(file);
 ===================================================== */
 
 window.addEventListener(
-"resize",
-()=>{
+    "resize",
+    ()=>{
 
-camera.aspect=
-viewport.clientWidth /
-viewport.clientHeight;
+        const width =
+            viewport.clientWidth;
 
-camera.updateProjectionMatrix();
 
-renderer.setSize(
-viewport.clientWidth,
-viewport.clientHeight
-);
+        const height =
+            viewport.clientHeight;
 
-}
+
+        camera.aspect =
+            width/height;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            width,
+            height
+        );
+
+    }
 );
 
 
@@ -2547,65 +3955,74 @@ viewport.clientHeight
    ANIMATION
 ===================================================== */
 
-const clock =
-new THREE_GLOBAL.Clock();
-
-
 function animate(){
 
-requestAnimationFrame(
-animate
-);
-
-const delta=
-clock.getDelta();
+    requestAnimationFrame(
+        animate
+    );
 
 
-controls.update();
+    controls.update();
 
 
-if(playMode){
+    if(playMode){
 
-for(
-const object of objects
-){
+        for(
+            const object
+            of objects
+        ){
 
-if(
-object.userData.compiled
-){
+            if(
+                object.userData.compiled
+            ){
 
-try{
+                try{
 
-object.userData.compiled(
-object,
-THREE_GLOBAL
-);
+                    object.userData.compiled(
+                        object,
+                        THREE
+                    );
 
-}catch(error){
+                }
+                catch(error){
 
-console.error(
-"Object Script Error:",
-error
-);
+                    console.error(
+                        "Object Script Error:",
+                        error
+                    );
 
-}
+                }
 
-}
+            }
 
-}
+        }
 
-}
+    }
 
 
-renderer.render(
-scene,
-camera
-);
+    renderer.render(
+        scene,
+        camera
+    );
 
 }
 
 
 animate();
+
+
+/* =====================================================
+   START
+===================================================== */
+
+setMapTool(
+    "raise"
+);
+
+
+console.log(
+    "GHOST ENGINE gestartet."
+);
 
 </script>
 
