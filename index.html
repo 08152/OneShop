@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>Ghost Game Engine</title>
+<title>GHOST ENGINE</title>
 
 <style>
 *{
@@ -16,19 +15,23 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
+    background:#79caff;
     font-family:Arial,sans-serif;
-    background:#111;
-    color:white;
 }
 
-#editor{
-    width:100vw;
-    height:100vh;
-    position:relative;
+#viewport{
+    position:absolute;
+    left:220px;
+    right:300px;
+    top:58px;
+    bottom:0;
+    overflow:hidden;
 }
 
-canvas{
+#viewport canvas{
     display:block;
+    width:100%;
+    height:100%;
 }
 
 #topbar{
@@ -36,71 +39,66 @@ canvas{
     top:0;
     left:0;
     right:0;
-    height:55px;
+    height:58px;
     background:#17191e;
     border-bottom:1px solid #333;
     display:flex;
     align-items:center;
     gap:7px;
     padding:7px;
-    z-index:20;
+    z-index:1000;
 }
 
 .logo{
-    font-weight:bold;
-    font-size:18px;
-    margin-right:12px;
     color:#ffd400;
-}
-
-button,
-select,
-input{
-    font-family:inherit;
+    font-weight:bold;
+    font-size:19px;
+    margin-right:15px;
 }
 
 button{
+    border:1px solid #444;
     background:#252830;
-    border:1px solid #3b3e47;
-    color:white;
-    padding:8px 11px;
+    color:#fff;
     border-radius:6px;
+    padding:9px 12px;
     cursor:pointer;
+    user-select:none;
 }
 
 button:hover{
-    background:#343843;
+    background:#343842;
 }
 
 button.active{
-    background:#d6a900;
+    background:#d6aa00;
     color:#111;
 }
 
 #leftbar{
     position:absolute;
-    top:55px;
+    top:58px;
     left:0;
     bottom:0;
-    width:210px;
+    width:220px;
     background:#181a1f;
     border-right:1px solid #333;
-    z-index:10;
+    z-index:900;
     padding:10px;
-    overflow:auto;
+    overflow-y:auto;
 }
 
 #rightbar{
     position:absolute;
-    top:55px;
+    top:58px;
     right:0;
     bottom:0;
-    width:280px;
+    width:300px;
     background:#181a1f;
     border-left:1px solid #333;
-    z-index:10;
+    z-index:900;
     padding:12px;
-    overflow:auto;
+    overflow-y:auto;
 }
 
 .section{
@@ -108,8 +106,8 @@ button.active{
 }
 
 .section h3{
-    margin:0 0 9px;
-    font-size:14px;
+    font-size:13px;
+    margin:0 0 8px;
     color:#ddd;
 }
 
@@ -121,95 +119,106 @@ button.active{
 
 label{
     display:block;
-    font-size:12px;
     color:#aaa;
+    font-size:12px;
     margin-top:9px;
     margin-bottom:4px;
 }
 
-input[type="range"]{
+input[type=range]{
     width:100%;
 }
 
-input[type="number"],
-input[type="text"],
-select,
+input[type=number],
+input[type=text],
 textarea{
     width:100%;
-    background:#101216;
-    color:white;
+    background:#0f1115;
     border:1px solid #393c44;
+    color:#fff;
     border-radius:5px;
     padding:7px;
 }
 
 textarea{
-    resize:vertical;
     min-height:150px;
+    resize:vertical;
     font-family:monospace;
     font-size:12px;
 }
 
-#gameCanvas{
-    position:absolute;
-    top:55px;
-    left:210px;
-    right:280px;
-    bottom:0;
+input[type=color]{
+    width:100%;
+    height:38px;
+    border:0;
+    background:none;
+}
+
+.small{
+    color:#888;
+    font-size:11px;
+    line-height:1.5;
+}
+
+hr{
+    border:0;
+    border-top:1px solid #30333a;
+    margin:12px 0;
 }
 
 #brushCursor{
-    position:absolute;
+    position:fixed;
     pointer-events:none;
     border:2px solid #ffd400;
     border-radius:50%;
+    z-index:2000;
     display:none;
-    z-index:50;
     transform:translate(-50%,-50%);
 }
 
 #status{
     position:absolute;
-    left:225px;
+    left:235px;
     bottom:12px;
+    z-index:100;
     background:rgba(0,0,0,.65);
     padding:7px 10px;
     border-radius:6px;
+    color:white;
     font-size:12px;
-    z-index:30;
+    pointer-events:none;
 }
 
 #objectList{
-    max-height:170px;
-    overflow:auto;
     background:#101216;
     border:1px solid #30333a;
     border-radius:5px;
+    max-height:220px;
+    overflow-y:auto;
 }
 
 .objectItem{
-    padding:7px;
+    padding:8px;
     border-bottom:1px solid #292c32;
-    cursor:pointer;
     font-size:12px;
+    cursor:pointer;
 }
 
 .objectItem:hover{
-    background:#272a31;
+    background:#292d35;
 }
 
 .objectItem.selected{
-    background:#665300;
+    background:#665400;
 }
 
-.colorRow{
-    display:flex;
+.colorGrid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
     gap:5px;
-    flex-wrap:wrap;
 }
 
 .color{
-    width:28px;
     height:28px;
     border-radius:5px;
     border:2px solid #555;
@@ -218,20 +227,22 @@ textarea{
 
 #dropZone{
     border:2px dashed #444;
-    padding:15px 5px;
-    text-align:center;
     border-radius:6px;
-    color:#aaa;
-    font-size:12px;
+    padding:15px;
+    text-align:center;
+    color:#999;
     margin-bottom:7px;
 }
 
-#playOverlay{
+#playMode{
     position:absolute;
-    inset:55px 280px 0 210px;
-    display:none;
+    left:220px;
+    right:300px;
+    top:58px;
+    bottom:0;
+    z-index:500;
     pointer-events:none;
-    z-index:100;
+    display:none;
 }
 
 #playLabel{
@@ -239,154 +250,182 @@ textarea{
     top:15px;
     left:50%;
     transform:translateX(-50%);
-    background:#111c;
-    padding:8px 15px;
-    border-radius:6px;
-    color:#7cff7c;
+    background:rgba(0,0,0,.7);
+    padding:8px 18px;
+    border-radius:7px;
+    color:#70ff70;
     font-weight:bold;
-}
-
-.small{
-    font-size:11px;
-    color:#888;
-    line-height:1.4;
-}
-
-hr{
-    border:0;
-    border-top:1px solid #30333a;
-    margin:12px 0;
 }
 </style>
 </head>
 
 <body>
 
-<div id="editor">
-
 <div id="topbar">
 
 <div class="logo">GHOST ENGINE</div>
 
-<button id="mapToolBtn">🗺 Map</button>
-<button id="decorateToolBtn">🌳 Schmuck</button>
-<button id="selectToolBtn">🖱 Auswahl</button>
+<button id="mapBtn">🗺 MAP</button>
+<button id="decorateBtn">🌳 SCHMUCK</button>
+<button id="selectBtn">🖱 AUSWAHL</button>
 
-<button id="importBtn">📦 GLB Import</button>
+<button id="importBtn">📦 GLB IMPORT</button>
 <input id="glbInput" type="file" accept=".glb,.gltf" hidden>
 
-<button id="saveBtn">💾 Speichern</button>
-<button id="loadBtn">📂 Laden</button>
-<input id="projectInput" type="file" accept=".json" hidden>
+<button id="playBtn">▶ PLAY</button>
 
-<button id="playBtn">▶ Play</button>
+<button id="saveBtn">💾 SPEICHERN</button>
+<button id="loadBtn">📂 LADEN</button>
+<input id="loadInput" type="file" accept=".json" hidden>
 
 </div>
 
 
 <div id="leftbar">
 
-<div class="section" id="mapPanel">
+<div id="mapPanel">
+
+<div class="section">
 
 <h3>MAP TOOL</h3>
 
-<button class="tool active" id="raiseBtn">
-⬆ Erhöhen
+<button id="raiseBtn" class="tool active">
+⬆ ERHÖHEN
 </button>
 
-<button class="tool" id="lowerBtn">
-⬇ Senken
+<button id="lowerBtn" class="tool">
+⬇ SENKEN
 </button>
 
-<button class="tool" id="paintTerrainBtn">
-🎨 Terrain bemalen
+<button id="paintTerrainBtn" class="tool">
+🎨 TERRAIN FÄRBEN
 </button>
 
 <label>Pinselgröße</label>
-<input id="brushSize" type="range" min="5" max="150" value="30">
+
+<input
+id="brushSize"
+type="range"
+min="5"
+max="100"
+value="25">
 
 <div class="small">
-Größe: <span id="brushSizeValue">30</span>
+Größe: <span id="brushSizeText">25</span>
 </div>
 
 <label>Stärke</label>
-<input id="brushStrength" type="range" min="0.01" max="1" step="0.01" value="0.25">
+
+<input
+id="brushStrength"
+type="range"
+min="0.01"
+max="1"
+step="0.01"
+value="0.25">
 
 <div class="small">
-Stärke: <span id="brushStrengthValue">0.25</span>
+Stärke: <span id="brushStrengthText">0.25</span>
 </div>
 
 <hr>
 
 <h3>Terrain-Farbe</h3>
 
-<div class="colorRow">
+<div class="colorGrid">
 
-<div class="color" style="background:#3c8f35" data-color="#3c8f35"></div>
-<div class="color" style="background:#5c9e3e" data-color="#5c9e3e"></div>
-<div class="color" style="background:#8c7a45" data-color="#8c7a45"></div>
-<div class="color" style="background:#777777" data-color="#777777"></div>
-<div class="color" style="background:#d1c18a" data-color="#d1c18a"></div>
-<div class="color" style="background:#ffffff" data-color="#ffffff"></div>
+<div class="color" data-color="#3c8f35" style="background:#3c8f35"></div>
+<div class="color" data-color="#70b84a" style="background:#70b84a"></div>
+<div class="color" data-color="#9a8148" style="background:#9a8148"></div>
+<div class="color" data-color="#777777" style="background:#777777"></div>
+<div class="color" data-color="#d0c58e" style="background:#d0c58e"></div>
+<div class="color" data-color="#ffffff" style="background:#ffffff"></div>
+
+</div>
 
 </div>
 
 </div>
 
 
-<div class="section" id="decoratePanel" style="display:none">
+<div id="decoratePanel" style="display:none">
+
+<div class="section">
 
 <h3>SCHMUCK TOOL</h3>
 
 <div id="dropZone">
 GLB hier hineinziehen
 <br>
-oder Datei auswählen
+oder unten auswählen
 </div>
 
 <button id="chooseModelBtn" class="tool">
-📦 Modell auswählen
+📦 GLB auswählen
 </button>
 
 <input id="modelInput" type="file" accept=".glb" hidden>
 
+<label>Größe</label>
+
+<input
+id="objectScale"
+type="range"
+min="0.1"
+max="5"
+step="0.1"
+value="1">
+
 <div class="small">
-Danach mit dem Pinsel auf die Landschaft klicken.
-Jeder Klick erzeugt ein neues Objekt.
+Mit dem Pinsel auf das Terrain klicken.
+Bei jedem Klick wird ein neues Modell erzeugt.
 </div>
 
-<label>Objektgröße</label>
-<input id="objectScale" type="range" min="0.1" max="5" step="0.1" value="1">
-
-<label>Zufällige Rotation</label>
+<label>
 <input id="randomRotation" type="checkbox" checked>
+ Zufällige Rotation
+</label>
 
-<label>Zufällige Skalierung</label>
+<label>
 <input id="randomScale" type="checkbox">
+ Zufällige Größe
+</label>
 
 <hr>
 
-<button id="clearDecorations" class="tool">
-🗑 Alle Schmuckobjekte löschen
+<button id="clearObjects" class="tool">
+🗑 ALLE SCHMUCKOBJEKTE LÖSCHEN
 </button>
 
 </div>
 
+</div>
 
-<div class="section" id="selectPanel" style="display:none">
+
+<div id="selectPanel" style="display:none">
+
+<div class="section">
 
 <h3>AUSWAHL</h3>
 
-<button id="deleteObject" class="tool">
-🗑 Objekt löschen
-</button>
-
-<button id="duplicateObject" class="tool">
-📑 Duplizieren
-</button>
-
 <div class="small">
-Objekt anklicken und anschließend rechts bearbeiten.
+Doppelklick auf ein Objekt.
+<br><br>
+W = Verschieben<br>
+E = Drehen<br>
+R = Skalieren
+</div>
+
+<hr>
+
+<button id="deleteBtn" class="tool">
+🗑 LÖSCHEN
+</button>
+
+<button id="duplicateBtn" class="tool">
+📑 DUPLIZIEREN
+</button>
+
 </div>
 
 </div>
@@ -400,13 +439,14 @@ Objekt anklicken und anschließend rechts bearbeiten.
 
 <h3>INSPEKTOR</h3>
 
-<div id="noSelection" class="small">
+<div id="nothingSelected" class="small">
 Kein Objekt ausgewählt.
 </div>
 
 <div id="inspector" style="display:none">
 
 <label>Name</label>
+
 <input id="objectName" type="text">
 
 <label>Position X</label>
@@ -418,44 +458,49 @@ Kein Objekt ausgewählt.
 <label>Position Z</label>
 <input id="posZ" type="number" step="0.1">
 
+<label>Rotation X</label>
+<input id="rotX" type="number" step="0.1">
+
 <label>Rotation Y</label>
 <input id="rotY" type="number" step="0.1">
 
+<label>Rotation Z</label>
+<input id="rotZ" type="number" step="0.1">
+
 <label>Skalierung</label>
-<input id="scaleInput" type="number" step="0.1" value="1">
+<input id="scaleInput" type="number" step="0.1">
 
 <hr>
 
-<h3>Farbe</h3>
+<label>Objektfarbe</label>
 
 <input id="objectColor" type="color" value="#ffffff">
 
 <hr>
 
-<h3>Script</h3>
+<h3>SCRIPT</h3>
 
 <div class="small">
-JavaScript für dieses Objekt.
+Das Script läuft im PLAY-Modus.
+<br><br>
+Verfügbare Variablen:
 <br>
-<code>object</code> ist das aktuelle 3D-Objekt.
+object
+<br>
+THREE
 </div>
 
 <textarea id="scriptInput">// Beispiel:
 //
-// object.rotation.y += 0.01;
-//
-// if(object.position.y < 5){
-//     object.position.y += 0.01;
-// }</textarea>
+// object.rotation.y += 0.01;</textarea>
 
 <button id="applyScript" class="tool">
-📜 Script anwenden
+📜 SCRIPT ANWENDEN
 </button>
 
 </div>
 
 </div>
-
 
 <hr>
 
@@ -474,11 +519,12 @@ JavaScript für dieses Objekt.
 <h3>ENGINE</h3>
 
 <div class="small">
-Welt: zusammenhängend<br>
-Chunk-System: deaktiviert<br>
-Terrain: dynamisches Heightfield<br>
-Renderer: WebGL<br>
-Modelle: GLB
+3D-Welt: aktiv<br>
+Chunks: deaktiviert<br>
+Terrain: ein zusammenhängendes Mesh<br>
+GLB: aktiv<br>
+Terrain Painting: aktiv<br>
+Object Painting: aktiv
 </div>
 
 </div>
@@ -486,7 +532,7 @@ Modelle: GLB
 </div>
 
 
-<div id="gameCanvas"></div>
+<div id="viewport"></div>
 
 <div id="brushCursor"></div>
 
@@ -494,163 +540,270 @@ Modelle: GLB
 Bereit
 </div>
 
-<div id="playOverlay">
-<div id="playLabel">PLAY MODE</div>
+<div id="playMode">
+<div id="playLabel">
+▶ PLAY MODE
+</div>
 </div>
 
-</div>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
 <script type="module">
 
-import * as THREE from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-
 import {OrbitControls}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
 
 import {GLTFLoader}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
 
 import {TransformControls}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
+from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
 
 
-/* =========================================================
-   ENGINE
-========================================================= */
+const THREE_GLOBAL = window.THREE;
 
-const container =
-document.getElementById("gameCanvas");
+const viewport =
+document.getElementById("viewport");
+
+
+/* =====================================================
+   SCENE
+===================================================== */
 
 const scene =
-new THREE.Scene();
+new THREE_GLOBAL.Scene();
 
 scene.background =
-new THREE.Color(0x8cc7ff);
+new THREE_GLOBAL.Color(0x79caff);
 
 scene.fog =
-new THREE.Fog(0x8cc7ff,300,1600);
+new THREE_GLOBAL.Fog(
+0x79caff,
+500,
+2200
+);
 
+
+/* =====================================================
+   CAMERA
+===================================================== */
 
 const camera =
-new THREE.PerspectiveCamera(
-60,
-container.clientWidth/container.clientHeight,
+new THREE_GLOBAL.PerspectiveCamera(
+75,
+viewport.clientWidth /
+viewport.clientHeight,
 0.1,
 5000
 );
 
-camera.position.set(180,180,180);
+camera.position.set(
+180,
+180,
+180
+);
 
+
+/* =====================================================
+   RENDERER
+===================================================== */
 
 const renderer =
-new THREE.WebGLRenderer({
+new THREE_GLOBAL.WebGLRenderer({
 antialias:true
 });
 
 renderer.setPixelRatio(
-Math.min(window.devicePixelRatio,2)
+Math.min(
+window.devicePixelRatio,
+1.5
+)
 );
 
 renderer.setSize(
-container.clientWidth,
-container.clientHeight
+viewport.clientWidth,
+viewport.clientHeight
 );
 
 renderer.shadowMap.enabled=true;
 
-container.appendChild(renderer.domElement);
-
-
-/* =========================================================
-   LIGHT
-========================================================= */
-
-const ambient =
-new THREE.HemisphereLight(
-0xffffff,
-0x445544,
-2
+viewport.appendChild(
+renderer.domElement
 );
 
-scene.add(ambient);
 
+/* =====================================================
+   CAMERA CONTROL
+===================================================== */
 
-const sun =
-new THREE.DirectionalLight(
-0xffffff,
-2
-);
-
-sun.position.set(
-300,
-500,
-200
-);
-
-sun.castShadow=true;
-
-sun.shadow.mapSize.width=2048;
-sun.shadow.mapSize.height=2048;
-
-scene.add(sun);
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-const orbit =
+const controls =
 new OrbitControls(
 camera,
 renderer.domElement
 );
 
-orbit.enableDamping=true;
-orbit.dampingFactor=0.08;
+controls.enableDamping=true;
 
-orbit.target.set(0,0,0);
+controls.dampingFactor=.08;
+
+controls.target.set(
+0,
+0,
+0
+);
 
 
-/* =========================================================
+/* =====================================================
+   LIGHT
+===================================================== */
+
+scene.add(
+new THREE_GLOBAL.AmbientLight(
+0xffffff,
+1
+)
+);
+
+const sun =
+new THREE_GLOBAL.DirectionalLight(
+0xffffff,
+1.6
+);
+
+sun.position.set(
+500,
+900,
+400
+);
+
+sun.castShadow=true;
+
+scene.add(sun);
+
+
+/* =====================================================
    TERRAIN
-========================================================= */
+   EIN großes Mesh - KEINE CHUNKS
+===================================================== */
 
 const TERRAIN_SIZE=800;
 
-const TERRAIN_SEGMENTS=180;
+const SEGMENTS=180;
 
-const terrainGeometry =
-new THREE.PlaneGeometry(
+const geometry =
+new THREE_GLOBAL.PlaneGeometry(
 TERRAIN_SIZE,
 TERRAIN_SIZE,
-TERRAIN_SEGMENTS,
-TERRAIN_SEGMENTS
+SEGMENTS,
+SEGMENTS
 );
 
-terrainGeometry.rotateX(-Math.PI/2);
+geometry.rotateX(
+-Math.PI/2
+);
+
+const position =
+geometry.attributes.position;
+
+const vertexCount =
+position.count;
+
+const heights =
+new Float32Array(
+vertexCount
+);
+
+const colors =
+new Float32Array(
+vertexCount*3
+);
 
 
-/*
-    Wir benutzen absichtlich EIN großes Terrain.
+/* Anfangsfarbe */
 
-    Kein Chunk-System.
-*/
+for(let i=0;i<vertexCount;i++){
+
+colors[i*3]=.30;
+colors[i*3+1]=.60;
+colors[i*3+2]=.25;
+
+}
+
+
+/* Terrain-Höhe */
+
+function initialHeight(x,z){
+
+let h=0;
+
+h +=
+Math.sin(x*.002) *
+Math.cos(z*.002) *
+35;
+
+h +=
+Math.sin(x*.006+z*.004) *
+12;
+
+h +=
+Math.cos(x*.011-z*.009) *
+5;
+
+h +=
+Math.sin(x*.00065) *
+Math.cos(z*.0008) *
+55;
+
+return h+15;
+
+}
+
+
+for(let i=0;i<vertexCount;i++){
+
+const x=
+position.getX(i);
+
+const z=
+position.getZ(i);
+
+const h=
+initialHeight(x,z);
+
+heights[i]=h;
+
+position.setY(i,h);
+
+}
+
+
+geometry.setAttribute(
+"color",
+new THREE_GLOBAL.BufferAttribute(
+colors,
+3
+)
+);
+
+geometry.computeVertexNormals();
+
 
 const terrainMaterial =
-new THREE.MeshStandardMaterial({
-color:0x4c963d,
+new THREE_GLOBAL.MeshStandardMaterial({
+
+vertexColors:true,
+
 roughness:1,
+
 metalness:0
+
 });
 
+
 const terrain =
-new THREE.Mesh(
-terrainGeometry,
+new THREE_GLOBAL.Mesh(
+geometry,
 terrainMaterial
 );
 
@@ -659,145 +812,209 @@ terrain.receiveShadow=true;
 scene.add(terrain);
 
 
-/* Höhen */
-const position =
-terrainGeometry.attributes.position;
+/* =====================================================
+   RAYCAST
+===================================================== */
 
-const vertexCount =
-position.count;
+const raycaster =
+new THREE_GLOBAL.Raycaster();
 
-const heights =
-new Float32Array(vertexCount);
+const mouse =
+new THREE_GLOBAL.Vector2();
 
 
-/* Terrain-Farbmaske */
-const terrainColors =
-new Float32Array(vertexCount*3);
+function getTerrainPoint(event){
 
-for(let i=0;i<vertexCount;i++){
+const rect =
+renderer.domElement.getBoundingClientRect();
 
-terrainColors[i*3]=0.3;
-terrainColors[i*3+1]=0.6;
-terrainColors[i*3+2]=0.25;
+mouse.x =
+((event.clientX-rect.left) /
+rect.width)*2-1;
+
+mouse.y =
+-((event.clientY-rect.top) /
+rect.height)*2+1;
+
+raycaster.setFromCamera(
+mouse,
+camera
+);
+
+const hit =
+raycaster.intersectObject(
+terrain,
+false
+);
+
+if(hit.length)
+return hit[0].point;
+
+return null;
 
 }
 
-terrainGeometry.setAttribute(
-"color",
-new THREE.BufferAttribute(
-terrainColors,
-3
-)
-);
 
-terrainMaterial.vertexColors=true;
+/* =====================================================
+   TOOLS
+===================================================== */
+
+let currentTool="raise";
+
+let currentTerrainColor="#3c8f35";
+
+let painting=false;
 
 
-/* =========================================================
-   TERRAIN HELPERS
-========================================================= */
+function setTool(tool){
 
-function worldToVertex(x,z){
+currentTool=tool;
 
-const half=TERRAIN_SIZE/2;
+document
+.querySelectorAll("#leftbar button")
+.forEach(b=>{
+b.classList.remove("active");
+});
 
-const gx=
-Math.round(
-((x+half)/TERRAIN_SIZE)*
-TERRAIN_SEGMENTS
-);
+if(tool==="raise")
+document
+.getElementById("raiseBtn")
+.classList.add("active");
 
-const gz=
-Math.round(
-((z+half)/TERRAIN_SIZE)*
-TERRAIN_SEGMENTS
-);
+if(tool==="lower")
+document
+.getElementById("lowerBtn")
+.classList.add("active");
 
-return {
-x:Math.max(0,Math.min(TERRAIN_SEGMENTS,gx)),
-z:Math.max(0,Math.min(TERRAIN_SEGMENTS,gz))
+if(tool==="paint")
+document
+.getElementById("paintTerrainBtn")
+.classList.add("active");
+
+}
+
+
+document
+.getElementById("raiseBtn")
+.onclick=()=>{
+setTool("raise");
 };
 
-}
+
+document
+.getElementById("lowerBtn")
+.onclick=()=>{
+setTool("lower");
+};
 
 
-function vertexIndex(x,z){
+document
+.getElementById("paintTerrainBtn")
+.onclick=()=>{
+setTool("paint");
+};
 
-return z*(TERRAIN_SEGMENTS+1)+x;
 
-}
+/* =====================================================
+   TERRAIN SCULPT
+===================================================== */
 
-
-function sculptTerrain(
-worldX,
-worldZ,
-amount
+function terrainSculpt(
+point,
+direction
 ){
 
-const p =
-worldToVertex(worldX,worldZ);
-
-const radius =
+const brushSize =
 Number(
-document.getElementById("brushSize").value
+document.getElementById(
+"brushSize"
+).value
 );
 
 const strength =
 Number(
-document.getElementById("brushStrength").value
+document.getElementById(
+"brushStrength"
+).value
 );
 
-const vertices=TERRAIN_SEGMENTS+1;
+const centerX =
+Math.round(
+((point.x+TERRAIN_SIZE/2) /
+TERRAIN_SIZE)*
+SEGMENTS
+);
 
-const radiusVertices =
-radius/TERRAIN_SIZE*
-TERRAIN_SEGMENTS;
+const centerZ =
+Math.round(
+((point.z+TERRAIN_SIZE/2) /
+TERRAIN_SIZE)*
+SEGMENTS
+);
+
+const radius =
+brushSize/TERRAIN_SIZE*SEGMENTS;
+
+const count=SEGMENTS+1;
 
 
-for(let z=p.z-radiusVertices;
-z<=p.z+radiusVertices;
-z++){
+for(
+let z=Math.floor(centerZ-radius);
+z<=Math.ceil(centerZ+radius);
+z++
+){
 
-for(let x=p.x-radiusVertices;
-x<=p.x+radiusVertices;
-x++){
+for(
+let x=Math.floor(centerX-radius);
+x<=Math.ceil(centerX+radius);
+x++
+){
 
 if(
 x<0 ||
 z<0 ||
-x>=vertices ||
-z>=vertices
-) continue;
-
-
-const dx=x-p.x;
-const dz=z-p.z;
-
-const dist=Math.sqrt(dx*dx+dz*dz);
-
-if(dist>radiusVertices)
+x>=count ||
+z>=count
+)
 continue;
 
 
-const falloff=
-1-dist/radiusVertices;
+const dx=x-centerX;
+const dz=z-centerZ;
 
-const index=
-vertexIndex(
-Math.round(x),
-Math.round(z)
+const distance =
+Math.sqrt(
+dx*dx+dz*dz
 );
 
-heights[index]+=
-amount*
+if(distance>radius)
+continue;
+
+
+const falloff =
+1-distance/radius;
+
+
+const index =
+z*count+x;
+
+
+heights[index] +=
+direction*
 strength*
-falloff;
+falloff*
+2;
+
 
 heights[index]=
 Math.max(
--80,
-Math.min(180,heights[index])
+-60,
+Math.min(
+160,
+heights[index]
+)
 );
+
 
 position.setY(
 index,
@@ -808,254 +1025,140 @@ heights[index]
 
 }
 
+
 position.needsUpdate=true;
 
-terrainGeometry.computeVertexNormals();
+geometry.computeVertexNormals();
 
 }
 
 
-function paintTerrain(
-worldX,
-worldZ
-){
+/* =====================================================
+   TERRAIN PAINT
+===================================================== */
 
-const p =
-worldToVertex(worldX,worldZ);
+function paintTerrain(point){
 
-const radius =
+const brushSize =
 Number(
-document.getElementById("brushSize").value
+document.getElementById(
+"brushSize"
+).value
 );
 
-const vertices=TERRAIN_SEGMENTS+1;
+const strength =
+Number(
+document.getElementById(
+"brushStrength"
+).value
+);
 
-const radiusVertices =
-radius/TERRAIN_SIZE*
-TERRAIN_SEGMENTS;
+const centerX =
+Math.round(
+((point.x+TERRAIN_SIZE/2) /
+TERRAIN_SIZE)*
+SEGMENTS
+);
 
-const color =
-new THREE.Color(currentTerrainColor);
+const centerZ =
+Math.round(
+((point.z+TERRAIN_SIZE/2) /
+TERRAIN_SIZE)*
+SEGMENTS
+);
+
+const radius =
+brushSize/TERRAIN_SIZE*SEGMENTS;
+
+const count=SEGMENTS+1;
+
+const target =
+new THREE_GLOBAL.Color(
+currentTerrainColor
+);
 
 
-for(let z=p.z-radiusVertices;
-z<=p.z+radiusVertices;
-z++){
+for(
+let z=Math.floor(centerZ-radius);
+z<=Math.ceil(centerZ+radius);
+z++
+){
 
-for(let x=p.x-radiusVertices;
-x<=p.x+radiusVertices;
-x++){
+for(
+let x=Math.floor(centerX-radius);
+x<=Math.ceil(centerX+radius);
+x++
+){
 
 if(
 x<0 ||
 z<0 ||
-x>=vertices ||
-z>=vertices
-) continue;
-
-const dx=x-p.x;
-const dz=z-p.z;
-
-const dist=Math.sqrt(dx*dx+dz*dz);
-
-if(dist>radiusVertices)
+x>=count ||
+z>=count
+)
 continue;
 
-const falloff=
-1-dist/radiusVertices;
 
-const index=
-vertexIndex(
-Math.round(x),
-Math.round(z)
+const dx=x-centerX;
+const dz=z-centerZ;
+
+const distance =
+Math.sqrt(
+dx*dx+dz*dz
 );
 
-const strength=
-Number(
-document.getElementById("brushStrength").value
-) * falloff;
+if(distance>radius)
+continue;
 
-terrainColors[index*3]=
-THREE.MathUtils.lerp(
-terrainColors[index*3],
-color.r,
-strength
+
+const falloff =
+1-distance/radius;
+
+const amount =
+strength*falloff;
+
+const index =
+z*count+x;
+
+
+colors[index*3] =
+THREE_GLOBAL.MathUtils.lerp(
+colors[index*3],
+target.r,
+amount
 );
 
-terrainColors[index*3+1]=
-THREE.MathUtils.lerp(
-terrainColors[index*3+1],
-color.g,
-strength
+colors[index*3+1] =
+THREE_GLOBAL.MathUtils.lerp(
+colors[index*3+1],
+target.g,
+amount
 );
 
-terrainColors[index*3+2]=
-THREE.MathUtils.lerp(
-terrainColors[index*3+2],
-color.b,
-strength
+colors[index*3+2] =
+THREE_GLOBAL.MathUtils.lerp(
+colors[index*3+2],
+target.b,
+amount
 );
 
 }
 
 }
 
-terrainGeometry.attributes.color.needsUpdate=true;
+
+geometry.attributes.color.needsUpdate=true;
 
 }
 
 
-/* =========================================================
-   RAYCAST
-========================================================= */
-
-const raycaster =
-new THREE.Raycaster();
-
-const mouse =
-new THREE.Vector2();
-
-
-function getWorldPoint(event){
-
-const rect =
-renderer.domElement.getBoundingClientRect();
-
-mouse.x =
-((event.clientX-rect.left)/rect.width)*2-1;
-
-mouse.y =
--((event.clientY-rect.top)/rect.height)*2+1;
-
-raycaster.setFromCamera(
-mouse,
-camera
-);
-
-const hits =
-raycaster.intersectObject(
-terrain,
-false
-);
-
-if(hits.length)
-return hits[0].point;
-
-return null;
-
-}
-
-
-/* =========================================================
-   TOOLS
-========================================================= */
-
-let currentTool="raise";
-
-let currentTerrainColor="#3c8f35";
-
-let painting=false;
-
-
-const raiseBtn=
-document.getElementById("raiseBtn");
-
-const lowerBtn=
-document.getElementById("lowerBtn");
-
-const paintTerrainBtn=
-document.getElementById("paintTerrainBtn");
-
-
-function selectMapBrush(tool){
-
-currentTool=tool;
-
-[
-raiseBtn,
-lowerBtn,
-paintTerrainBtn
-].forEach(b=>b.classList.remove("active"));
-
-if(tool==="raise")
-raiseBtn.classList.add("active");
-
-if(tool==="lower")
-lowerBtn.classList.add("active");
-
-if(tool==="paint")
-paintTerrainBtn.classList.add("active");
-
-}
-
-
-raiseBtn.onclick=
-()=>selectMapBrush("raise");
-
-lowerBtn.onclick=
-()=>selectMapBrush("lower");
-
-paintTerrainBtn.onclick=
-()=>selectMapBrush("paint");
-
-
-/* =========================================================
-   BRUSH CURSOR
-========================================================= */
-
-const brushCursor=
-document.getElementById("brushCursor");
-
-renderer.domElement.addEventListener(
-"pointermove",
-e=>{
-
-if(
-currentTool==="raise" ||
-currentTool==="lower" ||
-currentTool==="paint" ||
-currentTool==="decorate"
-){
-
-const rect =
-renderer.domElement.getBoundingClientRect();
-
-brushCursor.style.display="block";
-
-brushCursor.style.left=
-(e.clientX-rect.left+210)+"px";
-
-brushCursor.style.top=
-(e.clientY-rect.top+55)+"px";
-
-const size=
-Number(
-document.getElementById("brushSize").value
-);
-
-const scale=
-Math.max(
-0.3,
-Math.min(
-2,
-size/30
-)
-);
-
-brushCursor.style.width=
-(60*scale)+"px";
-
-brushCursor.style.height=
-(60*scale)+"px";
-
-}
-
-});
-
+/* =====================================================
+   MOUSE PAINT
+===================================================== */
 
 renderer.domElement.addEventListener(
 "pointerdown",
-e=>{
+event=>{
 
 if(
 currentTool==="raise" ||
@@ -1065,226 +1168,250 @@ currentTool==="paint"
 
 painting=true;
 
-useMapBrush(e);
+useBrush(event);
 
 }
 
-if(currentTool==="decorate"){
-
-placeDecoration(e);
-
 }
-
-});
-
-
-renderer.domElement.addEventListener(
-"pointerup",
-()=>{
-painting=false;
-});
-
-
-renderer.domElement.addEventListener(
-"pointerleave",
-()=>{
-painting=false;
-});
+);
 
 
 renderer.domElement.addEventListener(
 "pointermove",
-e=>{
+event=>{
 
-if(painting &&
+updateBrushCursor(event);
+
+if(
+painting &&
 (
 currentTool==="raise" ||
 currentTool==="lower" ||
 currentTool==="paint"
-)){
+)
+){
 
-useMapBrush(e);
+useBrush(event);
 
 }
 
-});
+}
+);
 
 
-function useMapBrush(e){
+window.addEventListener(
+"pointerup",
+()=>{
+painting=false;
+}
+);
 
-const point=
-getWorldPoint(e);
 
-if(!point)return;
+function useBrush(event){
+
+const point =
+getTerrainPoint(event);
+
+if(!point)
+return;
 
 if(currentTool==="raise")
-sculptTerrain(
-point.x,
-point.z,
-1.5
+terrainSculpt(
+point,
+1
 );
 
 if(currentTool==="lower")
-sculptTerrain(
-point.x,
-point.z,
--1.5
+terrainSculpt(
+point,
+-1
 );
 
 if(currentTool==="paint")
 paintTerrain(
-point.x,
-point.z
+point
 );
 
 }
 
 
-/* =========================================================
-   COLORS
-========================================================= */
+/* =====================================================
+   BRUSH CURSOR
+===================================================== */
 
-document.querySelectorAll(".color")
-.forEach(el=>{
+function updateBrushCursor(event){
 
-el.onclick=()=>{
+if(
+currentTool!=="raise" &&
+currentTool!=="lower" &&
+currentTool!=="paint" &&
+currentTool!=="decorate"
+){
+
+document
+.getElementById("brushCursor")
+.style.display="none";
+
+return;
+
+}
+
+
+const cursor =
+document.getElementById(
+"brushCursor"
+);
+
+cursor.style.display="block";
+
+cursor.style.left=
+event.clientX+"px";
+
+cursor.style.top=
+event.clientY+"px";
+
+
+const size =
+Number(
+document.getElementById(
+"brushSize"
+).value
+);
+
+const visual =
+Math.max(
+20,
+size*2
+);
+
+cursor.style.width=
+visual+"px";
+
+cursor.style.height=
+visual+"px";
+
+}
+
+
+/* =====================================================
+   COLOR
+===================================================== */
+
+document
+.querySelectorAll(".color")
+.forEach(color=>{
+
+color.addEventListener(
+"click",
+()=>{
 
 currentTerrainColor=
-el.dataset.color;
+color.dataset.color;
 
-};
+}
+);
 
 });
 
 
-/* =========================================================
-   SIZE UI
-========================================================= */
+/* =====================================================
+   SLIDER
+===================================================== */
 
-const brushSize=
-document.getElementById("brushSize");
+document
+.getElementById("brushSize")
+.addEventListener(
+"input",
+e=>{
 
-const brushSizeValue=
-document.getElementById("brushSizeValue");
+document
+.getElementById("brushSizeText")
+.textContent=e.target.value;
 
-brushSize.oninput=()=>{
-brushSizeValue.textContent=
-brushSize.value;
-};
-
-
-const brushStrength=
-document.getElementById("brushStrength");
-
-const brushStrengthValue=
-document.getElementById("brushStrengthValue");
-
-brushStrength.oninput=()=>{
-brushStrengthValue.textContent=
-brushStrength.value;
-};
+}
+);
 
 
-/* =========================================================
-   GLB SYSTEM
-========================================================= */
+document
+.getElementById("brushStrength")
+.addEventListener(
+"input",
+e=>{
 
-const loader=
+document
+.getElementById("brushStrengthText")
+.textContent=e.target.value;
+
+}
+);
+
+
+/* =====================================================
+   GLB
+===================================================== */
+
+const loader =
 new GLTFLoader();
 
-let loadedModel=null;
+let sourceModel=null;
 
 let objectCounter=0;
 
 const objects=[];
 
-const objectList=
-document.getElementById("objectList");
 
+function removeTextures(root){
 
-function removeTextures(object){
+root.traverse(
+child=>{
 
-object.traverse(child=>{
+if(!child.isMesh)
+return;
 
-if(!child.isMesh)return;
-
-const old=child.material;
-
-const material=
-new THREE.MeshStandardMaterial({
+const material =
+new THREE_GLOBAL.MeshStandardMaterial({
 color:0xffffff,
-roughness:0.85,
+roughness:.85,
 metalness:0
 });
 
 child.material=material;
 
-if(old.map)
-old.map.dispose();
-
-});
-
-}
-
-
-function prepareModel(gltf){
-
-const root=
-gltf.scene.clone(true);
-
-removeTextures(root);
-
-root.traverse(child=>{
-
-if(child.isMesh){
-
 child.castShadow=true;
+
 child.receiveShadow=true;
 
 }
-
-});
-
-return root;
+);
 
 }
 
 
-document.getElementById("importBtn")
-.onclick=()=>{
-document.getElementById("glbInput").click();
-};
+function loadModel(file){
 
-
-document.getElementById("glbInput")
-.onchange=e=>{
-
-const file=e.target.files[0];
-
-if(!file)return;
-
-loadGLB(file);
-
-};
-
-
-function loadGLB(file){
-
-const url=
+const url =
 URL.createObjectURL(file);
 
 loader.load(
 url,
 gltf=>{
 
-loadedModel=
-prepareModel(gltf);
+sourceModel =
+gltf.scene;
 
-loadedModel.visible=false;
+removeTextures(
+sourceModel
+);
 
-scene.add(loadedModel);
+sourceModel.visible=false;
 
-document.getElementById("status").textContent=
+scene.add(
+sourceModel
+);
+
+document
+.getElementById("status")
+.textContent=
 "GLB geladen: "+file.name;
 
 URL.revokeObjectURL(url);
@@ -1296,7 +1423,7 @@ error=>{
 console.error(error);
 
 alert(
-"GLB konnte nicht geladen werden."
+"Fehler beim Laden des GLB."
 );
 
 }
@@ -1305,83 +1432,139 @@ alert(
 }
 
 
-/* =========================================================
-   DECORATE TOOL
-========================================================= */
+document
+.getElementById("importBtn")
+.onclick=()=>{
 
-document.getElementById("decorateToolBtn")
+document
+.getElementById("glbInput")
+.click();
+
+};
+
+
+document
+.getElementById("glbInput")
+.onchange=e=>{
+
+if(e.target.files[0])
+loadModel(
+e.target.files[0]
+);
+
+};
+
+
+document
+.getElementById("chooseModelBtn")
+.onclick=()=>{
+
+document
+.getElementById("modelInput")
+.click();
+
+};
+
+
+document
+.getElementById("modelInput")
+.onchange=e=>{
+
+if(e.target.files[0])
+loadModel(
+e.target.files[0]
+);
+
+};
+
+
+/* =====================================================
+   SCHMUCK
+===================================================== */
+
+document
+.getElementById("decorateBtn")
 .onclick=()=>{
 
 currentTool="decorate";
 
-document.getElementById("mapPanel")
+document
+.getElementById("mapPanel")
 .style.display="none";
 
-document.getElementById("decoratePanel")
+document
+.getElementById("decoratePanel")
 .style.display="block";
 
-document.getElementById("selectPanel")
+document
+.getElementById("selectPanel")
 .style.display="none";
 
 };
 
 
-document.getElementById("mapToolBtn")
+document
+.getElementById("mapBtn")
 .onclick=()=>{
 
-currentTool="raise";
+setTool("raise");
 
-document.getElementById("mapPanel")
+document
+.getElementById("mapPanel")
 .style.display="block";
 
-document.getElementById("decoratePanel")
+document
+.getElementById("decoratePanel")
 .style.display="none";
 
-document.getElementById("selectPanel")
+document
+.getElementById("selectPanel")
 .style.display="none";
 
 };
 
 
-document.getElementById("selectToolBtn")
+document
+.getElementById("selectBtn")
 .onclick=()=>{
 
 currentTool="select";
 
-document.getElementById("mapPanel")
+document
+.getElementById("mapPanel")
 .style.display="none";
 
-document.getElementById("decoratePanel")
+document
+.getElementById("decoratePanel")
 .style.display="none";
 
-document.getElementById("selectPanel")
+document
+.getElementById("selectPanel")
 .style.display="block";
 
-brushCursor.style.display="none";
+document
+.getElementById("brushCursor")
+.style.display="none";
 
 };
 
 
-document.getElementById("chooseModelBtn")
-.onclick=()=>{
-document.getElementById("modelInput").click();
-};
+renderer.domElement.addEventListener(
+"click",
+event=>{
+
+if(currentTool!=="decorate")
+return;
+
+placeObject(event);
+
+}
+);
 
 
-document.getElementById("modelInput")
-.onchange=e=>{
+function placeObject(event){
 
-const file=e.target.files[0];
-
-if(file)
-loadGLB(file);
-
-};
-
-
-function placeDecoration(event){
-
-if(!loadedModel){
+if(!sourceModel){
 
 alert(
 "Bitte zuerst ein GLB importieren."
@@ -1391,308 +1574,440 @@ return;
 
 }
 
-const point=
-getWorldPoint(event);
 
-if(!point)return;
+const point =
+getTerrainPoint(event);
 
-
-const obj=
-loadedModel.clone(true);
-
-obj.visible=true;
-
-obj.position.copy(point);
-
-obj.position.y += 0.2;
+if(!point)
+return;
 
 
-const baseScale=
+const object =
+sourceModel.clone(true);
+
+object.visible=true;
+
+object.position.copy(point);
+
+object.position.y+=.2;
+
+
+let scale =
 Number(
-document.getElementById("objectScale").value
+document.getElementById(
+"objectScale"
+).value
 );
 
-let scale=baseScale;
 
 if(
-document.getElementById("randomScale").checked
+document.getElementById(
+"randomScale"
+).checked
 ){
 
 scale *=
-THREE.MathUtils.randFloat(
-0.75,
+THREE_GLOBAL.MathUtils.randFloat(
+.75,
 1.25
 );
 
 }
 
-obj.scale.setScalar(scale);
+
+object.scale.setScalar(
+scale
+);
 
 
 if(
-document.getElementById("randomRotation").checked
+document.getElementById(
+"randomRotation"
+).checked
 ){
 
-obj.rotation.y=
-Math.random()*Math.PI*2;
+object.rotation.y=
+Math.random()*
+Math.PI*2;
 
 }
 
 
 objectCounter++;
 
-obj.name=
+object.name=
 "Object_"+objectCounter;
 
-obj.userData={
-type:"decoration",
-script:"",
-color:"#ffffff"
-};
+object.userData.script="";
 
-scene.add(obj);
+object.userData.color="#ffffff";
 
-objects.push(obj);
+scene.add(object);
 
-addObjectToList(obj);
+objects.push(object);
+
+addObjectList(object);
 
 }
 
 
-/* =========================================================
+/* =====================================================
    OBJECT LIST
-========================================================= */
+===================================================== */
 
-function addObjectToList(obj){
+const objectList =
+document.getElementById(
+"objectList"
+);
 
-const item=
+
+function addObjectList(object){
+
+const item =
 document.createElement("div");
 
-item.className="objectItem";
+item.className=
+"objectItem";
 
-item.textContent=obj.name;
+item.textContent=
+object.name;
 
 item.onclick=()=>{
-selectObject(obj);
+selectObject(object);
 };
 
-obj.userData.listElement=item;
+object.userData.item=item;
 
 objectList.appendChild(item);
 
 }
 
 
+/* =====================================================
+   OBJECT SELECTION
+===================================================== */
+
 let selectedObject=null;
 
-let transform=null;
+let transformControls=null;
 
-
-function selectObject(obj){
-
-selectedObject=obj;
-
-document
-.querySelectorAll(".objectItem")
-.forEach(x=>
-x.classList.remove("selected")
-);
-
-if(obj.userData.listElement)
-obj.userData.listElement
-.classList.add("selected");
-
-
-document.getElementById("noSelection")
-.style.display="none";
-
-document.getElementById("inspector")
-.style.display="block";
-
-
-document.getElementById("objectName")
-.value=obj.name;
-
-document.getElementById("posX")
-.value=obj.position.x.toFixed(2);
-
-document.getElementById("posY")
-.value=obj.position.y.toFixed(2);
-
-document.getElementById("posZ")
-.value=obj.position.z.toFixed(2);
-
-document.getElementById("rotY")
-.value=obj.rotation.y.toFixed(2);
-
-document.getElementById("scaleInput")
-.value=obj.scale.x.toFixed(2);
-
-document.getElementById("scriptInput")
-.value=
-obj.userData.script || "";
-
-
-if(transform){
-
-scene.remove(transform);
-
-transform.dispose();
-
-}
-
-transform=
-new TransformControls(
-camera,
-renderer.domElement
-);
-
-transform.setMode("translate");
-
-transform.attach(obj);
-
-transform.addEventListener(
-"objectChange",
-()=>{
-updateInspector();
-}
-);
-
-scene.add(transform);
-
-}
-
-
-/* =========================================================
-   SELECT OBJECT WITH MOUSE
-========================================================= */
 
 renderer.domElement.addEventListener(
 "dblclick",
-e=>{
+event=>{
 
 if(currentTool!=="select")
 return;
 
-const rect=
+
+const rect =
 renderer.domElement.getBoundingClientRect();
 
-mouse.x=
-((e.clientX-rect.left)/rect.width)*2-1;
+mouse.x =
+((event.clientX-rect.left) /
+rect.width)*2-1;
 
-mouse.y=
--((e.clientY-rect.top)/rect.height)*2+1;
+mouse.y =
+-((event.clientY-rect.top) /
+rect.height)*2+1;
+
 
 raycaster.setFromCamera(
 mouse,
 camera
 );
 
+
 const meshes=[];
 
-objects.forEach(o=>{
 
-o.traverse(c=>{
+for(
+const object of objects
+){
 
-if(c.isMesh)
-meshes.push(c);
+object.traverse(
+child=>{
 
-});
+if(child.isMesh)
+meshes.push(child);
 
-});
+}
+);
 
-const hits=
+}
+
+
+const hits =
 raycaster.intersectObjects(
 meshes,
 true
 );
 
-if(hits.length){
 
-let obj=
+if(!hits.length)
+return;
+
+
+let object =
 hits[0].object;
 
+
 while(
-obj.parent &&
-!objects.includes(obj)
+object.parent &&
+!objects.includes(object)
 ){
 
-obj=obj.parent;
+object=object.parent;
 
 }
 
-if(objects.includes(obj))
-selectObject(obj);
+
+if(
+objects.includes(object)
+){
+
+selectObject(object);
 
 }
 
-});
+}
+);
 
 
-/* =========================================================
-   TRANSFORM MODE
-========================================================= */
+/* =====================================================
+   SELECT OBJECT
+===================================================== */
+
+function selectObject(object){
+
+selectedObject=object;
+
+
+document
+.querySelectorAll(".objectItem")
+.forEach(
+item=>
+item.classList.remove("selected")
+);
+
+
+if(object.userData.item)
+object.userData.item
+.classList.add("selected");
+
+
+document
+.getElementById("nothingSelected")
+.style.display="none";
+
+document
+.getElementById("inspector")
+.style.display="block";
+
+
+document
+.getElementById("objectName")
+.value=
+object.name;
+
+
+document
+.getElementById("posX")
+.value=
+object.position.x;
+
+
+document
+.getElementById("posY")
+.value=
+object.position.y;
+
+
+document
+.getElementById("posZ")
+.value=
+object.position.z;
+
+
+document
+.getElementById("rotX")
+.value=
+object.rotation.x;
+
+
+document
+.getElementById("rotY")
+.value=
+object.rotation.y;
+
+
+document
+.getElementById("rotZ")
+.value=
+object.rotation.z;
+
+
+document
+.getElementById("scaleInput")
+.value=
+object.scale.x;
+
+
+document
+.getElementById("objectColor")
+.value=
+object.userData.color ||
+"#ffffff";
+
+
+document
+.getElementById("scriptInput")
+.value=
+object.userData.script ||
+"";
+
+
+if(transformControls){
+
+scene.remove(
+transformControls
+);
+
+transformControls.dispose();
+
+}
+
+
+transformControls =
+new TransformControls(
+camera,
+renderer.domElement
+);
+
+transformControls.attach(
+object
+);
+
+transformControls.setMode(
+"translate"
+);
+
+transformControls.addEventListener(
+"objectChange",
+updateInspector
+);
+
+scene.add(
+transformControls
+);
+
+}
+
+
+/* =====================================================
+   W / E / R
+===================================================== */
 
 window.addEventListener(
 "keydown",
-e=>{
+event=>{
 
-if(!transform)
+if(!transformControls)
 return;
 
-if(e.key==="w")
-transform.setMode("translate");
+if(event.key.toLowerCase()==="w")
+transformControls.setMode(
+"translate"
+);
 
-if(e.key==="e")
-transform.setMode("rotate");
+if(event.key.toLowerCase()==="e")
+transformControls.setMode(
+"rotate"
+);
 
-if(e.key==="r")
-transform.setMode("scale");
+if(event.key.toLowerCase()==="r")
+transformControls.setMode(
+"scale"
+);
 
-});
+}
+);
 
 
-/* =========================================================
+/* =====================================================
    INSPECTOR
-========================================================= */
+===================================================== */
 
 function updateInspector(){
 
 if(!selectedObject)
 return;
 
+
 selectedObject.name=
-document.getElementById("objectName").value;
+document
+.getElementById("objectName")
+.value;
+
 
 selectedObject.position.x=
 Number(
-document.getElementById("posX").value
+document
+.getElementById("posX")
+.value
 );
 
 selectedObject.position.y=
 Number(
-document.getElementById("posY").value
+document
+.getElementById("posY")
+.value
 );
 
 selectedObject.position.z=
 Number(
-document.getElementById("posZ").value
+document
+.getElementById("posZ")
+.value
+);
+
+
+selectedObject.rotation.x=
+Number(
+document
+.getElementById("rotX")
+.value
 );
 
 selectedObject.rotation.y=
 Number(
-document.getElementById("rotY").value
+document
+.getElementById("rotY")
+.value
 );
 
-const s=
+selectedObject.rotation.z=
 Number(
-document.getElementById("scaleInput").value
+document
+.getElementById("rotZ")
+.value
 );
 
-selectedObject.scale.setScalar(s);
 
-if(selectedObject.userData.listElement)
-selectedObject.userData.listElement.textContent=
+const scale=
+Number(
+document
+.getElementById("scaleInput")
+.value
+);
+
+selectedObject.scale.setScalar(
+scale
+);
+
+
+if(selectedObject.userData.item)
+selectedObject.userData.item.textContent=
 selectedObject.name;
 
 }
@@ -1703,11 +2018,14 @@ selectedObject.name;
 "posX",
 "posY",
 "posZ",
+"rotX",
 "rotY",
+"rotZ",
 "scaleInput"
 ].forEach(id=>{
 
-document.getElementById(id)
+document
+.getElementById(id)
 .addEventListener(
 "input",
 updateInspector
@@ -1716,70 +2034,81 @@ updateInspector
 });
 
 
-/* =========================================================
+/* =====================================================
    OBJECT COLOR
-========================================================= */
+===================================================== */
 
-document.getElementById("objectColor")
-.oninput=e=>{
+document
+.getElementById("objectColor")
+.addEventListener(
+"input",
+event=>{
 
 if(!selectedObject)
 return;
 
-const color=
-new THREE.Color(e.target.value);
 
-selectedObject.traverse(c=>{
+const color =
+new THREE_GLOBAL.Color(
+event.target.value
+);
 
-if(!c.isMesh)
-return;
 
-if(c.material){
+selectedObject.traverse(
+child=>{
 
-c.material.color.copy(color);
+if(child.isMesh){
+
+child.material.color.copy(
+color
+);
 
 }
 
-});
+}
+);
+
 
 selectedObject.userData.color=
-e.target.value;
+event.target.value;
 
-};
+}
+);
 
 
-/* =========================================================
-   SCRIPTS
-========================================================= */
+/* =====================================================
+   SCRIPT
+===================================================== */
 
-document.getElementById("applyScript")
+document
+.getElementById("applyScript")
 .onclick=()=>{
 
 if(!selectedObject)
 return;
 
-const code=
-document.getElementById("scriptInput").value;
 
-selectedObject.userData.script=code;
-
-compileScript(selectedObject,code);
-
-};
+const code =
+document
+.getElementById("scriptInput")
+.value;
 
 
-function compileScript(obj,code){
+selectedObject.userData.script=
+code;
+
 
 try{
 
-obj.userData.compiledScript=
+selectedObject.userData.compiled=
 new Function(
 "object",
 "THREE",
 code
 );
 
-document.getElementById("status")
+document
+.getElementById("status")
 .textContent=
 "Script angewendet.";
 
@@ -1792,99 +2121,82 @@ error.message
 
 }
 
-}
+};
 
 
-/* =========================================================
-   SCRIPT LOOP
-========================================================= */
-
-function runScripts(delta){
-
-for(const obj of objects){
-
-if(
-obj.userData.compiledScript
-){
-
-try{
-
-obj.userData.compiledScript(
-obj,
-THREE
-);
-
-}catch(error){
-
-console.error(
-"Script error:",
-error
-);
-
-}
-
-}
-
-}
-
-}
-
-
-/* =========================================================
+/* =====================================================
    DELETE
-========================================================= */
+===================================================== */
 
-document.getElementById("deleteObject")
+document
+.getElementById("deleteBtn")
 .onclick=()=>{
 
 if(!selectedObject)
 return;
 
-scene.remove(selectedObject);
 
-const index=
-objects.indexOf(selectedObject);
+scene.remove(
+selectedObject
+);
 
-if(index!==-1)
-objects.splice(index,1);
 
-if(
-selectedObject.userData.listElement
-)
-selectedObject.userData.listElement.remove();
+const index =
+objects.indexOf(
+selectedObject
+);
 
-if(transform){
+if(index>=0)
+objects.splice(
+index,
+1
+);
 
-scene.remove(transform);
 
-transform.dispose();
+if(selectedObject.userData.item)
+selectedObject.userData.item.remove();
 
-transform=null;
+
+if(transformControls){
+
+scene.remove(
+transformControls
+);
+
+transformControls.dispose();
+
+transformControls=null;
 
 }
 
+
 selectedObject=null;
 
-document.getElementById("inspector")
+
+document
+.getElementById("inspector")
 .style.display="none";
 
-document.getElementById("noSelection")
+document
+.getElementById("nothingSelected")
 .style.display="block";
 
 };
 
 
-/* =========================================================
+/* =====================================================
    DUPLICATE
-========================================================= */
+===================================================== */
 
-document.getElementById("duplicateObject")
+document
+.getElementById("duplicateBtn")
 .onclick=()=>{
 
 if(!selectedObject)
 return;
 
-const clone=
+
+const clone =
 selectedObject.clone(true);
 
 objectCounter++;
@@ -1895,139 +2207,250 @@ clone.name=
 clone.position.x+=5;
 
 clone.userData={
-...selectedObject.userData,
-listElement:null
+script:selectedObject.userData.script || "",
+color:selectedObject.userData.color || "#ffffff",
+item:null
 };
+
 
 scene.add(clone);
 
 objects.push(clone);
 
-addObjectToList(clone);
+addObjectList(clone);
 
 };
 
 
-/* =========================================================
-   CLEAR DECORATIONS
-========================================================= */
+/* =====================================================
+   CLEAR
+===================================================== */
 
-document.getElementById("clearDecorations")
+document
+.getElementById("clearObjects")
 .onclick=()=>{
 
 for(
-let i=objects.length-1;
-i>=0;
-i--
+const object of objects
 ){
 
-const obj=objects[i];
+scene.remove(object);
 
-scene.remove(obj);
-
-if(obj.userData.listElement)
-obj.userData.listElement.remove();
-
-objects.splice(i,1);
+if(object.userData.item)
+object.userData.item.remove();
 
 }
+
+objects.length=0;
 
 selectedObject=null;
 
 };
 
 
-/* =========================================================
-   SAVE
-========================================================= */
+/* =====================================================
+   PLAY
+===================================================== */
 
-document.getElementById("saveBtn")
+let playMode=false;
+
+
+document
+.getElementById("playBtn")
 .onclick=()=>{
 
-const data={
+playMode=!playMode;
 
-terrain:Array.from(heights),
 
-terrainColors:Array.from(terrainColors),
+if(playMode){
 
-objects:objects.map(obj=>({
+document
+.getElementById("playBtn")
+.textContent="■ STOP";
 
-name:obj.name,
+document
+.getElementById("playMode")
+.style.display="block";
 
-position:{
-x:obj.position.x,
-y:obj.position.y,
-z:obj.position.z
-},
+}else{
 
-rotation:{
-x:obj.rotation.x,
-y:obj.rotation.y,
-z:obj.rotation.z
-},
+document
+.getElementById("playBtn")
+.textContent="▶ PLAY";
 
-scale:obj.scale.x,
+document
+.getElementById("playMode")
+.style.display="none";
 
-color:obj.userData.color,
-
-script:obj.userData.script
-
-}))
+}
 
 };
 
 
-const blob=
+/* =====================================================
+   DRAG & DROP GLB
+===================================================== */
+
+const dropZone =
+document.getElementById(
+"dropZone"
+);
+
+
+dropZone.addEventListener(
+"dragover",
+event=>{
+event.preventDefault();
+}
+);
+
+
+dropZone.addEventListener(
+"drop",
+event=>{
+
+event.preventDefault();
+
+const file=
+event.dataTransfer.files[0];
+
+if(
+file &&
+file.name
+.toLowerCase()
+.endsWith(".glb")
+){
+
+loadModel(file);
+
+}
+
+}
+);
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+document
+.getElementById("saveBtn")
+.onclick=()=>{
+
+const data={
+
+terrain:Array.from(
+heights
+),
+
+terrainColors:Array.from(
+colors
+),
+
+objects:objects.map(
+object=>({
+
+name:object.name,
+
+position:[
+object.position.x,
+object.position.y,
+object.position.z
+],
+
+rotation:[
+object.rotation.x,
+object.rotation.y,
+object.rotation.z
+],
+
+scale:object.scale.x,
+
+color:object.userData.color,
+
+script:object.userData.script
+
+})
+)
+
+};
+
+
+const blob =
 new Blob(
-[JSON.stringify(data,null,2)],
+[
+JSON.stringify(
+data,
+null,
+2
+)
+],
 {
 type:"application/json"
 }
 );
 
+
+const url=
+URL.createObjectURL(blob);
+
+
 const a=
 document.createElement("a");
 
-a.href=
-URL.createObjectURL(blob);
+a.href=url;
 
 a.download=
 "ghost-engine-project.json";
 
 a.click();
 
+URL.revokeObjectURL(url);
+
 };
 
 
-/* =========================================================
+/* =====================================================
    LOAD
-========================================================= */
+===================================================== */
 
-document.getElementById("loadBtn")
+document
+.getElementById("loadBtn")
 .onclick=()=>{
-document.getElementById("projectInput").click();
+
+document
+.getElementById("loadInput")
+.click();
+
 };
 
 
-document.getElementById("projectInput")
+document
+.getElementById("loadInput")
 .onchange=e=>{
 
-const file=e.target.files[0];
+const file=
+e.target.files[0];
 
-if(!file)return;
+if(!file)
+return;
+
 
 const reader=
 new FileReader();
+
 
 reader.onload=()=>{
 
 try{
 
 const data=
-JSON.parse(reader.result);
+JSON.parse(
+reader.result
+);
 
 
-/* terrain */
+/* Terrain */
 
 if(data.terrain){
 
@@ -2049,12 +2472,12 @@ heights[i]
 
 position.needsUpdate=true;
 
-terrainGeometry.computeVertexNormals();
+geometry.computeVertexNormals();
 
 }
 
 
-/* colors */
+/* Farben */
 
 if(data.terrainColors){
 
@@ -2064,19 +2487,20 @@ i<data.terrainColors.length;
 i++
 ){
 
-terrainColors[i]=
+colors[i]=
 data.terrainColors[i];
 
 }
 
-terrainGeometry.attributes
+geometry.attributes
 .color
 .needsUpdate=true;
 
 }
 
 
-document.getElementById("status")
+document
+.getElementById("status")
 .textContent=
 "Projekt geladen.";
 
@@ -2090,137 +2514,88 @@ alert(
 
 };
 
+
 reader.readAsText(file);
 
 };
 
 
-/* =========================================================
-   PLAY MODE
-========================================================= */
-
-let playMode=false;
-
-
-document.getElementById("playBtn")
-.onclick=()=>{
-
-playMode=!playMode;
-
-if(playMode){
-
-document.getElementById("playBtn")
-.textContent="■ Stop";
-
-document.getElementById("playOverlay")
-.style.display="block";
-
-orbit.enabled=false;
-
-}else{
-
-document.getElementById("playBtn")
-.textContent="▶ Play";
-
-document.getElementById("playOverlay")
-.style.display="none";
-
-orbit.enabled=true;
-
-}
-
-};
-
-
-/* =========================================================
-   DROP GLB
-========================================================= */
-
-const dropZone=
-document.getElementById("dropZone");
-
-
-dropZone.addEventListener(
-"dragover",
-e=>{
-e.preventDefault();
-dropZone.style.borderColor="#ffd400";
-}
-);
-
-
-dropZone.addEventListener(
-"dragleave",
-()=>{
-dropZone.style.borderColor="#444";
-}
-);
-
-
-dropZone.addEventListener(
-"drop",
-e=>{
-
-e.preventDefault();
-
-dropZone.style.borderColor="#444";
-
-const file=
-e.dataTransfer.files[0];
-
-if(
-file &&
-file.name.toLowerCase().endsWith(".glb")
-){
-
-loadGLB(file);
-
-}
-
-});
-
-
-/* =========================================================
+/* =====================================================
    RESIZE
-========================================================= */
+===================================================== */
 
 window.addEventListener(
 "resize",
 ()=>{
 
 camera.aspect=
-container.clientWidth/
-container.clientHeight;
+viewport.clientWidth /
+viewport.clientHeight;
 
 camera.updateProjectionMatrix();
 
 renderer.setSize(
-container.clientWidth,
-container.clientHeight
+viewport.clientWidth,
+viewport.clientHeight
 );
 
-});
+}
+);
 
 
-/* =========================================================
+/* =====================================================
    ANIMATION
-========================================================= */
+===================================================== */
 
-const clock=
-new THREE.Clock();
+const clock =
+new THREE_GLOBAL.Clock();
 
 
 function animate(){
 
-requestAnimationFrame(animate);
+requestAnimationFrame(
+animate
+);
 
 const delta=
 clock.getDelta();
 
-orbit.update();
 
-if(playMode)
-runScripts(delta);
+controls.update();
+
+
+if(playMode){
+
+for(
+const object of objects
+){
+
+if(
+object.userData.compiled
+){
+
+try{
+
+object.userData.compiled(
+object,
+THREE_GLOBAL
+);
+
+}catch(error){
+
+console.error(
+"Object Script Error:",
+error
+);
+
+}
+
+}
+
+}
+
+}
+
 
 renderer.render(
 scene,
@@ -2228,6 +2603,7 @@ camera
 );
 
 }
+
 
 animate();
 
