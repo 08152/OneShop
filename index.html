@@ -3,2035 +3,2233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST Finance</title>
+
+<title>Ghost Game Engine</title>
 
 <style>
 *{
     box-sizing:border-box;
+}
+
+html,body{
     margin:0;
-    padding:0;
-}
-
-:root{
-    --green:#19a86b;
-    --green-dark:#0d8955;
-    --bg:#f3f7f5;
-    --card:#fff;
-    --text:#17231e;
-    --muted:#89938e;
-    --border:#e1e8e4;
-}
-
-body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    min-height:100vh;
-}
-
-/* LOGIN */
-
-#loginScreen{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.login-box{
     width:100%;
-    max-width:410px;
-    background:white;
-    border:1px solid var(--border);
-    border-radius:28px;
-    padding:35px;
-    box-shadow:0 20px 60px rgba(20,50,35,.12);
-}
-
-.login-logo{
-    text-align:center;
-    font-size:31px;
-    font-weight:850;
-}
-
-.login-logo span{
-    color:var(--green);
-}
-
-.login-subtitle{
-    text-align:center;
-    color:var(--muted);
-    margin-top:8px;
-    margin-bottom:30px;
-}
-
-.login-box label{
-    display:block;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:8px;
-}
-
-.login-box input{
-    width:100%;
-    height:53px;
-    border:1px solid #dbe4df;
-    border-radius:15px;
-    padding:0 16px;
-    font-size:16px;
-    outline:none;
-    margin-bottom:14px;
-}
-
-.login-box input:focus{
-    border-color:var(--green);
-}
-
-.login-button{
-    width:100%;
-    height:53px;
-    border:0;
-    border-radius:15px;
-    background:var(--green);
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    background:#111;
     color:white;
-    font-size:16px;
-    font-weight:750;
-    cursor:pointer;
 }
 
-.login-button:hover{
-    background:var(--green-dark);
+#editor{
+    width:100vw;
+    height:100vh;
+    position:relative;
 }
 
-.login-error{
-    display:none;
-    background:#fff0f0;
-    color:#d34e4e;
-    padding:12px;
-    border-radius:12px;
-    margin-bottom:14px;
-    font-size:14px;
+canvas{
+    display:block;
 }
 
-/* APP */
-
-#app{
-    display:none;
-}
-
-.header{
-    height:68px;
-    background:white;
-    border-bottom:1px solid var(--border);
+#topbar{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:55px;
+    background:#17191e;
+    border-bottom:1px solid #333;
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    padding:0 24px;
-    position:sticky;
-    top:0;
+    gap:7px;
+    padding:7px;
     z-index:20;
 }
 
 .logo{
-    font-size:22px;
-    font-weight:850;
+    font-weight:bold;
+    font-size:18px;
+    margin-right:12px;
+    color:#ffd400;
 }
 
-.logo span{
-    color:var(--green);
+button,
+select,
+input{
+    font-family:inherit;
 }
 
-.user-area{
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.user-name{
-    font-size:14px;
-    font-weight:700;
-}
-
-.avatar{
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:#17231e;
+button{
+    background:#252830;
+    border:1px solid #3b3e47;
     color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:800;
-}
-
-.logout{
-    border:0;
-    background:#eef2ef;
-    border-radius:10px;
-    padding:9px 11px;
+    padding:8px 11px;
+    border-radius:6px;
     cursor:pointer;
 }
 
-.app{
-    max-width:900px;
-    margin:auto;
-    padding:28px 20px 105px;
+button:hover{
+    background:#343843;
 }
 
-.page{
-    display:none;
+button.active{
+    background:#d6a900;
+    color:#111;
 }
 
-.page.active{
-    display:block;
+#leftbar{
+    position:absolute;
+    top:55px;
+    left:0;
+    bottom:0;
+    width:210px;
+    background:#181a1f;
+    border-right:1px solid #333;
+    z-index:10;
+    padding:10px;
+    overflow:auto;
 }
 
-/* HOME */
-
-.welcome{
-    margin-bottom:22px;
+#rightbar{
+    position:absolute;
+    top:55px;
+    right:0;
+    bottom:0;
+    width:280px;
+    background:#181a1f;
+    border-left:1px solid #333;
+    z-index:10;
+    padding:12px;
+    overflow:auto;
 }
 
-.welcome h1{
-    font-size:30px;
-    margin-bottom:5px;
+.section{
+    margin-bottom:18px;
 }
 
-.welcome p{
-    color:var(--muted);
-}
-
-.account-card{
-    background:linear-gradient(135deg,#17231e,#294a3b);
-    color:white;
-    border-radius:25px;
-    padding:28px;
-    margin-bottom:24px;
-    box-shadow:0 15px 35px rgba(20,40,30,.15);
-}
-
-.account-top{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
-
-.bank-icon{
-    width:52px;
-    height:52px;
-    border-radius:16px;
-    background:rgba(255,255,255,.1);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:25px;
-}
-
-.account-name{
-    font-size:18px;
-    font-weight:750;
-}
-
-.account-type{
-    color:#b7c8bf;
-    font-size:13px;
-    margin-top:3px;
-}
-
-.balance-label{
-    color:#b7c8bf;
+.section h3{
+    margin:0 0 9px;
     font-size:14px;
-    margin-top:28px;
+    color:#ddd;
 }
 
-.balance{
-    font-size:43px;
-    font-weight:850;
-    margin-top:4px;
+.tool{
+    width:100%;
+    margin-bottom:6px;
+    text-align:left;
 }
 
-/* CHART */
-
-.chart-card,
-.salary-card,
-.users-card,
-.admin-card{
-    background:white;
-    border:1px solid var(--border);
-    border-radius:24px;
-    padding:23px;
-    margin-bottom:20px;
+label{
+    display:block;
+    font-size:12px;
+    color:#aaa;
+    margin-top:9px;
+    margin-bottom:4px;
 }
 
-.chart-header{
+input[type="range"]{
+    width:100%;
+}
+
+input[type="number"],
+input[type="text"],
+select,
+textarea{
+    width:100%;
+    background:#101216;
+    color:white;
+    border:1px solid #393c44;
+    border-radius:5px;
+    padding:7px;
+}
+
+textarea{
+    resize:vertical;
+    min-height:150px;
+    font-family:monospace;
+    font-size:12px;
+}
+
+#gameCanvas{
+    position:absolute;
+    top:55px;
+    left:210px;
+    right:280px;
+    bottom:0;
+}
+
+#brushCursor{
+    position:absolute;
+    pointer-events:none;
+    border:2px solid #ffd400;
+    border-radius:50%;
+    display:none;
+    z-index:50;
+    transform:translate(-50%,-50%);
+}
+
+#status{
+    position:absolute;
+    left:225px;
+    bottom:12px;
+    background:rgba(0,0,0,.65);
+    padding:7px 10px;
+    border-radius:6px;
+    font-size:12px;
+    z-index:30;
+}
+
+#objectList{
+    max-height:170px;
+    overflow:auto;
+    background:#101216;
+    border:1px solid #30333a;
+    border-radius:5px;
+}
+
+.objectItem{
+    padding:7px;
+    border-bottom:1px solid #292c32;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.objectItem:hover{
+    background:#272a31;
+}
+
+.objectItem.selected{
+    background:#665300;
+}
+
+.colorRow{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
+    gap:5px;
+    flex-wrap:wrap;
 }
 
-.chart-title{
-    font-size:19px;
-    font-weight:800;
+.color{
+    width:28px;
+    height:28px;
+    border-radius:5px;
+    border:2px solid #555;
+    cursor:pointer;
 }
 
-.chart-total{
-    color:var(--muted);
-    font-size:13px;
-}
-
-.chart{
-    height:220px;
-    display:flex;
-    align-items:flex-end;
-    gap:8px;
-    margin-top:20px;
-    border-bottom:1px solid #e8edea;
-    padding:0 4px;
-}
-
-.day{
-    flex:1;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    align-items:center;
-    gap:6px;
-}
-
-.bar{
-    width:min(36px,80%);
-    background:var(--green);
-    border-radius:8px 8px 3px 3px;
-    min-height:3px;
-}
-
-.day-name{
-    font-size:11px;
-    color:var(--muted);
+#dropZone{
+    border:2px dashed #444;
+    padding:15px 5px;
+    text-align:center;
+    border-radius:6px;
+    color:#aaa;
+    font-size:12px;
     margin-bottom:7px;
 }
 
-.bar-amount{
-    font-size:10px;
-    color:var(--muted);
-}
-
-/* GEHALT */
-
-.salary-card{
-    text-align:center;
-}
-
-.salary-icon{
-    width:65px;
-    height:65px;
-    border-radius:20px;
-    background:#eaf7f1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:30px;
-    margin:5px auto 18px;
-}
-
-.salary-title{
-    font-size:24px;
-    font-weight:850;
-}
-
-.salary-text{
-    color:var(--muted);
-    margin-top:8px;
-}
-
-.days{
-    font-size:58px;
-    font-weight:850;
-    color:var(--green);
-    margin-top:20px;
-}
-
-.days-label{
-    color:var(--muted);
-}
-
-.salary-amount{
-    margin-top:20px;
-    font-size:18px;
-    font-weight:750;
-}
-
-.salary-date{
-    margin-top:15px;
-    padding:14px;
-    border-radius:14px;
-    background:#f5f8f6;
-    color:#65716b;
-}
-
-/* ADMIN */
-
-.admin-title{
-    font-size:28px;
-    font-weight:850;
-}
-
-.admin-subtitle{
-    color:var(--muted);
-    margin-top:5px;
-    margin-bottom:25px;
-}
-
-.users-list{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    margin-top:15px;
-}
-
-.user-card{
-    border:1px solid var(--border);
-    border-radius:17px;
-    padding:15px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.user-info{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.user-avatar{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    background:#eaf7f1;
-    color:var(--green-dark);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:800;
-}
-
-.user-details strong{
-    display:block;
-}
-
-.user-details small{
-    color:var(--muted);
-    display:block;
-    margin-top:3px;
-}
-
-.user-balance{
-    font-weight:800;
-}
-
-.setting{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    margin-top:15px;
-}
-
-.setting label{
-    font-size:13px;
-    font-weight:750;
-}
-
-.setting input,
-.setting select{
-    width:100%;
-    height:48px;
-    border:1px solid #dce4df;
-    border-radius:13px;
-    padding:0 13px;
-    font-size:15px;
-    outline:none;
-    background:white;
-}
-
-.setting input:focus,
-.setting select:focus{
-    border-color:var(--green);
-}
-
-.save-button{
-    width:100%;
-    height:50px;
-    border:0;
-    border-radius:14px;
-    background:var(--green);
-    color:white;
-    font-weight:800;
-    cursor:pointer;
-    margin-top:18px;
-}
-
-.status{
+#playOverlay{
+    position:absolute;
+    inset:55px 280px 0 210px;
     display:none;
-    margin-top:12px;
-    padding:12px;
-    border-radius:12px;
-    background:#eaf7f1;
-    color:#118653;
-    font-size:13px;
+    pointer-events:none;
+    z-index:100;
 }
 
-/* NAV */
-
-.bottom-nav{
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    height:74px;
-    background:rgba(255,255,255,.97);
-    backdrop-filter:blur(15px);
-    border-top:1px solid var(--border);
-    display:flex;
-    justify-content:center;
-    gap:70px;
-    align-items:center;
-    z-index:50;
+#playLabel{
+    position:absolute;
+    top:15px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111c;
+    padding:8px 15px;
+    border-radius:6px;
+    color:#7cff7c;
+    font-weight:bold;
 }
 
-.nav-button{
-    border:0;
-    background:none;
-    color:#89938e;
-    cursor:pointer;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
+.small{
     font-size:11px;
-    min-width:80px;
+    color:#888;
+    line-height:1.4;
 }
 
-.nav-button.active{
-    color:var(--green);
-    font-weight:750;
-}
-
-.nav-icon{
-    font-size:23px;
-}
-
-.admin-nav{
-    display:none;
-}
-
-/* MOBILE */
-
-@media(max-width:600px){
-
-    .header{
-        height:62px;
-        padding:0 15px;
-    }
-
-    .user-name{
-        display:none;
-    }
-
-    .app{
-        padding:22px 14px 100px;
-    }
-
-    .welcome h1{
-        font-size:25px;
-    }
-
-    .account-card{
-        padding:22px;
-        border-radius:21px;
-    }
-
-    .balance{
-        font-size:36px;
-    }
-
-    .chart-card,
-    .salary-card,
-    .users-card,
-    .admin-card{
-        border-radius:20px;
-        padding:19px;
-    }
-
-    .chart{
-        height:200px;
-        gap:4px;
-    }
-
-    .bottom-nav{
-        gap:10px;
-        justify-content:space-around;
-    }
-
-    .days{
-        font-size:52px;
-    }
-
-    .user-card{
-        align-items:flex-start;
-        gap:12px;
-    }
+hr{
+    border:0;
+    border-top:1px solid #30333a;
+    margin:12px 0;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<div id="editor">
 
-<div id="loginScreen">
+<div id="topbar">
 
-    <div class="login-box">
+<div class="logo">GHOST ENGINE</div>
 
-        <div class="login-logo">
-            GHOST<span>Finance</span>
-        </div>
+<button id="mapToolBtn">🗺 Map</button>
+<button id="decorateToolBtn">🌳 Schmuck</button>
+<button id="selectToolBtn">🖱 Auswahl</button>
 
-        <div class="login-subtitle">
-            Melde dich mit deinem Namen an
-        </div>
+<button id="importBtn">📦 GLB Import</button>
+<input id="glbInput" type="file" accept=".glb,.gltf" hidden>
 
-        <div id="loginError" class="login-error"></div>
+<button id="saveBtn">💾 Speichern</button>
+<button id="loadBtn">📂 Laden</button>
+<input id="projectInput" type="file" accept=".json" hidden>
 
-        <label for="nameInput">
-            Name
-        </label>
-
-        <input
-            id="nameInput"
-            type="text"
-            placeholder="Dein Name"
-            autocomplete="name">
-
-        <button
-            id="loginButton"
-            class="login-button">
-            Anmelden
-        </button>
-
-    </div>
+<button id="playBtn">▶ Play</button>
 
 </div>
 
 
-<!-- APP -->
+<div id="leftbar">
 
-<div id="app">
+<div class="section" id="mapPanel">
 
-<header class="header">
+<h3>MAP TOOL</h3>
 
-    <div class="logo">
-        GHOST<span>Finance</span>
-    </div>
+<button class="tool active" id="raiseBtn">
+⬆ Erhöhen
+</button>
 
-    <div class="user-area">
+<button class="tool" id="lowerBtn">
+⬇ Senken
+</button>
 
-        <span
-            id="headerName"
-            class="user-name">
-        </span>
+<button class="tool" id="paintTerrainBtn">
+🎨 Terrain bemalen
+</button>
 
-        <div
-            id="avatar"
-            class="avatar">
-        </div>
+<label>Pinselgröße</label>
+<input id="brushSize" type="range" min="5" max="150" value="30">
 
-        <button
-            id="logout"
-            class="logout">
-            ↪
-        </button>
+<div class="small">
+Größe: <span id="brushSizeValue">30</span>
+</div>
 
-    </div>
+<label>Stärke</label>
+<input id="brushStrength" type="range" min="0.01" max="1" step="0.01" value="0.25">
 
-</header>
+<div class="small">
+Stärke: <span id="brushStrengthValue">0.25</span>
+</div>
 
+<hr>
 
-<main class="app">
+<h3>Terrain-Farbe</h3>
 
-<!-- HOME -->
+<div class="colorRow">
 
-<section
-    id="homePage"
-    class="page active">
+<div class="color" style="background:#3c8f35" data-color="#3c8f35"></div>
+<div class="color" style="background:#5c9e3e" data-color="#5c9e3e"></div>
+<div class="color" style="background:#8c7a45" data-color="#8c7a45"></div>
+<div class="color" style="background:#777777" data-color="#777777"></div>
+<div class="color" style="background:#d1c18a" data-color="#d1c18a"></div>
+<div class="color" style="background:#ffffff" data-color="#ffffff"></div>
 
-    <div class="welcome">
-
-        <h1 id="welcomeTitle">
-            Willkommen 👋
-        </h1>
-
-        <p>
-            Deine Finanzübersicht
-        </p>
-
-    </div>
-
-
-    <div class="account-card">
-
-        <div class="account-top">
-
-            <div class="bank-icon">
-                🏦
-            </div>
-
-            <div>
-
-                <div class="account-name">
-                    Girokonto
-                </div>
-
-                <div class="account-type">
-                    Hauptkonto
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="balance-label">
-            Kontostand
-        </div>
-
-        <div
-            id="balance"
-            class="balance">
-            0,00 €
-        </div>
-
-    </div>
-
-
-    <div class="chart-card">
-
-        <div class="chart-header">
-
-            <div class="chart-title">
-                Ausgaben
-            </div>
-
-            <div class="chart-total">
-                Letzte 7 Tage
-            </div>
-
-        </div>
-
-        <div
-            id="chart"
-            class="chart">
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- GEHALT -->
-
-<section
-    id="salaryPage"
-    class="page">
-
-    <div class="welcome">
-
-        <h1>
-            Nächstes Gehalt
-        </h1>
-
-        <p>
-            Deine nächste Auszahlung
-        </p>
-
-    </div>
-
-
-    <div class="salary-card">
-
-        <div class="salary-icon">
-            💶
-        </div>
-
-        <div class="salary-title">
-            Nächstes Gehalt
-        </div>
-
-        <div class="salary-text">
-            Noch
-        </div>
-
-        <div
-            id="salaryDays"
-            class="days">
-            0
-        </div>
-
-        <div class="days-label">
-            Tage
-        </div>
-
-        <div
-            id="salaryAmount"
-            class="salary-amount">
-            Gehalt: 0,00 €
-        </div>
-
-        <div
-            id="salaryDate"
-            class="salary-date">
-            Noch 0 Tage bis zum Gehalt
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- ADMIN -->
-
-<section
-    id="adminPage"
-    class="page">
-
-    <div class="admin-title">
-        Verwaltung
-    </div>
-
-    <div class="admin-subtitle">
-        Benutzer und Gehälter verwalten
-    </div>
-
-
-    <div class="users-card">
-
-        <div class="chart-title">
-            Alle angemeldeten
-        </div>
-
-        <div
-            id="usersList"
-            class="users-list">
-        </div>
-
-    </div>
-
-
-    <div class="admin-card">
-
-        <div class="chart-title">
-            Benutzer bearbeiten
-        </div>
-
-
-        <div class="setting">
-
-            <label>
-                Benutzer
-            </label>
-
-            <select id="targetUser"></select>
-
-        </div>
-
-
-        <div class="setting">
-
-            <label>
-                Tage bis zum nächsten Gehalt
-            </label>
-
-            <input
-                id="adminDays"
-                type="number"
-                min="0"
-                value="0">
-
-        </div>
-
-
-        <div class="setting">
-
-            <label>
-                Gehalt pro Auszahlung
-            </label>
-
-            <input
-                id="adminSalary"
-                type="number"
-                min="0"
-                step="0.01"
-                value="0">
-
-        </div>
-
-
-        <div class="setting">
-
-            <label>
-                Preis pro Ausgabe
-            </label>
-
-            <input
-                id="adminExpense"
-                type="number"
-                min="0"
-                step="0.01"
-                value="0">
-
-        </div>
-
-
-        <div class="setting">
-
-            <label>
-                Kontostand
-            </label>
-
-            <input
-                id="adminBalance"
-                type="number"
-                step="0.01"
-                value="0">
-
-        </div>
-
-
-        <button
-            id="saveSettings"
-            class="save-button">
-            Speichern
-        </button>
-
-
-        <div
-            id="adminStatus"
-            class="status">
-        </div>
-
-    </div>
-
-</section>
-
-</main>
-
-
-<!-- BOTTOM NAV -->
-
-<nav class="bottom-nav">
-
-    <button
-        class="nav-button active"
-        data-page="homePage">
-
-        <span class="nav-icon">
-            ⌂
-        </span>
-
-        Home
-
-    </button>
-
-
-    <button
-        class="nav-button"
-        data-page="salaryPage">
-
-        <span class="nav-icon">
-            💶
-        </span>
-
-        Nächstes Gehalt
-
-    </button>
-
-
-    <button
-        id="adminNav"
-        class="nav-button admin-nav"
-        data-page="adminPage">
-
-        <span class="nav-icon">
-            ⚙
-        </span>
-
-        Verwaltung
-
-    </button>
-
-</nav>
+</div>
 
 </div>
 
 
-<script>
+<div class="section" id="decoratePanel" style="display:none">
 
-/* ==================================================
-   LOCAL STORAGE
-================================================== */
+<h3>SCHMUCK TOOL</h3>
 
-const USERS_KEY = "ghostFinanceUsers";
-const CURRENT_USER_KEY = "ghostFinanceCurrentUser";
+<div id="dropZone">
+GLB hier hineinziehen
+<br>
+oder Datei auswählen
+</div>
 
+<button id="chooseModelBtn" class="tool">
+📦 Modell auswählen
+</button>
 
-let users = loadUsers();
-let currentUser = null;
+<input id="modelInput" type="file" accept=".glb" hidden>
 
+<div class="small">
+Danach mit dem Pinsel auf die Landschaft klicken.
+Jeder Klick erzeugt ein neues Objekt.
+</div>
 
-/* ==================================================
-   DATEN LADEN
-================================================== */
+<label>Objektgröße</label>
+<input id="objectScale" type="range" min="0.1" max="5" step="0.1" value="1">
 
-function loadUsers(){
+<label>Zufällige Rotation</label>
+<input id="randomRotation" type="checkbox" checked>
 
-    try{
+<label>Zufällige Skalierung</label>
+<input id="randomScale" type="checkbox">
 
-        const data =
-            localStorage.getItem(USERS_KEY);
+<hr>
 
-        if(!data){
-            return {};
-        }
+<button id="clearDecorations" class="tool">
+🗑 Alle Schmuckobjekte löschen
+</button>
 
-        return JSON.parse(data);
-
-    }catch(error){
-
-        console.error(error);
-
-        return {};
-
-    }
-
-}
+</div>
 
 
-/* ==================================================
-   DATEN SPEICHERN
-================================================== */
+<div class="section" id="selectPanel" style="display:none">
 
-function saveUsers(){
+<h3>AUSWAHL</h3>
 
-    localStorage.setItem(
-        USERS_KEY,
-        JSON.stringify(users)
-    );
+<button id="deleteObject" class="tool">
+🗑 Objekt löschen
+</button>
 
-}
+<button id="duplicateObject" class="tool">
+📑 Duplizieren
+</button>
 
+<div class="small">
+Objekt anklicken und anschließend rechts bearbeiten.
+</div>
 
-/* ==================================================
-   STANDARDDATEN
-================================================== */
+</div>
 
-function createUser(name){
-
-    return {
-
-        name:name,
-
-        balance:0,
-
-        salaryDays:0,
-
-        salaryAmount:0,
-
-        expensePrice:0,
-
-        expenses:[
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        ],
-
-        /*
-            Zeitstempel für den Countdown.
-            Dadurch kann der Countdown auch
-            nach dem Schließen der Seite
-            korrekt weiterlaufen.
-        */
-
-        lastDayCheck:Date.now()
-
-    };
-
-}
+</div>
 
 
-/* ==================================================
-   LOGIN
-================================================== */
+<div id="rightbar">
 
-const loginButton =
-    document.getElementById("loginButton");
+<div class="section">
 
-const nameInput =
-    document.getElementById("nameInput");
+<h3>INSPEKTOR</h3>
 
-const loginError =
-    document.getElementById("loginError");
+<div id="noSelection" class="small">
+Kein Objekt ausgewählt.
+</div>
+
+<div id="inspector" style="display:none">
+
+<label>Name</label>
+<input id="objectName" type="text">
+
+<label>Position X</label>
+<input id="posX" type="number" step="0.1">
+
+<label>Position Y</label>
+<input id="posY" type="number" step="0.1">
+
+<label>Position Z</label>
+<input id="posZ" type="number" step="0.1">
+
+<label>Rotation Y</label>
+<input id="rotY" type="number" step="0.1">
+
+<label>Skalierung</label>
+<input id="scaleInput" type="number" step="0.1" value="1">
+
+<hr>
+
+<h3>Farbe</h3>
+
+<input id="objectColor" type="color" value="#ffffff">
+
+<hr>
+
+<h3>Script</h3>
+
+<div class="small">
+JavaScript für dieses Objekt.
+<br>
+<code>object</code> ist das aktuelle 3D-Objekt.
+</div>
+
+<textarea id="scriptInput">// Beispiel:
+//
+// object.rotation.y += 0.01;
+//
+// if(object.position.y < 5){
+//     object.position.y += 0.01;
+// }</textarea>
+
+<button id="applyScript" class="tool">
+📜 Script anwenden
+</button>
+
+</div>
+
+</div>
 
 
-loginButton.addEventListener(
-    "click",
-    login
+<hr>
+
+<div class="section">
+
+<h3>OBJEKTE</h3>
+
+<div id="objectList"></div>
+
+</div>
+
+<hr>
+
+<div class="section">
+
+<h3>ENGINE</h3>
+
+<div class="small">
+Welt: zusammenhängend<br>
+Chunk-System: deaktiviert<br>
+Terrain: dynamisches Heightfield<br>
+Renderer: WebGL<br>
+Modelle: GLB
+</div>
+
+</div>
+
+</div>
+
+
+<div id="gameCanvas"></div>
+
+<div id="brushCursor"></div>
+
+<div id="status">
+Bereit
+</div>
+
+<div id="playOverlay">
+<div id="playLabel">PLAY MODE</div>
+</div>
+
+</div>
+
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+import {OrbitControls}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
+
+import {GLTFLoader}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
+
+import {TransformControls}
+from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
+
+
+/* =========================================================
+   ENGINE
+========================================================= */
+
+const container =
+document.getElementById("gameCanvas");
+
+const scene =
+new THREE.Scene();
+
+scene.background =
+new THREE.Color(0x8cc7ff);
+
+scene.fog =
+new THREE.Fog(0x8cc7ff,300,1600);
+
+
+const camera =
+new THREE.PerspectiveCamera(
+60,
+container.clientWidth/container.clientHeight,
+0.1,
+5000
 );
 
+camera.position.set(180,180,180);
 
-nameInput.addEventListener(
-    "keydown",
-    event => {
 
-        if(event.key === "Enter"){
-            login();
-        }
+const renderer =
+new THREE.WebGLRenderer({
+antialias:true
+});
 
-    }
+renderer.setPixelRatio(
+Math.min(window.devicePixelRatio,2)
 );
 
+renderer.setSize(
+container.clientWidth,
+container.clientHeight
+);
 
-function login(){
+renderer.shadowMap.enabled=true;
 
-    const name =
-        nameInput.value.trim();
-
-
-    if(!name){
-
-        loginError.textContent =
-            "Bitte gib einen Namen ein.";
-
-        loginError.style.display =
-            "block";
-
-        return;
-
-    }
+container.appendChild(renderer.domElement);
 
 
-    /*
-        Neuen Benutzer erstellen.
-    */
+/* =========================================================
+   LIGHT
+========================================================= */
 
-    if(!users[name]){
+const ambient =
+new THREE.HemisphereLight(
+0xffffff,
+0x445544,
+2
+);
 
-        users[name] =
-            createUser(name);
-
-        saveUsers();
-
-    }
-
-
-    currentUser = name;
+scene.add(ambient);
 
 
-    localStorage.setItem(
-        CURRENT_USER_KEY,
-        name
-    );
+const sun =
+new THREE.DirectionalLight(
+0xffffff,
+2
+);
+
+sun.position.set(
+300,
+500,
+200
+);
+
+sun.castShadow=true;
+
+sun.shadow.mapSize.width=2048;
+sun.shadow.mapSize.height=2048;
+
+scene.add(sun);
 
 
-    openApp();
+/* =========================================================
+   CAMERA
+========================================================= */
+
+const orbit =
+new OrbitControls(
+camera,
+renderer.domElement
+);
+
+orbit.enableDamping=true;
+orbit.dampingFactor=0.08;
+
+orbit.target.set(0,0,0);
+
+
+/* =========================================================
+   TERRAIN
+========================================================= */
+
+const TERRAIN_SIZE=800;
+
+const TERRAIN_SEGMENTS=180;
+
+const terrainGeometry =
+new THREE.PlaneGeometry(
+TERRAIN_SIZE,
+TERRAIN_SIZE,
+TERRAIN_SEGMENTS,
+TERRAIN_SEGMENTS
+);
+
+terrainGeometry.rotateX(-Math.PI/2);
+
+
+/*
+    Wir benutzen absichtlich EIN großes Terrain.
+
+    Kein Chunk-System.
+*/
+
+const terrainMaterial =
+new THREE.MeshStandardMaterial({
+color:0x4c963d,
+roughness:1,
+metalness:0
+});
+
+const terrain =
+new THREE.Mesh(
+terrainGeometry,
+terrainMaterial
+);
+
+terrain.receiveShadow=true;
+
+scene.add(terrain);
+
+
+/* Höhen */
+const position =
+terrainGeometry.attributes.position;
+
+const vertexCount =
+position.count;
+
+const heights =
+new Float32Array(vertexCount);
+
+
+/* Terrain-Farbmaske */
+const terrainColors =
+new Float32Array(vertexCount*3);
+
+for(let i=0;i<vertexCount;i++){
+
+terrainColors[i*3]=0.3;
+terrainColors[i*3+1]=0.6;
+terrainColors[i*3+2]=0.25;
+
+}
+
+terrainGeometry.setAttribute(
+"color",
+new THREE.BufferAttribute(
+terrainColors,
+3
+)
+);
+
+terrainMaterial.vertexColors=true;
+
+
+/* =========================================================
+   TERRAIN HELPERS
+========================================================= */
+
+function worldToVertex(x,z){
+
+const half=TERRAIN_SIZE/2;
+
+const gx=
+Math.round(
+((x+half)/TERRAIN_SIZE)*
+TERRAIN_SEGMENTS
+);
+
+const gz=
+Math.round(
+((z+half)/TERRAIN_SIZE)*
+TERRAIN_SEGMENTS
+);
+
+return {
+x:Math.max(0,Math.min(TERRAIN_SEGMENTS,gx)),
+z:Math.max(0,Math.min(TERRAIN_SEGMENTS,gz))
+};
 
 }
 
 
-/* ==================================================
-   APP ÖFFNEN
-================================================== */
+function vertexIndex(x,z){
 
-function openApp(){
-
-    loginScreen.style.display =
-        "none";
-
-    app.style.display =
-        "block";
-
-
-    const user =
-        users[currentUser];
-
-
-    document.getElementById(
-        "headerName"
-    ).textContent =
-        user.name;
-
-
-    document.getElementById(
-        "avatar"
-    ).textContent =
-        user.name
-        .charAt(0)
-        .toUpperCase();
-
-
-    /*
-        Nur "Haupt" bekommt
-        das Verwaltungsmenü.
-    */
-
-    const adminNav =
-        document.getElementById(
-            "adminNav"
-        );
-
-
-    if(user.name === "Haupt"){
-
-        adminNav.style.display =
-            "flex";
-
-    }else{
-
-        adminNav.style.display =
-            "none";
-
-    }
-
-
-    checkSalary();
-
-    updateInterface();
+return z*(TERRAIN_SEGMENTS+1)+x;
 
 }
 
 
-/* ==================================================
-   GEHALT AUTOMATISCH VERARBEITEN
-================================================== */
+function sculptTerrain(
+worldX,
+worldZ,
+amount
+){
 
-function checkSalary(){
+const p =
+worldToVertex(worldX,worldZ);
 
-    const user =
-        users[currentUser];
+const radius =
+Number(
+document.getElementById("brushSize").value
+);
 
+const strength =
+Number(
+document.getElementById("brushStrength").value
+);
 
-    if(!user){
-        return;
-    }
+const vertices=TERRAIN_SEGMENTS+1;
 
-
-    if(typeof user.lastDayCheck !== "number"){
-
-        user.lastDayCheck =
-            Date.now();
-
-    }
-
-
-    const now =
-        Date.now();
-
-
-    const difference =
-        now - user.lastDayCheck;
+const radiusVertices =
+radius/TERRAIN_SIZE*
+TERRAIN_SEGMENTS;
 
 
-    const passedDays =
-        Math.floor(
-            difference /
-            (1000 * 60 * 60 * 24)
-        );
+for(let z=p.z-radiusVertices;
+z<=p.z+radiusVertices;
+z++){
+
+for(let x=p.x-radiusVertices;
+x<=p.x+radiusVertices;
+x++){
+
+if(
+x<0 ||
+z<0 ||
+x>=vertices ||
+z>=vertices
+) continue;
 
 
-    if(passedDays <= 0){
-        return;
-    }
+const dx=x-p.x;
+const dz=z-p.z;
+
+const dist=Math.sqrt(dx*dx+dz*dz);
+
+if(dist>radiusVertices)
+continue;
 
 
-    user.lastDayCheck =
-        now;
+const falloff=
+1-dist/radiusVertices;
 
+const index=
+vertexIndex(
+Math.round(x),
+Math.round(z)
+);
 
-    /*
-        Countdown reduzieren.
-    */
+heights[index]+=
+amount*
+strength*
+falloff;
 
-    user.salaryDays -= passedDays;
+heights[index]=
+Math.max(
+-80,
+Math.min(180,heights[index])
+);
 
+position.setY(
+index,
+heights[index]
+);
 
-    /*
-        Falls das Gehalt fällig ist.
-    */
+}
 
-    while(user.salaryDays <= 0){
+}
 
-        /*
-            Gehalt auszahlen.
-        */
+position.needsUpdate=true;
 
-        user.balance +=
-            Number(
-                user.salaryAmount || 0
-            );
-
-
-        /*
-            Wenn keine gültige
-            Gehaltsdauer vorhanden ist,
-            bei 0 bleiben.
-        */
-
-        if(
-            !user.salaryInterval ||
-            user.salaryInterval <= 0
-        ){
-
-            user.salaryDays = 0;
-
-            break;
-
-        }
-
-
-        user.salaryDays +=
-            user.salaryInterval;
-
-    }
-
-
-    user.balance =
-        Number(
-            user.balance.toFixed(2)
-        );
-
-
-    saveUsers();
+terrainGeometry.computeVertexNormals();
 
 }
 
 
-/* ==================================================
-   UI
-================================================== */
+function paintTerrain(
+worldX,
+worldZ
+){
 
-function updateInterface(){
+const p =
+worldToVertex(worldX,worldZ);
 
-    const user =
-        users[currentUser];
+const radius =
+Number(
+document.getElementById("brushSize").value
+);
 
+const vertices=TERRAIN_SEGMENTS+1;
 
-    document.getElementById(
-        "balance"
-    ).textContent =
-        formatMoney(user.balance);
+const radiusVertices =
+radius/TERRAIN_SIZE*
+TERRAIN_SEGMENTS;
 
-
-    document.getElementById(
-        "salaryDays"
-    ).textContent =
-        user.salaryDays;
-
-
-    document.getElementById(
-        "salaryAmount"
-    ).textContent =
-        "Gehalt: " +
-        formatMoney(
-            user.salaryAmount
-        );
+const color =
+new THREE.Color(currentTerrainColor);
 
 
-    document.getElementById(
-        "salaryDate"
-    ).textContent =
-        user.salaryDays === 0
-        ? "Gehalt ist heute fällig"
-        : "Noch " +
-          user.salaryDays +
-          " Tage bis zum Gehalt";
+for(let z=p.z-radiusVertices;
+z<=p.z+radiusVertices;
+z++){
 
+for(let x=p.x-radiusVertices;
+x<=p.x+radiusVertices;
+x++){
 
-    drawChart(
-        user.expenses || []
-    );
+if(
+x<0 ||
+z<0 ||
+x>=vertices ||
+z>=vertices
+) continue;
+
+const dx=x-p.x;
+const dz=z-p.z;
+
+const dist=Math.sqrt(dx*dx+dz*dz);
+
+if(dist>radiusVertices)
+continue;
+
+const falloff=
+1-dist/radiusVertices;
+
+const index=
+vertexIndex(
+Math.round(x),
+Math.round(z)
+);
+
+const strength=
+Number(
+document.getElementById("brushStrength").value
+) * falloff;
+
+terrainColors[index*3]=
+THREE.MathUtils.lerp(
+terrainColors[index*3],
+color.r,
+strength
+);
+
+terrainColors[index*3+1]=
+THREE.MathUtils.lerp(
+terrainColors[index*3+1],
+color.g,
+strength
+);
+
+terrainColors[index*3+2]=
+THREE.MathUtils.lerp(
+terrainColors[index*3+2],
+color.b,
+strength
+);
+
+}
+
+}
+
+terrainGeometry.attributes.color.needsUpdate=true;
 
 }
 
 
-/* ==================================================
-   GELD FORMATIEREN
-================================================== */
+/* =========================================================
+   RAYCAST
+========================================================= */
 
-function formatMoney(value){
+const raycaster =
+new THREE.Raycaster();
 
-    return Number(value || 0)
-        .toLocaleString(
-            "de-DE",
-            {
-                minimumFractionDigits:2,
-                maximumFractionDigits:2
-            }
-        ) + " €";
-
-}
+const mouse =
+new THREE.Vector2();
 
 
-/* ==================================================
-   DIAGRAMM
-================================================== */
+function getWorldPoint(event){
 
-function drawChart(expenses){
+const rect =
+renderer.domElement.getBoundingClientRect();
 
-    const chart =
-        document.getElementById(
-            "chart"
-        );
+mouse.x =
+((event.clientX-rect.left)/rect.width)*2-1;
 
+mouse.y =
+-((event.clientY-rect.top)/rect.height)*2+1;
 
-    chart.innerHTML = "";
+raycaster.setFromCamera(
+mouse,
+camera
+);
 
+const hits =
+raycaster.intersectObject(
+terrain,
+false
+);
 
-    let values =
-        Array.isArray(expenses)
-        ? [...expenses]
-        : [];
+if(hits.length)
+return hits[0].point;
 
-
-    while(values.length < 7){
-        values.unshift(0);
-    }
-
-
-    values =
-        values.slice(-7);
-
-
-    const max =
-        Math.max(...values,1);
-
-
-    const today =
-        new Date();
-
-
-    const names = [];
-
-
-    for(let i=6;i>=0;i--){
-
-        const date =
-            new Date(today);
-
-        date.setDate(
-            today.getDate()-i
-        );
-
-
-        names.push(
-            date
-            .toLocaleDateString(
-                "de-DE",
-                {
-                    weekday:"short"
-                }
-            )
-            .replace(".","")
-        );
-
-    }
-
-
-    values.forEach(
-        (value,index)=>{
-
-            const day =
-                document.createElement(
-                    "div"
-                );
-
-            day.className =
-                "day";
-
-
-            const amount =
-                document.createElement(
-                    "div"
-                );
-
-            amount.className =
-                "bar-amount";
-
-            amount.textContent =
-                formatMoney(value);
-
-
-            const bar =
-                document.createElement(
-                    "div"
-                );
-
-            bar.className =
-                "bar";
-
-
-            const height =
-                value <= 0
-                ? 3
-                : Math.max(
-                    5,
-                    (value/max)*150
-                );
-
-
-            bar.style.height =
-                height + "px";
-
-
-            const label =
-                document.createElement(
-                    "div"
-                );
-
-            label.className =
-                "day-name";
-
-            label.textContent =
-                names[index];
-
-
-            day.appendChild(amount);
-            day.appendChild(bar);
-            day.appendChild(label);
-
-
-            chart.appendChild(day);
-
-        }
-    );
+return null;
 
 }
 
 
-/* ==================================================
-   NAVIGATION
-================================================== */
+/* =========================================================
+   TOOLS
+========================================================= */
 
-document
-.querySelectorAll(".nav-button")
-.forEach(button => {
+let currentTool="raise";
 
-    button.addEventListener(
-        "click",
-        ()=>{
+let currentTerrainColor="#3c8f35";
 
-            const page =
-                button.dataset.page;
+let painting=false;
 
 
-            document
-            .querySelectorAll(
-                ".nav-button"
-            )
-            .forEach(b =>
-                b.classList.remove(
-                    "active"
-                )
-            );
+const raiseBtn=
+document.getElementById("raiseBtn");
+
+const lowerBtn=
+document.getElementById("lowerBtn");
+
+const paintTerrainBtn=
+document.getElementById("paintTerrainBtn");
 
 
-            button.classList.add(
-                "active"
-            );
+function selectMapBrush(tool){
+
+currentTool=tool;
+
+[
+raiseBtn,
+lowerBtn,
+paintTerrainBtn
+].forEach(b=>b.classList.remove("active"));
+
+if(tool==="raise")
+raiseBtn.classList.add("active");
+
+if(tool==="lower")
+lowerBtn.classList.add("active");
+
+if(tool==="paint")
+paintTerrainBtn.classList.add("active");
+
+}
 
 
-            document
-            .querySelectorAll(
-                ".page"
-            )
-            .forEach(p =>
-                p.classList.remove(
-                    "active"
-                )
-            );
+raiseBtn.onclick=
+()=>selectMapBrush("raise");
+
+lowerBtn.onclick=
+()=>selectMapBrush("lower");
+
+paintTerrainBtn.onclick=
+()=>selectMapBrush("paint");
 
 
-            document
-            .getElementById(page)
-            .classList.add("active");
+/* =========================================================
+   BRUSH CURSOR
+========================================================= */
 
+const brushCursor=
+document.getElementById("brushCursor");
 
-            if(page === "adminPage"){
-                loadAdmin();
-            }
+renderer.domElement.addEventListener(
+"pointermove",
+e=>{
 
-        }
-    );
+if(
+currentTool==="raise" ||
+currentTool==="lower" ||
+currentTool==="paint" ||
+currentTool==="decorate"
+){
+
+const rect =
+renderer.domElement.getBoundingClientRect();
+
+brushCursor.style.display="block";
+
+brushCursor.style.left=
+(e.clientX-rect.left+210)+"px";
+
+brushCursor.style.top=
+(e.clientY-rect.top+55)+"px";
+
+const size=
+Number(
+document.getElementById("brushSize").value
+);
+
+const scale=
+Math.max(
+0.3,
+Math.min(
+2,
+size/30
+)
+);
+
+brushCursor.style.width=
+(60*scale)+"px";
+
+brushCursor.style.height=
+(60*scale)+"px";
+
+}
 
 });
 
 
-/* ==================================================
-   ADMIN
-================================================== */
+renderer.domElement.addEventListener(
+"pointerdown",
+e=>{
 
-function loadAdmin(){
+if(
+currentTool==="raise" ||
+currentTool==="lower" ||
+currentTool==="paint"
+){
 
-    if(currentUser !== "Haupt"){
-        return;
-    }
+painting=true;
 
-
-    renderUsers();
-
-}
-
-
-function renderUsers(){
-
-    const list =
-        document.getElementById(
-            "usersList"
-        );
-
-    const select =
-        document.getElementById(
-            "targetUser"
-        );
-
-
-    list.innerHTML = "";
-    select.innerHTML = "";
-
-
-    Object.keys(users)
-    .forEach(name => {
-
-        const user =
-            users[name];
-
-
-        const card =
-            document.createElement(
-                "div"
-            );
-
-        card.className =
-            "user-card";
-
-
-        const info =
-            document.createElement(
-                "div"
-            );
-
-        info.className =
-            "user-info";
-
-
-        const avatar =
-            document.createElement(
-                "div"
-            );
-
-        avatar.className =
-            "user-avatar";
-
-        avatar.textContent =
-            name
-            .charAt(0)
-            .toUpperCase();
-
-
-        const details =
-            document.createElement(
-                "div"
-            );
-
-        details.className =
-            "user-details";
-
-
-        const strong =
-            document.createElement(
-                "strong"
-            );
-
-        strong.textContent =
-            name;
-
-
-        const small =
-            document.createElement(
-                "small"
-            );
-
-        small.textContent =
-            "Gehalt: " +
-            formatMoney(
-                user.salaryAmount
-            ) +
-            " · " +
-            user.salaryDays +
-            " Tage";
-
-
-        details.appendChild(strong);
-        details.appendChild(small);
-
-
-        info.appendChild(avatar);
-        info.appendChild(details);
-
-
-        const balance =
-            document.createElement(
-                "div"
-            );
-
-        balance.className =
-            "user-balance";
-
-        balance.textContent =
-            formatMoney(
-                user.balance
-            );
-
-
-        card.appendChild(info);
-        card.appendChild(balance);
-
-
-        list.appendChild(card);
-
-
-        const option =
-            document.createElement(
-                "option"
-            );
-
-        option.value =
-            name;
-
-        option.textContent =
-            name;
-
-        select.appendChild(option);
-
-    });
-
-
-    loadSelectedUser();
+useMapBrush(e);
 
 }
 
+if(currentTool==="decorate"){
 
-/* ==================================================
-   BENUTZER AUSWÄHLEN
-================================================== */
+placeDecoration(e);
 
-document
-.getElementById("targetUser")
-.addEventListener(
-    "change",
-    loadSelectedUser
+}
+
+});
+
+
+renderer.domElement.addEventListener(
+"pointerup",
+()=>{
+painting=false;
+});
+
+
+renderer.domElement.addEventListener(
+"pointerleave",
+()=>{
+painting=false;
+});
+
+
+renderer.domElement.addEventListener(
+"pointermove",
+e=>{
+
+if(painting &&
+(
+currentTool==="raise" ||
+currentTool==="lower" ||
+currentTool==="paint"
+)){
+
+useMapBrush(e);
+
+}
+
+});
+
+
+function useMapBrush(e){
+
+const point=
+getWorldPoint(e);
+
+if(!point)return;
+
+if(currentTool==="raise")
+sculptTerrain(
+point.x,
+point.z,
+1.5
 );
 
-
-function loadSelectedUser(){
-
-    const name =
-        document.getElementById(
-            "targetUser"
-        ).value;
-
-
-    if(!name || !users[name]){
-        return;
-    }
-
-
-    const user =
-        users[name];
-
-
-    document.getElementById(
-        "adminDays"
-    ).value =
-        user.salaryDays;
-
-
-    document.getElementById(
-        "adminSalary"
-    ).value =
-        user.salaryAmount;
-
-
-    document.getElementById(
-        "adminExpense"
-    ).value =
-        user.expensePrice;
-
-
-    document.getElementById(
-        "adminBalance"
-    ).value =
-        user.balance;
-
-}
-
-
-/* ==================================================
-   ADMIN SPEICHERN
-================================================== */
-
-document
-.getElementById("saveSettings")
-.addEventListener(
-    "click",
-    saveSettings
+if(currentTool==="lower")
+sculptTerrain(
+point.x,
+point.z,
+-1.5
 );
 
-
-function saveSettings(){
-
-    if(currentUser !== "Haupt"){
-        return;
-    }
-
-
-    const target =
-        document.getElementById(
-            "targetUser"
-        ).value;
-
-
-    if(!target || !users[target]){
-        return;
-    }
-
-
-    const days =
-        Math.max(
-            0,
-            Math.floor(
-                Number(
-                    document.getElementById(
-                        "adminDays"
-                    ).value
-                ) || 0
-            )
-        );
-
-
-    const salary =
-        Math.max(
-            0,
-            Number(
-                document.getElementById(
-                    "adminSalary"
-                ).value
-            ) || 0
-        );
-
-
-    const expense =
-        Math.max(
-            0,
-            Number(
-                document.getElementById(
-                    "adminExpense"
-                ).value
-            ) || 0
-        );
-
-
-    const balance =
-        Number(
-            document.getElementById(
-                "adminBalance"
-            ).value
-        ) || 0;
-
-
-    const user =
-        users[target];
-
-
-    /*
-        Die eingegebenen Tage werden
-        gleichzeitig als neues
-        Gehaltsintervall gespeichert.
-
-        Beispiel:
-
-        Tage: 7
-        Gehalt: 100 €
-
-        => alle 7 Tage 100 €
-    */
-
-    user.salaryDays =
-        days;
-
-    user.salaryInterval =
-        days;
-
-    user.salaryAmount =
-        Number(
-            salary.toFixed(2)
-        );
-
-    user.expensePrice =
-        Number(
-            expense.toFixed(2)
-        );
-
-    user.balance =
-        Number(
-            balance.toFixed(2)
-        );
-
-    user.lastDayCheck =
-        Date.now();
-
-
-    saveUsers();
-
-
-    if(target === currentUser){
-
-        checkSalary();
-        updateInterface();
-
-    }
-
-
-    renderUsers();
-
-
-    showStatus(
-        "Einstellungen gespeichert."
-    );
-
-}
-
-
-/* ==================================================
-   STATUS
-================================================== */
-
-function showStatus(text){
-
-    const status =
-        document.getElementById(
-            "adminStatus"
-        );
-
-
-    status.textContent =
-        text;
-
-    status.style.display =
-        "block";
-
-
-    setTimeout(
-        ()=>{
-            status.style.display =
-                "none";
-        },
-        3000
-    );
-
-}
-
-
-/* ==================================================
-   LOGOUT
-================================================== */
-
-document
-.getElementById("logout")
-.addEventListener(
-    "click",
-    ()=>{
-
-        currentUser = null;
-
-
-        localStorage.removeItem(
-            CURRENT_USER_KEY
-        );
-
-
-        app.style.display =
-            "none";
-
-        loginScreen.style.display =
-            "flex";
-
-
-        nameInput.value = "";
-
-        loginError.style.display =
-            "none";
-
-    }
+if(currentTool==="paint")
+paintTerrain(
+point.x,
+point.z
 );
 
+}
 
-/* ==================================================
-   AUTOMATISCHER LOGIN
-================================================== */
 
-const savedUser =
-    localStorage.getItem(
-        CURRENT_USER_KEY
-    );
+/* =========================================================
+   COLORS
+========================================================= */
+
+document.querySelectorAll(".color")
+.forEach(el=>{
+
+el.onclick=()=>{
+
+currentTerrainColor=
+el.dataset.color;
+
+};
+
+});
+
+
+/* =========================================================
+   SIZE UI
+========================================================= */
+
+const brushSize=
+document.getElementById("brushSize");
+
+const brushSizeValue=
+document.getElementById("brushSizeValue");
+
+brushSize.oninput=()=>{
+brushSizeValue.textContent=
+brushSize.value;
+};
+
+
+const brushStrength=
+document.getElementById("brushStrength");
+
+const brushStrengthValue=
+document.getElementById("brushStrengthValue");
+
+brushStrength.oninput=()=>{
+brushStrengthValue.textContent=
+brushStrength.value;
+};
+
+
+/* =========================================================
+   GLB SYSTEM
+========================================================= */
+
+const loader=
+new GLTFLoader();
+
+let loadedModel=null;
+
+let objectCounter=0;
+
+const objects=[];
+
+const objectList=
+document.getElementById("objectList");
+
+
+function removeTextures(object){
+
+object.traverse(child=>{
+
+if(!child.isMesh)return;
+
+const old=child.material;
+
+const material=
+new THREE.MeshStandardMaterial({
+color:0xffffff,
+roughness:0.85,
+metalness:0
+});
+
+child.material=material;
+
+if(old.map)
+old.map.dispose();
+
+});
+
+}
+
+
+function prepareModel(gltf){
+
+const root=
+gltf.scene.clone(true);
+
+removeTextures(root);
+
+root.traverse(child=>{
+
+if(child.isMesh){
+
+child.castShadow=true;
+child.receiveShadow=true;
+
+}
+
+});
+
+return root;
+
+}
+
+
+document.getElementById("importBtn")
+.onclick=()=>{
+document.getElementById("glbInput").click();
+};
+
+
+document.getElementById("glbInput")
+.onchange=e=>{
+
+const file=e.target.files[0];
+
+if(!file)return;
+
+loadGLB(file);
+
+};
+
+
+function loadGLB(file){
+
+const url=
+URL.createObjectURL(file);
+
+loader.load(
+url,
+gltf=>{
+
+loadedModel=
+prepareModel(gltf);
+
+loadedModel.visible=false;
+
+scene.add(loadedModel);
+
+document.getElementById("status").textContent=
+"GLB geladen: "+file.name;
+
+URL.revokeObjectURL(url);
+
+},
+undefined,
+error=>{
+
+console.error(error);
+
+alert(
+"GLB konnte nicht geladen werden."
+);
+
+}
+);
+
+}
+
+
+/* =========================================================
+   DECORATE TOOL
+========================================================= */
+
+document.getElementById("decorateToolBtn")
+.onclick=()=>{
+
+currentTool="decorate";
+
+document.getElementById("mapPanel")
+.style.display="none";
+
+document.getElementById("decoratePanel")
+.style.display="block";
+
+document.getElementById("selectPanel")
+.style.display="none";
+
+};
+
+
+document.getElementById("mapToolBtn")
+.onclick=()=>{
+
+currentTool="raise";
+
+document.getElementById("mapPanel")
+.style.display="block";
+
+document.getElementById("decoratePanel")
+.style.display="none";
+
+document.getElementById("selectPanel")
+.style.display="none";
+
+};
+
+
+document.getElementById("selectToolBtn")
+.onclick=()=>{
+
+currentTool="select";
+
+document.getElementById("mapPanel")
+.style.display="none";
+
+document.getElementById("decoratePanel")
+.style.display="none";
+
+document.getElementById("selectPanel")
+.style.display="block";
+
+brushCursor.style.display="none";
+
+};
+
+
+document.getElementById("chooseModelBtn")
+.onclick=()=>{
+document.getElementById("modelInput").click();
+};
+
+
+document.getElementById("modelInput")
+.onchange=e=>{
+
+const file=e.target.files[0];
+
+if(file)
+loadGLB(file);
+
+};
+
+
+function placeDecoration(event){
+
+if(!loadedModel){
+
+alert(
+"Bitte zuerst ein GLB importieren."
+);
+
+return;
+
+}
+
+const point=
+getWorldPoint(event);
+
+if(!point)return;
+
+
+const obj=
+loadedModel.clone(true);
+
+obj.visible=true;
+
+obj.position.copy(point);
+
+obj.position.y += 0.2;
+
+
+const baseScale=
+Number(
+document.getElementById("objectScale").value
+);
+
+let scale=baseScale;
+
+if(
+document.getElementById("randomScale").checked
+){
+
+scale *=
+THREE.MathUtils.randFloat(
+0.75,
+1.25
+);
+
+}
+
+obj.scale.setScalar(scale);
 
 
 if(
-    savedUser &&
-    users[savedUser]
+document.getElementById("randomRotation").checked
 ){
 
-    currentUser =
-        savedUser;
-
-    checkSalary();
-    openApp();
+obj.rotation.y=
+Math.random()*Math.PI*2;
 
 }
 
 
-/* ==================================================
-   COUNTDOWN AKTUALISIEREN
-================================================== */
+objectCounter++;
 
-setInterval(
-    ()=>{
+obj.name=
+"Object_"+objectCounter;
 
-        if(!currentUser){
-            return;
-        }
+obj.userData={
+type:"decoration",
+script:"",
+color:"#ffffff"
+};
+
+scene.add(obj);
+
+objects.push(obj);
+
+addObjectToList(obj);
+
+}
 
 
-        checkSalary();
-        updateInterface();
+/* =========================================================
+   OBJECT LIST
+========================================================= */
 
-    },
-    60000
+function addObjectToList(obj){
+
+const item=
+document.createElement("div");
+
+item.className="objectItem";
+
+item.textContent=obj.name;
+
+item.onclick=()=>{
+selectObject(obj);
+};
+
+obj.userData.listElement=item;
+
+objectList.appendChild(item);
+
+}
+
+
+let selectedObject=null;
+
+let transform=null;
+
+
+function selectObject(obj){
+
+selectedObject=obj;
+
+document
+.querySelectorAll(".objectItem")
+.forEach(x=>
+x.classList.remove("selected")
 );
+
+if(obj.userData.listElement)
+obj.userData.listElement
+.classList.add("selected");
+
+
+document.getElementById("noSelection")
+.style.display="none";
+
+document.getElementById("inspector")
+.style.display="block";
+
+
+document.getElementById("objectName")
+.value=obj.name;
+
+document.getElementById("posX")
+.value=obj.position.x.toFixed(2);
+
+document.getElementById("posY")
+.value=obj.position.y.toFixed(2);
+
+document.getElementById("posZ")
+.value=obj.position.z.toFixed(2);
+
+document.getElementById("rotY")
+.value=obj.rotation.y.toFixed(2);
+
+document.getElementById("scaleInput")
+.value=obj.scale.x.toFixed(2);
+
+document.getElementById("scriptInput")
+.value=
+obj.userData.script || "";
+
+
+if(transform){
+
+scene.remove(transform);
+
+transform.dispose();
+
+}
+
+transform=
+new TransformControls(
+camera,
+renderer.domElement
+);
+
+transform.setMode("translate");
+
+transform.attach(obj);
+
+transform.addEventListener(
+"objectChange",
+()=>{
+updateInspector();
+}
+);
+
+scene.add(transform);
+
+}
+
+
+/* =========================================================
+   SELECT OBJECT WITH MOUSE
+========================================================= */
+
+renderer.domElement.addEventListener(
+"dblclick",
+e=>{
+
+if(currentTool!=="select")
+return;
+
+const rect=
+renderer.domElement.getBoundingClientRect();
+
+mouse.x=
+((e.clientX-rect.left)/rect.width)*2-1;
+
+mouse.y=
+-((e.clientY-rect.top)/rect.height)*2+1;
+
+raycaster.setFromCamera(
+mouse,
+camera
+);
+
+const meshes=[];
+
+objects.forEach(o=>{
+
+o.traverse(c=>{
+
+if(c.isMesh)
+meshes.push(c);
+
+});
+
+});
+
+const hits=
+raycaster.intersectObjects(
+meshes,
+true
+);
+
+if(hits.length){
+
+let obj=
+hits[0].object;
+
+while(
+obj.parent &&
+!objects.includes(obj)
+){
+
+obj=obj.parent;
+
+}
+
+if(objects.includes(obj))
+selectObject(obj);
+
+}
+
+});
+
+
+/* =========================================================
+   TRANSFORM MODE
+========================================================= */
+
+window.addEventListener(
+"keydown",
+e=>{
+
+if(!transform)
+return;
+
+if(e.key==="w")
+transform.setMode("translate");
+
+if(e.key==="e")
+transform.setMode("rotate");
+
+if(e.key==="r")
+transform.setMode("scale");
+
+});
+
+
+/* =========================================================
+   INSPECTOR
+========================================================= */
+
+function updateInspector(){
+
+if(!selectedObject)
+return;
+
+selectedObject.name=
+document.getElementById("objectName").value;
+
+selectedObject.position.x=
+Number(
+document.getElementById("posX").value
+);
+
+selectedObject.position.y=
+Number(
+document.getElementById("posY").value
+);
+
+selectedObject.position.z=
+Number(
+document.getElementById("posZ").value
+);
+
+selectedObject.rotation.y=
+Number(
+document.getElementById("rotY").value
+);
+
+const s=
+Number(
+document.getElementById("scaleInput").value
+);
+
+selectedObject.scale.setScalar(s);
+
+if(selectedObject.userData.listElement)
+selectedObject.userData.listElement.textContent=
+selectedObject.name;
+
+}
+
+
+[
+"objectName",
+"posX",
+"posY",
+"posZ",
+"rotY",
+"scaleInput"
+].forEach(id=>{
+
+document.getElementById(id)
+.addEventListener(
+"input",
+updateInspector
+);
+
+});
+
+
+/* =========================================================
+   OBJECT COLOR
+========================================================= */
+
+document.getElementById("objectColor")
+.oninput=e=>{
+
+if(!selectedObject)
+return;
+
+const color=
+new THREE.Color(e.target.value);
+
+selectedObject.traverse(c=>{
+
+if(!c.isMesh)
+return;
+
+if(c.material){
+
+c.material.color.copy(color);
+
+}
+
+});
+
+selectedObject.userData.color=
+e.target.value;
+
+};
+
+
+/* =========================================================
+   SCRIPTS
+========================================================= */
+
+document.getElementById("applyScript")
+.onclick=()=>{
+
+if(!selectedObject)
+return;
+
+const code=
+document.getElementById("scriptInput").value;
+
+selectedObject.userData.script=code;
+
+compileScript(selectedObject,code);
+
+};
+
+
+function compileScript(obj,code){
+
+try{
+
+obj.userData.compiledScript=
+new Function(
+"object",
+"THREE",
+code
+);
+
+document.getElementById("status")
+.textContent=
+"Script angewendet.";
+
+}catch(error){
+
+alert(
+"Script-Fehler:\n"+
+error.message
+);
+
+}
+
+}
+
+
+/* =========================================================
+   SCRIPT LOOP
+========================================================= */
+
+function runScripts(delta){
+
+for(const obj of objects){
+
+if(
+obj.userData.compiledScript
+){
+
+try{
+
+obj.userData.compiledScript(
+obj,
+THREE
+);
+
+}catch(error){
+
+console.error(
+"Script error:",
+error
+);
+
+}
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+document.getElementById("deleteObject")
+.onclick=()=>{
+
+if(!selectedObject)
+return;
+
+scene.remove(selectedObject);
+
+const index=
+objects.indexOf(selectedObject);
+
+if(index!==-1)
+objects.splice(index,1);
+
+if(
+selectedObject.userData.listElement
+)
+selectedObject.userData.listElement.remove();
+
+if(transform){
+
+scene.remove(transform);
+
+transform.dispose();
+
+transform=null;
+
+}
+
+selectedObject=null;
+
+document.getElementById("inspector")
+.style.display="none";
+
+document.getElementById("noSelection")
+.style.display="block";
+
+};
+
+
+/* =========================================================
+   DUPLICATE
+========================================================= */
+
+document.getElementById("duplicateObject")
+.onclick=()=>{
+
+if(!selectedObject)
+return;
+
+const clone=
+selectedObject.clone(true);
+
+objectCounter++;
+
+clone.name=
+"Object_"+objectCounter;
+
+clone.position.x+=5;
+
+clone.userData={
+...selectedObject.userData,
+listElement:null
+};
+
+scene.add(clone);
+
+objects.push(clone);
+
+addObjectToList(clone);
+
+};
+
+
+/* =========================================================
+   CLEAR DECORATIONS
+========================================================= */
+
+document.getElementById("clearDecorations")
+.onclick=()=>{
+
+for(
+let i=objects.length-1;
+i>=0;
+i--
+){
+
+const obj=objects[i];
+
+scene.remove(obj);
+
+if(obj.userData.listElement)
+obj.userData.listElement.remove();
+
+objects.splice(i,1);
+
+}
+
+selectedObject=null;
+
+};
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+document.getElementById("saveBtn")
+.onclick=()=>{
+
+const data={
+
+terrain:Array.from(heights),
+
+terrainColors:Array.from(terrainColors),
+
+objects:objects.map(obj=>({
+
+name:obj.name,
+
+position:{
+x:obj.position.x,
+y:obj.position.y,
+z:obj.position.z
+},
+
+rotation:{
+x:obj.rotation.x,
+y:obj.rotation.y,
+z:obj.rotation.z
+},
+
+scale:obj.scale.x,
+
+color:obj.userData.color,
+
+script:obj.userData.script
+
+}))
+
+};
+
+
+const blob=
+new Blob(
+[JSON.stringify(data,null,2)],
+{
+type:"application/json"
+}
+);
+
+const a=
+document.createElement("a");
+
+a.href=
+URL.createObjectURL(blob);
+
+a.download=
+"ghost-engine-project.json";
+
+a.click();
+
+};
+
+
+/* =========================================================
+   LOAD
+========================================================= */
+
+document.getElementById("loadBtn")
+.onclick=()=>{
+document.getElementById("projectInput").click();
+};
+
+
+document.getElementById("projectInput")
+.onchange=e=>{
+
+const file=e.target.files[0];
+
+if(!file)return;
+
+const reader=
+new FileReader();
+
+reader.onload=()=>{
+
+try{
+
+const data=
+JSON.parse(reader.result);
+
+
+/* terrain */
+
+if(data.terrain){
+
+for(
+let i=0;
+i<data.terrain.length;
+i++
+){
+
+heights[i]=
+data.terrain[i];
+
+position.setY(
+i,
+heights[i]
+);
+
+}
+
+position.needsUpdate=true;
+
+terrainGeometry.computeVertexNormals();
+
+}
+
+
+/* colors */
+
+if(data.terrainColors){
+
+for(
+let i=0;
+i<data.terrainColors.length;
+i++
+){
+
+terrainColors[i]=
+data.terrainColors[i];
+
+}
+
+terrainGeometry.attributes
+.color
+.needsUpdate=true;
+
+}
+
+
+document.getElementById("status")
+.textContent=
+"Projekt geladen.";
+
+}catch(error){
+
+alert(
+"Projekt konnte nicht geladen werden."
+);
+
+}
+
+};
+
+reader.readAsText(file);
+
+};
+
+
+/* =========================================================
+   PLAY MODE
+========================================================= */
+
+let playMode=false;
+
+
+document.getElementById("playBtn")
+.onclick=()=>{
+
+playMode=!playMode;
+
+if(playMode){
+
+document.getElementById("playBtn")
+.textContent="■ Stop";
+
+document.getElementById("playOverlay")
+.style.display="block";
+
+orbit.enabled=false;
+
+}else{
+
+document.getElementById("playBtn")
+.textContent="▶ Play";
+
+document.getElementById("playOverlay")
+.style.display="none";
+
+orbit.enabled=true;
+
+}
+
+};
+
+
+/* =========================================================
+   DROP GLB
+========================================================= */
+
+const dropZone=
+document.getElementById("dropZone");
+
+
+dropZone.addEventListener(
+"dragover",
+e=>{
+e.preventDefault();
+dropZone.style.borderColor="#ffd400";
+}
+);
+
+
+dropZone.addEventListener(
+"dragleave",
+()=>{
+dropZone.style.borderColor="#444";
+}
+);
+
+
+dropZone.addEventListener(
+"drop",
+e=>{
+
+e.preventDefault();
+
+dropZone.style.borderColor="#444";
+
+const file=
+e.dataTransfer.files[0];
+
+if(
+file &&
+file.name.toLowerCase().endsWith(".glb")
+){
+
+loadGLB(file);
+
+}
+
+});
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+"resize",
+()=>{
+
+camera.aspect=
+container.clientWidth/
+container.clientHeight;
+
+camera.updateProjectionMatrix();
+
+renderer.setSize(
+container.clientWidth,
+container.clientHeight
+);
+
+});
+
+
+/* =========================================================
+   ANIMATION
+========================================================= */
+
+const clock=
+new THREE.Clock();
+
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+const delta=
+clock.getDelta();
+
+orbit.update();
+
+if(playMode)
+runScripts(delta);
+
+renderer.render(
+scene,
+camera
+);
+
+}
+
+animate();
 
 </script>
 
