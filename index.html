@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST ENGINE</title>
+<title>GHOST 3D ENGINE</title>
 
 <style>
 *{
@@ -15,45 +15,19 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
+    background:#111;
     font-family:Arial,sans-serif;
-    background:#79caff;
+    color:white;
 }
 
-/* =====================================================
-   3D VIEWPORT
-===================================================== */
-
-#viewport{
-    position:absolute;
-    left:220px;
-    right:300px;
-    top:58px;
-    bottom:0;
-
-    overflow:hidden;
-
-    z-index:1;
-
-    background:#79caff;
-
-    pointer-events:auto;
+#app{
+    position:fixed;
+    inset:0;
 }
 
-#viewport canvas{
-    position:absolute;
-    left:0;
-    top:0;
-
-    width:100%;
-    height:100%;
-
+canvas{
     display:block;
-
-    z-index:1;
-
-    pointer-events:auto;
 }
-
 
 /* =====================================================
    TOPBAR
@@ -61,256 +35,334 @@ html,body{
 
 #topbar{
     position:absolute;
-
     top:0;
     left:0;
     right:0;
 
     height:58px;
 
-    background:#17191e;
-
-    border-bottom:1px solid #333;
-
     display:flex;
     align-items:center;
 
-    gap:7px;
+    gap:6px;
 
-    padding:7px;
+    padding:8px 10px;
 
-    z-index:1000;
+    background:rgba(24,27,30,.97);
 
-    pointer-events:auto;
+    border-bottom:1px solid #454b50;
+
+    z-index:100;
 }
 
 .logo{
-    color:#ffd400;
-
-    font-size:19px;
+    font-size:20px;
     font-weight:bold;
 
-    margin-right:15px;
+    color:#ffd52d;
+
+    margin-right:10px;
 
     white-space:nowrap;
 }
 
+.topButton{
+    height:40px;
 
-/* =====================================================
-   BUTTONS
-===================================================== */
+    padding:0 12px;
 
-button{
-    border:1px solid #444;
-
-    background:#252830;
+    background:#30363b;
 
     color:white;
 
-    border-radius:6px;
+    border:1px solid #515960;
 
-    padding:9px 12px;
+    border-radius:7px;
+
+    font-weight:bold;
 
     cursor:pointer;
 
     user-select:none;
-
     -webkit-user-select:none;
-
-    pointer-events:auto;
 }
 
-button:hover{
-    background:#343842;
+.topButton:hover{
+    background:#3d454b;
 }
 
-button:active{
-    transform:scale(.97);
+.topButton:active{
+    transform:scale(.96);
 }
 
-button.active{
-    background:#d6aa00;
-
+.topButton.active{
+    background:#d49a18;
     color:#111;
-
-    border-color:#ffd400;
+    border-color:#ffd044;
 }
 
+#playButton{
+    margin-left:auto;
+
+    background:#35b956;
+
+    color:#071108;
+
+    border-color:#68df82;
+}
 
 /* =====================================================
-   LEFT BAR
+   LEFT PANEL
 ===================================================== */
 
-#leftbar{
+#leftPanel{
     position:absolute;
 
-    top:58px;
-    left:0;
-    bottom:0;
+    left:10px;
+    top:68px;
+    bottom:10px;
 
     width:220px;
 
-    background:#181a1f;
+    background:rgba(24,27,30,.97);
 
-    border-right:1px solid #333;
+    border:1px solid #454b50;
 
-    z-index:1000;
+    border-radius:10px;
+
+    z-index:90;
 
     padding:10px;
 
-    overflow-y:auto;
+    overflow:auto;
 
-    pointer-events:auto;
+    box-shadow:0 8px 30px #0009;
 }
 
-
-/* =====================================================
-   RIGHT BAR
-===================================================== */
-
-#rightbar{
-    position:absolute;
-
-    top:58px;
-    right:0;
-    bottom:0;
-
-    width:300px;
-
-    background:#181a1f;
-
-    border-left:1px solid #333;
-
-    z-index:1000;
-
-    padding:12px;
-
-    overflow-y:auto;
-
-    pointer-events:auto;
-}
-
-
-/* =====================================================
-   UI
-===================================================== */
-
-.section{
-    margin-bottom:18px;
-}
-
-.section h3{
-    font-size:13px;
-
-    margin:0 0 8px;
-
-    color:#ddd;
-}
-
-.tool{
-    width:100%;
-
-    margin-bottom:6px;
-
-    text-align:left;
-}
-
-label{
-    display:block;
-
-    color:#aaa;
+.panelTitle{
+    color:#9da7af;
 
     font-size:12px;
 
-    margin-top:9px;
+    font-weight:bold;
 
-    margin-bottom:4px;
+    margin:5px 0 8px;
+
+    text-transform:uppercase;
 }
 
-input[type=range]{
-    width:100%;
-}
-
-input[type=number],
-input[type=text],
-textarea{
+.toolButton{
     width:100%;
 
-    background:#0f1115;
+    min-height:42px;
 
-    border:1px solid #393c44;
+    margin-bottom:6px;
+
+    background:#30363b;
 
     color:white;
 
-    border-radius:5px;
+    border:1px solid #4d555c;
 
-    padding:7px;
+    border-radius:7px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    text-align:left;
+
+    padding:0 12px;
 }
 
-input[type=color]{
+.toolButton:hover{
+    background:#3c444a;
+}
+
+.toolButton.active{
+    background:#d49a18;
+    color:#111;
+    border-color:#ffd044;
+}
+
+hr{
+    border:0;
+
+    border-top:1px solid #42484e;
+
+    margin:13px 0;
+}
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+
+.setting{
+    color:#aeb7bd;
+
+    font-size:12px;
+
+    margin:10px 0 4px;
+}
+
+.settingValue{
+    float:right;
+
+    color:white;
+}
+
+input[type="range"]{
+    width:100%;
+}
+
+input[type="color"]{
     width:100%;
 
-    height:38px;
+    height:35px;
 
-    background:#0f1115;
+    border:1px solid #555;
 
-    border:1px solid #393c44;
+    background:#111;
 
-    border-radius:5px;
+    border-radius:6px;
+}
 
-    padding:3px;
+/* =====================================================
+   RIGHT INSPECTOR
+===================================================== */
+
+#rightPanel{
+    position:absolute;
+
+    top:68px;
+    right:10px;
+    bottom:10px;
+
+    width:260px;
+
+    background:rgba(24,27,30,.97);
+
+    border:1px solid #454b50;
+
+    border-radius:10px;
+
+    z-index:90;
+
+    padding:12px;
+
+    overflow:auto;
+
+    box-shadow:0 8px 30px #0009;
+}
+
+.inspectorTitle{
+    font-size:18px;
+
+    font-weight:bold;
+
+    margin-bottom:12px;
+}
+
+#noObject{
+    color:#8d979f;
+
+    font-size:13px;
+
+    line-height:1.5;
+}
+
+#objectInspector{
+    display:none;
+}
+
+.fieldTitle{
+    color:#aeb7bd;
+
+    font-size:11px;
+
+    margin-top:10px;
+}
+
+input[type="text"],
+input[type="number"],
+textarea{
+    width:100%;
+
+    background:#111518;
+
+    color:white;
+
+    border:1px solid #485159;
+
+    border-radius:6px;
+
+    padding:8px;
+
+    outline:none;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#e1a620;
+}
+
+.vec{
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    gap:4px;
+}
+
+.vec input{
+    min-width:0;
 }
 
 textarea{
-    min-height:150px;
+    min-height:180px;
 
     resize:vertical;
 
     font-family:monospace;
 
     font-size:12px;
+
+    line-height:1.4;
 }
 
-.small{
-    color:#888;
+.actionButton{
+    width:100%;
 
-    font-size:11px;
+    margin-top:7px;
 
-    line-height:1.5;
+    padding:9px;
+
+    background:#30373d;
+
+    color:white;
+
+    border:1px solid #4e565d;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    font-weight:bold;
 }
 
-hr{
-    border:0;
-
-    border-top:1px solid #30333a;
-
-    margin:12px 0;
+.actionButton:hover{
+    background:#3d464d;
 }
 
-
-/* =====================================================
-   BRUSH
-===================================================== */
-
-#brushCursor{
-    position:fixed;
-
-    pointer-events:none;
-
-    border:2px solid #ffd400;
-
-    border-radius:50%;
-
-    z-index:2000;
-
-    display:none;
-
-    transform:translate(-50%,-50%);
-
-    box-shadow:
-        0 0 4px #000;
+.danger{
+    background:#933434;
+    border-color:#b94b4b;
 }
 
+.danger:hover{
+    background:#b13d3d;
+}
 
 /* =====================================================
    STATUS
@@ -319,916 +371,746 @@ hr{
 #status{
     position:absolute;
 
-    left:235px;
+    bottom:18px;
+    left:245px;
 
-    bottom:12px;
+    z-index:80;
 
-    z-index:100;
+    background:rgba(15,17,19,.9);
 
-    background:rgba(0,0,0,.65);
+    border:1px solid #454b50;
 
-    padding:7px 10px;
+    border-radius:7px;
 
-    border-radius:6px;
-
-    color:white;
+    padding:8px 12px;
 
     font-size:12px;
+
+    color:#d3d8dc;
 
     pointer-events:none;
 }
 
-
 /* =====================================================
-   COLORS
+   BRUSH CURSOR
 ===================================================== */
 
-.colorGrid{
-    display:grid;
-
-    grid-template-columns:
-        repeat(6,1fr);
-
-    gap:5px;
-}
-
-.color{
-    height:28px;
-
-    border-radius:5px;
-
-    border:2px solid #555;
-
-    cursor:pointer;
-}
-
-.color:hover{
-    border-color:white;
-}
-
-
-/* =====================================================
-   OBJECT LIST
-===================================================== */
-
-#objectList{
-    background:#101216;
-
-    border:1px solid #30333a;
-
-    border-radius:5px;
-
-    max-height:220px;
-
-    overflow-y:auto;
-}
-
-.objectItem{
-    padding:8px;
-
-    border-bottom:1px solid #292c32;
-
-    font-size:12px;
-
-    cursor:pointer;
-}
-
-.objectItem:hover{
-    background:#292d35;
-}
-
-.objectItem.selected{
-    background:#665400;
-}
-
-
-/* =====================================================
-   DROPZONE
-===================================================== */
-
-#dropZone{
-    border:2px dashed #444;
-
-    border-radius:6px;
-
-    padding:15px;
-
-    text-align:center;
-
-    color:#999;
-
-    margin-bottom:7px;
-}
-
-#dropZone.drag{
-    border-color:#ffd400;
-
-    color:#fff;
-
-    background:#252000;
-}
-
-
-/* =====================================================
-   PLAY
-===================================================== */
-
-#playMode{
+#brushCursor{
     position:absolute;
 
-    left:220px;
-    right:300px;
+    width:50px;
+    height:50px;
 
-    top:58px;
-    bottom:0;
+    border:2px solid #ffd22e;
 
-    z-index:500;
+    border-radius:50%;
+
+    transform:translate(-50%,-50%);
 
     pointer-events:none;
+
+    z-index:50;
 
     display:none;
 }
 
-#playLabel{
+/* =====================================================
+   PLAY INDICATOR
+===================================================== */
+
+#playIndicator{
     position:absolute;
 
-    top:15px;
+    top:70px;
     left:50%;
 
     transform:translateX(-50%);
 
-    background:rgba(0,0,0,.7);
+    background:#35b956;
 
-    padding:8px 18px;
+    color:#071108;
 
-    border-radius:7px;
+    padding:7px 14px;
 
-    color:#70ff70;
+    border-radius:20px;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+    display:none;
+
+    z-index:120;
+
+    box-shadow:0 3px 12px #0008;
+}
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+#modal{
+    position:absolute;
+
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:300;
+}
+
+.modalBox{
+    width:440px;
+
+    max-width:90%;
+
+    background:#22272c;
+
+    border:1px solid #555e66;
+
+    border-radius:12px;
+
+    padding:20px;
+
+    box-shadow:0 20px 70px #000;
+}
+
+.modalBox h2{
+    margin-top:0;
+}
+
+.modalBox button{
+    width:100%;
+
+    padding:11px;
+
+    margin-top:10px;
+
+    border:0;
+
+    border-radius:6px;
+
+    cursor:pointer;
 
     font-weight:bold;
 }
 
-
 /* =====================================================
-   CHECKBOX
+   MOBILE
 ===================================================== */
 
-input[type=checkbox]{
-    width:16px;
-    height:16px;
-    vertical-align:middle;
+@media(max-width:850px){
+
+    .logo{
+        display:none;
+    }
+
+    .topButton{
+        padding:0 7px;
+        font-size:11px;
+    }
+
+    #leftPanel{
+        width:180px;
+    }
+
+    #rightPanel{
+        width:210px;
+    }
+
+    #status{
+        left:195px;
+    }
 }
 </style>
 </head>
 
 <body>
 
+<div id="app"></div>
 
 <!-- =====================================================
-     TOP
+     TOPBAR
 ===================================================== -->
 
 <div id="topbar">
 
     <div class="logo">
-        GHOST ENGINE
+        GHOST 3D
     </div>
 
-    <button id="mapBtn">
-        🗺 MAP
+    <button
+        class="topButton active"
+        id="handTool">
+        ✋ HAND
     </button>
 
-    <button id="decorateBtn">
-        🌳 SCHMUCK
+    <button
+        class="topButton"
+        id="raiseTool">
+        ⬆ ERHÖHEN
     </button>
 
-    <button id="selectBtn">
+    <button
+        class="topButton"
+        id="lowerTool">
+        ⬇ SENKEN
+    </button>
+
+    <button
+        class="topButton"
+        id="smoothTool">
+        ≈ GLÄTTEN
+    </button>
+
+    <button
+        class="topButton"
+        id="paintTool">
+        🎨 FARBE
+    </button>
+
+    <button
+        class="topButton"
+        id="selectTool">
         🖱 AUSWAHL
     </button>
 
-    <button id="importBtn">
-        📦 GLB IMPORT
+    <button
+        class="topButton"
+        id="moveTool">
+        W
     </button>
 
-    <input
-        id="glbInput"
-        type="file"
-        accept=".glb,.gltf"
-        hidden
-    >
+    <button
+        class="topButton"
+        id="rotateTool">
+        E
+    </button>
 
-    <button id="playBtn">
+    <button
+        class="topButton"
+        id="scaleTool">
+        R
+    </button>
+
+    <button
+        class="topButton"
+        id="addCube">
+        ＋ CUBE
+    </button>
+
+    <button
+        class="topButton"
+        id="addSphere">
+        ＋ KUGEL
+    </button>
+
+    <button
+        class="topButton"
+        id="addCylinder">
+        ＋ ZYLINDER
+    </button>
+
+    <button
+        class="topButton"
+        id="playButton">
         ▶ PLAY
     </button>
 
-    <button id="saveBtn">
-        💾 SPEICHERN
+</div>
+
+<!-- =====================================================
+     LEFT PANEL
+===================================================== -->
+
+<div id="leftPanel">
+
+    <div class="panelTitle">
+        TERRAIN
+    </div>
+
+    <button
+        class="toolButton active"
+        id="handSide">
+        ✋ Hand / Kamera
     </button>
 
-    <button id="loadBtn">
-        📂 LADEN
+    <button
+        class="toolButton"
+        id="raiseSide">
+        ⬆ Terrain erhöhen
     </button>
+
+    <button
+        class="toolButton"
+        id="lowerSide">
+        ⬇ Terrain senken
+    </button>
+
+    <button
+        class="toolButton"
+        id="smoothSide">
+        ≈ Terrain glätten
+    </button>
+
+    <button
+        class="toolButton"
+        id="paintSide">
+        🎨 Terrain färben
+    </button>
+
+    <div class="setting">
+        Pinselgröße
+        <span
+            class="settingValue"
+            id="brushSizeValue">
+            30
+        </span>
+    </div>
 
     <input
-        id="loadInput"
-        type="file"
-        accept=".json"
-        hidden
-    >
+        type="range"
+        id="brushSize"
+        min="5"
+        max="100"
+        value="30">
 
-</div>
-
-
-<!-- =====================================================
-     LEFT
-===================================================== -->
-
-<div id="leftbar">
-
-
-    <!-- MAP -->
-
-    <div id="mapPanel">
-
-        <div class="section">
-
-            <h3>
-                MAP TOOL
-            </h3>
-
-            <button
-                id="raiseBtn"
-                class="tool active"
-            >
-                ⬆ ERHÖHEN
-            </button>
-
-            <button
-                id="lowerBtn"
-                class="tool"
-            >
-                ⬇ SENKEN
-            </button>
-
-            <button
-                id="paintTerrainBtn"
-                class="tool"
-            >
-                🎨 TERRAIN FÄRBEN
-            </button>
-
-
-            <label>
-                Pinselgröße
-            </label>
-
-            <input
-                id="brushSize"
-                type="range"
-                min="5"
-                max="100"
-                value="25"
-            >
-
-            <div class="small">
-                Größe:
-                <span id="brushSizeText">
-                    25
-                </span>
-            </div>
-
-
-            <label>
-                Stärke
-            </label>
-
-            <input
-                id="brushStrength"
-                type="range"
-                min="0.01"
-                max="1"
-                step="0.01"
-                value="0.25"
-            >
-
-            <div class="small">
-                Stärke:
-                <span id="brushStrengthText">
-                    0.25
-                </span>
-            </div>
-
-
-            <hr>
-
-
-            <h3>
-                TERRAIN-FARBE
-            </h3>
-
-            <div class="colorGrid">
-
-                <div
-                    class="color"
-                    data-color="#3c8f35"
-                    style="background:#3c8f35"
-                ></div>
-
-                <div
-                    class="color"
-                    data-color="#70b84a"
-                    style="background:#70b84a"
-                ></div>
-
-                <div
-                    class="color"
-                    data-color="#9a8148"
-                    style="background:#9a8148"
-                ></div>
-
-                <div
-                    class="color"
-                    data-color="#777777"
-                    style="background:#777777"
-                ></div>
-
-                <div
-                    class="color"
-                    data-color="#d0c58e"
-                    style="background:#d0c58e"
-                ></div>
-
-                <div
-                    class="color"
-                    data-color="#ffffff"
-                    style="background:#ffffff"
-                ></div>
-
-            </div>
-
-        </div>
-
+    <div class="setting">
+        Stärke
+        <span
+            class="settingValue"
+            id="brushStrengthValue">
+            5
+        </span>
     </div>
 
+    <input
+        type="range"
+        id="brushStrength"
+        min="1"
+        max="20"
+        value="5">
 
-    <!-- SCHMUCK -->
-
-    <div
-        id="decoratePanel"
-        style="display:none"
-    >
-
-        <div class="section">
-
-            <h3>
-                SCHMUCK TOOL
-            </h3>
-
-
-            <div id="dropZone">
-
-                GLB hier hineinziehen
-
-                <br>
-
-                oder unten auswählen
-
-            </div>
-
-
-            <button
-                id="chooseModelBtn"
-                class="tool"
-            >
-                📦 GLB AUSWÄHLEN
-            </button>
-
-            <input
-                id="modelInput"
-                type="file"
-                accept=".glb"
-                hidden
-            >
-
-
-            <label>
-                Objektgröße
-            </label>
-
-            <input
-                id="objectScale"
-                type="range"
-                min="0.1"
-                max="5"
-                step="0.1"
-                value="1"
-            >
-
-
-            <label>
-
-                <input
-                    id="randomRotation"
-                    type="checkbox"
-                    checked
-                >
-
-                Zufällige Rotation
-
-            </label>
-
-
-            <label>
-
-                <input
-                    id="randomScale"
-                    type="checkbox"
-                >
-
-                Zufällige Größe
-
-            </label>
-
-
-            <hr>
-
-
-            <div class="small">
-
-                Klicke mit dem Pinsel auf
-                das Terrain.
-
-                <br><br>
-
-                Bei jedem Klick wird
-                ein neues GLB platziert.
-
-            </div>
-
-
-            <hr>
-
-
-            <button
-                id="clearObjects"
-                class="tool"
-            >
-                🗑 ALLE OBJEKTE LÖSCHEN
-            </button>
-
-        </div>
-
+    <div class="setting">
+        Terrain-Farbe
     </div>
 
-
-    <!-- AUSWAHL -->
-
-    <div
-        id="selectPanel"
-        style="display:none"
-    >
-
-        <div class="section">
-
-            <h3>
-                AUSWAHL
-            </h3>
-
-            <div class="small">
-
-                Doppelklick auf ein
-                Objekt.
-
-                <br><br>
-
-                W = Verschieben
-
-                <br>
-
-                E = Drehen
-
-                <br>
-
-                R = Skalieren
-
-            </div>
-
-
-            <hr>
-
-
-            <button
-                id="deleteBtn"
-                class="tool"
-            >
-                🗑 LÖSCHEN
-            </button>
-
-
-            <button
-                id="duplicateBtn"
-                class="tool"
-            >
-                📑 DUPLIZIEREN
-            </button>
-
-        </div>
-
-    </div>
-
-
-</div>
-
-
-<!-- =====================================================
-     RIGHT
-===================================================== -->
-
-<div id="rightbar">
-
-    <div class="section">
-
-        <h3>
-            INSPEKTOR
-        </h3>
-
-
-        <div
-            id="nothingSelected"
-            class="small"
-        >
-            Kein Objekt ausgewählt.
-        </div>
-
-
-        <div
-            id="inspector"
-            style="display:none"
-        >
-
-            <label>
-                Name
-            </label>
-
-            <input
-                id="objectName"
-                type="text"
-            >
-
-
-            <label>
-                Position X
-            </label>
-
-            <input
-                id="posX"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Position Y
-            </label>
-
-            <input
-                id="posY"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Position Z
-            </label>
-
-            <input
-                id="posZ"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Rotation X
-            </label>
-
-            <input
-                id="rotX"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Rotation Y
-            </label>
-
-            <input
-                id="rotY"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Rotation Z
-            </label>
-
-            <input
-                id="rotZ"
-                type="number"
-                step="0.1"
-            >
-
-
-            <label>
-                Skalierung
-            </label>
-
-            <input
-                id="scaleInput"
-                type="number"
-                step="0.1"
-            >
-
-
-            <hr>
-
-
-            <label>
-                Objektfarbe
-            </label>
-
-            <input
-                id="objectColor"
-                type="color"
-                value="#ffffff"
-            >
-
-
-            <hr>
-
-
-            <h3>
-                SCRIPT
-            </h3>
-
-
-            <div class="small">
-
-                Das Script wird im
-                Play-Modus ausgeführt.
-
-                <br><br>
-
-                Verfügbar:
-
-                <br>
-
-                <code>object</code>
-
-                <br>
-
-                <code>THREE</code>
-
-            </div>
-
-
-            <textarea id="scriptInput">
-/* Beispiel */
-
-object.rotation.y += 0.01;
-            </textarea>
-
-
-            <button
-                id="applyScript"
-                class="tool"
-            >
-                📜 SCRIPT ANWENDEN
-            </button>
-
-        </div>
-
-    </div>
-
+    <input
+        type="color"
+        id="terrainColor"
+        value="#ffffff">
 
     <hr>
 
-
-    <div class="section">
-
-        <h3>
-            OBJEKTE
-        </h3>
-
-        <div id="objectList"></div>
-
+    <div class="panelTitle">
+        OBJEKTE
     </div>
 
+    <button
+        class="toolButton"
+        id="deleteObject">
+        🗑 Objekt löschen
+    </button>
+
+    <button
+        class="toolButton"
+        id="duplicateObject">
+        ⧉ Objekt duplizieren
+    </button>
+
+    <button
+        class="toolButton"
+        id="focusObject">
+        ◎ Kamera auf Objekt
+    </button>
 
     <hr>
 
+    <div class="panelTitle">
+        PROJEKT
+    </div>
 
-    <div class="section">
+    <button
+        class="toolButton"
+        id="saveProject">
+        💾 Projekt speichern
+    </button>
 
-        <h3>
-            ENGINE
-        </h3>
+    <button
+        class="toolButton"
+        id="loadProject">
+        📂 Projekt laden
+    </button>
 
-        <div class="small">
+    <button
+        class="toolButton"
+        id="undo">
+        ↶ Undo
+    </button>
 
-            3D-Welt: aktiv
+    <button
+        class="toolButton"
+        id="redo">
+        ↷ Redo
+    </button>
 
-            <br>
+    <hr>
 
-            Chunks: deaktiviert
+    <div
+        style="
+        font-size:11px;
+        color:#89939b;
+        line-height:1.6;
+        ">
+        <b style="color:#ddd">
+        Kamera:
+        </b><br>
+        Hand → Kamera bewegen<br>
+        Mausrad → Zoom<br><br>
 
-            <br>
+        <b style="color:#ddd">
+        Terrain:
+        </b><br>
+        Tool auswählen → klicken/ziehen<br>
+        Kamera bleibt dabei fest.<br><br>
 
-            Terrain: ein großes Mesh
+        <b style="color:#ddd">
+        Scripts:
+        </b><br>
+        Script im Inspector eintragen<br>
+        → PLAY drücken
+    </div>
 
-            <br>
+</div>
 
-            GLB: aktiv
+<!-- =====================================================
+     RIGHT PANEL
+===================================================== -->
 
-            <br>
+<div id="rightPanel">
 
-            Terrain Painting: aktiv
+    <div class="inspectorTitle">
+        INSPECTOR
+    </div>
 
-            <br>
+    <div id="noObject">
+        Kein Objekt ausgewählt.<br><br>
+        Erstelle z. B. einen Cube oder eine Kugel und klicke ihn anschließend mit AUSWAHL an.
+    </div>
 
-            Schmuck-Pinsel: aktiv
+    <div id="objectInspector">
+
+        <div class="fieldTitle">
+            NAME
+        </div>
+
+        <input
+            type="text"
+            id="objectName"
+            value="Objekt">
+
+        <div class="fieldTitle">
+            POSITION X / Y / Z
+        </div>
+
+        <div class="vec">
+
+            <input
+                type="number"
+                step=".1"
+                id="posX">
+
+            <input
+                type="number"
+                step=".1"
+                id="posY">
+
+            <input
+                type="number"
+                step=".1"
+                id="posZ">
 
         </div>
+
+        <div class="fieldTitle">
+            ROTATION X / Y / Z
+        </div>
+
+        <div class="vec">
+
+            <input
+                type="number"
+                step="1"
+                id="rotX">
+
+            <input
+                type="number"
+                step="1"
+                id="rotY">
+
+            <input
+                type="number"
+                step="1"
+                id="rotZ">
+
+        </div>
+
+        <div class="fieldTitle">
+            SKALIERUNG X / Y / Z
+        </div>
+
+        <div class="vec">
+
+            <input
+                type="number"
+                step=".01"
+                id="scaleX">
+
+            <input
+                type="number"
+                step=".01"
+                id="scaleY">
+
+            <input
+                type="number"
+                step=".01"
+                id="scaleZ">
+
+        </div>
+
+        <button
+            class="actionButton"
+            id="applyTransform">
+            Änderungen übernehmen
+        </button>
+
+        <hr>
+
+        <div class="fieldTitle">
+            OBJEKT-SCRIPT
+        </div>
+
+        <textarea
+            id="scriptEditor"
+            spellcheck="false"
+            placeholder="// Beispiel:
+
+object.rotation.y += delta;
+
+// object = dein Objekt
+// THREE = Three.js
+// delta = Zeit seit letztem Frame"></textarea>
+
+        <button
+            class="actionButton"
+            id="saveScript">
+            📜 Script speichern
+        </button>
+
+        <button
+            class="actionButton"
+            id="testScript">
+            ▶ Script testen
+        </button>
+
+        <hr>
+
+        <button
+            class="actionButton"
+            id="deleteInspector">
+            🗑 Löschen
+        </button>
 
     </div>
 
 </div>
 
-
 <!-- =====================================================
-     VIEWPORT
+     STATUS
 ===================================================== -->
 
-<div id="viewport"></div>
-
+<div id="status">
+    Hand-Modus | Keine WASD-Steuerung
+</div>
 
 <div id="brushCursor"></div>
 
-
-<div id="status">
-    Bereit
+<div id="playIndicator">
+    ▶ PLAY-MODUS
 </div>
 
+<div id="modal">
 
-<div id="playMode">
+    <div class="modalBox">
 
-    <div id="playLabel">
-        ▶ PLAY MODE
+        <h2 id="modalTitle">
+            GHOST 3D
+        </h2>
+
+        <div id="modalText"></div>
+
+        <button
+            id="modalClose"
+            style="
+            background:#d49a18;
+            color:#111;
+            ">
+            OK
+        </button>
+
     </div>
 
 </div>
 
+<input
+    type="file"
+    id="projectFile"
+    accept=".json"
+    style="display:none">
 
 <!-- =====================================================
-     THREE.JS
+     THREE
 ===================================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-
+<script type="importmap">
+{
+    "imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
 
 <script type="module">
 
+import * as THREE from "three";
+
 import {
     OrbitControls
-}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js";
-
-
-import {
-    GLTFLoader
-}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
-
+} from
+"three/addons/controls/OrbitControls.js";
 
 import {
     TransformControls
-}
-from
-"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/TransformControls.js";
-
-
-/* =====================================================
-   THREE
-===================================================== */
-
-const THREE =
-window.THREE;
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const viewport =
-document.getElementById(
-    "viewport"
-);
-
+} from
+"three/addons/controls/TransformControls.js";
 
 /* =====================================================
    SCENE
 ===================================================== */
 
 const scene =
-new THREE.Scene();
-
+    new THREE.Scene();
 
 scene.background =
-new THREE.Color(
-    0x79caff
-);
-
+    new THREE.Color(
+        0x75caff
+    );
 
 scene.fog =
-new THREE.Fog(
-    0x79caff,
-    500,
-    2200
-);
-
+    new THREE.Fog(
+        0x75caff,
+        700,
+        2200
+    );
 
 /* =====================================================
    CAMERA
 ===================================================== */
 
 const camera =
-new THREE.PerspectiveCamera(
-    75,
-    viewport.clientWidth /
-    viewport.clientHeight,
-    0.1,
-    5000
-);
-
+    new THREE.PerspectiveCamera(
+        65,
+        innerWidth / innerHeight,
+        .1,
+        5000
+    );
 
 camera.position.set(
-    180,
-    180,
-    180
+    420,
+    300,
+    420
 );
-
 
 /* =====================================================
    RENDERER
 ===================================================== */
 
 const renderer =
-new THREE.WebGLRenderer({
-    antialias:true
-});
+    new THREE.WebGLRenderer({
+        antialias:true
+    });
 
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
 
 renderer.setPixelRatio(
     Math.min(
-        window.devicePixelRatio,
+        devicePixelRatio,
         1.5
     )
 );
 
-
-renderer.setSize(
-    viewport.clientWidth,
-    viewport.clientHeight
-);
-
-
 renderer.shadowMap.enabled=true;
 
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
 
-viewport.appendChild(
-    renderer.domElement
-);
+renderer.outputColorSpace =
+    THREE.SRGBColorSpace;
 
+document
+    .getElementById("app")
+    .appendChild(renderer.domElement);
 
 /* =====================================================
-   CAMERA CONTROLS
+   LIGHT
+===================================================== */
+
+const ambient =
+    new THREE.AmbientLight(
+        0xffffff,
+        1.4
+    );
+
+scene.add(ambient);
+
+const sun =
+    new THREE.DirectionalLight(
+        0xffffff,
+        1.8
+    );
+
+sun.position.set(
+    400,
+    800,
+    300
+);
+
+sun.castShadow=true;
+
+scene.add(sun);
+
+/* =====================================================
+   ORBIT CAMERA
 ===================================================== */
 
 const controls =
-new OrbitControls(
-    camera,
-    renderer.domElement
-);
-
+    new OrbitControls(
+        camera,
+        renderer.domElement
+    );
 
 controls.enableDamping=true;
 
-controls.dampingFactor=0.08;
+controls.dampingFactor=.08;
 
 controls.target.set(
     0,
@@ -1236,254 +1118,532 @@ controls.target.set(
     0
 );
 
+controls.minDistance=10;
+
+controls.maxDistance=1800;
+
+controls.maxPolarAngle =
+    Math.PI*.49;
+
+/*
+    WICHTIG:
+
+    Die Kamera darf nur im Hand-Modus
+    bedient werden.
+*/
+
+controls.enabled=true;
 
 /* =====================================================
-   LIGHT
+   TRANSFORM CONTROLS
 ===================================================== */
 
-const ambient =
-new THREE.HemisphereLight(
-    0xffffff,
-    0x445544,
-    1.7
+const transform =
+    new TransformControls(
+        camera,
+        renderer.domElement
+    );
+
+transform.setSize(.8);
+
+scene.add(transform);
+
+transform.addEventListener(
+    "dragging-changed",
+    event=>{
+
+        if(
+            currentTool==="select" ||
+            currentTool==="move" ||
+            currentTool==="rotate" ||
+            currentTool==="scale"
+        ){
+
+            controls.enabled =
+                !event.value &&
+                currentTool==="hand";
+        }
+    }
 );
-
-
-scene.add(
-    ambient
-);
-
-
-const sun =
-new THREE.DirectionalLight(
-    0xffffff,
-    2
-);
-
-
-sun.position.set(
-    400,
-    700,
-    300
-);
-
-
-sun.castShadow=true;
-
-
-scene.add(
-    sun
-);
-
 
 /* =====================================================
    TERRAIN
 ===================================================== */
 
-const TERRAIN_SIZE =
-800;
+const TERRAIN_SIZE=1800;
 
-
-const SEGMENTS =
-180;
-
+const SEGMENTS=90;
 
 const terrainGeometry =
-new THREE.PlaneGeometry(
-    TERRAIN_SIZE,
-    TERRAIN_SIZE,
-    SEGMENTS,
-    SEGMENTS
-);
-
+    new THREE.PlaneGeometry(
+        TERRAIN_SIZE,
+        TERRAIN_SIZE,
+        SEGMENTS,
+        SEGMENTS
+    );
 
 terrainGeometry.rotateX(
     -Math.PI/2
 );
 
+const terrainMaterial =
+    new THREE.MeshStandardMaterial({
 
-const position =
-terrainGeometry.attributes.position;
+        color:0xffffff,
 
+        roughness:.9,
 
-const vertexCount =
-position.count;
+        metalness:0,
 
+        vertexColors:true
+    });
 
-const heights =
-new Float32Array(
-    vertexCount
-);
+const terrain =
+    new THREE.Mesh(
+        terrainGeometry,
+        terrainMaterial
+    );
 
+terrain.receiveShadow=true;
 
-const colors =
-new Float32Array(
-    vertexCount*3
-);
+terrain.userData.isTerrain=true;
 
+scene.add(terrain);
 
 /* =====================================================
-   INITIAL TERRAIN
+   TERRAIN COLORS
 ===================================================== */
 
-function initialHeight(
-    x,
-    z
-){
+const terrainPositions =
+    terrainGeometry.attributes.position;
 
-    let h=0;
-
-
-    h +=
-        Math.sin(x*0.002) *
-        Math.cos(z*0.002) *
-        35;
-
-
-    h +=
-        Math.sin(
-            x*0.006+
-            z*0.004
-        ) * 12;
-
-
-    h +=
-        Math.cos(
-            x*0.011-
-            z*0.009
-        ) * 5;
-
-
-    h +=
-        Math.sin(x*0.00065) *
-        Math.cos(z*0.0008) *
-        55;
-
-
-    return h+15;
-
-}
-
+const terrainColors =
+    new Float32Array(
+        terrainPositions.count*3
+    );
 
 for(
     let i=0;
-    i<vertexCount;
+    i<terrainPositions.count;
     i++
 ){
 
-    const x =
-        position.getX(i);
-
-    const z =
-        position.getZ(i);
-
-
-    const h =
-        initialHeight(
-            x,
-            z
-        );
-
-
-    heights[i]=h;
-
-
-    position.setY(
-        i,
-        h
-    );
-
-
-    colors[i*3]=0.30;
-
-    colors[i*3+1]=0.60;
-
-    colors[i*3+2]=0.25;
-
+    terrainColors[i*3]=1;
+    terrainColors[i*3+1]=1;
+    terrainColors[i*3+2]=1;
 }
-
 
 terrainGeometry.setAttribute(
     "color",
     new THREE.BufferAttribute(
-        colors,
+        terrainColors,
         3
     )
 );
 
-
-terrainGeometry.computeVertexNormals();
-
-
-const terrainMaterial =
-new THREE.MeshStandardMaterial({
-
-    vertexColors:true,
-
-    roughness:1,
-
-    metalness:0
-
-});
-
-
-const terrain =
-new THREE.Mesh(
-    terrainGeometry,
-    terrainMaterial
-);
-
-
-terrain.receiveShadow=true;
-
-
-scene.add(
-    terrain
-);
-
-
 /* =====================================================
-   RAYCAST
+   WATER
 ===================================================== */
 
-const raycaster =
-new THREE.Raycaster();
+const waterGeometry =
+    new THREE.PlaneGeometry(
+        TERRAIN_SIZE,
+        TERRAIN_SIZE
+    );
 
+waterGeometry.rotateX(
+    -Math.PI/2
+);
+
+const waterMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color:0x1677d2,
+
+        transparent:true,
+
+        opacity:.78,
+
+        roughness:.15,
+
+        metalness:.05
+    });
+
+const water =
+    new THREE.Mesh(
+        waterGeometry,
+        waterMaterial
+    );
+
+water.position.y=-4;
+
+water.receiveShadow=true;
+
+scene.add(water);
+
+/* =====================================================
+   TOOLS
+===================================================== */
+
+let currentTool="hand";
+
+let brushSize=30;
+
+let brushStrength=5;
+
+let painting=false;
+
+let brushPoint =
+    new THREE.Vector3();
+
+const raycaster =
+    new THREE.Raycaster();
 
 const mouse =
-new THREE.Vector2();
+    new THREE.Vector2();
 
+/* =====================================================
+   EDITOR OBJECTS
+===================================================== */
 
-function getTerrainPoint(
-    event
-){
+const objects=[];
+
+let selected=null;
+
+/* =====================================================
+   TOOL SET
+===================================================== */
+
+function setTool(tool){
+
+    currentTool=tool;
+
+    /*
+       Kamera nur im Hand-Modus aktiv.
+    */
+
+    controls.enabled =
+        tool==="hand";
+
+    /*
+       Transform ausblenden,
+       wenn kein Objekt-Transform.
+    */
+
+    if(
+        tool!=="select" &&
+        tool!=="move" &&
+        tool!=="rotate" &&
+        tool!=="scale"
+    ){
+
+        transform.detach();
+    }
+
+    document
+        .querySelectorAll(".topButton")
+        .forEach(
+            button=>{
+                button.classList.remove(
+                    "active"
+                );
+            }
+        );
+
+    document
+        .querySelectorAll(".toolButton")
+        .forEach(
+            button=>{
+                button.classList.remove(
+                    "active"
+                );
+            }
+        );
+
+    const map={
+        hand:[
+            "handTool",
+            "handSide"
+        ],
+
+        raise:[
+            "raiseTool",
+            "raiseSide"
+        ],
+
+        lower:[
+            "lowerTool",
+            "lowerSide"
+        ],
+
+        smooth:[
+            "smoothTool",
+            "smoothSide"
+        ],
+
+        paint:[
+            "paintTool",
+            "paintSide"
+        ],
+
+        select:[
+            "selectTool"
+        ],
+
+        move:[
+            "moveTool"
+        ],
+
+        rotate:[
+            "rotateTool"
+        ],
+
+        scale:[
+            "scaleTool"
+        ]
+    };
+
+    if(map[tool]){
+
+        map[tool].forEach(
+            id=>{
+                const element=
+                    document.getElementById(id);
+
+                if(element)
+                    element.classList.add(
+                        "active"
+                    );
+            }
+        );
+    }
+
+    document.getElementById(
+        "status"
+    ).innerText =
+        tool==="hand"
+        ? "Hand-Modus | Kamera frei"
+        : tool==="raise"
+        ? "Erhöhen | Kamera gesperrt"
+        : tool==="lower"
+        ? "Senken | Kamera gesperrt"
+        : tool==="smooth"
+        ? "Glätten | Kamera gesperrt"
+        : tool==="paint"
+        ? "Farbe | Kamera gesperrt"
+        : tool==="select"
+        ? "Auswahl"
+        : "Transform: "+tool;
+
+    document.getElementById(
+        "brushCursor"
+    ).style.display =
+        (
+            tool==="raise" ||
+            tool==="lower" ||
+            tool==="smooth" ||
+            tool==="paint"
+        )
+        ? "block"
+        : "none";
+
+    if(
+        tool==="move" &&
+        selected
+    ){
+
+        transform.attach(
+            selected
+        );
+
+        transform.setMode(
+            "translate"
+        );
+    }
+
+    if(
+        tool==="rotate" &&
+        selected
+    ){
+
+        transform.attach(
+            selected
+        );
+
+        transform.setMode(
+            "rotate"
+        );
+    }
+
+    if(
+        tool==="scale" &&
+        selected
+    ){
+
+        transform.attach(
+            selected
+        );
+
+        transform.setMode(
+            "scale"
+        );
+    }
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document.getElementById(
+    "handTool"
+).onclick=()=>{
+    setTool("hand");
+};
+
+document.getElementById(
+    "handSide"
+).onclick=()=>{
+    setTool("hand");
+};
+
+document.getElementById(
+    "raiseTool"
+).onclick=()=>{
+    setTool("raise");
+};
+
+document.getElementById(
+    "raiseSide"
+).onclick=()=>{
+    setTool("raise");
+};
+
+document.getElementById(
+    "lowerTool"
+).onclick=()=>{
+    setTool("lower");
+};
+
+document.getElementById(
+    "lowerSide"
+).onclick=()=>{
+    setTool("lower");
+};
+
+document.getElementById(
+    "smoothTool"
+).onclick=()=>{
+    setTool("smooth");
+};
+
+document.getElementById(
+    "smoothSide"
+).onclick=()=>{
+    setTool("smooth");
+};
+
+document.getElementById(
+    "paintTool"
+).onclick=()=>{
+    setTool("paint");
+};
+
+document.getElementById(
+    "paintSide"
+).onclick=()=>{
+    setTool("paint");
+};
+
+document.getElementById(
+    "selectTool"
+).onclick=()=>{
+    setTool("select");
+};
+
+document.getElementById(
+    "moveTool"
+).onclick=()=>{
+    setTool("move");
+};
+
+document.getElementById(
+    "rotateTool"
+).onclick=()=>{
+    setTool("rotate");
+};
+
+document.getElementById(
+    "scaleTool"
+).onclick=()=>{
+    setTool("scale");
+};
+
+/* =====================================================
+   BRUSH SETTINGS
+===================================================== */
+
+document.getElementById(
+    "brushSize"
+).oninput=e=>{
+
+    brushSize=
+        Number(e.target.value);
+
+    document.getElementById(
+        "brushSizeValue"
+    ).innerText=
+        brushSize;
+
+    updateBrushCursor();
+};
+
+document.getElementById(
+    "brushStrength"
+).oninput=e=>{
+
+    brushStrength=
+        Number(e.target.value);
+
+    document.getElementById(
+        "brushStrengthValue"
+    ).innerText=
+        brushStrength;
+};
+
+/* =====================================================
+   MOUSE POSITION
+===================================================== */
+
+function updateMouse(event){
 
     const rect =
-        renderer.domElement
-        .getBoundingClientRect();
-
+        renderer
+            .domElement
+            .getBoundingClientRect();
 
     mouse.x =
         (
-            (event.clientX -
-            rect.left) /
+            (event.clientX-rect.left)/
             rect.width
-        ) * 2 - 1;
-
+        )*2-1;
 
     mouse.y =
         -(
-            (event.clientY -
-            rect.top) /
+            (event.clientY-rect.top)/
             rect.height
-        ) * 2 + 1;
+        )*2+1;
+}
 
+/* =====================================================
+   TERRAIN HIT
+===================================================== */
+
+function terrainHit(){
 
     raycaster.setFromCamera(
         mouse,
         camera
     );
-
 
     const hits =
         raycaster.intersectObject(
@@ -1491,2433 +1651,1666 @@ function getTerrainPoint(
             false
         );
 
-
     if(hits.length)
-        return hits[0].point;
-
+        return hits[0];
 
     return null;
-
 }
-
-
-/* =====================================================
-   MAP TOOL
-===================================================== */
-
-let currentTool =
-    "raise";
-
-
-let currentTerrainColor =
-    "#3c8f35";
-
-
-let painting =
-    false;
-
-
-function setMapTool(
-    tool
-){
-
-    currentTool =
-        tool;
-
-
-    document
-        .querySelectorAll(
-            "#mapPanel button"
-        )
-        .forEach(
-            b=>{
-                b.classList.remove(
-                    "active"
-                );
-            }
-        );
-
-
-    if(tool==="raise"){
-
-        document
-            .getElementById(
-                "raiseBtn"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-
-    if(tool==="lower"){
-
-        document
-            .getElementById(
-                "lowerBtn"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-
-    if(tool==="paint"){
-
-        document
-            .getElementById(
-                "paintTerrainBtn"
-            )
-            .classList.add(
-                "active"
-            );
-
-    }
-
-}
-
-
-document
-    .getElementById(
-        "raiseBtn"
-    )
-    .onclick=()=>{
-        setMapTool("raise");
-    };
-
-
-document
-    .getElementById(
-        "lowerBtn"
-    )
-    .onclick=()=>{
-        setMapTool("lower");
-    };
-
-
-document
-    .getElementById(
-        "paintTerrainBtn"
-    )
-    .onclick=()=>{
-        setMapTool("paint");
-    };
-
-
-/* =====================================================
-   SCULPT
-===================================================== */
-
-function sculptTerrain(
-    point,
-    direction
-){
-
-    const brushSize =
-        Number(
-            document.getElementById(
-                "brushSize"
-            ).value
-        );
-
-
-    const strength =
-        Number(
-            document.getElementById(
-                "brushStrength"
-            ).value
-        );
-
-
-    const centerX =
-        Math.round(
-            (
-                (point.x +
-                TERRAIN_SIZE/2) /
-                TERRAIN_SIZE
-            ) * SEGMENTS
-        );
-
-
-    const centerZ =
-        Math.round(
-            (
-                (point.z +
-                TERRAIN_SIZE/2) /
-                TERRAIN_SIZE
-            ) * SEGMENTS
-        );
-
-
-    const radius =
-        brushSize /
-        TERRAIN_SIZE *
-        SEGMENTS;
-
-
-    const count =
-        SEGMENTS+1;
-
-
-    for(
-        let z=
-            Math.floor(
-                centerZ-radius
-            );
-
-        z<=
-            Math.ceil(
-                centerZ+radius
-            );
-
-        z++
-    ){
-
-        for(
-            let x=
-                Math.floor(
-                    centerX-radius
-                );
-
-            x<=
-                Math.ceil(
-                    centerX+radius
-                );
-
-            x++
-        ){
-
-            if(
-                x<0 ||
-                z<0 ||
-                x>=count ||
-                z>=count
-            )
-                continue;
-
-
-            const dx =
-                x-centerX;
-
-
-            const dz =
-                z-centerZ;
-
-
-            const distance =
-                Math.sqrt(
-                    dx*dx+
-                    dz*dz
-                );
-
-
-            if(
-                distance>radius
-            )
-                continue;
-
-
-            const falloff =
-                1 -
-                distance/radius;
-
-
-            const index =
-                z*count+x;
-
-
-            heights[index] +=
-                direction *
-                strength *
-                falloff *
-                2;
-
-
-            heights[index] =
-                Math.max(
-                    -60,
-                    Math.min(
-                        160,
-                        heights[index]
-                    )
-                );
-
-
-            position.setY(
-                index,
-                heights[index]
-            );
-
-        }
-
-    }
-
-
-    position.needsUpdate=true;
-
-
-    terrainGeometry
-        .computeVertexNormals();
-
-}
-
-
-/* =====================================================
-   TERRAIN PAINT
-===================================================== */
-
-function paintTerrain(
-    point
-){
-
-    const brushSize =
-        Number(
-            document.getElementById(
-                "brushSize"
-            ).value
-        );
-
-
-    const strength =
-        Number(
-            document.getElementById(
-                "brushStrength"
-            ).value
-        );
-
-
-    const centerX =
-        Math.round(
-            (
-                (point.x +
-                TERRAIN_SIZE/2) /
-                TERRAIN_SIZE
-            ) * SEGMENTS
-        );
-
-
-    const centerZ =
-        Math.round(
-            (
-                (point.z +
-                TERRAIN_SIZE/2) /
-                TERRAIN_SIZE
-            ) * SEGMENTS
-        );
-
-
-    const radius =
-        brushSize /
-        TERRAIN_SIZE *
-        SEGMENTS;
-
-
-    const count =
-        SEGMENTS+1;
-
-
-    const target =
-        new THREE.Color(
-            currentTerrainColor
-        );
-
-
-    for(
-        let z=
-            Math.floor(
-                centerZ-radius
-            );
-
-        z<=
-            Math.ceil(
-                centerZ+radius
-            );
-
-        z++
-    ){
-
-        for(
-            let x=
-                Math.floor(
-                    centerX-radius
-                );
-
-            x<=
-                Math.ceil(
-                    centerX+radius
-                );
-
-            x++
-        ){
-
-            if(
-                x<0 ||
-                z<0 ||
-                x>=count ||
-                z>=count
-            )
-                continue;
-
-
-            const dx =
-                x-centerX;
-
-
-            const dz =
-                z-centerZ;
-
-
-            const distance =
-                Math.sqrt(
-                    dx*dx+
-                    dz*dz
-                );
-
-
-            if(
-                distance>radius
-            )
-                continue;
-
-
-            const falloff =
-                1-distance/radius;
-
-
-            const amount =
-                strength*falloff;
-
-
-            const index =
-                z*count+x;
-
-
-            colors[index*3] =
-                THREE.MathUtils.lerp(
-                    colors[index*3],
-                    target.r,
-                    amount
-                );
-
-
-            colors[index*3+1] =
-                THREE.MathUtils.lerp(
-                    colors[index*3+1],
-                    target.g,
-                    amount
-                );
-
-
-            colors[index*3+2] =
-                THREE.MathUtils.lerp(
-                    colors[index*3+2],
-                    target.b,
-                    amount
-                );
-
-        }
-
-    }
-
-
-    terrainGeometry
-        .attributes
-        .color
-        .needsUpdate=true;
-
-}
-
-
-/* =====================================================
-   BRUSH
-===================================================== */
-
-function useBrush(
-    event
-){
-
-    const point =
-        getTerrainPoint(
-            event
-        );
-
-
-    if(!point)
-        return;
-
-
-    if(
-        currentTool==="raise"
-    ){
-
-        sculptTerrain(
-            point,
-            1
-        );
-
-    }
-
-
-    if(
-        currentTool==="lower"
-    ){
-
-        sculptTerrain(
-            point,
-            -1
-        );
-
-    }
-
-
-    if(
-        currentTool==="paint"
-    ){
-
-        paintTerrain(
-            point
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   MOUSE EVENTS
-===================================================== */
-
-renderer.domElement
-    .addEventListener(
-        "pointerdown",
-        event=>{
-
-            if(
-                currentTool==="raise" ||
-                currentTool==="lower" ||
-                currentTool==="paint"
-            ){
-
-                painting=true;
-
-                useBrush(event);
-
-            }
-
-        }
-    );
-
-
-renderer.domElement
-    .addEventListener(
-        "pointermove",
-        event=>{
-
-            updateBrush(
-                event
-            );
-
-
-            if(
-                painting &&
-                (
-                    currentTool==="raise" ||
-                    currentTool==="lower" ||
-                    currentTool==="paint"
-                )
-            ){
-
-                useBrush(event);
-
-            }
-
-        }
-    );
-
-
-window.addEventListener(
-    "pointerup",
-    ()=>{
-        painting=false;
-    }
-);
-
 
 /* =====================================================
    BRUSH CURSOR
 ===================================================== */
 
-function updateBrush(
-    event
-){
-
-    if(
-        currentTool!=="raise" &&
-        currentTool!=="lower" &&
-        currentTool!=="paint" &&
-        currentTool!=="decorate"
-    ){
-
-        document
-            .getElementById(
-                "brushCursor"
-            )
-            .style.display="none";
-
-        return;
-
-    }
-
+function updateBrushCursor(){
 
     const cursor =
         document.getElementById(
             "brushCursor"
         );
 
+    cursor.style.width=
+        brushSize*2+"px";
 
-    cursor.style.display=
-        "block";
+    cursor.style.height=
+        brushSize*2+"px";
+}
 
+renderer.domElement.addEventListener(
+    "pointermove",
+    event=>{
 
-    cursor.style.left=
-        event.clientX+"px";
+        updateMouse(event);
 
+        if(
+            currentTool==="raise" ||
+            currentTool==="lower" ||
+            currentTool==="smooth" ||
+            currentTool==="paint"
+        ){
 
-    cursor.style.top=
-        event.clientY+"px";
+            const hit=
+                terrainHit();
 
+            if(hit){
 
-    const size =
-        Number(
+                const p=
+                    hit.point;
+
+                brushPoint.copy(p);
+
+                const rect=
+                    renderer
+                        .domElement
+                        .getBoundingClientRect();
+
+                const screen =
+                    p.clone()
+                     .project(camera);
+
+                const sx=
+                    rect.left+
+                    (screen.x+1)/2*
+                    rect.width;
+
+                const sy=
+                    rect.top+
+                    (-screen.y+1)/2*
+                    rect.height;
+
+                const cursor=
+                    document.getElementById(
+                        "brushCursor"
+                    );
+
+                cursor.style.left=
+                    sx+"px";
+
+                cursor.style.top=
+                    sy+"px";
+            }
+        }
+
+        if(
+            painting &&
+            currentTool!=="hand"
+        ){
+
+            editTerrain();
+        }
+    }
+);
+
+/* =====================================================
+   TERRAIN EDIT
+===================================================== */
+
+function editTerrain(){
+
+    const hit=
+        terrainHit();
+
+    if(!hit)
+        return;
+
+    const point=
+        hit.point;
+
+    const positions=
+        terrainGeometry.attributes.position;
+
+    const radius=
+        brushSize;
+
+    const strength=
+        brushStrength*.18;
+
+    const color=
+        new THREE.Color(
             document.getElementById(
-                "brushSize"
+                "terrainColor"
             ).value
         );
 
+    for(
+        let i=0;
+        i<positions.count;
+        i++
+    ){
 
-    const visualSize =
-        Math.max(
-            20,
-            size*2
-        );
+        const x=
+            positions.getX(i);
 
+        const z=
+            positions.getZ(i);
 
-    cursor.style.width=
-        visualSize+"px";
+        const dx=
+            x-point.x;
 
+        const dz=
+            z-point.z;
 
-    cursor.style.height=
-        visualSize+"px";
-
-}
-
-
-/* =====================================================
-   TERRAIN COLORS
-===================================================== */
-
-document
-    .querySelectorAll(
-        ".color"
-    )
-    .forEach(
-        color=>{
-
-            color.addEventListener(
-                "click",
-                ()=>{
-
-                    currentTerrainColor =
-                        color.dataset.color;
-
-                }
+        const distance=
+            Math.sqrt(
+                dx*dx+
+                dz*dz
             );
 
+        if(
+            distance>radius
+        )
+            continue;
+
+        const falloff=
+            Math.pow(
+                1-distance/radius,
+                2
+            );
+
+        if(
+            currentTool==="raise"
+        ){
+
+            positions.setY(
+                i,
+                positions.getY(i)+
+                strength*
+                falloff
+            );
         }
-    );
 
+        if(
+            currentTool==="lower"
+        ){
 
-/* =====================================================
-   SLIDERS
-===================================================== */
+            positions.setY(
+                i,
+                positions.getY(i)-
+                strength*
+                falloff
+            );
+        }
 
-document
-    .getElementById(
-        "brushSize"
-    )
-    .addEventListener(
-        "input",
-        event=>{
+        if(
+            currentTool==="smooth"
+        ){
 
-            document
-                .getElementById(
-                    "brushSizeText"
+            const y=
+                positions.getY(i);
+
+            const target=
+                0;
+
+            positions.setY(
+                i,
+                THREE.MathUtils.lerp(
+                    y,
+                    target,
+                    .015*
+                    falloff
                 )
-                .textContent =
-                    event.target.value;
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "brushStrength"
-    )
-    .addEventListener(
-        "input",
-        event=>{
-
-            document
-                .getElementById(
-                    "brushStrengthText"
-                )
-                .textContent =
-                    event.target.value;
-
-        }
-    );
-
-
-/* =====================================================
-   GLB
-===================================================== */
-
-const loader =
-    new GLTFLoader();
-
-
-let sourceModel =
-    null;
-
-
-let objectCounter =
-    0;
-
-
-const objects =
-    [];
-
-
-function removeTextures(
-    root
-){
-
-    root.traverse(
-        child=>{
-
-            if(
-                !child.isMesh
-            )
-                return;
-
-
-            child.material =
-                new THREE.MeshStandardMaterial({
-
-                    color:0xffffff,
-
-                    roughness:.85,
-
-                    metalness:0
-
-                });
-
-
-            child.castShadow=true;
-
-            child.receiveShadow=true;
-
-        }
-    );
-
-}
-
-
-function loadModel(
-    file
-){
-
-    if(!file)
-        return;
-
-
-    const url =
-        URL.createObjectURL(
-            file
-        );
-
-
-    loader.load(
-
-        url,
-
-        gltf=>{
-
-            sourceModel =
-                gltf.scene;
-
-
-            removeTextures(
-                sourceModel
             );
-
-
-            sourceModel.visible=false;
-
-
-            scene.add(
-                sourceModel
-            );
-
-
-            document
-                .getElementById(
-                    "status"
-                )
-                .textContent =
-                    "GLB geladen: "+
-                    file.name;
-
-
-            URL.revokeObjectURL(
-                url
-            );
-
-        },
-
-        undefined,
-
-        error=>{
-
-            console.error(
-                error
-            );
-
-
-            alert(
-                "GLB konnte nicht geladen werden."
-            );
-
-
-            URL.revokeObjectURL(
-                url
-            );
-
         }
 
-    );
+        if(
+            currentTool==="paint"
+        ){
 
-}
-
-
-/* =====================================================
-   GLB BUTTONS
-===================================================== */
-
-document
-    .getElementById(
-        "importBtn"
-    )
-    .onclick=()=>{
-
-        document
-            .getElementById(
-                "glbInput"
-            )
-            .click();
-
-    };
-
-
-document
-    .getElementById(
-        "glbInput"
-    )
-    .addEventListener(
-        "change",
-        event=>{
-
-            if(
-                event.target.files[0]
-            ){
-
-                loadModel(
-                    event.target.files[0]
+            const old=
+                new THREE.Color(
+                    terrainColors[i*3],
+                    terrainColors[i*3+1],
+                    terrainColors[i*3+2]
                 );
 
-            }
+            old.lerp(
+                color,
+                .12*falloff
+            );
 
+            terrainColors[i*3]=old.r;
+            terrainColors[i*3+1]=old.g;
+            terrainColors[i*3+2]=old.b;
         }
-    );
-
-
-document
-    .getElementById(
-        "chooseModelBtn"
-    )
-    .onclick=()=>{
-
-        document
-            .getElementById(
-                "modelInput"
-            )
-            .click();
-
-    };
-
-
-document
-    .getElementById(
-        "modelInput"
-    )
-    .addEventListener(
-        "change",
-        event=>{
-
-            if(
-                event.target.files[0]
-            ){
-
-                loadModel(
-                    event.target.files[0]
-                );
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   SCHMUCK TOOL
-===================================================== */
-
-document
-    .getElementById(
-        "decorateBtn"
-    )
-    .onclick=()=>{
-
-        currentTool="decorate";
-
-
-        document
-            .getElementById(
-                "mapPanel"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "decoratePanel"
-            )
-            .style.display=
-                "block";
-
-
-        document
-            .getElementById(
-                "selectPanel"
-            )
-            .style.display=
-                "none";
-
-    };
-
-
-/* =====================================================
-   MAP BUTTON
-===================================================== */
-
-document
-    .getElementById(
-        "mapBtn"
-    )
-    .onclick=()=>{
-
-        setMapTool(
-            "raise"
-        );
-
-
-        document
-            .getElementById(
-                "mapPanel"
-            )
-            .style.display=
-                "block";
-
-
-        document
-            .getElementById(
-                "decoratePanel"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "selectPanel"
-            )
-            .style.display=
-                "none";
-
-    };
-
-
-/* =====================================================
-   SELECT BUTTON
-===================================================== */
-
-document
-    .getElementById(
-        "selectBtn"
-    )
-    .onclick=()=>{
-
-        currentTool=
-            "select";
-
-
-        document
-            .getElementById(
-                "mapPanel"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "decoratePanel"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "selectPanel"
-            )
-            .style.display=
-                "block";
-
-
-        document
-            .getElementById(
-                "brushCursor"
-            )
-            .style.display=
-                "none";
-
-    };
-
-
-/* =====================================================
-   PLACE OBJECT
-===================================================== */
-
-function placeObject(
-    event
-){
-
-    if(!sourceModel){
-
-        alert(
-            "Bitte zuerst ein GLB importieren."
-        );
-
-        return;
-
     }
 
+    positions.needsUpdate=true;
 
-    const point =
-        getTerrainPoint(
-            event
+    terrainGeometry
+        .getAttribute("color")
+        .needsUpdate=true;
+
+    terrainGeometry.computeVertexNormals();
+}
+
+/* =====================================================
+   TERRAIN MOUSE
+===================================================== */
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    event=>{
+
+        if(event.button!==0)
+            return;
+
+        if(
+            currentTool==="raise" ||
+            currentTool==="lower" ||
+            currentTool==="smooth" ||
+            currentTool==="paint"
+        ){
+
+            painting=true;
+
+            editTerrain();
+        }
+
+        if(
+            currentTool==="select"
+        ){
+
+            selectAtMouse();
+        }
+    }
+);
+
+window.addEventListener(
+    "pointerup",
+    ()=>{
+
+        if(painting){
+
+            painting=false;
+
+            saveHistory();
+        }
+    }
+);
+
+/* =====================================================
+   CREATE OBJECT
+===================================================== */
+
+function addPrimitive(
+    type
+){
+
+    let geometry;
+
+    if(type==="cube"){
+
+        geometry=
+            new THREE.BoxGeometry(
+                30,
+                30,
+                30
+            );
+    }
+
+    if(type==="sphere"){
+
+        geometry=
+            new THREE.SphereGeometry(
+                18,
+                32,
+                20
+            );
+    }
+
+    if(type==="cylinder"){
+
+        geometry=
+            new THREE.CylinderGeometry(
+                15,
+                15,
+                35,
+                32
+            );
+    }
+
+    const material=
+        new THREE.MeshStandardMaterial({
+            color:0xb5b5b5,
+            roughness:.65
+        });
+
+    const object=
+        new THREE.Mesh(
+            geometry,
+            material
         );
 
+    object.position.set(
+        controls.target.x,
+        terrainHeightAt(
+            controls.target.x,
+            controls.target.z
+        )+
+        (
+            type==="sphere"
+            ? 18
+            : type==="cylinder"
+            ? 17
+            : 15
+        ),
+        controls.target.z
+    );
 
-    if(!point)
+    object.castShadow=true;
+
+    object.receiveShadow=true;
+
+    object.userData.editorObject=true;
+
+    object.userData.primitive=
+        type;
+
+    object.userData.script="";
+
+    object.userData.name=
+        type==="cube"
+        ? "Cube"
+        : type==="sphere"
+        ? "Kugel"
+        : "Zylinder";
+
+    object.name=
+        object.userData.name;
+
+    scene.add(object);
+
+    objects.push(object);
+
+    selectObject(object);
+
+    saveHistory();
+}
+
+/* =====================================================
+   TERRAIN HEIGHT HELPER
+===================================================== */
+
+function terrainHeightAt(x,z){
+
+    const positions=
+        terrainGeometry
+            .attributes
+            .position;
+
+    let nearestY=0;
+
+    let nearestDistance=Infinity;
+
+    for(
+        let i=0;
+        i<positions.count;
+        i++
+    ){
+
+        const px=
+            positions.getX(i);
+
+        const pz=
+            positions.getZ(i);
+
+        const d=
+            Math.abs(px-x)+
+            Math.abs(pz-z);
+
+        if(d<nearestDistance){
+
+            nearestDistance=d;
+
+            nearestY=
+                positions.getY(i);
+        }
+    }
+
+    return nearestY;
+}
+
+/* =====================================================
+   ADD BUTTONS
+===================================================== */
+
+document.getElementById(
+    "addCube"
+).onclick=()=>{
+    addPrimitive("cube");
+};
+
+document.getElementById(
+    "addSphere"
+).onclick=()=>{
+    addPrimitive("sphere");
+};
+
+document.getElementById(
+    "addCylinder"
+).onclick=()=>{
+    addPrimitive("cylinder");
+};
+
+/* =====================================================
+   SELECT OBJECT
+===================================================== */
+
+function selectObject(object){
+
+    if(!object)
         return;
 
+    selected=object;
 
-    const object =
-        sourceModel.clone(
+    transform.attach(
+        selected
+    );
+
+    transform.setMode(
+        "translate"
+    );
+
+    showInspector();
+
+    updateInspector();
+
+    setTool("select");
+
+    statusText(
+        "Objekt ausgewählt: "+
+        object.name
+    );
+}
+
+function selectAtMouse(){
+
+    updateMouse(
+        window.event
+    );
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+    const hits=
+        raycaster.intersectObjects(
+            objects,
             true
         );
 
+    if(!hits.length){
 
-    object.visible=true;
+        selected=null;
 
+        transform.detach();
 
-    object.position.copy(
-        point
-    );
+        hideInspector();
 
-
-    object.position.y +=
-        0.2;
-
-
-    let scale =
-        Number(
-            document
-                .getElementById(
-                    "objectScale"
-                )
-                .value
-        );
-
-
-    if(
-        document
-            .getElementById(
-                "randomScale"
-            )
-            .checked
-    ){
-
-        scale *=
-            THREE.MathUtils.randFloat(
-                .75,
-                1.25
-            );
-
+        return;
     }
 
+    let object=
+        hits[0].object;
 
-    object.scale.setScalar(
-        scale
-    );
-
-
-    if(
-        document
-            .getElementById(
-                "randomRotation"
-            )
-            .checked
+    while(
+        object.parent &&
+        !object.userData.editorObject
     ){
 
-        object.rotation.y =
-            Math.random() *
-            Math.PI*2;
-
+        object=
+            object.parent;
     }
 
+    if(
+        object.userData.editorObject
+    ){
 
-    objectCounter++;
-
-
-    object.name =
-        "Object_"+objectCounter;
-
-
-    object.userData.script =
-        "";
-
-
-    object.userData.color =
-        "#ffffff";
-
-
-    scene.add(
-        object
-    );
-
-
-    objects.push(
-        object
-    );
-
-
-    addObjectToList(
-        object
-    );
-
-}
-
-
-/* =====================================================
-   DECORATE CLICK
-===================================================== */
-
-renderer.domElement
-    .addEventListener(
-        "click",
-        event=>{
-
-            if(
-                currentTool==="decorate"
-            ){
-
-                placeObject(
-                    event
-                );
-
-            }
-
-        }
-    );
-
-
-/* =====================================================
-   OBJECT LIST
-===================================================== */
-
-const objectList =
-    document.getElementById(
-        "objectList"
-    );
-
-
-function addObjectToList(
-    object
-){
-
-    const item =
-        document.createElement(
-            "div"
-        );
-
-
-    item.className =
-        "objectItem";
-
-
-    item.textContent =
-        object.name;
-
-
-    item.onclick=()=>{
         selectObject(
             object
         );
-    };
-
-
-    object.userData.item =
-        item;
-
-
-    objectList.appendChild(
-        item
-    );
-
+    }
 }
 
-
 /* =====================================================
-   OBJECT SELECTION
+   BETTER POINTER SELECT
 ===================================================== */
 
-let selectedObject =
-    null;
+renderer.domElement.addEventListener(
+    "pointerdown",
+    event=>{
 
+        if(
+            event.button!==0
+        )
+            return;
 
-let transformControls =
-    null;
+        if(
+            currentTool!=="select"
+        )
+            return;
 
+        updateMouse(event);
 
-renderer.domElement
-    .addEventListener(
-        "dblclick",
-        event=>{
+        raycaster.setFromCamera(
+            mouse,
+            camera
+        );
 
-            if(
-                currentTool!=="select"
-            )
-                return;
-
-
-            const rect =
-                renderer.domElement
-                .getBoundingClientRect();
-
-
-            mouse.x =
-                (
-                    (event.clientX -
-                    rect.left) /
-                    rect.width
-                ) * 2 - 1;
-
-
-            mouse.y =
-                -(
-                    (event.clientY -
-                    rect.top) /
-                    rect.height
-                ) * 2 + 1;
-
-
-            raycaster.setFromCamera(
-                mouse,
-                camera
+        const hits=
+            raycaster.intersectObjects(
+                objects,
+                true
             );
 
+        if(hits.length){
 
-            const meshes=[];
-
-
-            for(
-                const object
-                of objects
-            ){
-
-                object.traverse(
-                    child=>{
-
-                        if(
-                            child.isMesh
-                        ){
-
-                            meshes.push(
-                                child
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-
-
-            const hits =
-                raycaster.intersectObjects(
-                    meshes,
-                    true
-                );
-
-
-            if(!hits.length)
-                return;
-
-
-            let object =
+            let object=
                 hits[0].object;
-
 
             while(
                 object.parent &&
-                !objects.includes(
-                    object
-                )
+                !object.userData.editorObject
             ){
 
-                object =
+                object=
                     object.parent;
-
             }
 
-
             if(
-                objects.includes(
-                    object
-                )
+                object.userData.editorObject
             ){
 
                 selectObject(
                     object
                 );
-
             }
+        }
+    }
+);
 
+/* =====================================================
+   INSPECTOR
+===================================================== */
+
+function showInspector(){
+
+    document.getElementById(
+        "noObject"
+    ).style.display="none";
+
+    document.getElementById(
+        "objectInspector"
+    ).style.display="block";
+}
+
+function hideInspector(){
+
+    document.getElementById(
+        "noObject"
+    ).style.display="block";
+
+    document.getElementById(
+        "objectInspector"
+    ).style.display="none";
+}
+
+function updateInspector(){
+
+    if(!selected)
+        return;
+
+    document.getElementById(
+        "objectName"
+    ).value=
+        selected.name;
+
+    document.getElementById(
+        "posX"
+    ).value=
+        selected.position.x.toFixed(2);
+
+    document.getElementById(
+        "posY"
+    ).value=
+        selected.position.y.toFixed(2);
+
+    document.getElementById(
+        "posZ"
+    ).value=
+        selected.position.z.toFixed(2);
+
+    document.getElementById(
+        "rotX"
+    ).value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.x
+        ).toFixed(1);
+
+    document.getElementById(
+        "rotY"
+    ).value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.y
+        ).toFixed(1);
+
+    document.getElementById(
+        "rotZ"
+    ).value=
+        THREE.MathUtils.radToDeg(
+            selected.rotation.z
+        ).toFixed(1);
+
+    document.getElementById(
+        "scaleX"
+    ).value=
+        selected.scale.x.toFixed(2);
+
+    document.getElementById(
+        "scaleY"
+    ).value=
+        selected.scale.y.toFixed(2);
+
+    document.getElementById(
+        "scaleZ"
+    ).value=
+        selected.scale.z.toFixed(2);
+
+    document.getElementById(
+        "scriptEditor"
+    ).value=
+        selected.userData.script ||
+        "";
+}
+
+/* =====================================================
+   APPLY INSPECTOR
+===================================================== */
+
+document.getElementById(
+    "applyTransform"
+).onclick=()=>{
+
+    if(!selected)
+        return;
+
+    selected.name=
+        document.getElementById(
+            "objectName"
+        ).value ||
+        "Objekt";
+
+    selected.userData.name=
+        selected.name;
+
+    selected.position.set(
+
+        Number(
+            document.getElementById(
+                "posX"
+            ).value
+        ),
+
+        Number(
+            document.getElementById(
+                "posY"
+            ).value
+        ),
+
+        Number(
+            document.getElementById(
+                "posZ"
+            ).value
+        )
+    );
+
+    selected.rotation.set(
+
+        THREE.MathUtils.degToRad(
+            Number(
+                document.getElementById(
+                    "rotX"
+                ).value
+            )
+        ),
+
+        THREE.MathUtils.degToRad(
+            Number(
+                document.getElementById(
+                    "rotY"
+                ).value
+            )
+        ),
+
+        THREE.MathUtils.degToRad(
+            Number(
+                document.getElementById(
+                    "rotZ"
+                ).value
+            )
+        )
+    );
+
+    selected.scale.set(
+
+        Number(
+            document.getElementById(
+                "scaleX"
+            ).value
+        ),
+
+        Number(
+            document.getElementById(
+                "scaleY"
+            ).value
+        ),
+
+        Number(
+            document.getElementById(
+                "scaleZ"
+            ).value
+        )
+    );
+
+    saveHistory();
+
+    statusText(
+        "Inspector aktualisiert"
+    );
+};
+
+/* =====================================================
+   SCRIPT
+===================================================== */
+
+document.getElementById(
+    "saveScript"
+).onclick=()=>{
+
+    if(!selected)
+        return;
+
+    selected.userData.script=
+        document.getElementById(
+            "scriptEditor"
+        ).value;
+
+    saveHistory();
+
+    statusText(
+        "Script gespeichert"
+    );
+};
+
+/* =====================================================
+   SCRIPT TEST
+===================================================== */
+
+document.getElementById(
+    "testScript"
+).onclick=()=>{
+
+    if(!selected)
+        return;
+
+    const code=
+        document.getElementById(
+            "scriptEditor"
+        ).value;
+
+    if(!code.trim()){
+
+        showModal(
+            "Kein Script",
+            "Das Script-Feld ist leer."
+        );
+
+        return;
+    }
+
+    try{
+
+        const fn=
+            new Function(
+                "object",
+                "THREE",
+                "delta",
+                code
+            );
+
+        fn(
+            selected,
+            THREE,
+            1/60
+        );
+
+        statusText(
+            "Script erfolgreich getestet"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showModal(
+            "Script-Fehler",
+            "<pre style='white-space:pre-wrap;color:#ff7777'>"+
+            escapeHTML(
+                error.message
+            )+
+            "</pre>"
+        );
+    }
+};
+
+/* =====================================================
+   PLAY SYSTEM
+===================================================== */
+
+let playing=false;
+
+document.getElementById(
+    "playButton"
+).onclick=()=>{
+
+    playing=!playing;
+
+    document.getElementById(
+        "playButton"
+    ).innerText=
+        playing
+        ? "■ STOP"
+        : "▶ PLAY";
+
+    document.getElementById(
+        "playIndicator"
+    ).style.display=
+        playing
+        ? "block"
+        : "none";
+
+    statusText(
+        playing
+        ? "PLAY-Modus aktiv – Scripts laufen"
+        : "Editor-Modus"
+    );
+};
+
+/* =====================================================
+   SCRIPT EXECUTION
+===================================================== */
+
+function executeScripts(delta){
+
+    if(!playing)
+        return;
+
+    for(
+        const object
+        of objects
+    ){
+
+        if(
+            !object ||
+            !object.parent
+        )
+            continue;
+
+        const code=
+            object.userData.script;
+
+        if(
+            !code ||
+            !code.trim()
+        )
+            continue;
+
+        /*
+           Das Script erhält:
+
+           object = Objekt
+           THREE  = Three.js
+           delta  = Sekunden seit letztem Frame
+        */
+
+        try{
+
+            const fn=
+                new Function(
+                    "object",
+                    "THREE",
+                    "delta",
+                    code
+                );
+
+            fn(
+                object,
+                THREE,
+                delta
+            );
+
+        }catch(error){
+
+            console.error(
+                "Script-Fehler in "+
+                object.name+
+                ":",
+                error
+            );
+
+            object.userData.scriptError=
+                error.message;
+        }
+    }
+}
+
+/* =====================================================
+   DELETE
+===================================================== */
+
+function deleteSelected(){
+
+    if(!selected)
+        return;
+
+    transform.detach();
+
+    scene.remove(
+        selected
+    );
+
+    const index=
+        objects.indexOf(
+            selected
+        );
+
+    if(index!==-1){
+
+        objects.splice(
+            index,
+            1
+        );
+    }
+
+    selected=null;
+
+    hideInspector();
+
+    saveHistory();
+
+    statusText(
+        "Objekt gelöscht"
+    );
+}
+
+document.getElementById(
+    "deleteObject"
+).onclick=
+    deleteSelected;
+
+document.getElementById(
+    "deleteInspector"
+).onclick=
+    deleteSelected;
+
+/* =====================================================
+   DUPLICATE
+===================================================== */
+
+function duplicateSelected(){
+
+    if(!selected)
+        return;
+
+    const clone=
+        selected.clone(true);
+
+    clone.position.x+=20;
+
+    clone.position.z+=20;
+
+    clone.userData=
+        JSON.parse(
+            JSON.stringify(
+                selected.userData
+            )
+        );
+
+    clone.userData.editorObject=
+        true;
+
+    clone.name=
+        selected.name+
+        " Kopie";
+
+    clone.userData.name=
+        clone.name;
+
+    clone.traverse(
+        object=>{
+
+            if(object.isMesh){
+
+                if(
+                    Array.isArray(
+                        object.material
+                    )
+                ){
+
+                    object.material=
+                        object.material.map(
+                            m=>m.clone()
+                        );
+
+                }else if(
+                    object.material
+                ){
+
+                    object.material=
+                        object.material.clone();
+                }
+            }
         }
     );
 
+    scene.add(clone);
+
+    objects.push(clone);
+
+    selectObject(clone);
+
+    saveHistory();
+
+    statusText(
+        "Objekt dupliziert"
+    );
+}
+
+document.getElementById(
+    "duplicateObject"
+).onclick=
+    duplicateSelected;
 
 /* =====================================================
-   SELECT
+   FOCUS
 ===================================================== */
 
-function selectObject(
-    object
-){
+document.getElementById(
+    "focusObject"
+).onclick=()=>{
 
-    selectedObject =
-        object;
+    if(!selected)
+        return;
 
+    const box=
+        new THREE.Box3()
+            .setFromObject(
+                selected
+            );
 
-    document
-        .querySelectorAll(
-            ".objectItem"
+    const center=
+        box.getCenter(
+            new THREE.Vector3()
+        );
+
+    const size=
+        box.getSize(
+            new THREE.Vector3()
+        );
+
+    const distance=
+        Math.max(
+            size.x,
+            size.y,
+            size.z
+        )*3+30;
+
+    controls.target.copy(
+        center
+    );
+
+    camera.position.copy(
+        center
+    ).add(
+        new THREE.Vector3(
+            1,
+            .7,
+            1
+        ).normalize()
+        .multiplyScalar(
+            distance
         )
+    );
+
+    controls.update();
+};
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+let undoStack=[];
+
+let redoStack=[];
+
+function sceneState(){
+
+    return JSON.stringify(
+        objects.map(
+            object=>({
+
+                type:
+                    object.userData.primitive ||
+                    "cube",
+
+                name:
+                    object.name,
+
+                position:[
+                    object.position.x,
+                    object.position.y,
+                    object.position.z
+                ],
+
+                rotation:[
+                    object.rotation.x,
+                    object.rotation.y,
+                    object.rotation.z
+                ],
+
+                scale:[
+                    object.scale.x,
+                    object.scale.y,
+                    object.scale.z
+                ],
+
+                script:
+                    object.userData.script ||
+                    ""
+            })
+        )
+    );
+}
+
+function saveHistory(){
+
+    const state=
+        sceneState();
+
+    if(
+        undoStack.length &&
+        undoStack[
+            undoStack.length-1
+        ]===state
+    )
+        return;
+
+    undoStack.push(
+        state
+    );
+
+    if(
+        undoStack.length>40
+    ){
+
+        undoStack.shift();
+    }
+
+    redoStack=[];
+}
+
+function restoreState(state){
+
+    let data;
+
+    try{
+
+        data=
+            JSON.parse(state);
+
+    }catch{
+
+        return;
+    }
+
+    objects
+        .slice()
         .forEach(
-            item=>{
-                item.classList.remove(
-                    "selected"
+            object=>{
+                scene.remove(
+                    object
                 );
             }
         );
 
+    objects.length=0;
 
-    if(
-        object.userData.item
+    selected=null;
+
+    transform.detach();
+
+    hideInspector();
+
+    for(
+        const item
+        of data
     ){
 
-        object.userData.item
-            .classList.add(
-                "selected"
+        let geometry;
+
+        if(
+            item.type==="sphere"
+        ){
+
+            geometry=
+                new THREE.SphereGeometry(
+                    18,
+                    32,
+                    20
+                );
+
+        }else if(
+            item.type==="cylinder"
+        ){
+
+            geometry=
+                new THREE.CylinderGeometry(
+                    15,
+                    15,
+                    35,
+                    32
+                );
+
+        }else{
+
+            geometry=
+                new THREE.BoxGeometry(
+                    30,
+                    30,
+                    30
+                );
+        }
+
+        const material=
+            new THREE.MeshStandardMaterial({
+                color:0xb5b5b5,
+                roughness:.65
+            });
+
+        const object=
+            new THREE.Mesh(
+                geometry,
+                material
             );
 
-    }
+        object.name=
+            item.name;
 
+        object.userData.editorObject=
+            true;
 
-    document
-        .getElementById(
-            "nothingSelected"
-        )
-        .style.display=
-            "none";
+        object.userData.primitive=
+            item.type;
 
+        object.userData.name=
+            item.name;
 
-    document
-        .getElementById(
-            "inspector"
-        )
-        .style.display=
-            "block";
+        object.userData.script=
+            item.script || "";
 
-
-    document
-        .getElementById(
-            "objectName"
-        )
-        .value=
-            object.name;
-
-
-    document
-        .getElementById(
-            "posX"
-        )
-        .value=
-            object.position.x;
-
-
-    document
-        .getElementById(
-            "posY"
-        )
-        .value=
-            object.position.y;
-
-
-    document
-        .getElementById(
-            "posZ"
-        )
-        .value=
-            object.position.z;
-
-
-    document
-        .getElementById(
-            "rotX"
-        )
-        .value=
-            object.rotation.x;
-
-
-    document
-        .getElementById(
-            "rotY"
-        )
-        .value=
-            object.rotation.y;
-
-
-    document
-        .getElementById(
-            "rotZ"
-        )
-        .value=
-            object.rotation.z;
-
-
-    document
-        .getElementById(
-            "scaleInput"
-        )
-        .value=
-            object.scale.x;
-
-
-    document
-        .getElementById(
-            "objectColor"
-        )
-        .value=
-            object.userData.color ||
-            "#ffffff";
-
-
-    document
-        .getElementById(
-            "scriptInput"
-        )
-        .value=
-            object.userData.script ||
-            "";
-
-
-    if(transformControls){
-
-        scene.remove(
-            transformControls
+        object.position.fromArray(
+            item.position
         );
 
-        transformControls.dispose();
-
-    }
-
-
-    transformControls =
-        new TransformControls(
-            camera,
-            renderer.domElement
+        object.rotation.set(
+            item.rotation[0],
+            item.rotation[1],
+            item.rotation[2]
         );
 
+        object.scale.fromArray(
+            item.scale
+        );
 
-    transformControls.attach(
-        object
-    );
+        object.castShadow=true;
 
+        object.receiveShadow=true;
 
-    transformControls.setMode(
-        "translate"
-    );
+        scene.add(object);
 
-
-    transformControls.addEventListener(
-        "objectChange",
-        updateInspector
-    );
-
-
-    scene.add(
-        transformControls
-    );
-
+        objects.push(object);
+    }
 }
 
+document.getElementById(
+    "undo"
+).onclick=()=>{
+
+    if(
+        undoStack.length<=1
+    )
+        return;
+
+    const current=
+        undoStack.pop();
+
+    redoStack.push(
+        current
+    );
+
+    restoreState(
+        undoStack[
+            undoStack.length-1
+        ]
+    );
+
+    statusText("Undo");
+};
+
+document.getElementById(
+    "redo"
+).onclick=()=>{
+
+    if(!redoStack.length)
+        return;
+
+    const state=
+        redoStack.pop();
+
+    undoStack.push(
+        state
+    );
+
+    restoreState(
+        state
+    );
+
+    statusText("Redo");
+};
 
 /* =====================================================
-   TRANSFORM SHORTCUTS
+   SAVE PROJECT
+===================================================== */
+
+document.getElementById(
+    "saveProject"
+).onclick=()=>{
+
+    const project={
+
+        engine:
+            "GHOST 3D ENGINE",
+
+        version:2,
+
+        objects:
+            JSON.parse(
+                sceneState()
+            ),
+
+        camera:{
+            position:[
+                camera.position.x,
+                camera.position.y,
+                camera.position.z
+            ],
+
+            target:[
+                controls.target.x,
+                controls.target.y,
+                controls.target.z
+            ]
+        }
+    };
+
+    const blob=
+        new Blob(
+            [
+                JSON.stringify(
+                    project,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+    const url=
+        URL.createObjectURL(
+            blob
+        );
+
+    const a=
+        document.createElement(
+            "a"
+        );
+
+    a.href=url;
+
+    a.download=
+        "ghost-project.json";
+
+    a.click();
+
+    URL.revokeObjectURL(
+        url
+    );
+
+    statusText(
+        "Projekt gespeichert"
+    );
+};
+
+/* =====================================================
+   LOAD PROJECT
+===================================================== */
+
+document.getElementById(
+    "loadProject"
+).onclick=()=>{
+
+    document.getElementById(
+        "projectFile"
+    ).click();
+};
+
+document.getElementById(
+    "projectFile"
+).addEventListener(
+    "change",
+    event=>{
+
+        const file=
+            event.target.files[0];
+
+        if(!file)
+            return;
+
+        const reader=
+            new FileReader();
+
+        reader.onload=()=>{
+
+            try{
+
+                const project=
+                    JSON.parse(
+                        reader.result
+                    );
+
+                if(
+                    !project.objects
+                )
+                    throw new Error(
+                        "Keine Objekte"
+                    );
+
+                restoreState(
+                    JSON.stringify(
+                        project.objects
+                    )
+                );
+
+                if(
+                    project.camera
+                ){
+
+                    camera.position.fromArray(
+                        project.camera.position
+                    );
+
+                    controls.target.fromArray(
+                        project.camera.target
+                    );
+
+                    controls.update();
+                }
+
+                saveHistory();
+
+                statusText(
+                    "Projekt geladen"
+                );
+
+            }catch(error){
+
+                showModal(
+                    "Ladefehler",
+                    "Die Projektdatei ist ungültig."
+                );
+            }
+        };
+
+        reader.readAsText(
+            file
+        );
+
+        event.target.value="";
+    }
+);
+
+/* =====================================================
+   KEYBOARD
 ===================================================== */
 
 window.addEventListener(
     "keydown",
     event=>{
 
-        if(!transformControls)
+        /*
+           Nur Werkzeug-Tastenkürzel.
+           KEINE WASD-Bewegung.
+        */
+
+        if(
+            event.target.tagName==="INPUT" ||
+            event.target.tagName==="TEXTAREA"
+        )
             return;
 
+        if(
+            event.key.toLowerCase()==="w"
+        ){
 
-        const key =
-            event.key.toLowerCase();
-
-
-        if(key==="w"){
-
-            transformControls.setMode(
-                "translate"
-            );
-
+            setTool("move");
         }
 
+        if(
+            event.key.toLowerCase()==="e"
+        ){
 
-        if(key==="e"){
-
-            transformControls.setMode(
-                "rotate"
-            );
-
+            setTool("rotate");
         }
 
+        if(
+            event.key.toLowerCase()==="r"
+        ){
 
-        if(key==="r"){
-
-            transformControls.setMode(
-                "scale"
-            );
-
+            setTool("scale");
         }
 
+        if(
+            event.key==="Escape"
+        ){
+
+            setTool("hand");
+        }
     }
 );
 
-
 /* =====================================================
-   INSPECTOR
+   MODAL
 ===================================================== */
 
-function updateInspector(){
+function showModal(
+    title,
+    text
+){
 
-    if(!selectedObject)
-        return;
+    document.getElementById(
+        "modalTitle"
+    ).innerText=title;
 
+    document.getElementById(
+        "modalText"
+    ).innerHTML=text;
 
-    selectedObject.name =
-        document
-            .getElementById(
-                "objectName"
-            )
-            .value;
-
-
-    selectedObject.position.x =
-        Number(
-            document
-                .getElementById(
-                    "posX"
-                )
-                .value
-        );
-
-
-    selectedObject.position.y =
-        Number(
-            document
-                .getElementById(
-                    "posY"
-                )
-                .value
-        );
-
-
-    selectedObject.position.z =
-        Number(
-            document
-                .getElementById(
-                    "posZ"
-                )
-                .value
-        );
-
-
-    selectedObject.rotation.x =
-        Number(
-            document
-                .getElementById(
-                    "rotX"
-                )
-                .value
-        );
-
-
-    selectedObject.rotation.y =
-        Number(
-            document
-                .getElementById(
-                    "rotY"
-                )
-                .value
-        );
-
-
-    selectedObject.rotation.z =
-        Number(
-            document
-                .getElementById(
-                    "rotZ"
-                )
-                .value
-        );
-
-
-    const scale =
-        Number(
-            document
-                .getElementById(
-                    "scaleInput"
-                )
-                .value
-        );
-
-
-    if(
-        Number.isFinite(scale)
-    ){
-
-        selectedObject.scale
-            .setScalar(
-                Math.max(
-                    .01,
-                    scale
-                )
-            );
-
-    }
-
-
-    if(
-        selectedObject.userData.item
-    ){
-
-        selectedObject.userData.item
-            .textContent =
-                selectedObject.name;
-
-    }
-
+    document.getElementById(
+        "modal"
+    ).style.display="flex";
 }
 
+document.getElementById(
+    "modalClose"
+).onclick=()=>{
 
-/* =====================================================
-   INSPECTOR INPUTS
-===================================================== */
-
-[
-    "objectName",
-    "posX",
-    "posY",
-    "posZ",
-    "rotX",
-    "rotY",
-    "rotZ",
-    "scaleInput"
-].forEach(
-    id=>{
-
-        document
-            .getElementById(
-                id
-            )
-            .addEventListener(
-                "input",
-                updateInspector
-            );
-
-    }
-);
-
-
-/* =====================================================
-   OBJECT COLOR
-===================================================== */
-
-document
-    .getElementById(
-        "objectColor"
-    )
-    .addEventListener(
-        "input",
-        event=>{
-
-            if(!selectedObject)
-                return;
-
-
-            const color =
-                new THREE.Color(
-                    event.target.value
-                );
-
-
-            selectedObject.traverse(
-                child=>{
-
-                    if(
-                        child.isMesh &&
-                        child.material
-                    ){
-
-                        child.material.color
-                            .copy(
-                                color
-                            );
-
-                    }
-
-                }
-            );
-
-
-            selectedObject.userData.color =
-                event.target.value;
-
-        }
-    );
-
-
-/* =====================================================
-   SCRIPT
-===================================================== */
-
-document
-    .getElementById(
-        "applyScript"
-    )
-    .onclick=()=>{
-
-        if(!selectedObject){
-
-            alert(
-                "Bitte zuerst ein Objekt auswählen."
-            );
-
-            return;
-
-        }
-
-
-        const code =
-            document
-                .getElementById(
-                    "scriptInput"
-                )
-                .value;
-
-
-        try{
-
-            selectedObject.userData.script =
-                code;
-
-
-            selectedObject.userData.compiled =
-                new Function(
-                    "object",
-                    "THREE",
-                    code
-                );
-
-
-            document
-                .getElementById(
-                    "status"
-                )
-                .textContent =
-                    "Script angewendet.";
-
-        }
-        catch(error){
-
-            alert(
-                "Script-Fehler:\n"+
-                error.message
-            );
-
-        }
-
-    };
-
-
-/* =====================================================
-   DELETE
-===================================================== */
-
-document
-    .getElementById(
-        "deleteBtn"
-    )
-    .onclick=()=>{
-
-        if(!selectedObject)
-            return;
-
-
-        scene.remove(
-            selectedObject
-        );
-
-
-        const index =
-            objects.indexOf(
-                selectedObject
-            );
-
-
-        if(index>=0){
-
-            objects.splice(
-                index,
-                1
-            );
-
-        }
-
-
-        if(
-            selectedObject.userData.item
-        ){
-
-            selectedObject.userData.item
-                .remove();
-
-        }
-
-
-        if(transformControls){
-
-            scene.remove(
-                transformControls
-            );
-
-            transformControls.dispose();
-
-            transformControls=null;
-
-        }
-
-
-        selectedObject=null;
-
-
-        document
-            .getElementById(
-                "inspector"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "nothingSelected"
-            )
-            .style.display=
-                "block";
-
-    };
-
-
-/* =====================================================
-   DUPLICATE
-===================================================== */
-
-document
-    .getElementById(
-        "duplicateBtn"
-    )
-    .onclick=()=>{
-
-        if(!selectedObject){
-
-            alert(
-                "Bitte zuerst ein Objekt auswählen."
-            );
-
-            return;
-
-        }
-
-
-        const clone =
-            selectedObject.clone(
-                true
-            );
-
-
-        objectCounter++;
-
-
-        clone.name =
-            "Object_"+objectCounter;
-
-
-        clone.position.x +=
-            5;
-
-
-        clone.userData = {
-
-            script:
-                selectedObject
-                .userData
-                .script ||
-                "",
-
-            color:
-                selectedObject
-                .userData
-                .color ||
-                "#ffffff",
-
-            item:null
-
-        };
-
-
-        scene.add(
-            clone
-        );
-
-
-        objects.push(
-            clone
-        );
-
-
-        addObjectToList(
-            clone
-        );
-
-    };
-
-
-/* =====================================================
-   CLEAR OBJECTS
-===================================================== */
-
-document
-    .getElementById(
-        "clearObjects"
-    )
-    .onclick=()=>{
-
-        for(
-            const object
-            of objects
-        ){
-
-            scene.remove(
-                object
-            );
-
-
-            if(
-                object.userData.item
-            ){
-
-                object.userData.item
-                    .remove();
-
-            }
-
-        }
-
-
-        objects.length=0;
-
-
-        selectedObject=null;
-
-
-        if(transformControls){
-
-            scene.remove(
-                transformControls
-            );
-
-            transformControls.dispose();
-
-            transformControls=null;
-
-        }
-
-
-        document
-            .getElementById(
-                "inspector"
-            )
-            .style.display=
-                "none";
-
-
-        document
-            .getElementById(
-                "nothingSelected"
-            )
-            .style.display=
-                "block";
-
-    };
-
-
-/* =====================================================
-   PLAY MODE
-===================================================== */
-
-let playMode =
-    false;
-
-
-document
-    .getElementById(
-        "playBtn"
-    )
-    .onclick=()=>{
-
-        playMode =
-            !playMode;
-
-
-        if(playMode){
-
-            document
-                .getElementById(
-                    "playBtn"
-                )
-                .textContent =
-                    "■ STOP";
-
-
-            document
-                .getElementById(
-                    "playMode"
-                )
-                .style.display =
-                    "block";
-
-        }
-        else{
-
-            document
-                .getElementById(
-                    "playBtn"
-                )
-                .textContent =
-                    "▶ PLAY";
-
-
-            document
-                .getElementById(
-                    "playMode"
-                )
-                .style.display =
-                    "none";
-
-        }
-
-    };
-
-
-/* =====================================================
-   DROPZONE
-===================================================== */
-
-const dropZone =
     document.getElementById(
-        "dropZone"
-    );
-
-
-dropZone.addEventListener(
-    "dragover",
-    event=>{
-
-        event.preventDefault();
-
-        dropZone.classList.add(
-            "drag"
-        );
-
-    }
-);
-
-
-dropZone.addEventListener(
-    "dragleave",
-    ()=>{
-
-        dropZone.classList.remove(
-            "drag"
-        );
-
-    }
-);
-
-
-dropZone.addEventListener(
-    "drop",
-    event=>{
-
-        event.preventDefault();
-
-        dropZone.classList.remove(
-            "drag"
-        );
-
-
-        const file =
-            event.dataTransfer.files[0];
-
-
-        if(
-            file &&
-            (
-                file.name
-                    .toLowerCase()
-                    .endsWith(".glb") ||
-                file.name
-                    .toLowerCase()
-                    .endsWith(".gltf")
-            )
-        ){
-
-            loadModel(
-                file
-            );
-
-        }
-
-    }
-);
-
+        "modal"
+    ).style.display="none";
+};
 
 /* =====================================================
-   SAVE
+   STATUS
 ===================================================== */
 
-document
-    .getElementById(
-        "saveBtn"
-    )
-    .onclick=()=>{
+function statusText(text){
 
-        const data={
-
-            terrain:
-                Array.from(
-                    heights
-                ),
-
-            terrainColors:
-                Array.from(
-                    colors
-                ),
-
-            objects:
-                objects.map(
-                    object=>({
-
-                        name:
-                            object.name,
-
-                        position:[
-                            object.position.x,
-                            object.position.y,
-                            object.position.z
-                        ],
-
-                        rotation:[
-                            object.rotation.x,
-                            object.rotation.y,
-                            object.rotation.z
-                        ],
-
-                        scale:
-                            object.scale.x,
-
-                        color:
-                            object.userData.color ||
-                            "#ffffff",
-
-                        script:
-                            object.userData.script ||
-                            ""
-
-                    })
-                )
-
-        };
-
-
-        const blob =
-            new Blob(
-                [
-                    JSON.stringify(
-                        data,
-                        null,
-                        2
-                    )
-                ],
-                {
-                    type:
-                        "application/json"
-                }
-            );
-
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-
-        const a =
-            document.createElement(
-                "a"
-            );
-
-
-        a.href=url;
-
-
-        a.download =
-            "ghost-engine-project.json";
-
-
-        a.click();
-
-
-        URL.revokeObjectURL(
-            url
-        );
-
-    };
-
+    document.getElementById(
+        "status"
+    ).innerText=text;
+}
 
 /* =====================================================
-   LOAD
+   HTML ESCAPE
 ===================================================== */
 
-document
-    .getElementById(
-        "loadBtn"
-    )
-    .onclick=()=>{
+function escapeHTML(text){
 
-        document
-            .getElementById(
-                "loadInput"
-            )
-            .click();
-
-    };
-
-
-document
-    .getElementById(
-        "loadInput"
-    )
-    .addEventListener(
-        "change",
-        event=>{
-
-            const file =
-                event.target.files[0];
-
-
-            if(!file)
-                return;
-
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload=()=>{
-
-                try{
-
-                    const data =
-                        JSON.parse(
-                            reader.result
-                        );
-
-
-                    if(
-                        Array.isArray(
-                            data.terrain
-                        )
-                    ){
-
-                        for(
-                            let i=0;
-
-                            i<
-                            Math.min(
-                                data.terrain.length,
-                                heights.length
-                            );
-
-                            i++
-                        ){
-
-                            heights[i] =
-                                data.terrain[i];
-
-
-                            position.setY(
-                                i,
-                                heights[i]
-                            );
-
-                        }
-
-
-                        position.needsUpdate=true;
-
-                        terrainGeometry
-                            .computeVertexNormals();
-
-                    }
-
-
-                    if(
-                        Array.isArray(
-                            data.terrainColors
-                        )
-                    ){
-
-                        for(
-                            let i=0;
-
-                            i<
-                            Math.min(
-                                data.terrainColors.length,
-                                colors.length
-                            );
-
-                            i++
-                        ){
-
-                            colors[i] =
-                                data.terrainColors[i];
-
-                        }
-
-
-                        terrainGeometry
-                            .attributes
-                            .color
-                            .needsUpdate=true;
-
-                    }
-
-
-                    document
-                        .getElementById(
-                            "status"
-                        )
-                        .textContent =
-                            "Projekt geladen.";
-
-                }
-                catch(error){
-
-                    console.error(
-                        error
-                    );
-
-                    alert(
-                        "Projekt konnte nicht geladen werden."
-                    );
-
-                }
-
-            };
-
-
-            reader.readAsText(
-                file
-            );
-
-        }
-    );
-
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
 
 /* =====================================================
    RESIZE
@@ -3927,33 +3320,35 @@ window.addEventListener(
     "resize",
     ()=>{
 
-        const width =
-            viewport.clientWidth;
-
-
-        const height =
-            viewport.clientHeight;
-
-
-        camera.aspect =
-            width/height;
-
+        camera.aspect=
+            innerWidth/
+            innerHeight;
 
         camera.updateProjectionMatrix();
 
-
         renderer.setSize(
-            width,
-            height
+            innerWidth,
+            innerHeight
         );
-
     }
 );
 
+/* =====================================================
+   START
+===================================================== */
+
+setTool("hand");
+
+updateBrushCursor();
+
+saveHistory();
 
 /* =====================================================
-   ANIMATION
+   GAME LOOP
 ===================================================== */
+
+let lastTime=
+    performance.now();
 
 function animate(){
 
@@ -3961,68 +3356,46 @@ function animate(){
         animate
     );
 
+    const now=
+        performance.now();
 
-    controls.update();
+    const delta=
+        Math.min(
+            (now-lastTime)/1000,
+            .1
+        );
 
+    lastTime=now;
 
-    if(playMode){
+    /*
+       Scripts laufen hier.
+       Beispiel:
+       object.rotation.y += delta;
+    */
 
-        for(
-            const object
-            of objects
-        ){
+    executeScripts(
+        delta
+    );
 
-            if(
-                object.userData.compiled
-            ){
+    /*
+       Kamera wird nur im Hand-Modus
+       aktualisiert.
+    */
 
-                try{
+    if(
+        currentTool==="hand"
+    ){
 
-                    object.userData.compiled(
-                        object,
-                        THREE
-                    );
-
-                }
-                catch(error){
-
-                    console.error(
-                        "Object Script Error:",
-                        error
-                    );
-
-                }
-
-            }
-
-        }
-
+        controls.update();
     }
-
 
     renderer.render(
         scene,
         camera
     );
-
 }
 
-
 animate();
-
-
-/* =====================================================
-   START
-===================================================== */
-
-setMapTool(
-    "raise"
-);
-
-
-console.log(
-    "GHOST ENGINE gestartet."
-);
 
 </script>
 
