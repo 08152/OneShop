@@ -3,993 +3,930 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ZEROPOINT – Mapper</title>
-
+<title>GHOST Paint Studio</title>
 <style>
-html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#79caff;
-    font-family:Arial,sans-serif;
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#202124;color:#eee;font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button,select{
+border:1px solid #45464b;
+background:#303136;
+color:#eee;
+border-radius:5px;
+cursor:pointer
 }
-
-canvas{display:block}
-
-#ui{
-    position:absolute;
-    top:15px;
-    left:15px;
-    z-index:20;
-    width:350px;
-    padding:16px;
-    border-radius:16px;
-    background:rgba(20,24,28,.92);
-    color:white;
-    box-shadow:0 10px 40px #0008;
+button:hover{background:#45474e}
+.app{height:100vh;display:grid;grid-template-rows:46px 1fr 27px}
+.topbar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:#292a2e;border-bottom:1px solid #111}
+.logo{font-weight:bold;font-size:17px;margin-right:14px}
+.tool{width:38px;height:34px;font-size:17px}
+.tool.active{background:#5558ff;border-color:#7779ff}
+.separator{width:1px;height:28px;background:#4a4b50;margin:0 5px}
+.main{display:grid;grid-template-columns:58px 1fr 260px;min-height:0}
+.left{background:#292a2e;border-right:1px solid #111;padding:7px 6px;display:flex;flex-direction:column;gap:6px}
+.left button{width:46px;height:40px;font-size:18px}
+.left button.active{background:#5558ff}
+.workspace{position:relative;background:#18191c;overflow:hidden;touch-action:none}
+#canvas{
+position:absolute;
+left:0;
+top:0;
+background:white;
+box-shadow:0 0 35px #000;
+transform-origin:0 0
 }
-
-#title{
-    font-size:26px;
-    font-weight:bold;
-    margin-bottom:12px;
+.right{background:#292a2e;border-left:1px solid #111;display:flex;flex-direction:column;min-width:0}
+.panel{border-bottom:1px solid #151515;padding:10px}
+.panel h3{margin:0 0 9px;font-size:13px;color:#bbb;text-transform:uppercase}
+.row{display:flex;align-items:center;gap:7px;margin:7px 0}
+.row label{font-size:12px;color:#bbb;flex:1}
+input[type=range]{width:125px}
+input[type=color]{width:45px;height:32px;border:0;padding:0;background:none}
+.value{width:42px;text-align:right;font-size:12px}
+select{padding:7px;width:100%}
+.brushGrid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:5px;
+max-height:230px;
+overflow:auto
 }
-
-.row{
-    display:flex;
-    gap:8px;
+.brushItem{
+height:58px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:3px;
+font-size:11px
 }
-
-input{
-    flex:1;
-    min-width:0;
-    padding:11px;
-    border:0;
-    border-radius:8px;
-    background:#101214;
-    color:white;
-    font-family:monospace;
+.brushItem.active{background:#5558ff}
+.brushPreview{
+width:42px;
+height:24px;
+display:flex;
+align-items:center;
+justify-content:center
 }
-
-button{
-    border:0;
-    border-radius:8px;
-    padding:11px 14px;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-#generate{background:#39a852}
-
-#export{
-    width:100%;
-    margin-top:8px;
-    background:#2874d8;
-}
-
-#export:disabled{
-    opacity:.6;
-    cursor:wait;
-}
-
-#info{
-    margin-top:11px;
-    font-size:13px;
-    line-height:1.5;
-}
-
-#hint{
-    position:absolute;
-    bottom:18px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:10;
-    background:#0008;
-    color:white;
-    padding:9px 14px;
-    border-radius:9px;
-    pointer-events:none;
-    white-space:nowrap;
-}
-
-#loading{
-    position:absolute;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:#0005;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    z-index:100;
+.layers{flex:1;overflow:auto;padding:8px}
+.layer{height:38px;display:flex;align-items:center;gap:7px;padding:5px 7px;border:1px solid transparent;border-radius:5px;margin-bottom:4px;background:#242529}
+.layer.selected{background:#4b4d54;border-color:#6c6e77}
+.layer span{flex:1;font-size:13px}
+.layer button{width:28px;height:27px;padding:0}
+.status{display:flex;align-items:center;justify-content:space-between;padding:0 9px;background:#292a2e;border-top:1px solid #111;font-size:11px;color:#aaa}
+#cursorInfo{
+position:absolute;
+pointer-events:none;
+background:#111c;
+color:#fff;
+padding:3px 6px;
+border-radius:4px;
+font-size:11px;
+display:none;
+z-index:10
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<div id="ui">
-
-    <div id="title">ZEROPOINT · MAPPER</div>
-
-    <div class="row">
-        <input id="seedInput" placeholder="Seed...">
-        <button id="generate">Neue Welt</button>
-    </div>
-
-    <button id="export">GLB herunterladen</button>
-
-    <div id="info">
-        Seed: <b id="seedText">-</b><br>
-        Runde Terrain-Insel · Ø 5000<br>
-        Eine einzige Terrain-Geometrie
-    </div>
-
+<div class="topbar">
+<div class="logo">GHOST PAINT</div>
+<button class="tool" id="newBtn">＋</button>
+<button class="tool" id="openBtn">📂</button>
+<button class="tool" id="saveBtn">💾</button>
+<div class="separator"></div>
+<button class="tool" id="undoBtn">↶</button>
+<button class="tool" id="redoBtn">↷</button>
+<div class="separator"></div>
+<button class="tool" id="zoomOut">−</button>
+<button class="tool" id="zoomReset">100%</button>
+<button class="tool" id="zoomIn">＋</button>
+<div style="flex:1"></div>
+<button class="tool" id="fullscreen">⛶</button>
 </div>
 
-<div id="hint">
-    Linksklick + Maus = 360° · Mausrad = Zoom · Rechtsklick = verschieben
+<div class="main">
+
+<div class="left">
+<button class="active" data-tool="brush">🖌️</button>
+<button data-tool="eraser">🧽</button>
+<button data-tool="line">╱</button>
+<button data-tool="rect">□</button>
+<button data-tool="circle">○</button>
+<button data-tool="fill">🪣</button>
+<button data-tool="picker">💧</button>
+<button data-tool="move">✋</button>
 </div>
 
-<div id="loading">
-    ZEROPOINT TERRAIN WIRD GENERIERT...
+<div class="workspace" id="workspace">
+<canvas id="canvas"></canvas>
+<div id="cursorInfo"></div>
+<input id="fileInput" type="file" accept="image/*" hidden>
 </div>
 
+<div class="right">
 
-<!-- Three.js -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<div class="panel">
+<h3>Pinsel</h3>
 
-<!-- GLTFExporter -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/exporters/GLTFExporter.js"></script>
+<div class="row">
+<label>Größe</label>
+<input id="size" type="range" min="1" max="300" value="25">
+<span class="value" id="sizeValue">25</span>
+</div>
 
+<div class="row">
+<label>Deckkraft</label>
+<input id="opacity" type="range" min="1" max="100" value="100">
+<span class="value" id="opacityValue">100%</span>
+</div>
+
+<div class="row">
+<label>Farbe</label>
+<input id="color" type="color" value="#111111">
+</div>
+
+<div class="row">
+<label>Härte</label>
+<input id="hardness" type="range" min="0" max="100" value="100">
+<span class="value" id="hardnessValue">100%</span>
+</div>
+</div>
+
+<div class="panel">
+<h3>Pinselarten</h3>
+<div class="brushGrid" id="brushGrid"></div>
+</div>
+
+<div class="panel">
+<h3>Werkzeug</h3>
+<select id="toolSelect">
+<option value="brush">Pinsel</option>
+<option value="eraser">Radierer</option>
+<option value="line">Linie</option>
+<option value="rect">Rechteck</option>
+<option value="circle">Kreis</option>
+<option value="fill">Füllen</option>
+<option value="picker">Farbwähler</option>
+<option value="move">Verschieben</option>
+</select>
+</div>
+
+<div class="layers">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+<h3 style="margin:0">Ebenen</h3>
+<div>
+<button id="addLayer">＋</button>
+<button id="deleteLayer">🗑</button>
+</div>
+</div>
+<div id="layerList"></div>
+</div>
+
+</div>
+</div>
+
+<div class="status">
+<span id="coords">0 × 0</span>
+<span id="statusText">Bereit</span>
+<span id="zoomText">100%</span>
+</div>
+
+</div>
 
 <script>
-
-// ============================================================
-// EINSTELLUNGEN
-// ============================================================
-
-const MAP_RADIUS = 2500;
-const MAP_DIAMETER = MAP_RADIUS * 2;
-
-const SEGMENTS = 220;
-
-
-// ============================================================
-// SEED
-// ============================================================
-
-let seed =
-    Math.floor(
-        Math.random() * 2147483647
-    );
-
-
-// ============================================================
-// SCENE
-// ============================================================
-
-const scene =
-    new THREE.Scene();
-
-scene.background =
-    new THREE.Color(
-        0x79caff
-    );
-
-scene.fog =
-    new THREE.Fog(
-        0x79caff,
-        900,
-        5000
-    );
-
-
-// ============================================================
-// CAMERA
-// AUS DEINEM 3-D-SYSTEM
-// ============================================================
-
-const camera =
-    new THREE.PerspectiveCamera(
-        75,
-        innerWidth / innerHeight,
-        0.1,
-        10000
-    );
-
-camera.position.set(
-    0,
-    650,
-    1000
-);
-
-
-// ============================================================
-// RENDERER
-// ============================================================
-
-const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true,
-        preserveDrawingBuffer:false
-    });
-
-renderer.setSize(
-    innerWidth,
-    innerHeight
-);
-
-renderer.setPixelRatio(
-    Math.min(
-        devicePixelRatio,
-        1.5
-    )
-);
-
-renderer.shadowMap.enabled=true;
-
-renderer.shadowMap.type =
-    THREE.PCFSoftShadowMap;
-
-renderer.outputColorSpace =
-    THREE.SRGBColorSpace;
-
-document.body.appendChild(
-    renderer.domElement
-);
-
-
-// ============================================================
-// LICHT
-// ============================================================
-
-scene.add(
-    new THREE.AmbientLight(
-        0xffffff,
-        1
-    )
-);
-
-const sun =
-    new THREE.DirectionalLight(
-        0xffffff,
-        1.7
-    );
-
-sun.position.set(
-    700,
-    1200,
-    500
-);
-
-sun.castShadow=true;
-
-scene.add(sun);
-
-
-// ============================================================
-// CAMERA RIG
-// ============================================================
-
-const rig =
-    new THREE.Object3D();
-
-scene.add(rig);
-
-rig.add(camera);
-
-
-// ============================================================
-// 3-D MAUS
-// ============================================================
-
-let mouseDown=false;
-
-let rotX=-0.45;
-let rotY=0;
-
-renderer.domElement.addEventListener(
-    "mousedown",
-    e=>{
-
-        if(e.button===0)
-            mouseDown=true;
-
-    }
-);
-
-window.addEventListener(
-    "mouseup",
-    ()=>{
-        mouseDown=false;
-    }
-);
-
-window.addEventListener(
-    "mousemove",
-    e=>{
-
-        if(!mouseDown)
-            return;
-
-        rotY -=
-            e.movementX * 0.003;
-
-        rotX -=
-            e.movementY * 0.003;
-
-        rotX =
-            Math.max(
-                -1.5,
-                Math.min(
-                    1.5,
-                    rotX
-                )
-            );
-
-        camera.rotation.x =
-            rotX;
-
-        rig.rotation.y =
-            rotY;
-
-    }
-);
-
-
-// ============================================================
-// ZOOM
-// ============================================================
-
-renderer.domElement.addEventListener(
-    "wheel",
-    e=>{
-
-        e.preventDefault();
-
-        const direction =
-            new THREE.Vector3(
-                0,
-                0,
-                1
-            );
-
-        direction.applyQuaternion(
-            camera.quaternion
-        );
-
-        camera.position.addScaledVector(
-            direction,
-            e.deltaY * 0.8
-        );
-
-        camera.position.y =
-            Math.max(
-                30,
-                Math.min(
-                    4500,
-                    camera.position.y
-                )
-            );
-
-    },
-    {
-        passive:false
-    }
-);
-
-
-// ============================================================
-// HASH
-// ============================================================
-
-function hash(x,z){
-
-    let n =
-        Math.imul(
-            x|0,
-            374761393
-        ) ^
-        Math.imul(
-            z|0,
-            668265263
-        ) ^
-        Math.imul(
-            seed|0,
-            1442695041
-        );
-
-    n ^= n >>> 13;
-
-    n =
-        Math.imul(
-            n,
-            1274126177
-        );
-
-    n ^= n >>> 16;
-
-    return (
-        n >>> 0
-    ) / 4294967295;
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d",{willReadFrequently:true});
+const workspace=document.getElementById("workspace");
+
+let W=1600,H=1000;
+let scale=1;
+let offsetX=0;
+let offsetY=0;
+
+let tool="brush";
+let brushType="normal";
+
+let drawing=false;
+let moving=false;
+
+let startX=0,startY=0;
+let lastX=0,lastY=0;
+
+let previewImage=null;
+
+let undoStack=[];
+let redoStack=[];
+
+let layers=[];
+let currentLayer=0;
+let layerId=1;
+
+const brushes={
+normal:{
+name:"Standard",
+icon:"●",
+draw:(x1,y1,x2,y2)=>{
+stroke(x1,y1,x2,y2,ctx.lineWidth)
 }
+},
 
-
-// ============================================================
-// NOISE
-// ============================================================
-
-function smooth(t){
-
-    return t*t*(3-2*t);
-
+pencil:{
+name:"Bleistift",
+icon:"✎",
+draw:(x1,y1,x2,y2)=>{
+ctx.globalAlpha=.75;
+ctx.lineWidth=Math.max(1,ctx.lineWidth*.55);
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.globalAlpha=1
 }
+},
 
-
-function noise(x,z){
-
-    const x0 =
-        Math.floor(x);
-
-    const z0 =
-        Math.floor(z);
-
-    const x1=x0+1;
-    const z1=z0+1;
-
-    const sx =
-        smooth(x-x0);
-
-    const sz =
-        smooth(z-z0);
-
-    const a =
-        hash(x0,z0);
-
-    const b =
-        hash(x1,z0);
-
-    const c =
-        hash(x0,z1);
-
-    const d =
-        hash(x1,z1);
-
-    const ab =
-        a+(b-a)*sx;
-
-    const cd =
-        c+(d-c)*sx;
-
-    return (
-        ab+(cd-ab)*sz
-    );
+ink:{
+name:"Tinte",
+icon:"✒",
+draw:(x1,y1,x2,y2)=>{
+ctx.lineWidth*=1.35;
+stroke(x1,y1,x2,y2,ctx.lineWidth)
 }
+},
 
-
-// ============================================================
-// FBM
-// ============================================================
-
-function fbm(x,z){
-
-    let value=0;
-    let amplitude=.5;
-    let frequency=1;
-
-    for(let i=0;i<6;i++){
-
-        value +=
-            noise(
-                x*frequency,
-                z*frequency
-            ) *
-            amplitude;
-
-        frequency*=2;
-        amplitude*=.5;
-
-    }
-
-    return value;
+marker:{
+name:"Marker",
+icon:"▬",
+draw:(x1,y1,x2,y2)=>{
+ctx.globalAlpha=.45;
+ctx.lineWidth*=2.2;
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.globalAlpha=1
 }
+},
 
-
-// ============================================================
-// TERRAIN HÖHE
-// ============================================================
-
-function getHeight(x,z){
-
-    const distance =
-        Math.sqrt(
-            x*x+
-            z*z
-        );
-
-    // Runde Insel
-    const edge =
-        distance / MAP_RADIUS;
-
-    if(edge>=1)
-        return -30;
-
-    let h=0;
-
-    // große Landschaft
-    h +=
-        (fbm(
-            x*.00065,
-            z*.00065
-        )-.5)
-        *350;
-
-    // Hügel
-    h +=
-        (fbm(
-            x*.0018+200,
-            z*.0018+500
-        )-.5)
-        *130;
-
-    // kleine Details
-    h +=
-        (fbm(
-            x*.006,
-            z*.006
-        )-.5)
-        *30;
-
-    // Bergketten
-    const mountains =
-        Math.max(
-            0,
-            fbm(
-                x*.0003+500,
-                z*.0003+700
-            )-.54
-        );
-
-    h +=
-        mountains *
-        mountains *
-        800;
-
-    // Rand fällt zum Meeresspiegel ab
-    const falloff =
-        Math.pow(
-            Math.max(
-                0,
-                edge-.70
-            ) / .30,
-            2
-        );
-
-    h -=
-        falloff * 180;
-
-    return h;
+soft:{
+name:"Soft",
+icon:"☁",
+draw:(x1,y1,x2,y2)=>{
+ctx.shadowBlur=ctx.lineWidth*.7;
+ctx.shadowColor=document.getElementById("color").value;
+ctx.globalAlpha=.35;
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.shadowBlur=0;
+ctx.globalAlpha=1
 }
+},
 
+airbrush:{
+name:"Airbrush",
+icon:"◌",
+draw:(x1,y1,x2,y2)=>{
+let r=ctx.lineWidth;
+let steps=Math.max(2,Math.ceil(Math.hypot(x2-x1,y2-y1)/3));
 
-// ============================================================
-// TERRAIN
-// ============================================================
+for(let i=0;i<=steps;i++){
+let t=i/steps;
+let x=x1+(x2-x1)*t;
+let y=y1+(y2-y1)*t;
 
-let terrain=null;
-
-function createTerrain(){
-
-    if(terrain){
-
-        scene.remove(
-            terrain
-        );
-
-        terrain.geometry.dispose();
-
-        terrain.material.dispose();
-
-        terrain=null;
-    }
-
-
-    const geometry =
-        new THREE.PlaneGeometry(
-            MAP_DIAMETER,
-            MAP_DIAMETER,
-            SEGMENTS,
-            SEGMENTS
-        );
-
-    geometry.rotateX(
-        -Math.PI/2
-    );
-
-
-    const positions =
-        geometry.attributes.position;
-
-
-    for(
-        let i=0;
-        i<positions.count;
-        i++
-    ){
-
-        const x =
-            positions.getX(i);
-
-        const z =
-            positions.getZ(i);
-
-        const distance =
-            Math.sqrt(
-                x*x+
-                z*z
-            );
-
-
-        if(distance > MAP_RADIUS){
-
-            // außerhalb der runden Welt
-            positions.setY(
-                i,
-                -30
-            );
-
-        }else{
-
-            positions.setY(
-                i,
-                getHeight(
-                    x,
-                    z
-                )
-            );
-
-        }
-
-    }
-
-
-    geometry.computeVertexNormals();
-
-
-    const material =
-        new THREE.MeshStandardMaterial({
-
-            color:0x4d9844,
-
-            roughness:1,
-
-            metalness:0
-
-        });
-
-
-    terrain =
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
-    terrain.receiveShadow=true;
-
-    scene.add(
-        terrain
-    );
+for(let j=0;j<7;j++){
+let a=Math.random()*Math.PI*2;
+let d=Math.random()*r;
+ctx.globalAlpha=.035;
+ctx.beginPath();
+ctx.arc(x+Math.cos(a)*d,y+Math.sin(a)*d,Math.max(1,r*.08),0,Math.PI*2);
+ctx.fill();
 }
-
-
-// ============================================================
-// GENERIEREN
-// ============================================================
-
-function generateWorld(){
-
-    document.getElementById(
-        "loading"
-    ).style.display="flex";
-
-
-    requestAnimationFrame(()=>{
-
-        createTerrain();
-
-        document.getElementById(
-            "seedText"
-        ).innerText =
-            seed;
-
-
-        camera.position.set(
-            0,
-            650,
-            1000
-        );
-
-        rotX=-.45;
-        rotY=0;
-
-        camera.rotation.x=
-            rotX;
-
-        rig.rotation.y=
-            rotY;
-
-
-        document.getElementById(
-            "loading"
-        ).style.display="none";
-
-    });
-
 }
+ctx.globalAlpha=1
+}
+},
 
+chalk:{
+name:"Kreide",
+icon:"▰",
+draw:(x1,y1,x2,y2)=>{
+ctx.globalAlpha=.45;
+for(let i=0;i<5;i++){
+let ox=(Math.random()-.5)*ctx.lineWidth*.35;
+let oy=(Math.random()-.5)*ctx.lineWidth*.35;
+stroke(x1+ox,y1+oy,x2+ox,y2+oy,Math.max(1,ctx.lineWidth*.35))
+}
+ctx.globalAlpha=1
+}
+},
 
-// ============================================================
-// NEUE WELT / SEED
-// ============================================================
+spray:{
+name:"Spray",
+icon:"⁙",
+draw:(x1,y1,x2,y2)=>{
+let r=ctx.lineWidth;
+let d=Math.max(1,Math.hypot(x2-x1,y2-y1));
+let n=Math.floor(d*r/8)+15;
 
-document.getElementById(
-    "generate"
-).onclick=()=>{
+for(let i=0;i<n;i++){
+let t=Math.random();
+let x=x1+(x2-x1)*t;
+let y=y1+(y2-y1)*t;
+let a=Math.random()*Math.PI*2;
+let rr=Math.random()*r;
+ctx.globalAlpha=.15;
+ctx.beginPath();
+ctx.arc(x+Math.cos(a)*rr,y+Math.sin(a)*rr,Math.random()*1.5+0.4,0,Math.PI*2);
+ctx.fill()
+}
+ctx.globalAlpha=1
+}
+},
 
-    const text =
-        document.getElementById(
-            "seedInput"
-        ).value.trim();
+square:{
+name:"Quadrat",
+icon:"■",
+draw:(x1,y1,x2,y2)=>{
+ctx.lineCap="square";
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.lineCap="round"
+}
+},
 
+calligraphy:{
+name:"Kalligrafie",
+icon:"／",
+draw:(x1,y1,x2,y2)=>{
+ctx.lineCap="butt";
+ctx.lineWidth*=.7;
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.lineCap="round"
+}
+},
 
-    if(text===""){
+neon:{
+name:"Glow",
+icon:"✦",
+draw:(x1,y1,x2,y2)=>{
+let c=document.getElementById("color").value;
+ctx.shadowColor=c;
+ctx.shadowBlur=ctx.lineWidth*2;
+ctx.globalAlpha=.9;
+stroke(x1,y1,x2,y2,ctx.lineWidth);
+ctx.shadowBlur=0;
+ctx.globalAlpha=1
+}
+},
 
-        seed =
-            Math.floor(
-                Math.random() *
-                2147483647
-            );
+dots:{
+name:"Punkte",
+icon:"⁙",
+draw:(x1,y1,x2,y2)=>{
+let d=Math.hypot(x2-x1,y2-y1);
+let steps=Math.max(1,Math.ceil(d/(ctx.lineWidth*1.2)));
 
-    }else{
-
-        let n=2166136261;
-
-        for(
-            let i=0;
-            i<text.length;
-            i++
-        ){
-
-            n ^=
-                text.charCodeAt(i);
-
-            n =
-                Math.imul(
-                    n,
-                    16777619
-                );
-
-        }
-
-        seed =
-            (n >>> 0) ||
-            1;
-    }
-
-
-    generateWorld();
-
+for(let i=0;i<=steps;i++){
+let t=i/steps;
+ctx.beginPath();
+ctx.arc(
+x1+(x2-x1)*t,
+y1+(y2-y1)*t,
+ctx.lineWidth/2,
+0,Math.PI*2
+);
+ctx.fill()
+}
+}
+}
 };
 
-
-// ============================================================
-// GLB EXPORT
-// ============================================================
-
-document.getElementById(
-    "export"
-).onclick=()=>{
-
-    if(!terrain)
-        return;
-
-
-    const button =
-        document.getElementById(
-            "export"
-        );
-
-    button.disabled=true;
-
-    button.innerText=
-        "GLB wird erstellt...";
-
-
-    // --------------------------------------------------------
-    // Export-Kopie
-    // Damit der Export sicher eine eigene Szene besitzt.
-    // --------------------------------------------------------
-
-    const exportScene =
-        new THREE.Scene();
-
-
-    const exportTerrain =
-        terrain.clone(true);
-
-
-    exportTerrain.geometry =
-        terrain.geometry.clone();
-
-
-    exportTerrain.material =
-        terrain.material.clone();
-
-
-    exportScene.add(
-        exportTerrain
-    );
-
-
-    const exporter =
-        new THREE.GLTFExporter();
-
-
-    exporter.parse(
-
-        exportScene,
-
-        result=>{
-
-            try{
-
-                const blob =
-                    new Blob(
-                        [result],
-                        {
-                            type:
-                            "model/gltf-binary"
-                        }
-                    );
-
-
-                const url =
-                    URL.createObjectURL(
-                        blob
-                    );
-
-
-                const a =
-                    document.createElement(
-                        "a"
-                    );
-
-                a.style.display="none";
-
-                a.href=url;
-
-                a.download =
-                    "ZEROPOINT_TERRAIN_" +
-                    seed +
-                    ".glb";
-
-
-                document.body.appendChild(a);
-
-                a.click();
-
-                document.body.removeChild(a);
-
-
-                setTimeout(
-                    ()=>{
-                        URL.revokeObjectURL(
-                            url
-                        );
-                    },
-                    1000
-                );
-
-
-            }catch(error){
-
-                console.error(error);
-
-                alert(
-                    "Der GLB konnte nicht gespeichert werden."
-                );
-
-            }
-
-
-            button.disabled=false;
-
-            button.innerText=
-                "GLB herunterladen";
-
-        },
-
-
-        error=>{
-
-            console.error(error);
-
-            alert(
-                "GLB-Export fehlgeschlagen."
-            );
-
-            button.disabled=false;
-
-            button.innerText=
-                "GLB herunterladen";
-
-        },
-
-
-        {
-            binary:true,
-            onlyVisible:true
-        }
-
-    );
-
-};
-
-
-// ============================================================
-// RESIZE
-// ============================================================
-
-window.addEventListener(
-    "resize",
-    ()=>{
-
-        camera.aspect =
-            innerWidth /
-            innerHeight;
-
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(
-            innerWidth,
-            innerHeight
-        );
-
-    }
-);
-
-
-// ============================================================
-// START
-// ============================================================
-
-generateWorld();
-
-
-// ============================================================
-// LOOP
-// ============================================================
-
-function animate(){
-
-    requestAnimationFrame(
-        animate
-    );
-
-    renderer.render(
-        scene,
-        camera
-    );
-
+function stroke(x1,y1,x2,y2,width){
+ctx.beginPath();
+ctx.moveTo(x1,y1);
+ctx.lineTo(x2,y2);
+ctx.lineWidth=width;
+ctx.stroke()
 }
 
-animate();
+function setupCanvas(){
+canvas.width=W;
+canvas.height=H;
+ctx.fillStyle="#fff";
+ctx.fillRect(0,0,W,H);
+}
 
+function centerCanvas(){
+offsetX=(workspace.clientWidth-W*scale)/2;
+offsetY=(workspace.clientHeight-H*scale)/2;
+updateTransform()
+}
+
+function updateTransform(){
+canvas.style.transform=`translate(${offsetX}px,${offsetY}px) scale(${scale})`;
+document.getElementById("zoomText").textContent=Math.round(scale*100)+"%"
+}
+
+function screenPoint(e){
+let r=workspace.getBoundingClientRect();
+
+return{
+sx:e.clientX-r.left,
+sy:e.clientY-r.top,
+x:(e.clientX-r.left-offsetX)/scale,
+y:(e.clientY-r.top-offsetY)/scale
+}
+}
+
+function saveState(){
+undoStack.push(canvas.toDataURL());
+if(undoStack.length>40)undoStack.shift();
+redoStack=[]
+}
+
+function restore(data){
+let img=new Image();
+
+img.onload=()=>{
+ctx.clearRect(0,0,W,H);
+ctx.drawImage(img,0,0)
+};
+
+img.src=data
+}
+
+function setTool(t){
+tool=t;
+
+document.querySelectorAll(".left button").forEach(b=>{
+b.classList.toggle("active",b.dataset.tool===t)
+});
+
+document.getElementById("toolSelect").value=t
+}
+
+document.querySelectorAll(".left button").forEach(b=>{
+b.onclick=()=>setTool(b.dataset.tool)
+});
+
+document.getElementById("toolSelect").onchange=e=>{
+setTool(e.target.value)
+};
+
+function configureBrush(){
+ctx.strokeStyle=document.getElementById("color").value;
+ctx.fillStyle=document.getElementById("color").value;
+ctx.lineWidth=+document.getElementById("size").value;
+ctx.lineCap="round";
+ctx.lineJoin="round";
+ctx.globalAlpha=+document.getElementById("opacity").value/100;
+ctx.globalCompositeOperation=
+tool==="eraser"?"destination-out":"source-over"
+}
+
+function drawBrush(x1,y1,x2,y2){
+configureBrush();
+
+if(brushes[brushType]){
+brushes[brushType].draw(x1,y1,x2,y2)
+}
+
+ctx.globalAlpha=1;
+ctx.globalCompositeOperation="source-over";
+ctx.shadowBlur=0
+}
+
+function begin(e){
+if(e.pointerType==="mouse"&&e.button!==0)return;
+
+let p=screenPoint(e);
+
+if(tool==="move"){
+moving=true;
+startX=e.clientX;
+startY=e.clientY;
+return
+}
+
+if(tool==="picker"){
+let x=Math.floor(p.x);
+let y=Math.floor(p.y);
+
+if(x>=0&&y>=0&&x<W&&y<H){
+let d=ctx.getImageData(x,y,1,1).data;
+
+document.getElementById("color").value=
+"#"+[d[0],d[1],d[2]]
+.map(v=>v.toString(16).padStart(2,"0")).join("")
+}
+
+return
+}
+
+if(tool==="fill"){
+saveState();
+fill(Math.floor(p.x),Math.floor(p.y));
+return
+}
+
+saveState();
+
+drawing=true;
+startX=p.x;
+startY=p.y;
+lastX=p.x;
+lastY=p.y;
+
+previewImage=ctx.getImageData(0,0,W,H);
+
+if(tool==="brush"||tool==="eraser"){
+drawBrush(p.x,p.y,p.x+.01,p.y+.01)
+}
+}
+
+function move(e){
+let p=screenPoint(e);
+
+document.getElementById("coords").textContent=
+Math.round(p.x)+" × "+Math.round(p.y);
+
+if(tool==="move"&&moving){
+offsetX+=e.movementX;
+offsetY+=e.movementY;
+updateTransform();
+return
+}
+
+if(!drawing)return;
+
+if(tool==="brush"||tool==="eraser"){
+drawBrush(lastX,lastY,p.x,p.y);
+lastX=p.x;
+lastY=p.y;
+return
+}
+
+ctx.putImageData(previewImage,0,0);
+
+ctx.strokeStyle=document.getElementById("color").value;
+ctx.lineWidth=+document.getElementById("size").value;
+ctx.globalAlpha=+document.getElementById("opacity").value/100;
+ctx.globalCompositeOperation="source-over";
+ctx.lineCap="round";
+
+if(tool==="line"){
+ctx.beginPath();
+ctx.moveTo(startX,startY);
+ctx.lineTo(p.x,p.y);
+ctx.stroke()
+}
+
+if(tool==="rect"){
+ctx.strokeRect(startX,startY,p.x-startX,p.y-startY)
+}
+
+if(tool==="circle"){
+let dx=p.x-startX;
+let dy=p.y-startY;
+let r=Math.sqrt(dx*dx+dy*dy);
+
+ctx.beginPath();
+ctx.arc(startX,startY,r,0,Math.PI*2);
+ctx.stroke()
+}
+
+ctx.globalAlpha=1
+}
+
+function end(){
+drawing=false;
+moving=false;
+previewImage=null
+}
+
+canvas.addEventListener("pointerdown",begin);
+workspace.addEventListener("pointermove",move);
+window.addEventListener("pointerup",end);
+
+workspace.addEventListener("pointerleave",()=>{
+document.getElementById("cursorInfo").style.display="none"
+});
+
+workspace.addEventListener("pointerenter",()=>{
+document.getElementById("cursorInfo").style.display="block"
+});
+
+workspace.addEventListener("pointermove",e=>{
+let r=workspace.getBoundingClientRect();
+
+let c=document.getElementById("cursorInfo");
+c.style.left=(e.clientX-r.left+14)+"px";
+c.style.top=(e.clientY-r.top+14)+"px";
+
+let p=screenPoint(e);
+
+c.textContent=Math.round(p.x)+" × "+Math.round(p.y)
+});
+
+workspace.addEventListener("wheel",e=>{
+e.preventDefault();
+
+let r=workspace.getBoundingClientRect();
+
+let mouseX=e.clientX-r.left;
+let mouseY=e.clientY-r.top;
+
+let worldX=(mouseX-offsetX)/scale;
+let worldY=(mouseY-offsetY)/scale;
+
+let factor=e.deltaY<0?1.12:.892857;
+
+let newScale=Math.max(.1,Math.min(8,scale*factor));
+
+offsetX=mouseX-worldX*newScale;
+offsetY=mouseY-worldY*newScale;
+
+scale=newScale;
+
+updateTransform()
+},{passive:false});
+
+function zoomCenter(factor){
+let cx=workspace.clientWidth/2;
+let cy=workspace.clientHeight/2;
+
+let worldX=(cx-offsetX)/scale;
+let worldY=(cy-offsetY)/scale;
+
+scale=Math.max(.1,Math.min(8,scale*factor));
+
+offsetX=cx-worldX*scale;
+offsetY=cy-worldY*scale;
+
+updateTransform()
+}
+
+document.getElementById("zoomIn").onclick=()=>zoomCenter(1.2);
+document.getElementById("zoomOut").onclick=()=>zoomCenter(.833333);
+document.getElementById("zoomReset").onclick=()=>{
+scale=1;
+centerCanvas()
+};
+
+document.getElementById("size").oninput=e=>{
+document.getElementById("sizeValue").textContent=e.target.value
+};
+
+document.getElementById("opacity").oninput=e=>{
+document.getElementById("opacityValue").textContent=e.target.value+"%"
+};
+
+document.getElementById("hardness").oninput=e=>{
+document.getElementById("hardnessValue").textContent=e.target.value+"%"
+};
+
+document.getElementById("undoBtn").onclick=()=>{
+if(!undoStack.length)return;
+
+redoStack.push(canvas.toDataURL());
+restore(undoStack.pop())
+};
+
+document.getElementById("redoBtn").onclick=()=>{
+if(!redoStack.length)return;
+
+undoStack.push(canvas.toDataURL());
+restore(redoStack.pop())
+};
+
+document.getElementById("newBtn").onclick=()=>{
+if(confirm("Neue Leinwand erstellen?")){
+setupCanvas();
+undoStack=[];
+redoStack=[];
+scale=1;
+centerCanvas()
+}
+};
+
+document.getElementById("openBtn").onclick=()=>{
+document.getElementById("fileInput").click()
+};
+
+document.getElementById("fileInput").onchange=e=>{
+let file=e.target.files[0];
+if(!file)return;
+
+let img=new Image();
+
+img.onload=()=>{
+W=img.width;
+H=img.height;
+
+canvas.width=W;
+canvas.height=H;
+
+ctx.fillStyle="#fff";
+ctx.fillRect(0,0,W,H);
+ctx.drawImage(img,0,0);
+
+undoStack=[];
+redoStack=[];
+scale=1;
+centerCanvas()
+};
+
+img.src=URL.createObjectURL(file)
+};
+
+document.getElementById("saveBtn").onclick=()=>{
+let a=document.createElement("a");
+a.download="ghost-paint.png";
+a.href=canvas.toDataURL("image/png");
+a.click()
+};
+
+document.getElementById("fullscreen").onclick=()=>{
+if(!document.fullscreenElement)
+document.documentElement.requestFullscreen();
+else
+document.exitFullscreen()
+};
+
+document.addEventListener("keydown",e=>{
+if(e.ctrlKey&&e.key.toLowerCase()==="z"){
+e.preventDefault();
+document.getElementById("undoBtn").click()
+}
+
+if(e.ctrlKey&&e.key.toLowerCase()==="y"){
+e.preventDefault();
+document.getElementById("redoBtn").click()
+}
+
+if(e.key.toLowerCase()==="b")setTool("brush");
+if(e.key.toLowerCase()==="e")setTool("eraser");
+if(e.key.toLowerCase()==="l")setTool("line");
+if(e.key.toLowerCase()==="r")setTool("rect");
+if(e.key.toLowerCase()==="o")setTool("circle");
+if(e.key.toLowerCase()==="f")setTool("fill");
+if(e.key.toLowerCase()==="i")setTool("picker");
+if(e.key.toLowerCase()==="m")setTool("move");
+
+if(e.key==="[" ){
+let s=document.getElementById("size");
+s.value=Math.max(1,+s.value-5);
+s.dispatchEvent(new Event("input"))
+}
+
+if(e.key==="]"){
+let s=document.getElementById("size");
+s.value=Math.min(300,+s.value+5);
+s.dispatchEvent(new Event("input"))
+}
+});
+
+function createBrushUI(){
+let grid=document.getElementById("brushGrid");
+
+Object.entries(brushes).forEach(([id,b])=>{
+let el=document.createElement("button");
+
+el.className="brushItem"+(id==="normal"?" active":"");
+
+el.innerHTML=
+`<div class="brushPreview">${b.icon}</div>
+<div>${b.name}</div>`;
+
+el.onclick=()=>{
+brushType=id;
+
+document.querySelectorAll(".brushItem").forEach(x=>{
+x.classList.remove("active")
+});
+
+el.classList.add("active");
+setTool("brush")
+};
+
+grid.appendChild(el)
+})
+}
+
+function fill(x,y){
+if(x<0||y<0||x>=W||y>=H)return;
+
+let img=ctx.getImageData(0,0,W,H);
+let data=img.data;
+
+let start=(y*W+x)*4;
+
+let target=[
+data[start],
+data[start+1],
+data[start+2],
+data[start+3]
+];
+
+let hex=document.getElementById("color").value;
+let rgb=hex.match(/\w\w/g).map(v=>parseInt(v,16));
+
+let replacement=[rgb[0],rgb[1],rgb[2],255];
+
+if(target.every((v,i)=>v===replacement[i]))return;
+
+let stack=[[x,y]];
+let seen=new Uint8Array(W*H);
+
+while(stack.length){
+let [px,py]=stack.pop();
+
+if(px<0||py<0||px>=W||py>=H)continue;
+
+let p=py*W+px;
+
+if(seen[p])continue;
+
+let i=p*4;
+
+if(
+data[i]!==target[0]||
+data[i+1]!==target[1]||
+data[i+2]!==target[2]||
+data[i+3]!==target[3]
+)continue;
+
+seen[p]=1;
+
+data[i]=replacement[0];
+data[i+1]=replacement[1];
+data[i+2]=replacement[2];
+data[i+3]=replacement[3];
+
+stack.push([px+1,py]);
+stack.push([px-1,py]);
+stack.push([px,py+1]);
+stack.push([px,py-1])
+}
+
+ctx.putImageData(img,0,0)
+}
+
+function renderLayers(){
+let list=document.getElementById("layerList");
+list.innerHTML="";
+
+layers.forEach((layer,i)=>{
+let el=document.createElement("div");
+
+el.className="layer"+(i===currentLayer?" selected":"");
+
+let eye=document.createElement("button");
+eye.textContent=layer.visible?"◉":"○";
+
+eye.onclick=e=>{
+e.stopPropagation();
+layer.visible=!layer.visible;
+eye.textContent=layer.visible?"◉":"○"
+};
+
+let name=document.createElement("span");
+name.textContent=layer.name;
+
+el.appendChild(eye);
+el.appendChild(name);
+
+el.onclick=()=>{
+currentLayer=i;
+renderLayers()
+};
+
+list.appendChild(el)
+})
+}
+
+document.getElementById("addLayer").onclick=()=>{
+layers.push({
+name:"Ebene "+layerId++,
+visible:true
+});
+
+currentLayer=layers.length-1;
+renderLayers()
+};
+
+document.getElementById("deleteLayer").onclick=()=>{
+if(layers.length<=1)return;
+
+layers.splice(currentLayer,1);
+currentLayer=Math.max(0,currentLayer-1);
+renderLayers()
+};
+
+layers.push({
+name:"Hintergrund",
+visible:true
+});
+
+createBrushUI();
+renderLayers();
+setupCanvas();
+centerCanvas();
 </script>
-
 </body>
 </html>
