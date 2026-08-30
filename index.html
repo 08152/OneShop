@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ZEROPOINT – Mapper</title>
+<title>ZEROPOINT – Mapper Terrain</title>
 
 <style>
 html,body{
@@ -24,16 +24,15 @@ canvas{
     top:15px;
     left:15px;
     z-index:20;
-    width:360px;
+    width:340px;
     padding:16px;
-    background:rgba(20,25,29,.9);
-    color:white;
     border-radius:15px;
-    box-shadow:0 10px 40px #0008;
+    background:rgba(20,24,28,.9);
+    color:white;
 }
 
 #title{
-    font-size:26px;
+    font-size:25px;
     font-weight:bold;
     margin-bottom:12px;
 }
@@ -57,14 +56,14 @@ input{
 button{
     border:0;
     border-radius:8px;
-    padding:11px 14px;
+    padding:11px;
+    color:white;
     font-weight:bold;
     cursor:pointer;
-    color:white;
 }
 
 #generate{
-    background:#3caf50;
+    background:#39a852;
 }
 
 #export{
@@ -74,7 +73,7 @@ button{
 }
 
 #info{
-    margin-top:12px;
+    margin-top:10px;
     font-size:13px;
     line-height:1.5;
 }
@@ -84,26 +83,12 @@ button{
     bottom:18px;
     left:50%;
     transform:translateX(-50%);
-    background:#0008;
+    z-index:10;
     color:white;
+    background:#0008;
     padding:9px 14px;
     border-radius:9px;
-    z-index:20;
     pointer-events:none;
-    font-size:13px;
-}
-
-#loading{
-    position:absolute;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:#0005;
-    color:white;
-    font-size:20px;
-    font-weight:bold;
-    z-index:100;
 }
 </style>
 </head>
@@ -111,28 +96,32 @@ button{
 <body>
 
 <div id="ui">
-    <div id="title">ZEROPOINT · MAPPER</div>
 
-    <div class="row">
-        <input id="seed" placeholder="Seed...">
-        <button id="generate">Neue Welt</button>
-    </div>
+<div id="title">
+ZEROPOINT · TERRAIN MAPPER
+</div>
 
-    <button id="export">GLB herunterladen</button>
+<div class="row">
+<input id="seed" placeholder="Seed...">
+<button id="generate">
+Neue Welt
+</button>
+</div>
 
-    <div id="info">
-        Seed: <b id="seedText">-</b><br>
-        Weltgröße: 6000 × 6000<br>
-        Chunks: <b id="chunksText">0</b>
-    </div>
+<button id="export">
+GLB herunterladen
+</button>
+
+<div id="info">
+Seed: <b id="seedText">-</b><br>
+Nur eine zusammenhängende Terrain-Fläche<br>
+Keine Bäume · Kein Wasser · Keine Objekte
+</div>
+
 </div>
 
 <div id="hint">
-    Klick auf die Welt → Maus bewegen = 360° · Mausrad = Zoom
-</div>
-
-<div id="loading">
-    ZEROPOINT WELT WIRD ERSTELLT...
+Linke Maustaste = 3-D drehen · Mausrad = Zoom · rechte Maustaste = verschieben
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -141,20 +130,17 @@ button{
 <script>
 
 // ============================================================
-// ZEROPOINT MAPPER
-// 3-D SYSTEM AUS DEINEM GESCHICKTEN CODE
-// KEIN WASD
-// KEIN SPIELER
-// NUR 3-D KAMERA
+// ZEROPOINT TERRAIN
+// EINE EINZIGE GEOMETRIE
 // ============================================================
 
-const WORLD_SIZE = 6000;
-const CHUNK_SIZE = 300;
+const SIZE = 5000;
+const SEGMENTS = 180;
 
-const RENDER_DISTANCE = 2;
-
-let seedValue =
-    Math.floor(Math.random()*2147483647);
+let seed =
+    Math.floor(
+        Math.random()*2147483647
+    );
 
 
 // ============================================================
@@ -165,19 +151,21 @@ const scene =
     new THREE.Scene();
 
 scene.background =
-    new THREE.Color(0x79caff);
+    new THREE.Color(
+        0x79caff
+    );
 
 scene.fog =
     new THREE.Fog(
         0x79caff,
-        500,
-        3500
+        900,
+        5000
     );
 
 
 // ============================================================
 // CAMERA
-// EXAKT DAS PRINZIP AUS DEINEM CODE
+// AUS DEINEM ORIGINAL
 // ============================================================
 
 const camera =
@@ -185,8 +173,14 @@ const camera =
         75,
         innerWidth/innerHeight,
         .1,
-        5000
+        10000
     );
+
+camera.position.set(
+    0,
+    500,
+    900
+);
 
 
 // ============================================================
@@ -204,13 +198,13 @@ renderer.setSize(
 );
 
 renderer.setPixelRatio(
-    Math.min(devicePixelRatio,1.5)
+    Math.min(
+        devicePixelRatio,
+        1.5
+    )
 );
 
 renderer.shadowMap.enabled=true;
-
-renderer.shadowMap.type =
-    THREE.PCFSoftShadowMap;
 
 document.body.appendChild(
     renderer.domElement
@@ -231,13 +225,13 @@ scene.add(
 const sun =
     new THREE.DirectionalLight(
         0xffffff,
-        1.6
+        1.7
     );
 
 sun.position.set(
-    500,
-    900,
-    400
+    700,
+    1200,
+    500
 );
 
 sun.castShadow=true;
@@ -246,44 +240,34 @@ scene.add(sun);
 
 
 // ============================================================
-// 3-D KAMERA-OBJEKT
-// AUS DEINEM ORIGINAL ÜBERNOMMEN
+// CAMERA RIG
 // ============================================================
 
-const cameraRig =
+const rig =
     new THREE.Object3D();
 
-scene.add(cameraRig);
+scene.add(rig);
 
-cameraRig.add(camera);
-
-
-// ============================================================
-// KAMERA-POSITION
-// ============================================================
-
-camera.position.set(
-    0,
-    180,
-    700
-);
+rig.add(camera);
 
 
 // ============================================================
-// MAUS-3D
-// AUS DEINEM CODE
+// MAUS
+// GENAU DAS 3-D-PRINZIP AUS DEINEM CODE
 // ============================================================
-
-let rotX = -.45;
-let rotY = 0;
 
 let mouseDown=false;
+
+let rotX=-.45;
+let rotY=0;
 
 renderer.domElement.addEventListener(
     "mousedown",
     e=>{
+
         if(e.button===0)
             mouseDown=true;
+
     }
 );
 
@@ -301,9 +285,11 @@ window.addEventListener(
         if(!mouseDown)
             return;
 
-        rotY -= e.movementX*.003;
+        rotY -=
+            e.movementX*.003;
 
-        rotX -= e.movementY*.003;
+        rotX -=
+            e.movementY*.003;
 
         rotX =
             Math.max(
@@ -314,9 +300,12 @@ window.addEventListener(
                 )
             );
 
-        camera.rotation.x=rotX;
+        camera.rotation.x=
+            rotX;
 
-        cameraRig.rotation.y=rotY;
+        rig.rotation.y=
+            rotY;
+
     }
 );
 
@@ -331,47 +320,28 @@ renderer.domElement.addEventListener(
 
         e.preventDefault();
 
-        const direction =
-            new THREE.Vector3(
-                0,
-                0,
-                1
-            );
-
-        direction.applyQuaternion(
-            camera.quaternion
-        );
-
-        camera.position.addScaledVector(
-            direction,
+        camera.translateZ(
             e.deltaY*.7
         );
 
-        camera.position.x =
+        camera.position.z=
             Math.max(
-                -2800,
+                100,
                 Math.min(
-                    2800,
-                    camera.position.x
-                )
-            );
-
-        camera.position.z =
-            Math.max(
-                -2800,
-                Math.min(
-                    2800,
+                    5000,
                     camera.position.z
                 )
             );
 
     },
-    {passive:false}
+    {
+        passive:false
+    }
 );
 
 
 // ============================================================
-// HASH
+// SEED RANDOM
 // ============================================================
 
 function hash(x,z){
@@ -386,7 +356,7 @@ function hash(x,z){
             668265263
         ) ^
         Math.imul(
-            seedValue|0,
+            seed|0,
             1442695041
         );
 
@@ -410,52 +380,77 @@ function hash(x,z){
 // NOISE
 // ============================================================
 
+function smooth(t){
+
+    return t*t*(3-2*t);
+
+}
+
 function noise(x,z){
 
-    const x0=Math.floor(x);
-    const z0=Math.floor(z);
+    const x0 =
+        Math.floor(x);
+
+    const z0 =
+        Math.floor(z);
 
     const x1=x0+1;
     const z1=z0+1;
 
-    const sx=x-x0;
-    const sz=z-z0;
+    const sx=
+        smooth(x-x0);
 
-    const a=hash(x0,z0);
-    const b=hash(x1,z0);
-    const c=hash(x0,z1);
-    const d=hash(x1,z1);
+    const sz=
+        smooth(z-z0);
 
-    const ab =
+    const a=
+        hash(x0,z0);
+
+    const b=
+        hash(x1,z0);
+
+    const c=
+        hash(x0,z1);
+
+    const d=
+        hash(x1,z1);
+
+    const ab=
         a+(b-a)*sx;
 
-    const cd =
+    const cd=
         c+(d-c)*sx;
 
-    return ab+(cd-ab)*sz;
+    return (
+        ab+(cd-ab)*sz
+    );
 }
 
 
 // ============================================================
-// FBM
+// FRACTAL NOISE
 // ============================================================
 
 function fbm(x,z){
 
     let value=0;
-    let amp=.5;
-    let freq=1;
 
-    for(let i=0;i<5;i++){
+    let amplitude=.5;
+
+    let frequency=1;
+
+    for(let i=0;i<6;i++){
 
         value +=
             noise(
-                x*freq,
-                z*freq
-            )*amp;
+                x*frequency,
+                z*frequency
+            )*
+            amplitude;
 
-        freq*=2;
-        amp*=.5;
+        frequency*=2;
+
+        amplitude*=.5;
     }
 
     return value;
@@ -463,500 +458,144 @@ function fbm(x,z){
 
 
 // ============================================================
-// TERRAIN
+// HÖHE
 // ============================================================
 
 function getHeight(x,z){
 
     let h=0;
 
+    // große Berge
     h +=
         (fbm(
-            x*.0007,
-            z*.0007
-        )-.5)*260;
+            x*.00065,
+            z*.00065
+        )-.5)
+        *380;
 
+    // Hügel
     h +=
         (fbm(
-            x*.002,
-            z*.002
-        )-.5)*100;
+            x*.0018+100,
+            z*.0018+200
+        )-.5)
+        *150;
 
+    // kleine Unebenheiten
     h +=
         (fbm(
-            x*.007,
-            z*.007
-        )-.5)*35;
+            x*.006,
+            z*.006
+        )-.5)
+        *35;
 
+    // zusätzliche Bergketten
     const mountain =
         Math.max(
             0,
             fbm(
-                x*.00035+50,
-                z*.00035+90
-            )-.52
+                x*.0003+500,
+                z*.0003+700
+            )-.55
         );
 
     h +=
         mountain*
         mountain*
-        900;
+        700;
 
     return h;
 }
 
 
 // ============================================================
-// MATERIALIEN
+// TERRAIN
+// WICHTIG:
+// EINE EINZIGE PLANE-GEOMETRIE
+// KEINE WÜRFEL
+// KEINE EINZELNEN FLÄCHEN
 // ============================================================
 
-const grassMat =
-    new THREE.MeshStandardMaterial({
-        color:0x4d9944,
-        roughness:1
-    });
+let terrain=null;
 
-const forestMat =
-    new THREE.MeshStandardMaterial({
-        color:0x35783b,
-        roughness:1
-    });
+function createTerrain(){
 
-const rockMat =
-    new THREE.MeshStandardMaterial({
-        color:0x707572,
-        roughness:1
-    });
+    if(terrain){
 
-const snowMat =
-    new THREE.MeshStandardMaterial({
-        color:0xf1f3f2,
-        roughness:1
-    });
-
-const sandMat =
-    new THREE.MeshStandardMaterial({
-        color:0xd9bd82,
-        roughness:1
-    });
-
-const trunkMat =
-    new THREE.MeshStandardMaterial({
-        color:0x604329,
-        roughness:1
-    });
-
-const leafMat =
-    new THREE.MeshStandardMaterial({
-        color:0x2f7838,
-        roughness:1
-    });
-
-const waterMat =
-    new THREE.MeshStandardMaterial({
-        color:0x318bc0,
-        transparent:true,
-        opacity:.72,
-        roughness:.2
-    });
-
-
-// ============================================================
-// WELT
-// ============================================================
-
-const world =
-    new THREE.Group();
-
-scene.add(world);
-
-const chunks =
-    new Map();
-
-
-// ============================================================
-// BIOME
-// ============================================================
-
-function getBiome(x,z,h){
-
-    const moisture =
-        fbm(
-            x*.0012+700,
-            z*.0012+400
+        scene.remove(
+            terrain
         );
 
-    if(h>260)
-        return "snow";
+        terrain.geometry.dispose();
 
-    if(h>180)
-        return "rock";
-
-    if(h<5)
-        return "sand";
-
-    if(moisture>.63)
-        return "forest";
-
-    return "grass";
-}
-
-
-// ============================================================
-// TREE
-// ============================================================
-
-function createTree(
-    group,
-    x,
-    y,
-    z,
-    random
-){
-
-    const tree =
-        new THREE.Group();
-
-    const height =
-        20+random*28;
-
-    const trunk =
-        new THREE.Mesh(
-            new THREE.CylinderGeometry(
-                1.2+random,
-                1.8+random,
-                height,
-                7
-            ),
-            trunkMat
-        );
-
-    trunk.position.y=
-        height/2;
-
-    trunk.castShadow=true;
-
-    tree.add(trunk);
-
-
-    for(let i=0;i<4;i++){
-
-        const leaves =
-            new THREE.Mesh(
-                new THREE.IcosahedronGeometry(
-                    5+random*4,
-                    1
-                ),
-                leafMat
-            );
-
-        const a =
-            hash(
-                Math.floor(x)+i*91,
-                Math.floor(z)+i*31
-            )*
-            Math.PI*2;
-
-        leaves.position.set(
-            Math.cos(a)*(4+i),
-            height*.55+i*5,
-            Math.sin(a)*(4+i)
-        );
-
-        leaves.scale.y=1.1;
-
-        leaves.castShadow=true;
-
-        tree.add(leaves);
     }
 
-    tree.position.set(
-        x,
-        y,
-        z
-    );
-
-    group.add(tree);
-}
-
-
-// ============================================================
-// FELS
-// ============================================================
-
-function createRock(
-    group,
-    x,
-    y,
-    z,
-    random
-){
-
-    const size =
-        3+random*13;
-
-    const rock =
-        new THREE.Mesh(
-            new THREE.DodecahedronGeometry(
-                size,
-                1
-            ),
-            rockMat
-        );
-
-    rock.position.set(
-        x,
-        y+size*.35,
-        z
-    );
-
-    rock.rotation.set(
-        random*2,
-        random*5,
-        random*3
-    );
-
-    rock.scale.y=.6+random*.5;
-
-    rock.castShadow=true;
-
-    group.add(rock);
-}
-
-
-// ============================================================
-// CHUNK
-// ============================================================
-
-function createChunk(cx,cz){
-
-    const k =
-        cx+","+cz;
-
-    if(chunks.has(k))
-        return;
-
-    const group =
-        new THREE.Group();
-
-    const geo =
+    const geometry =
         new THREE.PlaneGeometry(
-            CHUNK_SIZE,
-            CHUNK_SIZE,
-            20,
-            20
+            SIZE,
+            SIZE,
+            SEGMENTS,
+            SEGMENTS
         );
 
-    geo.rotateX(
+    geometry.rotateX(
         -Math.PI/2
     );
 
-    const pos =
-        geo.attributes.position;
-
-    let average=0;
+    const positions =
+        geometry.attributes.position;
 
     for(
         let i=0;
-        i<pos.count;
+        i<positions.count;
         i++
     ){
 
-        const lx=pos.getX(i);
-        const lz=pos.getZ(i);
+        const x=
+            positions.getX(i);
 
-        const x =
-            cx*CHUNK_SIZE+
-            lx+
-            CHUNK_SIZE/2-
-            WORLD_SIZE/2;
+        const z=
+            positions.getZ(i);
 
-        const z =
-            cz*CHUNK_SIZE+
-            lz+
-            CHUNK_SIZE/2-
-            WORLD_SIZE/2;
-
-        const h=
-            getHeight(x,z);
-
-        pos.setY(i,h);
-
-        average+=h;
-    }
-
-    geo.computeVertexNormals();
-
-    average/=pos.count;
-
-    const biome =
-        getBiome(
-            cx*CHUNK_SIZE-
-            WORLD_SIZE/2+
-            CHUNK_SIZE/2,
-
-            cz*CHUNK_SIZE-
-            WORLD_SIZE/2+
-            CHUNK_SIZE/2,
-
-            average
+        positions.setY(
+            i,
+            getHeight(
+                x,
+                z
+            )
         );
 
-    let material=grassMat;
+    }
 
-    if(biome==="forest")
-        material=forestMat;
+    geometry.computeVertexNormals();
 
-    if(biome==="rock")
-        material=rockMat;
 
-    if(biome==="snow")
-        material=snowMat;
+    // Eine einzige Terrain-Fläche
+    const material =
+        new THREE.MeshStandardMaterial({
 
-    if(biome==="sand")
-        material=sandMat;
+            color:0x4f963f,
 
-    const terrain =
+            roughness:1,
+
+            metalness:0
+
+        });
+
+
+    terrain =
         new THREE.Mesh(
-            geo,
+            geometry,
             material
         );
 
     terrain.receiveShadow=true;
 
-    group.add(terrain);
+    terrain.castShadow=false;
 
-
-    // --------------------------------------------------------
-    // DETAILS
-    // --------------------------------------------------------
-
-    const count =
-        12+
-        Math.floor(
-            hash(cx*51,cz*93)*16
-        );
-
-    for(
-        let i=0;
-        i<count;
-        i++
-    ){
-
-        const r1=
-            hash(
-                cx*1000+i,
-                cz*2000+i
-            );
-
-        const r2=
-            hash(
-                cx*3000+i,
-                cz*4000+i
-            );
-
-        const x=
-            cx*CHUNK_SIZE+
-            r1*CHUNK_SIZE-
-            WORLD_SIZE/2;
-
-        const z=
-            cz*CHUNK_SIZE+
-            r2*CHUNK_SIZE-
-            WORLD_SIZE/2;
-
-        const y=
-            getHeight(x,z);
-
-        const b=
-            getBiome(x,z,y);
-
-        if(
-            b==="grass" ||
-            b==="forest"
-        ){
-
-            if(r1>.3)
-                createTree(
-                    group,
-                    x,
-                    y,
-                    z,
-                    r2
-                );
-
-        }else if(
-            b==="rock"
-        ){
-
-            createRock(
-                group,
-                x,
-                y,
-                z,
-                r2
-            );
-        }
-    }
-
-    world.add(group);
-
-    chunks.set(
-        k,
-        group
+    scene.add(
+        terrain
     );
-}
-
-
-// ============================================================
-// WASSER
-// ============================================================
-
-function createWater(){
-
-    const waterGroup =
-        new THREE.Group();
-
-    // Seen
-    for(let i=0;i<8;i++){
-
-        const r1=
-            hash(i*811,999+i);
-
-        const r2=
-            hash(i*311,555+i);
-
-        const x=
-            (r1-.5)*4800;
-
-        const z=
-            (r2-.5)*4800;
-
-        const lake =
-            new THREE.Mesh(
-                new THREE.CircleGeometry(
-                    70+r1*130,
-                    40
-                ),
-                waterMat
-            );
-
-        lake.rotation.x=
-            -Math.PI/2;
-
-        lake.position.set(
-            x,
-            4,
-            z
-        );
-
-        lake.scale.x=
-            .6+r2*.6;
-
-        waterGroup.add(lake);
-    }
-
-    world.add(waterGroup);
 }
 
 
@@ -964,74 +603,34 @@ function createWater(){
 // GENERIEREN
 // ============================================================
 
-function generate(){
+function generateWorld(){
+
+    createTerrain();
 
     document.getElementById(
-        "loading"
-    ).style.display="flex";
+        "seedText"
+    ).innerText=
+        seed;
 
-    requestAnimationFrame(()=>{
+    camera.position.set(
+        0,
+        500,
+        900
+    );
 
-        while(world.children.length)
-            world.remove(
-                world.children[0]
-            );
+    rotX=-.45;
+    rotY=0;
 
-        chunks.clear();
+    camera.rotation.x=
+        rotX;
 
-        // Welt in Chunks
-        for(
-            let cx=0;
-            cx<WORLD_SIZE/CHUNK_SIZE;
-            cx++
-        ){
-
-            for(
-                let cz=0;
-                cz<WORLD_SIZE/CHUNK_SIZE;
-                cz++
-            ){
-
-                createChunk(
-                    cx,
-                    cz
-                );
-
-            }
-        }
-
-        createWater();
-
-        document.getElementById(
-            "seedText"
-        ).innerText=seedValue;
-
-        document.getElementById(
-            "chunksText"
-        ).innerText=chunks.size;
-
-        camera.position.set(
-            0,
-            250,
-            900
-        );
-
-        rotX=-.35;
-        rotY=0;
-
-        camera.rotation.x=rotX;
-        cameraRig.rotation.y=rotY;
-
-        document.getElementById(
-            "loading"
-        ).style.display="none";
-
-    });
+    rig.rotation.y=
+        rotY;
 }
 
 
 // ============================================================
-// SEED
+// NEUE WELT
 // ============================================================
 
 document.getElementById(
@@ -1045,7 +644,7 @@ document.getElementById(
 
     if(text===""){
 
-        seedValue=
+        seed =
             Math.floor(
                 Math.random()*
                 2147483647
@@ -1061,7 +660,7 @@ document.getElementById(
             i++
         ){
 
-            n=
+            n =
                 Math.imul(
                     n^text.charCodeAt(i),
                     16777619
@@ -1069,37 +668,32 @@ document.getElementById(
 
         }
 
-        seedValue=
+        seed =
             Math.abs(n)||1;
+
     }
 
-    generate();
+    generateWorld();
 };
 
 
 // ============================================================
-// GLB
+// GLB EXPORT
 // ============================================================
 
 document.getElementById(
     "export"
 ).onclick=()=>{
 
+    if(!terrain)
+        return;
+
     const exporter =
         new THREE.GLTFExporter();
 
-    const button =
-        document.getElementById(
-            "export"
-        );
-
-    button.disabled=true;
-
-    button.innerText=
-        "GLB wird erstellt...";
-
     exporter.parse(
-        world,
+
+        terrain,
 
         result=>{
 
@@ -1125,36 +719,40 @@ document.getElementById(
             a.href=url;
 
             a.download=
-                "ZEROPOINT_"+seedValue+".glb";
+                "ZEROPOINT_Terrain_"+
+                seed+
+                ".glb";
+
+            document.body.appendChild(a);
 
             a.click();
 
-            URL.revokeObjectURL(url);
+            a.remove();
 
-            button.disabled=false;
+            URL.revokeObjectURL(
+                url
+            );
 
-            button.innerText=
-                "GLB herunterladen";
         },
 
         error=>{
 
-            console.error(error);
-
-            button.disabled=false;
-
-            button.innerText=
-                "GLB herunterladen";
+            console.error(
+                error
+            );
 
             alert(
                 "GLB-Export fehlgeschlagen."
             );
+
         },
 
         {
             binary:true
         }
+
     );
+
 };
 
 
@@ -1185,7 +783,7 @@ window.addEventListener(
 // START
 // ============================================================
 
-generate();
+generateWorld();
 
 
 // ============================================================
@@ -1202,6 +800,7 @@ function animate(){
         scene,
         camera
     );
+
 }
 
 animate();
