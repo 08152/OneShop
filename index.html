@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST 3D Landscape Engine</title>
+<title>ZEROPOINT – Mapper</title>
 
 <style>
 *{box-sizing:border-box}
@@ -13,539 +13,191 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#111;
+    background:#8acfff;
     font-family:Arial,sans-serif;
 }
 
 canvas{
-    position:fixed;
-    inset:0;
     display:block;
 }
 
-#top{
-    position:fixed;
+#ui{
+    position:absolute;
+    top:16px;
+    left:16px;
     z-index:20;
-    top:0;
-    left:0;
-    right:0;
-    height:58px;
-    display:flex;
-    align-items:center;
-    gap:7px;
-    padding:8px;
-    background:rgba(22,25,30,.96);
-    border-bottom:1px solid #444;
-    overflow-x:auto;
+    width:360px;
+    padding:16px;
+    border-radius:16px;
+    background:rgba(18,22,25,.88);
+    color:white;
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+    backdrop-filter:blur(8px);
 }
 
-.logo{
-    color:white;
-    font-size:19px;
-    font-weight:900;
-    margin:0 12px 0 5px;
-    white-space:nowrap;
-}
-
-button{
-    border:1px solid #555d66;
-    background:#292e35;
-    color:white;
-    border-radius:8px;
-    cursor:pointer;
+#title{
+    font-size:26px;
     font-weight:bold;
-}
-
-button:hover{
-    background:#3a4048;
-}
-
-.topBtn{
-    height:40px;
-    padding:0 13px;
-    white-space:nowrap;
-}
-
-.active{
-    background:#e9c300!important;
-    color:#111!important;
-    border-color:#ffe96b!important;
-}
-
-#gravity.active{
-    background:#6849e8!important;
-    color:white!important;
-}
-
-#play.active{
-    background:#c83c45!important;
-    color:white!important;
-}
-
-#left{
-    position:fixed;
-    z-index:20;
-    top:70px;
-    left:10px;
-    width:210px;
-    max-height:calc(100vh - 82px);
-    overflow:auto;
-    padding:12px;
-    border-radius:12px;
-    background:rgba(24,28,33,.96);
-    border:1px solid #454c55;
-    color:white;
-}
-
-.title{
-    font-size:11px;
-    color:#aeb5bd;
-    font-weight:bold;
-    letter-spacing:1px;
-    margin:3px 0 9px;
-}
-
-.tool{
-    width:100%;
-    height:42px;
-    margin-bottom:7px;
-    font-size:13px;
-}
-
-.section{
-    border-top:1px solid #41474f;
-    margin-top:12px;
-    padding-top:12px;
-}
-
-.label{
-    display:flex;
-    justify-content:space-between;
-    color:#ddd;
-    font-size:12px;
-    margin-bottom:5px;
-}
-
-input[type=range]{
-    width:100%;
-}
-
-#right{
-    position:fixed;
-    z-index:20;
-    top:70px;
-    right:10px;
-    width:245px;
-    max-height:calc(100vh - 82px);
-    overflow:auto;
-    padding:12px;
-    border-radius:12px;
-    background:rgba(24,28,33,.96);
-    border:1px solid #454c55;
-    color:white;
-}
-
-input[type=text],
-input[type=number],
-textarea{
-    width:100%;
-    background:#11151a;
-    color:white;
-    border:1px solid #505761;
-    border-radius:6px;
-    padding:8px;
-    outline:none;
+    margin-bottom:12px;
 }
 
 .row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-    margin-bottom:7px;
-}
-
-.small{
-    width:100%;
-    height:35px;
-    margin-top:6px;
-}
-
-textarea{
-    min-height:110px;
-    resize:vertical;
-    font-family:monospace;
-    font-size:12px;
-}
-
-#status{
-    position:fixed;
-    z-index:30;
-    left:12px;
-    bottom:12px;
-    background:rgba(20,24,29,.9);
-    border:1px solid #444;
-    border-radius:8px;
-    padding:8px 11px;
-    color:white;
-    font-size:12px;
-    pointer-events:none;
-}
-
-#help{
-    position:fixed;
-    z-index:30;
-    left:50%;
-    transform:translateX(-50%);
-    bottom:12px;
-    background:rgba(20,24,29,.9);
-    border:1px solid #444;
-    border-radius:8px;
-    padding:8px 12px;
-    color:#ddd;
-    font-size:12px;
-    pointer-events:none;
-}
-
-#start{
-    position:fixed;
-    inset:0;
-    z-index:100;
     display:flex;
+    gap:8px;
+    margin-top:8px;
+}
+
+input{
+    min-width:0;
+    flex:1;
+    padding:11px;
+    border:0;
+    border-radius:9px;
+    background:#0d1012;
+    color:white;
+    outline:none;
+    font-family:monospace;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+    padding:11px 13px;
+    font-weight:bold;
+    cursor:pointer;
+    color:white;
+}
+
+#generate{
+    background:#36a852;
+    flex:1;
+}
+
+#export{
+    width:100%;
+    margin-top:8px;
+    background:#2868d7;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+#info{
+    margin-top:12px;
+    font-size:13px;
+    line-height:1.5;
+    color:#d8dee2;
+}
+
+#loading{
+    position:absolute;
+    inset:0;
+    z-index:50;
+    display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,.5);
-}
-
-.startBox{
-    width:370px;
-    max-width:90%;
-    background:#20252b;
-    border:1px solid #555d66;
-    border-radius:18px;
-    padding:28px;
     color:white;
-    text-align:center;
-    box-shadow:0 20px 80px #000;
+    font-size:20px;
+    font-weight:bold;
+    background:rgba(0,0,0,.3);
 }
 
-.startBox h1{
-    margin:0 0 8px;
-}
-
-.startBox button{
-    width:100%;
-    height:48px;
-    margin-top:15px;
-    background:#e9c300;
-    color:#111;
-    border:0;
-    font-size:17px;
-}
-
-@media(max-width:800px){
-    #left{
-        width:165px;
-    }
-
-    #right{
-        width:190px;
-    }
-
-    #help{
-        display:none;
-    }
+#hint{
+    position:absolute;
+    bottom:18px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:20;
+    padding:9px 14px;
+    border-radius:10px;
+    background:rgba(0,0,0,.5);
+    color:white;
+    font-size:13px;
+    pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<div id="top">
+<div id="ui">
+    <div id="title">ZEROPOINT · MAPPER</div>
 
-    <div class="logo">GHOST 3D</div>
+    <div class="row">
+        <input id="seedInput" placeholder="Seed eingeben...">
+        <button id="generate">Neue Welt</button>
+    </div>
 
-    <button class="topBtn active" id="hand">
-        ✋ HAND
-    </button>
+    <button id="export">GLB herunterladen</button>
 
-    <button class="topBtn" id="select">
-        ↖ AUSWAHL
-    </button>
-
-    <button class="topBtn" id="move">
-        ↔ MOVE
-    </button>
-
-    <button class="topBtn" id="rotate">
-        ⟳ ROTATE
-    </button>
-
-    <button class="topBtn" id="scale">
-        ⤢ SCALE
-    </button>
-
-    <button class="topBtn" id="gravity">
-        🪐 SCHWERKRAFT
-    </button>
-
-    <button class="topBtn" id="newMap">
-        🌍 NEUE INSEL
-    </button>
-
-    <button class="topBtn" id="save">
-        💾 SPEICHERN
-    </button>
-
-    <button class="topBtn" id="load">
-        📂 LADEN
-    </button>
-
-    <button class="topBtn" id="play">
-        ▶ PLAY
-    </button>
-
+    <div id="info">
+        Seed: <b id="seedText">-</b><br>
+        Welt: 6000 × 6000<br>
+        Chunks: <b id="chunkText">0</b><br>
+        Kamera: freie 3D-Betrachtung
+    </div>
 </div>
 
+<div id="loading">ZEROPOINT WIRD GENERIERT...</div>
 
-<div id="left">
-
-    <div class="title">LANDSCAPE</div>
-
-    <button class="tool active" id="raise">
-        ⬆ ERHÖHEN
-    </button>
-
-    <button class="tool" id="lower">
-        ⬇ SENKEN
-    </button>
-
-    <button class="tool" id="smooth">
-        ◯ GLÄTTEN
-    </button>
-
-    <button class="tool" id="flatten">
-        ▬ EBENEN
-    </button>
-
-    <div class="section">
-
-        <div class="title">BRUSH</div>
-
-        <div class="label">
-            <span>Größe</span>
-            <b id="sizeValue">25</b>
-        </div>
-
-        <input
-            id="brushSize"
-            type="range"
-            min="5"
-            max="100"
-            value="25"
-        >
-
-        <div class="label" style="margin-top:10px">
-            <span>Stärke</span>
-            <b id="strengthValue">5</b>
-        </div>
-
-        <input
-            id="strength"
-            type="range"
-            min="1"
-            max="30"
-            value="5"
-        >
-
-    </div>
-
-
-    <div class="section">
-
-        <div class="title">OBJECTS</div>
-
-        <button class="tool" id="cube">
-            + WÜRFEL
-        </button>
-
-        <button class="tool" id="sphere">
-            + KUGEL
-        </button>
-
-    </div>
-
+<div id="hint">
+    Linke Maustaste = drehen · Mausrad = zoomen · rechte Maustaste = verschieben
 </div>
-
-
-<div id="right">
-
-    <div class="title">INSPECTOR</div>
-
-    <label>Objektname</label>
-    <input id="name" type="text">
-
-    <div class="section">
-
-        <div class="title">POSITION</div>
-
-        <div class="row">
-            <div>
-                <label>X</label>
-                <input id="px" type="number" step=".1">
-            </div>
-
-            <div>
-                <label>Y</label>
-                <input id="py" type="number" step=".1">
-            </div>
-        </div>
-
-        <label>Z</label>
-        <input id="pz" type="number" step=".1">
-
-    </div>
-
-
-    <div class="section">
-
-        <div class="title">ROTATION</div>
-
-        <div class="row">
-            <div>
-                <label>X</label>
-                <input id="rx" type="number" step="1">
-            </div>
-
-            <div>
-                <label>Y</label>
-                <input id="ry" type="number" step="1">
-            </div>
-        </div>
-
-        <label>Z</label>
-        <input id="rz" type="number" step="1">
-
-    </div>
-
-
-    <div class="section">
-
-        <div class="title">SCALE</div>
-
-        <input id="scaleValue" type="number" value="1" min=".05" step=".05">
-
-    </div>
-
-
-    <button class="small" id="apply">
-        ÜBERNEHMEN
-    </button>
-
-    <button class="small" id="duplicate">
-        DUPLIZIEREN
-    </button>
-
-    <button class="small" id="delete">
-        LÖSCHEN
-    </button>
-
-
-    <div class="section">
-
-        <div class="title">SCRIPT</div>
-
-        <textarea id="script"></textarea>
-
-        <button class="small" id="applyScript">
-            SCRIPT ÜBERNEHMEN
-        </button>
-
-    </div>
-
-</div>
-
-
-<div id="status">
-    HAND
-</div>
-
-<div id="help">
-    HAND: Maus = Umschauen · WASD = Bewegen · Mausrad = Zoom · Sculpt = Terrain bearbeiten
-</div>
-
-
-<div id="start">
-
-    <div class="startBox">
-
-        <h1>GHOST 3D</h1>
-
-        <p>
-            Unreal-inspirierte Landscape-Engine
-        </p>
-
-        <p>
-            Große zusammenhängende Landschaft ohne Chunks.
-        </p>
-
-        <button id="startButton">
-            ENGINE STARTEN
-        </button>
-
-    </div>
-
-</div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/exporters/GLTFExporter.js"></script>
 
 <script>
 
-/* =========================================================
-   SCENE
-========================================================= */
+// ============================================================
+// ZEROPOINT MAPPER
+// ============================================================
+
+const WORLD_SIZE = 6000;
+const CHUNK_SIZE = 300;
+const GRID = WORLD_SIZE / CHUNK_SIZE;
+
+let seed = randomSeed();
 
 const scene = new THREE.Scene();
 
-scene.background =
-    new THREE.Color(0x68c3ed);
+scene.background = new THREE.Color(0x87cefa);
 
-scene.fog =
-    new THREE.Fog(
-        0x68c3ed,
-        600,
-        3000
-    );
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-const camera =
-    new THREE.PerspectiveCamera(
-        65,
-        innerWidth / innerHeight,
-        .1,
-        10000
-    );
-
-
-camera.position.set(
-    0,
-    180,
-    500
+scene.fog = new THREE.Fog(
+    0x87cefa,
+    900,
+    4300
 );
 
 
-/* =========================================================
-   RENDERER
-========================================================= */
+// ============================================================
+// KAMERA
+// ============================================================
 
-const renderer =
-    new THREE.WebGLRenderer({
-        antialias:true
-    });
+const camera = new THREE.PerspectiveCamera(
+    55,
+    innerWidth / innerHeight,
+    0.1,
+    12000
+);
+
+camera.position.set(
+    850,
+    850,
+    850
+);
+
+
+// ============================================================
+// RENDERER
+// ============================================================
+
+const renderer = new THREE.WebGLRenderer({
+    antialias:true,
+    powerPreference:"high-performance"
+});
 
 renderer.setSize(
     innerWidth,
@@ -557,1984 +209,1151 @@ renderer.setPixelRatio(
 );
 
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-renderer.shadowMap.type =
-    THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-document.body.appendChild(
+document.body.appendChild(renderer.domElement);
+
+
+// ============================================================
+// ORBIT-KAMERA
+// ============================================================
+
+const controls = new THREE.OrbitControls(
+    camera,
     renderer.domElement
 );
 
+controls.enableDamping = true;
+controls.dampingFactor = .055;
 
-/* =========================================================
-   LIGHT
-========================================================= */
+controls.minDistance = 80;
+controls.maxDistance = 7000;
+
+controls.maxPolarAngle = Math.PI * .495;
+
+controls.target.set(
+    0,
+    50,
+    0
+);
+
+
+// ============================================================
+// LICHT
+// ============================================================
 
 scene.add(
     new THREE.HemisphereLight(
-        0xffffff,
-        0x6d8590,
-        1.7
+        0xcfeeff,
+        0x4c3928,
+        1.5
     )
 );
 
-const sun =
-    new THREE.DirectionalLight(
-        0xffffff,
-        2.2
-    );
+const sun = new THREE.DirectionalLight(
+    0xffffff,
+    2
+);
 
 sun.position.set(
-    400,
-    800,
-    300
+    1200,
+    1800,
+    800
 );
 
 sun.castShadow = true;
 
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+
+sun.shadow.camera.left = -1800;
+sun.shadow.camera.right = 1800;
+sun.shadow.camera.top = 1800;
+sun.shadow.camera.bottom = -1800;
+
 scene.add(sun);
 
 
-/* =========================================================
-   RANDOM SEED
-========================================================= */
+// ============================================================
+// SEED
+// ============================================================
 
-let seed =
-    Math.floor(
+function randomSeed(){
+
+    return Math.floor(
         Math.random()*2147483647
     );
 
-
-/* =========================================================
-   TERRAIN
-========================================================= */
-
-const SIZE = 1200;
-
-const SEGMENTS = 180;
-
-const HALF = SIZE/2;
-
-const geometry =
-    new THREE.PlaneGeometry(
-        SIZE,
-        SIZE,
-        SEGMENTS,
-        SEGMENTS
-    );
-
-geometry.rotateX(-Math.PI/2);
-
-
-const position =
-    geometry.attributes.position;
-
-
-const heights =
-    new Float32Array(
-        position.count
-    );
-
-
-/* =========================================================
-   NOISE
-========================================================= */
-
-function random2(x,z){
-
-    let n =
-        Math.sin(
-            x*127.1 +
-            z*311.7 +
-            seed*.00001
-        ) *
-        43758.5453123;
-
-    return n -
-        Math.floor(n);
 }
 
+function hash2(x,z){
+
+    let n =
+        Math.imul(
+            x|0,
+            374761393
+        ) ^
+        Math.imul(
+            z|0,
+            668265263
+        ) ^
+        Math.imul(
+            seed|0,
+            1442695041
+        );
+
+    n ^= n >>> 13;
+    n = Math.imul(n,1274126177);
+    n ^= n >>> 16;
+
+    return (n >>> 0) / 4294967295;
+
+}
+
+
+// ============================================================
+// SMOOTH NOISE
+// ============================================================
+
+function fade(t){
+    return t*t*(3-2*t);
+}
 
 function noise(x,z){
 
-    const x0 =
-        Math.floor(x);
+    const x0 = Math.floor(x);
+    const z0 = Math.floor(z);
 
-    const z0 =
-        Math.floor(z);
+    const x1 = x0+1;
+    const z1 = z0+1;
 
-    const x1 =
-        x0+1;
+    const sx = fade(x-x0);
+    const sz = fade(z-z0);
 
-    const z1 =
-        z0+1;
+    const a = hash2(x0,z0);
+    const b = hash2(x1,z0);
+    const c = hash2(x0,z1);
+    const d = hash2(x1,z1);
 
-    const sx =
-        x-x0;
+    const ab = a+(b-a)*sx;
+    const cd = c+(d-c)*sx;
 
-    const sz =
-        z-z0;
+    return ab+(cd-ab)*sz;
 
-    const u =
-        sx*sx*(3-2*sx);
-
-    const v =
-        sz*sz*(3-2*sz);
-
-    const a =
-        random2(x0,z0);
-
-    const b =
-        random2(x1,z0);
-
-    const c =
-        random2(x0,z1);
-
-    const d =
-        random2(x1,z1);
-
-    return (
-        a+(b-a)*u
-    ) +
-    (
-        c+(d-c)*u
-    -
-        (a+(b-a)*u)
-    )*v;
 }
 
 
-/* =========================================================
-   UNREAL-STYLE LANDSCAPE HEIGHT
-========================================================= */
+// ============================================================
+// FRAKTALES TERRAIN
+// ============================================================
 
-function landscapeHeight(x,z){
+function fbm(x,z){
 
-    const nx =
-        x/(SIZE*.47);
+    let value = 0;
+    let amplitude = .5;
+    let frequency = 1;
 
-    const nz =
-        z/(SIZE*.47);
+    for(let i=0;i<5;i++){
 
-    const dist =
-        Math.sqrt(
-            nx*nx+nz*nz
-        );
+        value +=
+            noise(
+                x*frequency,
+                z*frequency
+            ) * amplitude;
+
+        frequency *= 2;
+        amplitude *= .5;
+    }
+
+    return value;
+}
 
 
-    /*
-       Große Inselbasis
-    */
+// ============================================================
+// TERRAIN
+// ============================================================
 
-    let island =
+function terrainHeight(x,z){
+
+    const nx = x / WORLD_SIZE;
+    const nz = z / WORLD_SIZE;
+
+    let h = 0;
+
+    // große Landschaft
+    h +=
+        (fbm(x*.00075,z*.00075)-.5)
+        * 300;
+
+    // mittlere Hügel
+    h +=
+        (fbm(x*.0022+500,z*.0022+800)-.5)
+        * 110;
+
+    // kleine Geländeformen
+    h +=
+        (fbm(x*.007,z*.007)-.5)
+        * 35;
+
+    // Gebirgsregionen
+    const mountains =
         Math.max(
             0,
-            1-Math.pow(dist,1.55)
-        );
-
-
-    /*
-       Unregelmäßige Küste
-    */
-
-    const coast =
-        noise(
-            x*.012,
-            z*.012
-        );
-
-    island +=
-        (coast-.5)*
-        .25*
-        Math.max(
-            0,
-            1-dist
-        );
-
-
-    island =
-        Math.max(
-            0,
-            island
-        );
-
-
-    /*
-       Multi-Layer Landscape Noise
-    */
-
-    const large =
-        noise(
-            x*.004,
-            z*.004
-        );
-
-    const medium =
-        noise(
-            x*.012,
-            z*.012
-        );
-
-    const small =
-        noise(
-            x*.035,
-            z*.035
-        );
-
-
-    let h =
-
-        island*70
-
-        +
-
-        large*
-        45*
-        island
-
-        +
-
-        medium*
-        22*
-        island
-
-        +
-
-        small*
-        8*
-        island;
-
-
-    /*
-       Berge im Inselinneren
-    */
-
-    const mountain =
-        Math.max(
-            0,
-            1-dist*1.8
+            fbm(
+                x*.00038+100,
+                z*.00038+100
+            )-.52
         );
 
     h +=
-        mountain *
-        Math.pow(
-            large,
-            2
-        ) *
-        80;
+        mountains * mountains * 900;
 
-
-    /*
-       Küste
-    */
+    // Talstruktur
+    const valley =
+        Math.abs(
+            Math.sin(x*.00055)
+            *
+            Math.cos(z*.00043)
+        );
 
     h -=
-        Math.max(
-            0,
-            dist-.72
-        )*35;
+        Math.max(0,.23-valley)
+        * 120;
 
+    // Inselrand etwas niedriger
+    const edge =
+        Math.max(
+            Math.abs(nx-.5),
+            Math.abs(nz-.5)
+        );
+
+    h -= Math.max(0,edge-.35)*500;
 
     return h;
 }
 
 
-/* =========================================================
-   CREATE TERRAIN
-========================================================= */
+// ============================================================
+// BIOM
+// ============================================================
 
-for(
-    let i=0;
-    i<position.count;
-    i++
-){
+function biomeAt(x,z,h){
 
-    const x =
-        position.getX(i);
-
-    const z =
-        position.getZ(i);
-
-    const h =
-        landscapeHeight(
-            x,
-            z
+    const moisture =
+        fbm(
+            x*.0013+700,
+            z*.0013+900
         );
 
-    position.setY(
-        i,
-        h
-    );
+    const temperature =
+        fbm(
+            x*.0009+1200,
+            z*.0009+400
+        );
 
-    heights[i] = h;
+    if(h > 260)
+        return "snow";
+
+    if(h > 190)
+        return "mountain";
+
+    if(h < -2)
+        return "water";
+
+    if(h < 7)
+        return "beach";
+
+    if(moisture > .65)
+        return "forest";
+
+    if(temperature < .35)
+        return "rock";
+
+    if(moisture < .28)
+        return "dry";
+
+    return "grass";
 }
 
 
-geometry.computeVertexNormals();
+// ============================================================
+// MATERIALIEN
+// ============================================================
 
+const materials = {
 
-const terrain =
-    new THREE.Mesh(
-        geometry,
-        new THREE.MeshStandardMaterial({
-            color:0xffffff,
-            roughness:1,
-            metalness:0
-        })
-    );
+    grass:new THREE.MeshStandardMaterial({
+        color:0x4f963f,
+        roughness:1
+    }),
 
+    forest:new THREE.MeshStandardMaterial({
+        color:0x347c38,
+        roughness:1
+    }),
 
-terrain.receiveShadow = true;
+    dry:new THREE.MeshStandardMaterial({
+        color:0x829344,
+        roughness:1
+    }),
 
-scene.add(terrain);
+    rock:new THREE.MeshStandardMaterial({
+        color:0x777b78,
+        roughness:1
+    }),
 
+    mountain:new THREE.MeshStandardMaterial({
+        color:0x696b69,
+        roughness:1
+    }),
 
-/* =========================================================
-   WATER
-========================================================= */
+    snow:new THREE.MeshStandardMaterial({
+        color:0xf1f3f2,
+        roughness:.9
+    }),
 
-const waterGeometry =
-    new THREE.PlaneGeometry(
-        3000,
-        3000
-    );
+    sand:new THREE.MeshStandardMaterial({
+        color:0xd8c18a,
+        roughness:1
+    }),
 
-waterGeometry.rotateX(
-    -Math.PI/2
-);
+    dirt:new THREE.MeshStandardMaterial({
+        color:0x76502f,
+        roughness:1
+    }),
 
+    water:new THREE.MeshStandardMaterial({
+        color:0x318dc2,
+        transparent:true,
+        opacity:.72,
+        roughness:.2,
+        metalness:.05
+    }),
 
-const water =
-    new THREE.Mesh(
-        waterGeometry,
-        new THREE.MeshStandardMaterial({
-            color:0x168ed0,
-            roughness:.2,
-            metalness:.1
-        })
-    );
+    trunk:new THREE.MeshStandardMaterial({
+        color:0x60432b,
+        roughness:1
+    }),
 
-water.position.y = -1;
+    leaves:new THREE.MeshStandardMaterial({
+        color:0x2e7136,
+        roughness:1
+    }),
 
-scene.add(water);
-
-
-/* =========================================================
-   TERRAIN HEIGHT
-========================================================= */
-
-function getHeight(x,z){
-
-    if(
-        x < -HALF ||
-        x > HALF ||
-        z < -HALF ||
-        z > HALF
-    ){
-        return -2;
-    }
-
-    const fx =
-        (x+HALF)/SIZE*
-        SEGMENTS;
-
-    const fz =
-        (z+HALF)/SIZE*
-        SEGMENTS;
-
-    let ix =
-        Math.floor(fx);
-
-    let iz =
-        Math.floor(fz);
-
-    ix =
-        Math.max(
-            0,
-            Math.min(
-                SEGMENTS-1,
-                ix
-            )
-        );
-
-    iz =
-        Math.max(
-            0,
-            Math.min(
-                SEGMENTS-1,
-                iz
-            )
-        );
-
-    const tx =
-        fx-ix;
-
-    const tz =
-        fz-iz;
-
-    const i00 =
-        iz*(SEGMENTS+1)+ix;
-
-    const i10 =
-        i00+1;
-
-    const i01 =
-        i00+(SEGMENTS+1);
-
-    const i11 =
-        i01+1;
-
-    const a =
-        heights[i00];
-
-    const b =
-        heights[i10];
-
-    const c =
-        heights[i01];
-
-    const d =
-        heights[i11];
-
-    const ab =
-        a+(b-a)*tx;
-
-    const cd =
-        c+(d-c)*tx;
-
-    return ab+(cd-ab)*tz;
-}
-
-
-/* =========================================================
-   RAYCAST
-========================================================= */
-
-const raycaster =
-    new THREE.Raycaster();
-
-const mouse =
-    new THREE.Vector2();
-
-let mouseX=0;
-let mouseY=0;
-
-
-function setMouse(e){
-
-    mouseX=e.clientX;
-    mouseY=e.clientY;
-
-    mouse.x =
-        (e.clientX/innerWidth)*2-1;
-
-    mouse.y =
-        -(e.clientY/innerHeight)*2+1;
-}
-
-
-/* =========================================================
-   TOOLS
-========================================================= */
-
-let currentTool = "hand";
-
-const topTools = {
-    hand:document.getElementById("hand"),
-    select:document.getElementById("select"),
-    move:document.getElementById("move"),
-    rotate:document.getElementById("rotate"),
-    scale:document.getElementById("scale")
+    leaves2:new THREE.MeshStandardMaterial({
+        color:0x438b3d,
+        roughness:1
+    })
 };
 
 
-const sculptTools = {
-    raise:document.getElementById("raise"),
-    lower:document.getElementById("lower"),
-    smooth:document.getElementById("smooth"),
-    flatten:document.getElementById("flatten")
-};
+// ============================================================
+// WELT-GRUPPE
+// ============================================================
+
+const world = new THREE.Group();
+
+scene.add(world);
+
+const terrainGroup = new THREE.Group();
+const detailGroup = new THREE.Group();
+const waterGroup = new THREE.Group();
+
+world.add(terrainGroup);
+world.add(detailGroup);
+world.add(waterGroup);
 
 
-function setTool(name){
+// ============================================================
+// CHUNKS
+// ============================================================
 
-    currentTool=name;
+const chunks = new Map();
 
-    Object.values(topTools)
-        .forEach(
-            b=>b.classList.remove("active")
-        );
-
-    Object.values(sculptTools)
-        .forEach(
-            b=>b.classList.remove("active")
-        );
-
-    if(topTools[name]){
-        topTools[name]
-            .classList.add("active");
-    }
-
-    if(sculptTools[name]){
-        sculptTools[name]
-            .classList.add("active");
-    }
-
-    document.getElementById("status")
-        .innerText =
-        name.toUpperCase();
+function key(cx,cz){
+    return cx+"_"+cz;
 }
 
 
-for(
-    const [name,button]
-    of Object.entries(topTools)
-){
+// ============================================================
+// CHUNK TERRAIN
+// ============================================================
 
-    button.onclick=()=>{
-        setTool(name);
-    };
+function createChunk(cx,cz){
 
-}
+    const k = key(cx,cz);
 
-
-for(
-    const [name,button]
-    of Object.entries(sculptTools)
-){
-
-    button.onclick=()=>{
-        setTool(name);
-    };
-
-}
-
-
-/* =========================================================
-   BRUSH
-========================================================= */
-
-let brushSize=25;
-
-let brushStrength=5;
-
-let mouseDown=false;
-
-
-document.getElementById("brushSize")
-    .oninput=e=>{
-
-        brushSize =
-            Number(e.target.value);
-
-        document.getElementById(
-            "sizeValue"
-        ).innerText =
-            brushSize;
-
-    };
-
-
-document.getElementById("strength")
-    .oninput=e=>{
-
-        brushStrength =
-            Number(e.target.value);
-
-        document.getElementById(
-            "strengthValue"
-        ).innerText =
-            brushStrength;
-
-    };
-
-
-/* =========================================================
-   SCULPT TERRAIN
-========================================================= */
-
-function sculpt(){
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
-    );
-
-    const hit =
-        raycaster.intersectObject(
-            terrain
-        )[0];
-
-    if(!hit)
+    if(chunks.has(k))
         return;
 
+    const group = new THREE.Group();
 
-    const point =
-        hit.point;
+    const segments = 20;
 
-
-    const radius =
-        brushSize;
-
-
-    const minX =
-        Math.max(
-            -HALF,
-            point.x-radius
+    const geo =
+        new THREE.PlaneGeometry(
+            CHUNK_SIZE,
+            CHUNK_SIZE,
+            segments,
+            segments
         );
 
-    const maxX =
-        Math.min(
-            HALF,
-            point.x+radius
-        );
+    geo.rotateX(-Math.PI/2);
 
-    const minZ =
-        Math.max(
-            -HALF,
-            point.z-radius
-        );
+    const pos = geo.attributes.position;
 
-    const maxZ =
-        Math.min(
-            HALF,
-            point.z+radius
-        );
+    let centerHeight = 0;
 
+    for(let i=0;i<pos.count;i++){
 
-    const step =
-        SIZE/SEGMENTS;
+        const lx = pos.getX(i);
+        const lz = pos.getZ(i);
 
+        const x =
+            cx*CHUNK_SIZE +
+            lx +
+            CHUNK_SIZE/2 -
+            WORLD_SIZE/2;
 
-    const startX =
-        Math.floor(
-            (minX+HALF)/step
-        );
+        const z =
+            cz*CHUNK_SIZE +
+            lz +
+            CHUNK_SIZE/2 -
+            WORLD_SIZE/2;
 
-    const endX =
-        Math.ceil(
-            (maxX+HALF)/step
-        );
+        const h =
+            terrainHeight(x,z);
 
-    const startZ =
-        Math.floor(
-            (minZ+HALF)/step
-        );
+        pos.setY(i,h);
 
-    const endZ =
-        Math.ceil(
-            (maxZ+HALF)/step
-        );
-
-
-    const centerHeight =
-        getHeight(
-            point.x,
-            point.z
-        );
-
-
-    for(
-        let iz=startZ;
-        iz<=endZ;
-        iz++
-    ){
-
-        if(
-            iz<0 ||
-            iz>SEGMENTS
-        )
-            continue;
-
-
-        for(
-            let ix=startX;
-            ix<=endX;
-            ix++
-        ){
-
-            if(
-                ix<0 ||
-                ix>SEGMENTS
-            )
-                continue;
-
-
-            const x =
-                -HALF+
-                ix*step;
-
-            const z =
-                -HALF+
-                iz*step;
-
-
-            const dx =
-                x-point.x;
-
-            const dz =
-                z-point.z;
-
-            const distance =
-                Math.sqrt(
-                    dx*dx+
-                    dz*dz
-                );
-
-
-            if(
-                distance>radius
-            )
-                continue;
-
-
-            let falloff =
-                1-
-                distance/radius;
-
-
-            falloff =
-                falloff*
-                falloff;
-
-
-            const index =
-                iz*(SEGMENTS+1)+ix;
-
-
-            if(currentTool==="raise"){
-
-                heights[index] +=
-                    brushStrength*
-                    .12*
-                    falloff;
-
-            }
-
-
-            if(currentTool==="lower"){
-
-                heights[index] -=
-                    brushStrength*
-                    .12*
-                    falloff;
-
-            }
-
-
-            if(currentTool==="smooth"){
-
-                heights[index] +=
-                    (
-                        centerHeight-
-                        heights[index]
-                    )*
-                    .08*
-                    falloff;
-
-            }
-
-
-            if(currentTool==="flatten"){
-
-                heights[index] +=
-                    (
-                        centerHeight-
-                        heights[index]
-                    )*
-                    .18*
-                    falloff;
-
-            }
-
-        }
-
+        centerHeight += h;
     }
 
+    centerHeight /= pos.count;
 
-    for(
-        let i=0;
-        i<position.count;
-        i++
-    ){
+    geo.computeVertexNormals();
 
-        position.setY(
-            i,
-            heights[i]
+    const biome =
+        biomeAt(
+            cx*CHUNK_SIZE -
+            WORLD_SIZE/2 +
+            CHUNK_SIZE/2,
+
+            cz*CHUNK_SIZE -
+            WORLD_SIZE/2 +
+            CHUNK_SIZE/2,
+
+            centerHeight
         );
 
-    }
+    let mat = materials.grass;
 
+    if(biome==="forest")
+        mat = materials.forest;
 
-    position.needsUpdate=true;
+    if(biome==="dry")
+        mat = materials.dry;
 
-    geometry.computeVertexNormals();
+    if(biome==="rock")
+        mat = materials.rock;
 
-    geometry.attributes.normal
-        .needsUpdate=true;
+    if(biome==="mountain")
+        mat = materials.mountain;
+
+    if(biome==="snow")
+        mat = materials.snow;
+
+    if(biome==="beach")
+        mat = materials.sand;
+
+    const terrain =
+        new THREE.Mesh(
+            geo,
+            mat
+        );
+
+    terrain.receiveShadow = true;
+    terrain.castShadow = false;
+
+    group.add(terrain);
+
+    createChunkDetails(
+        group,
+        cx,
+        cz
+    );
+
+    world.add(group);
+
+    chunks.set(k,group);
 }
 
 
-/* =========================================================
-   MOUSE
-========================================================= */
+// ============================================================
+// DETAILS
+// ============================================================
 
-renderer.domElement.addEventListener(
-    "pointerdown",
-    e=>{
+function createChunkDetails(group,cx,cz){
 
-        mouseDown=true;
+    const baseX =
+        cx*CHUNK_SIZE -
+        WORLD_SIZE/2;
 
-        setMouse(e);
+    const baseZ =
+        cz*CHUNK_SIZE -
+        WORLD_SIZE/2;
+
+    const amount =
+        18 +
+        Math.floor(
+            hash2(cx*91,cz*47)*20
+        );
+
+    for(let i=0;i<amount;i++){
+
+        const r1 =
+            hash2(
+                cx*1000+i,
+                cz*2000+i
+            );
+
+        const r2 =
+            hash2(
+                cx*3000+i,
+                cz*4000+i
+            );
+
+        const x =
+            baseX+r1*CHUNK_SIZE;
+
+        const z =
+            baseZ+r2*CHUNK_SIZE;
+
+        const h =
+            terrainHeight(x,z);
+
+        const biome =
+            biomeAt(x,z,h);
 
         if(
-            currentTool!=="hand" &&
-            currentTool!=="select" &&
-            currentTool!=="move" &&
-            currentTool!=="rotate" &&
-            currentTool!=="scale"
+            biome==="forest" ||
+            biome==="grass"
         ){
 
-            sculpt();
+            if(r1>.22)
+                createTree(
+                    group,
+                    x,
+                    h,
+                    z,
+                    r1,
+                    r2
+                );
+            else
+                createBush(
+                    group,
+                    x,
+                    h,
+                    z,
+                    r1
+                );
+
         }
 
         if(
-            currentTool==="select"
+            biome==="rock" ||
+            biome==="mountain"
         ){
 
-            selectObject();
+            createRock(
+                group,
+                x,
+                h,
+                z,
+                r1
+            );
+
         }
 
-    }
-);
-
-
-renderer.domElement.addEventListener(
-    "pointermove",
-    e=>{
-
-        setMouse(e);
-
         if(
-            mouseDown &&
-            ["raise","lower","smooth","flatten"]
-            .includes(currentTool)
+            biome==="beach" &&
+            r1>.5
         ){
 
-            sculpt();
+            createRock(
+                group,
+                x,
+                h,
+                z,
+                r2
+            );
 
         }
-
     }
-);
+}
 
 
-window.addEventListener(
-    "pointerup",
-    ()=>{
-        mouseDown=false;
-    }
-);
+// ============================================================
+// BÄUME
+// ============================================================
 
+function createTree(
+    group,
+    x,
+    y,
+    z,
+    r1,
+    r2
+){
 
-/* =========================================================
-   CAMERA / HAND
-========================================================= */
+    const tree = new THREE.Group();
 
-let yaw=0;
+    const height =
+        18+r1*28;
 
-let pitch=-.35;
+    const trunk =
+        new THREE.Mesh(
+            new THREE.CylinderGeometry(
+                1.2+r1*1.2,
+                1.8+r1*1.5,
+                height,
+                7
+            ),
+            materials.trunk
+        );
 
-let cameraDistance=500;
+    trunk.position.y =
+        height/2;
 
-let looking=false;
+    trunk.castShadow = true;
 
-let lastMouseX=0;
+    tree.add(trunk);
 
-let lastMouseY=0;
+    const crownCount =
+        3+
+        Math.floor(r2*3);
 
+    for(let i=0;i<crownCount;i++){
 
-renderer.domElement.addEventListener(
-    "pointerdown",
-    e=>{
+        const angle =
+            hash2(
+                Math.floor(x)+i*17,
+                Math.floor(z)+i*31
+            ) *
+            Math.PI*2;
 
-        if(currentTool==="hand"){
+        const radius =
+            5+
+            hash2(
+                Math.floor(x)+i*71,
+                Math.floor(z)+i*43
+            )*5;
 
-            looking=true;
-
-            lastMouseX=e.clientX;
-            lastMouseY=e.clientY;
-
-        }
-
-    }
-);
-
-
-window.addEventListener(
-    "pointerup",
-    ()=>{
-        looking=false;
-    }
-);
-
-
-renderer.domElement.addEventListener(
-    "pointermove",
-    e=>{
-
-        if(
-            !looking ||
-            currentTool!=="hand"
-        )
-            return;
-
-
-        const dx =
-            e.clientX-lastMouseX;
-
-        const dy =
-            e.clientY-lastMouseY;
-
-
-        yaw -= dx*.006;
-
-        pitch -= dy*.005;
-
-
-        pitch =
-            Math.max(
-                -1.45,
-                Math.min(
-                    1.45,
-                    pitch
-                )
+        const crown =
+            new THREE.Mesh(
+                new THREE.IcosahedronGeometry(
+                    radius,
+                    1
+                ),
+                i%2===0
+                    ? materials.leaves
+                    : materials.leaves2
             );
 
+        crown.position.set(
+            Math.cos(angle)*radius*.45,
+            height*.62+
+            i*3+
+            radius*.25,
+            Math.sin(angle)*radius*.45
+        );
 
-        lastMouseX=e.clientX;
-        lastMouseY=e.clientY;
+        crown.scale.y =
+            .85+
+            r1*.45;
 
-    }
-);
+        crown.castShadow = true;
 
-
-/* =========================================================
-   ZOOM
-========================================================= */
-
-renderer.domElement.addEventListener(
-    "wheel",
-    e=>{
-
-        e.preventDefault();
-
-        cameraDistance *=
-            Math.exp(
-                e.deltaY*.0012
-            );
-
-        cameraDistance =
-            Math.max(
-                2,
-                Math.min(
-                    5000,
-                    cameraDistance
-                )
-            );
-
-    },
-    {passive:false}
-);
-
-
-/* =========================================================
-   WASD
-========================================================= */
-
-const keys={};
-
-window.addEventListener(
-    "keydown",
-    e=>{
-        keys[e.key.toLowerCase()]=true;
-    }
-);
-
-window.addEventListener(
-    "keyup",
-    e=>{
-        keys[e.key.toLowerCase()]=false;
-    }
-);
-
-
-/* =========================================================
-   CAMERA TARGET
-========================================================= */
-
-const target =
-    new THREE.Vector3(
-        0,
-        0,
-        0
-    );
-
-
-function updateCamera(){
-
-    if(currentTool==="hand"){
-
-        const speed=3;
-
-        const forward =
-            new THREE.Vector3(
-                Math.sin(yaw),
-                0,
-                Math.cos(yaw)
-            );
-
-        const right =
-            new THREE.Vector3(
-                Math.cos(yaw),
-                0,
-                -Math.sin(yaw)
-            );
-
-
-        if(keys.w)
-            target.addScaledVector(
-                forward,
-                speed
-            );
-
-        if(keys.s)
-            target.addScaledVector(
-                forward,
-                -speed
-            );
-
-        if(keys.a)
-            target.addScaledVector(
-                right,
-                -speed
-            );
-
-        if(keys.d)
-            target.addScaledVector(
-                right,
-                speed
-            );
-
+        tree.add(crown);
     }
 
-
-    const x =
-        target.x+
-        Math.sin(yaw)*
-        Math.cos(pitch)*
-        cameraDistance;
-
-    const y =
-        target.y+
-        Math.sin(pitch)*
-        cameraDistance;
-
-    const z =
-        target.z+
-        Math.cos(yaw)*
-        Math.cos(pitch)*
-        cameraDistance;
-
-
-    camera.position.set(
+    tree.position.set(
         x,
         y,
         z
     );
 
-    camera.lookAt(target);
+    tree.rotation.y =
+        r1*Math.PI*2;
 
+    group.add(tree);
 }
 
 
-/* =========================================================
-   OBJECT SYSTEM
-========================================================= */
+// ============================================================
+// BÜSCHE
+// ============================================================
 
-const objects=[];
+function createBush(
+    group,
+    x,
+    y,
+    z,
+    r
+){
 
-let selected=null;
-
-
-function addObject(mesh){
-
-    mesh.castShadow=true;
-
-    mesh.receiveShadow=true;
-
-    mesh.userData.script="";
-
-    mesh.userData.name=
-        "Object_"+(objects.length+1);
-
-    scene.add(mesh);
-
-    objects.push(mesh);
-
-    selected=mesh;
-
-    updateInspector();
-
-}
-
-
-document.getElementById("cube").onclick=()=>{
-
-    const cube =
+    const bush =
         new THREE.Mesh(
-            new THREE.BoxGeometry(
-                30,
-                30,
-                30
+            new THREE.IcosahedronGeometry(
+                2.5+r*3,
+                1
             ),
-            new THREE.MeshStandardMaterial({
-                color:0xffaa22
-            })
+            materials.leaves2
         );
 
-    cube.position.set(
-        target.x,
-        getHeight(
-            target.x,
-            target.z
-        )+15,
-        target.z
+    bush.position.set(
+        x,
+        y+2,
+        z
     );
 
-    addObject(cube);
-};
+    bush.scale.y=.65;
+
+    bush.castShadow=true;
+
+    group.add(bush);
+}
 
 
-document.getElementById("sphere").onclick=()=>{
+// ============================================================
+// FELSEN
+// ============================================================
 
-    const sphere =
+function createRock(
+    group,
+    x,
+    y,
+    z,
+    r
+){
+
+    const size =
+        3+r*15;
+
+    const rock =
         new THREE.Mesh(
-            new THREE.SphereGeometry(
-                18,
-                32,
-                20
+            new THREE.DodecahedronGeometry(
+                size,
+                1
             ),
-            new THREE.MeshStandardMaterial({
-                color:0x55aaff
-            })
+            materials.rock
         );
 
-    sphere.position.set(
-        target.x,
-        getHeight(
-            target.x,
-            target.z
-        )+18,
-        target.z
+    rock.position.set(
+        x,
+        y+size*.35,
+        z
     );
 
-    addObject(sphere);
-};
-
-
-/* =========================================================
-   SELECT
-========================================================= */
-
-function selectObject(){
-
-    raycaster.setFromCamera(
-        mouse,
-        camera
+    rock.rotation.set(
+        r*2,
+        r*5,
+        r*3
     );
 
-    const hits =
-        raycaster.intersectObjects(
-            objects,
-            true
-        );
+    rock.scale.y =
+        .65+r*.5;
 
-    if(!hits.length)
-        return;
+    rock.castShadow=true;
 
-    let obj=hits[0].object;
-
-    while(
-        obj.parent &&
-        obj.parent!==scene
-    ){
-
-        if(
-            objects.includes(obj)
-        )
-            break;
-
-        obj=obj.parent;
-    }
-
-    if(objects.includes(obj)){
-
-        selected=obj;
-
-        updateInspector();
-
-    }
+    group.add(rock);
 }
 
 
-/* =========================================================
-   INSPECTOR
-========================================================= */
+// ============================================================
+// SEEN
+// ============================================================
 
-function updateInspector(){
+function createLakes(){
 
-    if(!selected){
-
-        document.getElementById("name")
-            .value="";
-
-        return;
-    }
-
-
-    document.getElementById("name")
-        .value=
-        selected.userData.name || "";
-
-
-    document.getElementById("px")
-        .value=selected.position.x.toFixed(2);
-
-    document.getElementById("py")
-        .value=selected.position.y.toFixed(2);
-
-    document.getElementById("pz")
-        .value=selected.position.z.toFixed(2);
-
-
-    document.getElementById("rx")
-        .value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.x
-        ).toFixed(1);
-
-    document.getElementById("ry")
-        .value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.y
-        ).toFixed(1);
-
-    document.getElementById("rz")
-        .value=
-        THREE.MathUtils.radToDeg(
-            selected.rotation.z
-        ).toFixed(1);
-
-
-    document.getElementById("scaleValue")
-        .value=
-        selected.scale.x.toFixed(2);
-
-
-    document.getElementById("script")
-        .value=
-        selected.userData.script || "";
-}
-
-
-document.getElementById("apply")
-.onclick=()=>{
-
-    if(!selected)
-        return;
-
-    selected.userData.name =
-        document.getElementById("name")
-            .value;
-
-
-    selected.position.set(
-        Number(document.getElementById("px").value),
-        Number(document.getElementById("py").value),
-        Number(document.getElementById("pz").value)
-    );
-
-
-    selected.rotation.set(
-        THREE.MathUtils.degToRad(
-            Number(document.getElementById("rx").value)
-        ),
-        THREE.MathUtils.degToRad(
-            Number(document.getElementById("ry").value)
-        ),
-        THREE.MathUtils.degToRad(
-            Number(document.getElementById("rz").value)
-        )
-    );
-
-
-    const s =
-        Number(
-            document.getElementById("scaleValue").value
+    while(waterGroup.children.length)
+        waterGroup.remove(
+            waterGroup.children[0]
         );
 
-    selected.scale.setScalar(s);
+    // mehrere natürliche Seen
+    const lakeCount = 7;
 
-};
+    for(let i=0;i<lakeCount;i++){
 
-
-/* =========================================================
-   TRANSFORM WITH MOUSE
-========================================================= */
-
-let transformStart=null;
-
-let transformMouseX=0;
-
-
-renderer.domElement.addEventListener(
-    "pointerdown",
-    e=>{
-
-        if(
-            !["move","rotate","scale"]
-            .includes(currentTool)
-        )
-            return;
-
-
-        raycaster.setFromCamera(
-            mouse,
-            camera
-        );
-
-        const hits =
-            raycaster.intersectObjects(
-                objects,
-                true
+        const r1 =
+            hash2(
+                i*923,
+                i*731
             );
 
-        if(!hits.length)
-            return;
-
-        let obj=hits[0].object;
-
-        while(
-            obj.parent &&
-            obj.parent!==scene &&
-            !objects.includes(obj)
-        ){
-            obj=obj.parent;
-        }
-
-        if(
-            !objects.includes(obj)
-        )
-            return;
-
-        selected=obj;
-
-        transformStart={
-            position:obj.position.clone(),
-            rotation:obj.rotation.clone(),
-            scale:obj.scale.clone()
-        };
-
-        transformMouseX=e.clientX;
-
-    }
-);
-
-
-renderer.domElement.addEventListener(
-    "pointermove",
-    e=>{
-
-        if(
-            !transformStart ||
-            !selected
-        )
-            return;
-
-
-        const dx =
-            e.clientX-transformMouseX;
-
-
-        if(currentTool==="move"){
-
-            selected.position.x =
-                transformStart.position.x+
-                dx*.15;
-
-            selected.position.y =
-                transformStart.position.y;
-
-        }
-
-
-        if(currentTool==="rotate"){
-
-            selected.rotation.y =
-                transformStart.rotation.y+
-                dx*.01;
-
-        }
-
-
-        if(currentTool==="scale"){
-
-            const s =
-                Math.max(
-                    .05,
-                    transformStart.scale.x+
-                    dx*.01
-                );
-
-            selected.scale.setScalar(s);
-
-        }
-
-
-        updateInspector();
-
-    }
-);
-
-
-window.addEventListener(
-    "pointerup",
-    ()=>{
-        transformStart=null;
-    }
-);
-
-
-/* =========================================================
-   DUPLICATE
-========================================================= */
-
-document.getElementById("duplicate")
-.onclick=()=>{
-
-    if(!selected)
-        return;
-
-    const clone =
-        selected.clone(true);
-
-    clone.position.x+=30;
-
-    clone.userData =
-        {...selected.userData};
-
-    clone.userData.name =
-        selected.userData.name+
-        "_Copy";
-
-    scene.add(clone);
-
-    objects.push(clone);
-
-    selected=clone;
-
-    updateInspector();
-};
-
-
-/* =========================================================
-   DELETE
-========================================================= */
-
-document.getElementById("delete")
-.onclick=()=>{
-
-    if(!selected)
-        return;
-
-    scene.remove(selected);
-
-    const i =
-        objects.indexOf(selected);
-
-    if(i!==-1)
-        objects.splice(i,1);
-
-    selected=null;
-
-    updateInspector();
-};
-
-
-/* =========================================================
-   SCRIPT
-========================================================= */
-
-document.getElementById("applyScript")
-.onclick=()=>{
-
-    if(!selected)
-        return;
-
-    selected.userData.script =
-        document.getElementById("script")
-            .value;
-};
-
-
-/* =========================================================
-   PLAY MODE
-========================================================= */
-
-let playing=false;
-
-
-document.getElementById("play")
-.onclick=()=>{
-
-    playing=!playing;
-
-    document.getElementById("play")
-        .classList.toggle(
-            "active",
-            playing
-        );
-
-    document.getElementById("play")
-        .innerText =
-        playing
-        ? "■ STOP"
-        : "▶ PLAY";
-};
-
-
-function runScripts(){
-
-    if(!playing)
-        return;
-
-    for(
-        const object of objects
-    ){
-
-        const code =
-            object.userData.script;
-
-        if(!code)
+        const r2 =
+            hash2(
+                i*541,
+                i*119
+            );
+
+        const x =
+            (r1-.5)*
+            WORLD_SIZE*.8;
+
+        const z =
+            (r2-.5)*
+            WORLD_SIZE*.8;
+
+        const h =
+            terrainHeight(x,z);
+
+        if(h>55)
             continue;
 
-        try{
+        const radius =
+            80+
+            r1*180;
 
-            new Function(
-                "object",
-                "THREE",
-                code
-            )(
-                object,
-                THREE
+        const lake =
+            new THREE.Mesh(
+                new THREE.CircleGeometry(
+                    radius,
+                    48
+                ),
+                materials.water
             );
 
-        }catch(err){
+        lake.rotation.x =
+            -Math.PI/2;
 
-            console.warn(
-                "Script error:",
-                err
-            );
+        lake.position.set(
+            x,
+            Math.max(
+                -1,
+                h+2
+            ),
+            z
+        );
+
+        lake.scale.x =
+            .65+r2*.55;
+
+        lake.scale.z =
+            1;
+
+        waterGroup.add(lake);
+    }
+}
+
+
+// ============================================================
+// FLUSS
+// ============================================================
+
+function createRiver(){
+
+    const points = [];
+
+    const offset =
+        (hash2(444,222)-.5)
+        * 1200;
+
+    for(let i=0;i<35;i++){
+
+        const t=i/34;
+
+        const x =
+            -WORLD_SIZE*.45 +
+            t*WORLD_SIZE*.9;
+
+        const z =
+            offset+
+            Math.sin(t*8+seed*.00001)*350;
+
+        const y =
+            terrainHeight(x,z)+3;
+
+        points.push(
+            new THREE.Vector3(
+                x,
+                y,
+                z
+            )
+        );
+    }
+
+    const curve =
+        new THREE.CatmullRomCurve3(
+            points
+        );
+
+    const geometry =
+        new THREE.TubeGeometry(
+            curve,
+            100,
+            8,
+            8,
+            false
+        );
+
+    // Fluss als abgeflachtes Band
+    const river =
+        new THREE.Mesh(
+            geometry,
+            materials.water
+        );
+
+    river.scale.y=.08;
+    river.scale.x=1.8;
+
+    waterGroup.add(river);
+}
+
+
+// ============================================================
+// WELT GENERIEREN
+// ============================================================
+
+function clearWorld(){
+
+    while(world.children.length){
+
+        world.remove(
+            world.children[0]
+        );
+
+    }
+
+    terrainGroup.clear();
+    detailGroup.clear();
+    waterGroup.clear();
+
+    chunks.clear();
+
+    world.add(terrainGroup);
+    world.add(detailGroup);
+    world.add(waterGroup);
+}
+
+
+function generateWorld(){
+
+    document.getElementById(
+        "loading"
+    ).style.display="flex";
+
+    requestAnimationFrame(()=>{
+
+        clearWorld();
+
+        const total = GRID*GRID;
+
+        for(let cx=0;cx<GRID;cx++){
+
+            for(let cz=0;cz<GRID;cz++){
+
+                createChunk(
+                    cx,
+                    cz
+                );
+
+            }
+        }
+
+        createLakes();
+        createRiver();
+
+        document.getElementById(
+            "seedText"
+        ).innerText=seed;
+
+        document.getElementById(
+            "chunkText"
+        ).innerText=chunks.size;
+
+        controls.target.set(
+            0,
+            terrainHeight(0,0),
+            0
+        );
+
+        camera.position.set(
+            900,
+            800,
+            900
+        );
+
+        controls.update();
+
+        document.getElementById(
+            "loading"
+        ).style.display="none";
+
+    });
+}
+
+
+// ============================================================
+// NEUE WELT
+// ============================================================
+
+document.getElementById(
+    "generate"
+).onclick=()=>{
+
+    const input =
+        document.getElementById(
+            "seedInput"
+        ).value.trim();
+
+    if(input===""){
+
+        seed=randomSeed();
+
+    }else{
+
+        let n=0;
+
+        for(let i=0;i<input.length;i++){
+
+            n =
+                Math.imul(
+                    n^input.charCodeAt(i),
+                    16777619
+                );
 
         }
 
+        seed =
+            Math.abs(n) ||
+            1;
     }
-}
 
-
-/* =========================================================
-   GRAVITY
-========================================================= */
-
-let gravityEnabled=false;
-
-let verticalVelocity=0;
-
-
-document.getElementById("gravity")
-.onclick=()=>{
-
-    gravityEnabled=
-        !gravityEnabled;
-
-    document.getElementById("gravity")
-        .classList.toggle(
-            "active",
-            gravityEnabled
-        );
-
+    generateWorld();
 };
 
 
-function updateGravity(){
+// Enter im Seed-Feld
+document.getElementById(
+    "seedInput"
+).addEventListener(
+    "keydown",
+    e=>{
 
-    if(!gravityEnabled)
-        return;
-
-
-    verticalVelocity-=.45;
-
-    target.y+=
-        verticalVelocity;
-
-
-    const ground =
-        getHeight(
-            target.x,
-            target.z
-        );
-
-
-    const minHeight =
-        ground+30;
-
-
-    if(target.y<minHeight){
-
-        target.y=minHeight;
-
-        verticalVelocity=0;
+        if(e.key==="Enter")
+            document.getElementById(
+                "generate"
+            ).click();
 
     }
+);
 
-}
 
+// ============================================================
+// GLB EXPORT
+// ============================================================
 
-/* =========================================================
-   SAVE
-========================================================= */
+document.getElementById(
+    "export"
+).onclick=()=>{
 
-document.getElementById("save")
-.onclick=()=>{
+    const exporter =
+        new THREE.GLTFExporter();
 
-    const data={
+    const button =
+        document.getElementById(
+            "export"
+        );
 
-        seed:seed,
+    button.innerText =
+        "GLB wird erstellt...";
 
-        heights:Array.from(
-            heights
-        ),
+    button.disabled=true;
 
-        camera:{
+    // Wasser beim Export ebenfalls behalten
+    exporter.parse(
+        world,
+        function(result){
 
-            target:[
-                target.x,
-                target.y,
-                target.z
-            ],
+            const blob =
+                new Blob(
+                    [
+                        result
+                    ],
+                    {
+                        type:
+                        "model/gltf-binary"
+                    }
+                );
 
-            yaw:yaw,
-            pitch:pitch,
-            distance:cameraDistance
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+            const a =
+                document.createElement(
+                    "a"
+                );
+
+            a.href=url;
+
+            a.download =
+                "ZEROPOINT_WORLD_" +
+                seed +
+                ".glb";
+
+            document.body.appendChild(a);
+
+            a.click();
+
+            a.remove();
+
+            URL.revokeObjectURL(
+                url
+            );
+
+            button.innerText =
+                "GLB herunterladen";
+
+            button.disabled=false;
 
         },
+        function(error){
 
-        objects:
-            objects.map(
-                o=>({
-
-                    name:o.userData.name,
-
-                    type:
-                        o.geometry
-                            instanceof
-                            THREE.SphereGeometry
-                        ? "sphere"
-                        : "cube",
-
-                    position:[
-                        o.position.x,
-                        o.position.y,
-                        o.position.z
-                    ],
-
-                    rotation:[
-                        o.rotation.x,
-                        o.rotation.y,
-                        o.rotation.z
-                    ],
-
-                    scale:[
-                        o.scale.x,
-                        o.scale.y,
-                        o.scale.z
-                    ],
-
-                    script:
-                        o.userData.script || ""
-
-                })
-            )
-
-    };
-
-
-    const blob =
-        new Blob(
-            [JSON.stringify(data)],
-            {
-                type:"application/json"
-            }
-        );
-
-
-    const a =
-        document.createElement("a");
-
-    a.href =
-        URL.createObjectURL(blob);
-
-    a.download=
-        "ghost-landscape.json";
-
-    a.click();
-
-    URL.revokeObjectURL(
-        a.href
-    );
-
-};
-
-
-/* =========================================================
-   LOAD
-========================================================= */
-
-const fileInput =
-    document.createElement("input");
-
-fileInput.type="file";
-
-fileInput.accept=".json";
-
-
-document.getElementById("load")
-.onclick=()=>{
-    fileInput.click();
-};
-
-
-fileInput.onchange=e=>{
-
-    const file=
-        e.target.files[0];
-
-    if(!file)
-        return;
-
-    const reader=
-        new FileReader();
-
-
-    reader.onload=()=>{
-
-        try{
-
-            const data=
-                JSON.parse(
-                    reader.result
-                );
-
-
-            if(
-                Array.isArray(
-                    data.heights
-                )
-            ){
-
-                for(
-                    let i=0;
-                    i<heights.length;
-                    i++
-                ){
-
-                    heights[i]=
-                        data.heights[i] ??
-                        heights[i];
-
-                    position.setY(
-                        i,
-                        heights[i]
-                    );
-
-                }
-
-                position.needsUpdate=true;
-
-                geometry.computeVertexNormals();
-
-            }
-
-
-            if(data.camera){
-
-                target.set(
-                    data.camera.target[0],
-                    data.camera.target[1],
-                    data.camera.target[2]
-                );
-
-                yaw=
-                    data.camera.yaw;
-
-                pitch=
-                    data.camera.pitch;
-
-                cameraDistance=
-                    data.camera.distance;
-
-            }
-
-
-            for(
-                const o of objects
-            )
-                scene.remove(o);
-
-            objects.length=0;
-
-            selected=null;
-
-
-            if(
-                Array.isArray(
-                    data.objects
-                )
-            ){
-
-                for(
-                    const d of data.objects
-                ){
-
-                    let mesh;
-
-
-                    if(
-                        d.type==="sphere"
-                    ){
-
-                        mesh=
-                            new THREE.Mesh(
-                                new THREE.SphereGeometry(
-                                    18,
-                                    32,
-                                    20
-                                ),
-                                new THREE.MeshStandardMaterial({
-                                    color:0x55aaff
-                                })
-                            );
-
-                    }else{
-
-                        mesh=
-                            new THREE.Mesh(
-                                new THREE.BoxGeometry(
-                                    30,
-                                    30,
-                                    30
-                                ),
-                                new THREE.MeshStandardMaterial({
-                                    color:0xffaa22
-                                })
-                            );
-
-                    }
-
-
-                    mesh.position.fromArray(
-                        d.position
-                    );
-
-                    mesh.rotation.set(
-                        d.rotation[0],
-                        d.rotation[1],
-                        d.rotation[2]
-                    );
-
-                    mesh.scale.fromArray(
-                        d.scale
-                    );
-
-                    mesh.castShadow=true;
-
-                    mesh.receiveShadow=true;
-
-                    mesh.userData.name=
-                        d.name;
-
-                    mesh.userData.script=
-                        d.script || "";
-
-                    scene.add(mesh);
-
-                    objects.push(mesh);
-
-                }
-
-            }
-
-        }catch(err){
+            console.error(error);
 
             alert(
-                "Projekt konnte nicht geladen werden."
+                "GLB-Export fehlgeschlagen."
             );
 
+            button.innerText =
+                "GLB herunterladen";
+
+            button.disabled=false;
+
+        },
+        {
+            binary:true,
+            onlyVisible:true
         }
-
-    };
-
-
-    reader.readAsText(file);
-
+    );
 };
 
 
-/* =========================================================
-   NEW RANDOM ISLAND
-========================================================= */
-
-document.getElementById("newMap")
-.onclick=()=>{
-
-    location.reload();
-
-};
-
-
-/* =========================================================
-   START
-========================================================= */
-
-document.getElementById("startButton")
-.onclick=()=>{
-
-    document.getElementById("start")
-        .style.display="none";
-
-};
-
-
-/* =========================================================
-   RESIZE
-========================================================= */
+// ============================================================
+// RESIZE
+// ============================================================
 
 window.addEventListener(
     "resize",
     ()=>{
 
-        camera.aspect=
+        camera.aspect =
             innerWidth/
             innerHeight;
 
@@ -2549,9 +1368,9 @@ window.addEventListener(
 );
 
 
-/* =========================================================
-   LOOP
-========================================================= */
+// ============================================================
+// LOOP
+// ============================================================
 
 function animate(){
 
@@ -2559,22 +1378,20 @@ function animate(){
         animate
     );
 
-
-    updateGravity();
-
-    updateCamera();
-
-    runScripts();
-
+    controls.update();
 
     renderer.render(
         scene,
         camera
     );
-
 }
 
 
+// ============================================================
+// START
+// ============================================================
+
+generateWorld();
 animate();
 
 </script>
