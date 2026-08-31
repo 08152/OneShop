@@ -2,191 +2,274 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>GHOST Voice Studio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LernStart – Nachhilfe</title>
 
 <style>
-*{box-sizing:border-box}
-
-html,body{
+*{
+    box-sizing:border-box;
     margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#08080f;
-    color:white;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
 }
 
 body{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.app{
-    width:min(900px,95vw);
-    background:#12121e;
-    border:1px solid #303049;
-    border-radius:24px;
-    padding:25px;
-    box-shadow:0 30px 100px #000b;
+    font-family:Arial,Helvetica,sans-serif;
+    background:linear-gradient(135deg,#fff8d9,#e8f5ff);
+    color:#172033;
 }
 
 header{
+    background:#172033;
+    color:white;
+    padding:20px 8%;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:22px;
+    position:sticky;
+    top:0;
+    z-index:100;
 }
 
 .logo{
     font-size:24px;
-    font-weight:900;
-    letter-spacing:2px;
+    font-weight:800;
 }
 
-.logo span{
-    color:#8b78ff;
-}
-
-.status{
-    color:#9292a8;
-    font-size:13px;
-}
-
-.recordArea{
+nav{
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:25px;
-    border-radius:20px;
-    background:#0d0d17;
-    border:1px solid #28283e;
+    gap:10px;
 }
 
-.recordButton{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:8px solid #25253a;
-    background:#8b78ff;
+nav a{
     color:white;
-    font-size:35px;
-    cursor:pointer;
-    transition:.15s;
-    box-shadow:0 0 0 0 #8b78ff55;
-}
-
-.recordButton:hover{
-    transform:scale(1.04);
-}
-
-.recordButton.recording{
-    background:#ff4f6d;
-    box-shadow:0 0 0 15px #ff4f6d22;
-}
-
-.timer{
-    margin-top:15px;
-    font-size:22px;
+    text-decoration:none;
+    padding:11px 16px;
+    border-radius:10px;
     font-weight:bold;
-    font-variant-numeric:tabular-nums;
+    cursor:pointer;
 }
 
-.visualizer{
-    width:100%;
-    height:100px;
-    margin-top:20px;
-    border-radius:12px;
-    background:#08080f;
-    overflow:hidden;
+nav a:hover,
+nav a.active{
+    background:#ffd84d;
+    color:#172033;
 }
 
-canvas{
-    width:100%;
-    height:100%;
+.page{
+    display:none;
+}
+
+.page.active{
     display:block;
 }
 
-.controls{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
-    margin-top:18px;
+.hero{
+    min-height:520px;
+    padding:70px 8%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:50px;
 }
 
-.box{
-    background:#191927;
-    border:1px solid #303049;
-    border-radius:15px;
-    padding:15px;
+.hero-text{
+    max-width:680px;
 }
 
-.boxTitle{
-    font-size:12px;
-    color:#88889e;
-    margin-bottom:8px;
-}
-
-.boxValue{
-    font-size:20px;
+.badge{
+    display:inline-block;
+    background:#ffd84d;
+    padding:9px 16px;
+    border-radius:30px;
     font-weight:bold;
+    margin-bottom:18px;
 }
 
-.meter{
-    height:7px;
-    background:#08080e;
-    border-radius:10px;
-    margin-top:10px;
-    overflow:hidden;
+h1{
+    font-size:clamp(42px,7vw,72px);
+    line-height:1;
 }
 
-.meterFill{
-    height:100%;
-    width:0%;
-    background:#8b78ff;
-    transition:width .04s linear;
+.hero p{
+    font-size:20px;
+    margin:25px 0;
+    line-height:1.5;
 }
 
-.buttons{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    margin-top:18px;
-}
-
-button.action{
-    border:0;
-    border-radius:13px;
-    padding:14px;
-    background:#29293d;
+.button{
+    display:inline-block;
+    background:#172033;
     color:white;
+    padding:15px 25px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:bold;
+    border:0;
+    cursor:pointer;
+}
+
+.price-card{
+    background:white;
+    padding:35px;
+    border-radius:25px;
+    box-shadow:0 15px 40px #17203322;
+    min-width:290px;
+    text-align:center;
+}
+
+.price-card .emoji{
+    font-size:55px;
+}
+
+.price{
+    font-size:52px;
+    font-weight:900;
+    margin:10px 0;
+}
+
+section{
+    padding:70px 8%;
+}
+
+.title{
+    text-align:center;
+    font-size:38px;
+    margin-bottom:35px;
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:22px;
+    max-width:1100px;
+    margin:auto;
+}
+
+.feature{
+    background:white;
+    padding:28px;
+    border-radius:20px;
+    box-shadow:0 8px 25px #17203315;
+}
+
+.feature span{
+    font-size:40px;
+}
+
+.feature h3{
+    margin:15px 0 8px;
+}
+
+.feature p{
+    line-height:1.5;
+    color:#536075;
+}
+
+.about{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:40px;
+    border-radius:25px;
+    box-shadow:0 10px 30px #17203315;
+    line-height:1.7;
+}
+
+.contact{
+    max-width:800px;
+    margin:40px auto;
+    background:#172033;
+    color:white;
+    border-radius:30px;
+    padding:45px;
+    box-shadow:0 15px 40px #17203330;
+}
+
+.contact h2{
+    font-size:35px;
+    margin-bottom:10px;
+}
+
+.contact-intro{
+    margin-bottom:25px;
+    color:#cbd3df;
+}
+
+form{
+    display:grid;
+    gap:15px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:15px;
+    border:0;
+    border-radius:10px;
+    font-size:16px;
+    font-family:inherit;
+}
+
+textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+button{
+    border:0;
+    background:#ffd84d;
+    color:#172033;
+    padding:15px;
+    border-radius:10px;
+    font-size:17px;
     font-weight:bold;
     cursor:pointer;
 }
 
-button.action:hover{
-    background:#383850;
+#status{
+    margin-top:20px;
+    text-align:center;
+    color:#ffd84d;
+    font-weight:bold;
 }
 
-button.action:disabled{
-    opacity:.35;
-    cursor:not-allowed;
+footer{
+    text-align:center;
+    padding:30px;
+    color:#687386;
 }
 
-audio{
-    width:100%;
-    margin-top:18px;
-}
+@media(max-width:700px){
 
-@media(max-width:650px){
-    .controls{
-        grid-template-columns:1fr;
+    header{
+        flex-direction:column;
+        gap:15px;
     }
 
-    .app{
-        padding:16px;
+    nav{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+    .hero{
+        flex-direction:column;
+        text-align:center;
+        padding-top:50px;
+    }
+
+    .price-card{
+        width:100%;
+        max-width:350px;
+    }
+
+    .contact{
+        border-radius:20px;
+        padding:25px;
     }
 }
 </style>
@@ -194,703 +277,339 @@ audio{
 
 <body>
 
-<div class="app">
-
 <header>
-    <div class="logo">
-        GHOST <span>VOICE STUDIO</span>
-    </div>
 
-    <div class="status" id="status">
-        Bereit
-    </div>
+    <div class="logo">📚 LernStart</div>
+
+    <nav>
+        <a class="nav-link active" data-page="home">Startseite</a>
+        <a class="nav-link" data-page="angebot">Angebot</a>
+        <a class="nav-link" data-page="ueber">Über mich</a>
+        <a class="nav-link" data-page="termin">Termin anfragen</a>
+    </nav>
+
 </header>
 
-<div class="recordArea">
 
-    <button
-        class="recordButton"
-        id="recordButton">
-        ●
-    </button>
+<main>
 
-    <div class="timer" id="timer">
-        00:00
-    </div>
+<!-- STARTSEITE -->
+<div id="home" class="page active">
 
-    <div class="visualizer">
-        <canvas id="visualizer"></canvas>
-    </div>
+    <section class="hero">
 
-</div>
+        <div class="hero-text">
 
-<div class="controls">
+            <div class="badge">
+                Nachhilfe für die 1.–4. Klasse
+            </div>
 
-    <div class="box">
-        <div class="boxTitle">STIMME</div>
-        <div class="boxValue" id="voiceLevel">0%</div>
+            <h1>
+                Gemeinsam<br>
+                besser lernen.
+            </h1>
 
-        <div class="meter">
-            <div class="meterFill" id="voiceMeter"></div>
+            <p>
+                Freundliche und verständliche Nachhilfe für
+                Grundschulkinder – mit Geduld, Spaß und ohne
+                unnötigen Druck.
+            </p>
+
+            <button class="button" onclick="openPage('termin')">
+                Termin anfragen
+            </button>
+
         </div>
-    </div>
 
-    <div class="box">
-        <div class="boxTitle">MUSIK</div>
-        <div class="boxValue" id="musicLevel">18%</div>
+        <div class="price-card">
 
-        <div class="meter">
-            <div class="meterFill" id="musicMeter"></div>
+            <div class="emoji">🎓</div>
+
+            <h2>Nachhilfe</h2>
+
+            <div class="price">20 €</div>
+
+            <p>pro 90 Minuten</p>
+
         </div>
-    </div>
 
-    <div class="box">
-        <div class="boxTitle">DUCKING</div>
-        <div class="boxValue" id="duckLevel">AUTO</div>
+    </section>
 
-        <div class="meter">
-            <div class="meterFill" id="duckMeter"></div>
+</div>
+
+
+<!-- ANGEBOT -->
+<div id="angebot" class="page">
+
+    <section>
+
+        <h2 class="title">
+            Mein Angebot
+        </h2>
+
+        <div class="features">
+
+            <div class="feature">
+                <span>➕</span>
+                <h3>Mathematik</h3>
+                <p>
+                    Rechnen, Aufgaben verstehen
+                    und gemeinsam üben.
+                </p>
+            </div>
+
+            <div class="feature">
+                <span>📖</span>
+                <h3>Deutsch</h3>
+                <p>
+                    Lesen, Schreiben, Rechtschreibung
+                    und Grammatik.
+                </p>
+            </div>
+
+            <div class="feature">
+                <span>🌍</span>
+                <h3>Englisch</h3>
+                <p>
+                    Grundlagen, Vokabeln und
+                    einfache Übungen.
+                </p>
+            </div>
+
+            <div class="feature">
+                <span>🧠</span>
+                <h3>Lernhilfe</h3>
+                <p>
+                    Hausaufgaben verstehen und
+                    besser lernen.
+                </p>
+            </div>
+
         </div>
-    </div>
+
+    </section>
 
 </div>
 
-<div class="buttons">
 
-    <button
-        class="action"
-        id="preview"
-        disabled>
-        ▶ VORSCHAU
-    </button>
+<!-- ÜBER MICH -->
+<div id="ueber" class="page">
 
-    <button
-        class="action"
-        id="stop"
-        disabled>
-        ■ STOP
-    </button>
+    <section>
+
+        <h2 class="title">
+            Über mich
+        </h2>
+
+        <div class="about">
+
+            <h2 style="margin-bottom:15px;">
+                👋 Hallo!
+            </h2>
+
+            <p>
+                Ich bin Schüler der 7. Klasse und möchte
+                Kindern aus der 1.–4. Klasse beim Lernen helfen.
+            </p>
+
+            <br>
+
+            <p>
+                Mir ist wichtig, dass Kinder Fragen stellen
+                können und den Stoff wirklich verstehen.
+            </p>
+
+            <br>
+
+            <p>
+                Eine Nachhilfestunde dauert 90 Minuten
+                und kostet <strong>20 €</strong>.
+            </p>
+
+        </div>
+
+    </section>
 
 </div>
 
-<audio id="player" controls></audio>
+
+<!-- TERMIN -->
+<div id="termin" class="page">
+
+    <section>
+
+        <div class="contact">
+
+            <h2>
+                📅 Termin anfragen
+            </h2>
+
+            <p class="contact-intro">
+                Fülle das Formular aus. Anschließend
+                wird dein E-Mail-Programm geöffnet.
+            </p>
+
+            <form onsubmit="sendRequest(event)">
+
+                <input
+                    id="name"
+                    type="text"
+                    placeholder="Name des Kindes"
+                    required
+                >
+
+                <select id="klasse" required>
+                    <option value="">
+                        Klasse auswählen
+                    </option>
+                    <option>1. Klasse</option>
+                    <option>2. Klasse</option>
+                    <option>3. Klasse</option>
+                    <option>4. Klasse</option>
+                </select>
+
+                <select id="fach" required>
+                    <option value="">
+                        Fach auswählen
+                    </option>
+                    <option>Mathematik</option>
+                    <option>Deutsch</option>
+                    <option>Englisch</option>
+                    <option>Hausaufgaben / Lernhilfe</option>
+                </select>
+
+                <input
+                    id="zeit"
+                    type="text"
+                    placeholder="Wunschzeit, z. B. Mittwoch 16:00 Uhr"
+                    required
+                >
+
+                <textarea
+                    id="nachricht"
+                    placeholder="Weitere Nachricht (optional)"
+                ></textarea>
+
+                <button type="submit">
+                    📧 Anfrage senden
+                </button>
+
+            </form>
+
+            <div id="status"></div>
+
+        </div>
+
+    </section>
 
 </div>
 
-<script src="https://unpkg.com/tone@15.1.22/build/Tone.js"></script>
+</main>
+
+
+<footer>
+    © 2026 LernStart · Nachhilfe 1.–4. Klasse
+</footer>
+
 
 <script>
 
-let micStream=null;
-let micSource=null;
-let micAnalyser=null;
+const links = document.querySelectorAll(".nav-link");
+const pages = document.querySelectorAll(".page");
 
-let voiceGain=null;
-let musicGain=null;
+function openPage(pageName){
 
-let musicSynth=null;
-let bassSynth=null;
-let padSynth=null;
+    pages.forEach(page=>{
+        page.classList.remove("active");
+    });
 
-let limiter=null;
+    links.forEach(link=>{
+        link.classList.remove("active");
+    });
 
-let recorder=null;
-let recordedChunks=[];
+    document.getElementById(pageName).classList.add("active");
 
-let recording=false;
-let startTime=0;
-let timerInterval=null;
-
-let animationFrame=null;
-
-let outputStream=null;
-let mediaDestination=null;
-
-const recordButton=
-    document.getElementById("recordButton");
-
-const previewButton=
-    document.getElementById("preview");
-
-const stopButton=
-    document.getElementById("stop");
-
-const status=
-    document.getElementById("status");
-
-const timer=
-    document.getElementById("timer");
-
-const player=
-    document.getElementById("player");
-
-const canvas=
-    document.getElementById("visualizer");
-
-const ctx=
-    canvas.getContext("2d");
-
-const voiceLevel=
-    document.getElementById("voiceLevel");
-
-const musicLevel=
-    document.getElementById("musicLevel");
-
-const duckLevel=
-    document.getElementById("duckLevel");
-
-const voiceMeter=
-    document.getElementById("voiceMeter");
-
-const musicMeter=
-    document.getElementById("musicMeter");
-
-const duckMeter=
-    document.getElementById("duckMeter");
-
-async function setupAudio(){
-
-    await Tone.start();
-
-    if(micStream)
-        return;
-
-    micStream=
-        await navigator.mediaDevices.getUserMedia({
-            audio:{
-                echoCancellation:true,
-                noiseSuppression:true,
-                autoGainControl:true
-            }
-        });
-
-    const rawContext=
-        Tone.getContext().rawContext;
-
-    micSource=
-        rawContext.createMediaStreamSource(
-            micStream
+    const activeLink =
+        document.querySelector(
+            `.nav-link[data-page="${pageName}"]`
         );
 
-    micAnalyser=
-        rawContext.createAnalyser();
-
-    micAnalyser.fftSize=256;
-
-    micSource.connect(micAnalyser);
-
-    const micTone=
-        new Tone.UserMedia();
-
-    voiceGain=
-        new Tone.Gain(1);
-
-    musicGain=
-        new Tone.Gain(0.18);
-
-    limiter=
-        new Tone.Limiter(-1)
-            .toDestination();
-
-    /*
-        Die Stimme wird über UserMedia
-        direkt in Tone.js eingespeist.
-    */
-
-    await micTone.open();
-
-    micTone
-        .connect(voiceGain);
-
-    voiceGain
-        .connect(limiter);
-
-    /*
-        Echter Tone.js Hintergrund:
-        kein einzelner Piepton,
-        sondern Akkorde + Bass + Melodie
-        mit verschiedenen Synthesizern.
-    */
-
-    musicSynth=
-        new Tone.PolySynth(
-            Tone.Synth,
-            {
-                oscillator:{
-                    type:"triangle"
-                },
-                envelope:{
-                    attack:.08,
-                    decay:.25,
-                    sustain:.55,
-                    release:1.2
-                }
-            }
-        );
-
-    musicSynth.volume.value=-8;
-
-    bassSynth=
-        new Tone.MonoSynth({
-            oscillator:{
-                type:"sine"
-            },
-            envelope:{
-                attack:.03,
-                decay:.25,
-                sustain:.7,
-                release:.8
-            },
-            filterEnvelope:{
-                attack:.01,
-                decay:.2,
-                sustain:.5,
-                release:.8,
-                baseFrequency:80,
-                octaves:2
-            }
-        });
-
-    bassSynth.volume.value=-8;
-
-    padSynth=
-        new Tone.PolySynth(
-            Tone.AMSynth,
-            {
-                envelope:{
-                    attack:.8,
-                    decay:.5,
-                    sustain:.7,
-                    release:2
-                }
-            }
-        );
-
-    padSynth.volume.value=-18;
-
-    musicSynth.connect(musicGain);
-    bassSynth.connect(musicGain);
-    padSynth.connect(musicGain);
-
-    musicGain.connect(limiter);
-
-    /*
-        Alles was an limiter geht wird
-        zusätzlich aufgenommen.
-    */
-
-    const destination=
-        Tone.getContext()
-            .rawContext
-            .createMediaStreamDestination();
-
-    mediaDestination=destination;
-
-    limiter.connect(destination);
-
-    outputStream=
-        destination.stream;
-
-    createMusic();
-
-    status.textContent=
-        "Mikrofon bereit";
-
-    previewButton.disabled=false;
-
-    animate();
-}
-
-function createMusic(){
-
-    Tone.getTransport().bpm.value=92;
-
-    const chords=[
-        ["C4","E4","G4"],
-        ["A3","C4","E4"],
-        ["F3","A3","C4"],
-        ["G3","B3","D4"]
-    ];
-
-    const bass=[
-        "C2",
-        "A1",
-        "F1",
-        "G1"
-    ];
-
-    const melody=[
-        ["G4","E4","C5","E4"],
-        ["A4","E4","C5","E4"],
-        ["A4","F4","C5","F4"],
-        ["B4","G4","D5","G4"]
-    ];
-
-    let step=0;
-
-    Tone.getTransport().scheduleRepeat(
-        time=>{
-
-            const chord=
-                chords[
-                    Math.floor(step/4)%chords.length
-                ];
-
-            musicSynth.triggerAttackRelease(
-                chord,
-                "2n",
-                time,
-                .35
-            );
-
-            bassSynth.triggerAttackRelease(
-                bass[
-                    Math.floor(step/4)%bass.length
-                ],
-                "2n",
-                time,
-                .42
-            );
-
-            const notes=
-                melody[
-                    Math.floor(step/4)%melody.length
-                ];
-
-            padSynth.triggerAttackRelease(
-                notes,
-                "1m",
-                time,
-                .18
-            );
-
-            step++;
-
-        },
-        "2n"
-    );
-}
-
-async function startRecording(){
-
-    await setupAudio();
-
-    if(recording)
-        return;
-
-    await Tone.start();
-
-    Tone.getTransport().start();
-
-    recordedChunks=[];
-
-    recorder=
-        new MediaRecorder(
-            outputStream,
-            {
-                mimeType:"audio/webm;codecs=opus"
-            }
-        );
-
-    recorder.ondataavailable=e=>{
-        if(e.data.size>0)
-            recordedChunks.push(e.data);
-    };
-
-    recorder.onstop=()=>{
-
-        const blob=
-            new Blob(
-                recordedChunks,
-                {
-                    type:"audio/webm"
-                }
-            );
-
-        player.src=
-            URL.createObjectURL(blob);
-
-        status.textContent=
-            "Aufnahme fertig";
-
-    };
-
-    recorder.start(250);
-
-    recording=true;
-
-    startTime=Date.now();
-
-    recordButton.classList.add(
-        "recording"
-    );
-
-    recordButton.textContent="■";
-
-    stopButton.disabled=false;
-
-    status.textContent=
-        "Aufnahme läuft";
-
-    timerInterval=
-        setInterval(updateTimer,100);
-
-}
-
-function stopRecording(){
-
-    if(!recording)
-        return;
-
-    recording=false;
-
-    if(recorder &&
-       recorder.state!=="inactive"){
-
-        recorder.stop();
+    if(activeLink){
+        activeLink.classList.add("active");
     }
 
-    Tone.getTransport().stop();
-
-    recordButton.classList.remove(
-        "recording"
-    );
-
-    recordButton.textContent="●";
-
-    stopButton.disabled=true;
-
-    clearInterval(
-        timerInterval
-    );
-
-    status.textContent=
-        "Aufnahme beendet";
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 }
 
-function updateTimer(){
+links.forEach(link=>{
 
-    const elapsed=
-        Math.floor(
-            (Date.now()-startTime)/1000
+    link.addEventListener("click",()=>{
+
+        openPage(
+            link.dataset.page
         );
 
-    const minutes=
-        Math.floor(elapsed/60);
+    });
 
-    const seconds=
-        elapsed%60;
+});
 
-    timer.textContent=
-        String(minutes).padStart(2,"0")+
-        ":"+
-        String(seconds).padStart(2,"0");
+
+function sendRequest(event){
+
+    event.preventDefault();
+
+    const name =
+        document.getElementById("name").value;
+
+    const klasse =
+        document.getElementById("klasse").value;
+
+    const fach =
+        document.getElementById("fach").value;
+
+    const zeit =
+        document.getElementById("zeit").value;
+
+    const nachricht =
+        document.getElementById("nachricht").value;
+
+
+    const text =
+`Hallo!
+
+ich interessiere mich für die Nachhilfe.
+
+Name des Kindes: ${name}
+Klasse: ${klasse}
+Fach: ${fach}
+Wunschzeit: ${zeit}
+
+Nachricht:
+${nachricht || "Keine weitere Nachricht."}
+
+Preis:
+20 € für 90 Minuten
+`;
+
+
+    const mail =
+        "mailto:r.schmid.8321@gmail.com" +
+        "?subject=" +
+        encodeURIComponent("Nachhilfe-Anfrage") +
+        "&body=" +
+        encodeURIComponent(text);
+
+
+    document.getElementById("status").textContent =
+        "E-Mail-Programm wird geöffnet …";
+
+    window.location.href = mail;
 }
-
-function animate(){
-
-    if(!micAnalyser){
-        animationFrame=
-            requestAnimationFrame(
-                animate
-            );
-        return;
-    }
-
-    const data=
-        new Uint8Array(
-            micAnalyser.fftSize
-        );
-
-    micAnalyser.getByteTimeDomainData(
-        data
-    );
-
-    let sum=0;
-
-    for(let i=0;i<data.length;i++){
-
-        const value=
-            (data[i]-128)/128;
-
-        sum+=value*value;
-    }
-
-    const rms=
-        Math.sqrt(
-            sum/data.length
-        );
-
-    let voice=
-        Math.min(
-            1,
-            rms*5
-        );
-
-    voice=
-        Math.pow(voice,.7);
-
-    /*
-        Automatisches Ducking:
-
-        Stimme ruhig:
-        Musik ca. 18%
-
-        Stimme normal:
-        Musik wird kleiner
-
-        Stimme laut:
-        Musik fast komplett heruntergeregelt
-    */
-
-    const duck=
-        Math.max(
-            .025,
-            .18-(voice*.155)
-        );
-
-    if(musicGain){
-
-        musicGain.gain.rampTo(
-            duck,
-            .04
-        );
-    }
-
-    voiceLevel.textContent=
-        Math.round(voice*100)+"%";
-
-    musicLevel.textContent=
-        Math.round(
-            duck/.18*100
-        )+"%";
-
-    duckLevel.textContent=
-        voice>0.55 ?
-        "STARK":
-        voice>0.2 ?
-        "MITTEL":
-        "LEICHT";
-
-    voiceMeter.style.width=
-        Math.round(voice*100)+"%";
-
-    musicMeter.style.width=
-        Math.round(
-            duck/.18*100
-        )+"%";
-
-    duckMeter.style.width=
-        Math.round(
-            voice*100
-        )+"%";
-
-    drawVisualizer(data);
-
-    animationFrame=
-        requestAnimationFrame(
-            animate
-        );
-}
-
-function drawVisualizer(data){
-
-    const width=
-        canvas.width=
-        canvas.clientWidth*
-        devicePixelRatio;
-
-    const height=
-        canvas.height=
-        canvas.clientHeight*
-        devicePixelRatio;
-
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
-
-    ctx.beginPath();
-
-    for(
-        let i=0;
-        i<data.length;
-        i++
-    ){
-
-        const x=
-            i/(data.length-1)*
-            width;
-
-        const y=
-            data[i]/255*
-            height;
-
-        if(i===0)
-            ctx.moveTo(x,y);
-        else
-            ctx.lineTo(x,y);
-    }
-
-    ctx.lineWidth=
-        2*devicePixelRatio;
-
-    ctx.strokeStyle=
-        "#8b78ff";
-
-    ctx.stroke();
-}
-
-recordButton.onclick=
-    startRecording;
-
-stopButton.onclick=
-    stopRecording;
-
-previewButton.onclick=
-    async()=>{
-
-        await setupAudio();
-
-        if(
-            Tone.getTransport().state===
-            "started"
-        ){
-
-            Tone.getTransport().stop();
-
-            previewButton.textContent=
-                "▶ VORSCHAU";
-
-        }else{
-
-            await Tone.start();
-
-            Tone.getTransport().start();
-
-            previewButton.textContent=
-                "■ VORSCHAU STOPPEN";
-        }
-    };
-
-window.addEventListener(
-    "beforeunload",
-    ()=>{
-        if(micStream){
-
-            micStream
-                .getTracks()
-                .forEach(
-                    track=>track.stop()
-                );
-        }
-    }
-);
 
 </script>
 
 </body>
 </html>
-```0
