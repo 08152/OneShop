@@ -12,10 +12,6 @@
     padding:0;
 }
 
-html{
-    scroll-behavior:smooth;
-}
-
 body{
     font-family:Arial,Helvetica,sans-serif;
     background:linear-gradient(135deg,#fff8d9,#e8f5ff);
@@ -150,11 +146,6 @@ h1{
     padding:30px;
     border-radius:22px;
     box-shadow:0 8px 25px #17203315;
-    transition:.2s;
-}
-
-.karte:hover{
-    transform:translateY(-4px);
 }
 
 .karte .symbol{
@@ -193,7 +184,6 @@ h1{
     color:white;
     padding:42px;
     border-radius:28px;
-    box-shadow:0 15px 40px #17203330;
 }
 
 .formular h2{
@@ -213,7 +203,6 @@ form{
 
 label{
     font-weight:bold;
-    margin-top:5px;
 }
 
 input,
@@ -224,19 +213,13 @@ textarea{
     border:0;
     border-radius:11px;
     font-size:16px;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family:Arial,sans-serif;
     outline:none;
 }
 
 textarea{
     min-height:130px;
     resize:vertical;
-}
-
-input:focus,
-select:focus,
-textarea:focus{
-    box-shadow:0 0 0 3px #ffd84d;
 }
 
 .senden{
@@ -250,11 +233,33 @@ textarea:focus{
     cursor:pointer;
 }
 
+.email-box{
+    margin-top:25px;
+    background:#27334b;
+    padding:20px;
+    border-radius:15px;
+}
+
+.email-box p{
+    color:#cbd3df;
+    margin-bottom:8px;
+}
+
+.email-adresse{
+    background:white;
+    color:#172033;
+    padding:14px;
+    border-radius:10px;
+    font-weight:bold;
+    user-select:text;
+}
+
 #meldung{
     text-align:center;
     margin-top:18px;
     color:#ffd84d;
     font-weight:bold;
+    line-height:1.5;
 }
 
 footer{
@@ -319,8 +324,6 @@ footer{
 
 <main>
 
-<!-- STARTSEITE -->
-
 <div id="start" class="seite aktiv">
 
     <section class="start">
@@ -352,7 +355,6 @@ footer{
 
         </div>
 
-
         <div class="preis">
 
             <div class="symbol">🎓</div>
@@ -363,9 +365,7 @@ footer{
                 20 €
             </div>
 
-            <p>
-                für 90 Minuten
-            </p>
+            <p>für 90 Minuten</p>
 
         </div>
 
@@ -373,8 +373,6 @@ footer{
 
 </div>
 
-
-<!-- ANGEBOTE -->
 
 <div id="angebot" class="seite">
 
@@ -447,8 +445,6 @@ footer{
 </div>
 
 
-<!-- ÜBER MICH -->
-
 <div id="ueber" class="seite">
 
     <section class="bildschirm">
@@ -459,9 +455,9 @@ footer{
 
         <div class="ueber">
 
-            <h2 style="margin-bottom:15px;">
-                👋 Hallo!
-            </h2>
+            <h2>👋 Hallo!</h2>
+
+            <br>
 
             <p>
                 Ich bin Schüler der 7. Klasse und möchte
@@ -482,31 +478,12 @@ footer{
                 und gezielte Prüfungsvorbereitung an.
             </p>
 
-            <br>
-
-            <p>
-                <strong>Einzelunterricht:</strong>
-                20 € für 90 Minuten
-            </p>
-
-            <p>
-                <strong>Gruppenunterricht:</strong>
-                15 € pro Kind für 90 Minuten
-            </p>
-
-            <p>
-                <strong>Prüfungsvorbereitung:</strong>
-                20 € für 90 Minuten
-            </p>
-
         </div>
 
     </section>
 
 </div>
 
-
-<!-- TERMIN -->
 
 <div id="termin" class="seite">
 
@@ -519,13 +496,13 @@ footer{
             </h2>
 
             <p class="beschreibung">
-                Wähle aus, welche Art von Nachhilfe du möchtest.
+                Wähle ein Angebot aus und erstelle deine Anfrage.
             </p>
 
             <form id="nachhilfeFormular">
 
                 <label for="angebotAuswahl">
-                    Was möchtest du buchen?
+                    Gewünschtes Angebot
                 </label>
 
                 <select id="angebotAuswahl" required>
@@ -602,12 +579,26 @@ footer{
                     class="senden"
                     type="submit"
                 >
-                    Anfrage senden
+                    Anfrage erstellen und kopieren
                 </button>
 
             </form>
 
+
             <div id="meldung"></div>
+
+
+            <div class="email-box">
+
+                <p>
+                    Anfrage bitte per E-Mail senden an:
+                </p>
+
+                <div class="email-adresse">
+                    r.schmid.8321@gmail.com
+                </div>
+
+            </div>
 
         </div>
 
@@ -650,7 +641,7 @@ function seiteZeigen(name, knopf){
 
 document
 .getElementById("nachhilfeFormular")
-.addEventListener("submit",function(event){
+.addEventListener("submit",async function(event){
 
     event.preventDefault();
 
@@ -673,7 +664,7 @@ document
         document.getElementById("nachricht").value;
 
 
-    const inhalt =
+    const text =
 `Neue Nachhilfe-Anfrage
 
 Gewünschtes Angebot:
@@ -695,18 +686,19 @@ Nachricht:
 ${nachricht || "Keine weitere Nachricht."}`;
 
 
-    /*
-    Eine reine HTML-Datei kann keine E-Mail
-    automatisch im Hintergrund versenden.
+    try{
 
-    Für den echten automatischen Versand muss
-    dieses Formular mit einem Server verbunden werden.
-    */
+        await navigator.clipboard.writeText(text);
 
-    console.log(inhalt);
+        document.getElementById("meldung").textContent =
+            "✅ Die komplette Anfrage wurde kopiert! Öffne jetzt deine E-Mail-App und sende sie an r.schmid.8321@gmail.com.";
 
-    document.getElementById("meldung").textContent =
-        "Anfrage wurde vorbereitet.";
+    }catch(error){
+
+        document.getElementById("meldung").textContent =
+            "Die Anfrage konnte nicht automatisch kopiert werden. Bitte markiere den Text in der Anfrage und kopiere ihn.";
+
+    }
 
 });
 
