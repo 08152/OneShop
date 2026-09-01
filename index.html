@@ -20,12 +20,13 @@ body{
     font-family:Arial,Helvetica,sans-serif;
     background:linear-gradient(135deg,#fff8d9,#e8f5ff);
     color:#172033;
+    min-height:100vh;
 }
 
 header{
     background:#172033;
     color:white;
-    padding:20px 8%;
+    padding:18px 7%;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -35,142 +36,142 @@ header{
 }
 
 .logo{
-    font-size:24px;
+    font-size:25px;
     font-weight:800;
 }
 
 nav{
     display:flex;
-    gap:10px;
+    gap:8px;
+    flex-wrap:wrap;
 }
 
-nav a{
+nav button{
+    background:transparent;
     color:white;
-    text-decoration:none;
-    padding:11px 16px;
+    border:0;
+    padding:11px 14px;
     border-radius:10px;
+    font-size:15px;
     font-weight:bold;
     cursor:pointer;
 }
 
-nav a:hover,
-nav a.active{
+nav button:hover,
+nav button.aktiv{
     background:#ffd84d;
     color:#172033;
 }
 
-.page{
+.seite{
     display:none;
 }
 
-.page.active{
+.seite.aktiv{
     display:block;
 }
 
-.hero{
-    min-height:520px;
-    padding:70px 8%;
+.start{
+    min-height:560px;
+    padding:80px 7%;
     display:flex;
-    align-items:center;
     justify-content:space-between;
+    align-items:center;
     gap:50px;
 }
 
-.hero-text{
-    max-width:680px;
+.inhalt{
+    max-width:700px;
 }
 
-.badge{
+.auszeichnung{
     display:inline-block;
     background:#ffd84d;
     padding:9px 16px;
     border-radius:30px;
     font-weight:bold;
-    margin-bottom:18px;
+    margin-bottom:20px;
 }
 
 h1{
-    font-size:clamp(42px,7vw,72px);
-    line-height:1;
+    font-size:clamp(43px,7vw,75px);
+    line-height:.98;
 }
 
-.hero p{
+.start p{
     font-size:20px;
-    margin:25px 0;
     line-height:1.5;
+    margin:25px 0;
 }
 
-.button{
-    display:inline-block;
-    background:#172033;
-    color:white;
-    padding:15px 25px;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:bold;
-    border:0;
-    cursor:pointer;
-}
-
-.price-card{
+.preis{
     background:white;
-    padding:35px;
-    border-radius:25px;
-    box-shadow:0 15px 40px #17203322;
+    padding:40px;
+    border-radius:28px;
+    text-align:center;
     min-width:290px;
-    text-align:center;
+    box-shadow:0 15px 40px #17203322;
 }
 
-.price-card .emoji{
+.preis .symbol{
+    font-size:60px;
+}
+
+.preis h2{
+    margin-top:10px;
+}
+
+.preis-zahl{
     font-size:55px;
-}
-
-.price{
-    font-size:52px;
     font-weight:900;
-    margin:10px 0;
+    margin:8px 0;
 }
 
-section{
-    padding:70px 8%;
+.bildschirm{
+    padding:70px 7%;
 }
 
-.title{
+.titel{
     text-align:center;
-    font-size:38px;
-    margin-bottom:35px;
+    font-size:40px;
+    margin-bottom:40px;
 }
 
-.features{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-    gap:22px;
+.karten{
     max-width:1100px;
     margin:auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
 }
 
-.feature{
+.karte{
     background:white;
-    padding:28px;
-    border-radius:20px;
+    padding:30px;
+    border-radius:22px;
     box-shadow:0 8px 25px #17203315;
+    transition:.2s;
 }
 
-.feature span{
-    font-size:40px;
+.karte:hover{
+    transform:translateY(-4px);
 }
 
-.feature h3{
-    margin:15px 0 8px;
+.karte .symbol{
+    font-size:42px;
 }
 
-.feature p{
+.karte h3{
+    margin:14px 0 8px;
+}
+
+.karte p{
+    color:#596579;
     line-height:1.5;
-    color:#536075;
 }
 
-.about{
-    max-width:900px;
+.ueber{
+    max-width:850px;
     margin:auto;
     background:white;
     padding:40px;
@@ -179,24 +180,24 @@ section{
     line-height:1.7;
 }
 
-.contact{
+.formular{
     max-width:800px;
-    margin:40px auto;
+    margin:auto;
     background:#172033;
     color:white;
-    border-radius:30px;
-    padding:45px;
+    padding:42px;
+    border-radius:28px;
     box-shadow:0 15px 40px #17203330;
 }
 
-.contact h2{
-    font-size:35px;
+.formular h2{
+    font-size:36px;
     margin-bottom:10px;
 }
 
-.contact-intro{
-    margin-bottom:25px;
+.beschreibung{
     color:#cbd3df;
+    margin-bottom:25px;
 }
 
 form{
@@ -208,32 +209,39 @@ input,
 select,
 textarea{
     width:100%;
-    padding:15px;
+    padding:16px;
     border:0;
-    border-radius:10px;
+    border-radius:11px;
     font-size:16px;
-    font-family:inherit;
+    font-family:Arial,Helvetica,sans-serif;
+    outline:none;
 }
 
 textarea{
-    min-height:120px;
+    min-height:130px;
     resize:vertical;
 }
 
-button{
-    border:0;
+input:focus,
+select:focus,
+textarea:focus{
+    box-shadow:0 0 0 3px #ffd84d;
+}
+
+.senden{
     background:#ffd84d;
     color:#172033;
-    padding:15px;
-    border-radius:10px;
+    border:0;
+    padding:16px;
+    border-radius:11px;
     font-size:17px;
     font-weight:bold;
     cursor:pointer;
 }
 
-#status{
-    margin-top:20px;
+#meldung{
     text-align:center;
+    margin-top:18px;
     color:#ffd84d;
     font-weight:bold;
 }
@@ -244,31 +252,25 @@ footer{
     color:#687386;
 }
 
-@media(max-width:700px){
+@media(max-width:750px){
 
     header{
         flex-direction:column;
         gap:15px;
     }
 
-    nav{
-        flex-wrap:wrap;
-        justify-content:center;
-    }
-
-    .hero{
+    .start{
         flex-direction:column;
         text-align:center;
-        padding-top:50px;
+        padding-top:55px;
     }
 
-    .price-card{
+    .preis{
         width:100%;
         max-width:350px;
     }
 
-    .contact{
-        border-radius:20px;
+    .formular{
         padding:25px;
     }
 }
@@ -282,10 +284,23 @@ footer{
     <div class="logo">📚 LernStart</div>
 
     <nav>
-        <a class="nav-link active" data-page="home">Startseite</a>
-        <a class="nav-link" data-page="angebot">Angebot</a>
-        <a class="nav-link" data-page="ueber">Über mich</a>
-        <a class="nav-link" data-page="termin">Termin anfragen</a>
+
+        <button class="aktiv" onclick="seiteZeigen('start',this)">
+            Startseite
+        </button>
+
+        <button onclick="seiteZeigen('angebot',this)">
+            Angebote
+        </button>
+
+        <button onclick="seiteZeigen('ueber',this)">
+            Über mich
+        </button>
+
+        <button onclick="seiteZeigen('termin',this)">
+            Termin anfragen
+        </button>
+
     </nav>
 
 </header>
@@ -294,13 +309,14 @@ footer{
 <main>
 
 <!-- STARTSEITE -->
-<div id="home" class="page active">
 
-    <section class="hero">
+<div id="start" class="seite aktiv">
 
-        <div class="hero-text">
+    <section class="start">
 
-            <div class="badge">
+        <div class="inhalt">
+
+            <div class="auszeichnung">
                 Nachhilfe für die 1.–4. Klasse
             </div>
 
@@ -310,26 +326,35 @@ footer{
             </h1>
 
             <p>
-                Freundliche und verständliche Nachhilfe für
-                Grundschulkinder – mit Geduld, Spaß und ohne
-                unnötigen Druck.
+                Freundliche und verständliche Nachhilfe
+                für Grundschulkinder – mit Geduld,
+                Spaß und ohne unnötigen Druck.
             </p>
 
-            <button class="button" onclick="openPage('termin')">
+            <button
+                class="senden"
+                onclick="seiteZeigen('termin')"
+                style="padding:15px 25px;"
+            >
                 Termin anfragen
             </button>
 
         </div>
 
-        <div class="price-card">
 
-            <div class="emoji">🎓</div>
+        <div class="preis">
+
+            <div class="symbol">🎓</div>
 
             <h2>Nachhilfe</h2>
 
-            <div class="price">20 €</div>
+            <div class="preis-zahl">
+                20 €
+            </div>
 
-            <p>pro 90 Minuten</p>
+            <p>
+                für 90 Minuten
+            </p>
 
         </div>
 
@@ -338,51 +363,57 @@ footer{
 </div>
 
 
-<!-- ANGEBOT -->
-<div id="angebot" class="page">
+<!-- ANGEBOTE -->
 
-    <section>
+<div id="angebot" class="seite">
 
-        <h2 class="title">
-            Mein Angebot
+    <section class="bildschirm">
+
+        <h2 class="titel">
+            Meine Angebote
         </h2>
 
-        <div class="features">
+        <div class="karten">
 
-            <div class="feature">
-                <span>➕</span>
+            <div class="karte">
+
+                <div class="symbol">➕</div>
+
                 <h3>Mathematik</h3>
+
                 <p>
                     Rechnen, Aufgaben verstehen
                     und gemeinsam üben.
                 </p>
+
             </div>
 
-            <div class="feature">
-                <span>📖</span>
+
+            <div class="karte">
+
+                <div class="symbol">📖</div>
+
                 <h3>Deutsch</h3>
+
                 <p>
-                    Lesen, Schreiben, Rechtschreibung
-                    und Grammatik.
+                    Lesen, Schreiben,
+                    Rechtschreibung und Grammatik.
                 </p>
+
             </div>
 
-            <div class="feature">
-                <span>🌍</span>
-                <h3>Englisch</h3>
-                <p>
-                    Grundlagen, Vokabeln und
-                    einfache Übungen.
-                </p>
-            </div>
 
-            <div class="feature">
-                <span>🧠</span>
+            <div class="karte">
+
+                <div class="symbol">🧠</div>
+
                 <h3>Lernhilfe</h3>
+
                 <p>
-                    Hausaufgaben verstehen und
-                    besser lernen.
+                    Hausaufgaben verstehen,
+                    üben und besser lernen.
                 </p>
+
             </div>
 
         </div>
@@ -393,15 +424,16 @@ footer{
 
 
 <!-- ÜBER MICH -->
-<div id="ueber" class="page">
 
-    <section>
+<div id="ueber" class="seite">
 
-        <h2 class="title">
+    <section class="bildschirm">
+
+        <h2 class="titel">
             Über mich
         </h2>
 
-        <div class="about">
+        <div class="ueber">
 
             <h2 style="margin-bottom:15px;">
                 👋 Hallo!
@@ -416,14 +448,20 @@ footer{
 
             <p>
                 Mir ist wichtig, dass Kinder Fragen stellen
-                können und den Stoff wirklich verstehen.
+                können und den Lernstoff wirklich verstehen.
             </p>
 
             <br>
 
             <p>
-                Eine Nachhilfestunde dauert 90 Minuten
-                und kostet <strong>20 €</strong>.
+                Eine Nachhilfestunde dauert
+                <strong>90 Minuten</strong>.
+            </p>
+
+            <br>
+
+            <p>
+                <strong>Preis: 20 € pro 90 Minuten</strong>
             </p>
 
         </div>
@@ -433,23 +471,23 @@ footer{
 </div>
 
 
-<!-- TERMIN -->
-<div id="termin" class="page">
+<!-- TERMIN ANFRAGEN -->
 
-    <section>
+<div id="termin" class="seite">
 
-        <div class="contact">
+    <section class="bildschirm">
+
+        <div class="formular">
 
             <h2>
                 📅 Termin anfragen
             </h2>
 
-            <p class="contact-intro">
-                Fülle das Formular aus. Anschließend
-                wird dein E-Mail-Programm geöffnet.
+            <p class="beschreibung">
+                Fülle das Formular aus.
             </p>
 
-            <form onsubmit="sendRequest(event)">
+            <form id="nachhilfeFormular">
 
                 <input
                     id="name"
@@ -459,44 +497,56 @@ footer{
                 >
 
                 <select id="klasse" required>
+
                     <option value="">
                         Klasse auswählen
                     </option>
+
                     <option>1. Klasse</option>
                     <option>2. Klasse</option>
                     <option>3. Klasse</option>
                     <option>4. Klasse</option>
+
                 </select>
 
+
                 <select id="fach" required>
+
                     <option value="">
                         Fach auswählen
                     </option>
+
                     <option>Mathematik</option>
                     <option>Deutsch</option>
-                    <option>Englisch</option>
                     <option>Hausaufgaben / Lernhilfe</option>
+
                 </select>
+
 
                 <input
                     id="zeit"
                     type="text"
-                    placeholder="Wunschzeit, z. B. Mittwoch 16:00 Uhr"
+                    placeholder="Wunschzeit"
                     required
                 >
 
+
                 <textarea
                     id="nachricht"
-                    placeholder="Weitere Nachricht (optional)"
+                    placeholder="Weitere Nachricht"
                 ></textarea>
 
-                <button type="submit">
-                    📧 Anfrage senden
+
+                <button
+                    class="senden"
+                    type="submit"
+                >
+                    Anfrage senden
                 </button>
 
             </form>
 
-            <div id="status"></div>
+            <div id="meldung"></div>
 
         </div>
 
@@ -514,28 +564,20 @@ footer{
 
 <script>
 
-const links = document.querySelectorAll(".nav-link");
-const pages = document.querySelectorAll(".page");
+function seiteZeigen(name, knopf){
 
-function openPage(pageName){
-
-    pages.forEach(page=>{
-        page.classList.remove("active");
+    document.querySelectorAll(".seite").forEach(function(seite){
+        seite.classList.remove("aktiv");
     });
 
-    links.forEach(link=>{
-        link.classList.remove("active");
+    document.getElementById(name).classList.add("aktiv");
+
+    document.querySelectorAll("nav button").forEach(function(button){
+        button.classList.remove("aktiv");
     });
 
-    document.getElementById(pageName).classList.add("active");
-
-    const activeLink =
-        document.querySelector(
-            `.nav-link[data-page="${pageName}"]`
-        );
-
-    if(activeLink){
-        activeLink.classList.add("active");
+    if(knopf){
+        knopf.classList.add("aktiv");
     }
 
     window.scrollTo({
@@ -544,20 +586,10 @@ function openPage(pageName){
     });
 }
 
-links.forEach(link=>{
 
-    link.addEventListener("click",()=>{
-
-        openPage(
-            link.dataset.page
-        );
-
-    });
-
-});
-
-
-function sendRequest(event){
+document
+.getElementById("nachhilfeFormular")
+.addEventListener("submit",function(event){
 
     event.preventDefault();
 
@@ -577,10 +609,8 @@ function sendRequest(event){
         document.getElementById("nachricht").value;
 
 
-    const text =
-`Hallo!
-
-ich interessiere mich für die Nachhilfe.
+    const inhalt =
+`Neue Nachhilfe-Anfrage
 
 Name des Kindes: ${name}
 Klasse: ${klasse}
@@ -590,24 +620,15 @@ Wunschzeit: ${zeit}
 Nachricht:
 ${nachricht || "Keine weitere Nachricht."}
 
-Preis:
-20 € für 90 Minuten
-`;
+Preis: 20 € für 90 Minuten`;
 
 
-    const mail =
-        "mailto:r.schmid.8321@gmail.com" +
-        "?subject=" +
-        encodeURIComponent("Nachhilfe-Anfrage") +
-        "&body=" +
-        encodeURIComponent(text);
+    console.log(inhalt);
 
+    document.getElementById("meldung").textContent =
+        "Anfrage wurde vorbereitet.";
 
-    document.getElementById("status").textContent =
-        "E-Mail-Programm wird geöffnet …";
-
-    window.location.href = mail;
-}
+});
 
 </script>
 
