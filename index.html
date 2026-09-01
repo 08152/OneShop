@@ -170,6 +170,12 @@ h1{
     line-height:1.5;
 }
 
+.preis-klein{
+    margin-top:15px;
+    font-size:20px;
+    font-weight:bold;
+}
+
 .ueber{
     max-width:850px;
     margin:auto;
@@ -203,6 +209,11 @@ h1{
 form{
     display:grid;
     gap:15px;
+}
+
+label{
+    font-weight:bold;
+    margin-top:5px;
 }
 
 input,
@@ -346,7 +357,7 @@ footer{
 
             <div class="symbol">🎓</div>
 
-            <h2>Nachhilfe</h2>
+            <h2>Einzelunterricht</h2>
 
             <div class="preis-zahl">
                 20 €
@@ -377,42 +388,55 @@ footer{
 
             <div class="karte">
 
-                <div class="symbol">➕</div>
+                <div class="symbol">📚</div>
 
-                <h3>Mathematik</h3>
+                <h3>Einzelunterricht</h3>
 
                 <p>
-                    Rechnen, Aufgaben verstehen
-                    und gemeinsam üben.
+                    Persönliche Nachhilfe für ein Kind.
+                    Gemeinsam lernen, üben und Fragen klären.
                 </p>
+
+                <div class="preis-klein">
+                    20 € · 90 Minuten
+                </div>
 
             </div>
 
 
             <div class="karte">
 
-                <div class="symbol">📖</div>
+                <div class="symbol">👥</div>
 
-                <h3>Deutsch</h3>
+                <h3>Gruppenunterricht</h3>
 
                 <p>
-                    Lesen, Schreiben,
-                    Rechtschreibung und Grammatik.
+                    Lernen in einer kleinen Gruppe mit
+                    bis zu 5 Kindern.
                 </p>
+
+                <div class="preis-klein">
+                    15 € pro Kind · 90 Minuten
+                </div>
 
             </div>
 
 
             <div class="karte">
 
-                <div class="symbol">🧠</div>
+                <div class="symbol">🧮</div>
 
-                <h3>Lernhilfe</h3>
+                <h3>Prüfungsvorbereitung</h3>
 
                 <p>
-                    Hausaufgaben verstehen,
-                    üben und besser lernen.
+                    Gemeinsam den Stoff wiederholen,
+                    schwierige Themen erklären und
+                    gezielt für eine Arbeit üben.
                 </p>
+
+                <div class="preis-klein">
+                    20 € · 90 Minuten
+                </div>
 
             </div>
 
@@ -454,14 +478,25 @@ footer{
             <br>
 
             <p>
-                Eine Nachhilfestunde dauert
-                <strong>90 Minuten</strong>.
+                Ich biete Einzelunterricht, Gruppenunterricht
+                und gezielte Prüfungsvorbereitung an.
             </p>
 
             <br>
 
             <p>
-                <strong>Preis: 20 € pro 90 Minuten</strong>
+                <strong>Einzelunterricht:</strong>
+                20 € für 90 Minuten
+            </p>
+
+            <p>
+                <strong>Gruppenunterricht:</strong>
+                15 € pro Kind für 90 Minuten
+            </p>
+
+            <p>
+                <strong>Prüfungsvorbereitung:</strong>
+                20 € für 90 Minuten
             </p>
 
         </div>
@@ -471,7 +506,7 @@ footer{
 </div>
 
 
-<!-- TERMIN ANFRAGEN -->
+<!-- TERMIN -->
 
 <div id="termin" class="seite">
 
@@ -484,10 +519,35 @@ footer{
             </h2>
 
             <p class="beschreibung">
-                Fülle das Formular aus.
+                Wähle aus, welche Art von Nachhilfe du möchtest.
             </p>
 
             <form id="nachhilfeFormular">
+
+                <label for="angebotAuswahl">
+                    Was möchtest du buchen?
+                </label>
+
+                <select id="angebotAuswahl" required>
+
+                    <option value="">
+                        Bitte auswählen
+                    </option>
+
+                    <option value="Einzelunterricht – 20 € / 90 Minuten">
+                        Einzelunterricht – 20 € / 90 Minuten
+                    </option>
+
+                    <option value="Gruppenunterricht – 15 € pro Kind / 90 Minuten">
+                        Gruppenunterricht – 15 € pro Kind / 90 Minuten
+                    </option>
+
+                    <option value="Prüfungsvorbereitung – 20 € / 90 Minuten">
+                        Prüfungsvorbereitung – 20 € / 90 Minuten
+                    </option>
+
+                </select>
+
 
                 <input
                     id="name"
@@ -495,6 +555,7 @@ footer{
                     placeholder="Name des Kindes"
                     required
                 >
+
 
                 <select id="klasse" required>
 
@@ -593,6 +654,9 @@ document
 
     event.preventDefault();
 
+    const angebot =
+        document.getElementById("angebotAuswahl").value;
+
     const name =
         document.getElementById("name").value;
 
@@ -612,16 +676,32 @@ document
     const inhalt =
 `Neue Nachhilfe-Anfrage
 
-Name des Kindes: ${name}
-Klasse: ${klasse}
-Fach: ${fach}
-Wunschzeit: ${zeit}
+Gewünschtes Angebot:
+${angebot}
+
+Name des Kindes:
+${name}
+
+Klasse:
+${klasse}
+
+Fach:
+${fach}
+
+Wunschzeit:
+${zeit}
 
 Nachricht:
-${nachricht || "Keine weitere Nachricht."}
+${nachricht || "Keine weitere Nachricht."}`;
 
-Preis: 20 € für 90 Minuten`;
 
+    /*
+    Eine reine HTML-Datei kann keine E-Mail
+    automatisch im Hintergrund versenden.
+
+    Für den echten automatischen Versand muss
+    dieses Formular mit einem Server verbunden werden.
+    */
 
     console.log(inhalt);
 
