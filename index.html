@@ -1,706 +1,838 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LernStart – Nachhilfe</title>
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Video zu MP3</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+
+* {
+    box-sizing: border-box;
 }
 
-body{
-    font-family:Arial,Helvetica,sans-serif;
-    background:linear-gradient(135deg,#fff8d9,#e8f5ff);
-    color:#172033;
-    min-height:100vh;
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #303078,
+            #15152d 45%,
+            #080810
+        );
+
+    color: white;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
 }
 
-header{
-    background:#172033;
-    color:white;
-    padding:18px 7%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    position:sticky;
-    top:0;
-    z-index:100;
+.app {
+
+    width: min(
+        700px,
+        94vw
+    );
+
+    padding: 25px;
+
 }
 
-.logo{
-    font-size:25px;
-    font-weight:800;
+h1 {
+
+    text-align: center;
+
+    font-size: 42px;
+
+    margin-bottom: 8px;
+
 }
 
-nav{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
+.subtitle {
+
+    text-align: center;
+
+    color: #b5b5d0;
+
+    margin-bottom: 30px;
+
 }
 
-nav button{
-    background:transparent;
-    color:white;
-    border:0;
-    padding:11px 14px;
-    border-radius:10px;
-    font-size:15px;
-    font-weight:bold;
-    cursor:pointer;
+.card {
+
+    background:
+        rgba(
+            25,
+            25,
+            45,
+            .9
+        );
+
+    border:
+
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .1
+        );
+
+    border-radius: 25px;
+
+    padding: 25px;
+
+    box-shadow:
+
+        0 25px 80px
+        rgba(
+            0,
+            0,
+            0,
+            .5
+        );
+
 }
 
-nav button:hover,
-nav button.aktiv{
-    background:#ffd84d;
-    color:#172033;
+.dropzone {
+
+    min-height: 270px;
+
+    border:
+
+        3px dashed
+        #7777ff;
+
+    border-radius: 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    cursor: pointer;
+
+    transition: .2s;
+
+    padding: 20px;
+
 }
 
-.seite{
-    display:none;
+.dropzone:hover {
+
+    border-color: #b0b0ff;
+
+    background:
+        rgba(
+            100,
+            100,
+            255,
+            .08
+        );
+
 }
 
-.seite.aktiv{
-    display:block;
+.dropzone.drag {
+
+    border-color: white;
+
+    background:
+        rgba(
+            120,
+            100,
+            255,
+            .2
+        );
+
 }
 
-.start{
-    min-height:560px;
-    padding:80px 7%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:50px;
+.icon {
+
+    font-size: 70px;
+
 }
 
-.inhalt{
-    max-width:700px;
+.dropzone h2 {
+
+    text-align: center;
+
 }
 
-.auszeichnung{
-    display:inline-block;
-    background:#ffd84d;
-    padding:9px 16px;
-    border-radius:30px;
-    font-weight:bold;
-    margin-bottom:20px;
+.dropzone p {
+
+    color: #aaaac5;
+
+    text-align: center;
+
 }
 
-h1{
-    font-size:clamp(43px,7vw,75px);
-    line-height:.98;
+input {
+
+    display: none;
+
 }
 
-.start p{
-    font-size:20px;
-    line-height:1.5;
-    margin:25px 0;
+.fileInfo {
+
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            .3
+        );
+
 }
 
-.preis{
-    background:white;
-    padding:40px;
-    border-radius:28px;
-    text-align:center;
-    min-width:290px;
-    box-shadow:0 15px 40px #17203322;
+.fileName {
+
+    font-weight: bold;
+
+    word-break: break-word;
+
 }
 
-.preis .symbol{
-    font-size:60px;
+.fileSize {
+
+    color: #aaaac5;
+
+    margin-top: 8px;
+
 }
 
-.preis h2{
-    margin-top:10px;
+button {
+
+    width: 100%;
+
+    margin-top: 20px;
+
+    padding: 18px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+
+        linear-gradient(
+            90deg,
+            #635bff,
+            #a35bff
+        );
+
+    transition: .2s;
+
 }
 
-.preis-zahl{
-    font-size:55px;
-    font-weight:900;
-    margin:8px 0;
+button:hover {
+
+    transform:
+        translateY(-2px);
+
+    filter:
+        brightness(1.15);
+
 }
 
-.bildschirm{
-    padding:70px 7%;
+button:disabled {
+
+    opacity: .5;
+
+    cursor: not-allowed;
+
+    transform: none;
+
 }
 
-.titel{
-    text-align:center;
-    font-size:40px;
-    margin-bottom:40px;
+.status {
+
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    text-align: center;
+
+    border-radius: 12px;
+
 }
 
-.karten{
-    max-width:1100px;
-    margin:auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:22px;
+.status.loading {
+
+    display: block;
+
+    background:
+        rgba(
+            100,
+            100,
+            255,
+            .15
+        );
+
 }
 
-.karte{
-    background:white;
-    padding:30px;
-    border-radius:22px;
-    box-shadow:0 8px 25px #17203315;
+.status.error {
+
+    display: block;
+
+    background:
+        rgba(
+            255,
+            60,
+            60,
+            .2
+        );
+
 }
 
-.karte .symbol{
-    font-size:42px;
+.status.success {
+
+    display: block;
+
+    background:
+        rgba(
+            50,
+            255,
+            130,
+            .15
+        );
+
 }
 
-.karte h3{
-    margin:14px 0 8px;
+.spinner {
+
+    display: inline-block;
+
+    width: 18px;
+
+    height: 18px;
+
+    border:
+
+        3px solid
+        rgba(
+            255,
+            255,
+            255,
+            .3
+        );
+
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation:
+        spin .8s linear infinite;
+
+    vertical-align: middle;
+
+    margin-right: 8px;
+
 }
 
-.karte p{
-    color:#596579;
-    line-height:1.5;
-}
+@keyframes spin {
 
-.preis-klein{
-    margin-top:15px;
-    font-size:20px;
-    font-weight:bold;
-}
+    to {
 
-.ueber{
-    max-width:850px;
-    margin:auto;
-    background:white;
-    padding:40px;
-    border-radius:25px;
-    box-shadow:0 10px 30px #17203315;
-    line-height:1.7;
-}
+        transform:
+            rotate(360deg);
 
-.formular{
-    max-width:800px;
-    margin:auto;
-    background:#172033;
-    color:white;
-    padding:42px;
-    border-radius:28px;
-}
-
-.formular h2{
-    font-size:36px;
-    margin-bottom:10px;
-}
-
-.beschreibung{
-    color:#cbd3df;
-    margin-bottom:25px;
-}
-
-form{
-    display:grid;
-    gap:15px;
-}
-
-label{
-    font-weight:bold;
-}
-
-input,
-select,
-textarea{
-    width:100%;
-    padding:16px;
-    border:0;
-    border-radius:11px;
-    font-size:16px;
-    font-family:Arial,sans-serif;
-    outline:none;
-}
-
-textarea{
-    min-height:130px;
-    resize:vertical;
-}
-
-.senden{
-    background:#ffd84d;
-    color:#172033;
-    border:0;
-    padding:16px;
-    border-radius:11px;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-.email-box{
-    margin-top:25px;
-    background:#27334b;
-    padding:20px;
-    border-radius:15px;
-}
-
-.email-box p{
-    color:#cbd3df;
-    margin-bottom:8px;
-}
-
-.email-adresse{
-    background:white;
-    color:#172033;
-    padding:14px;
-    border-radius:10px;
-    font-weight:bold;
-    user-select:text;
-}
-
-#meldung{
-    text-align:center;
-    margin-top:18px;
-    color:#ffd84d;
-    font-weight:bold;
-    line-height:1.5;
-}
-
-footer{
-    text-align:center;
-    padding:30px;
-    color:#687386;
-}
-
-@media(max-width:750px){
-
-    header{
-        flex-direction:column;
-        gap:15px;
     }
 
-    .start{
-        flex-direction:column;
-        text-align:center;
-        padding-top:55px;
-    }
-
-    .preis{
-        width:100%;
-        max-width:350px;
-    }
-
-    .formular{
-        padding:25px;
-    }
 }
+
+.footer {
+
+    text-align: center;
+
+    color: #777790;
+
+    margin-top: 20px;
+
+    font-size: 13px;
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>
+<div class="app">
 
-    <div class="logo">📚 LernStart</div>
+    <h1>
+        🎵 Video zu MP3
+    </h1>
 
-    <nav>
+    <div class="subtitle">
 
-        <button class="aktiv" onclick="seiteZeigen('start',this)">
-            Startseite
-        </button>
+        Lade ein Video hoch und
+        konvertiere die Audiospur
+        in eine MP3-Datei.
 
-        <button onclick="seiteZeigen('angebot',this)">
-            Angebote
-        </button>
-
-        <button onclick="seiteZeigen('ueber',this)">
-            Über mich
-        </button>
-
-        <button onclick="seiteZeigen('termin',this)">
-            Termin anfragen
-        </button>
-
-    </nav>
-
-</header>
+    </div>
 
 
-<main>
+    <div class="card">
 
-<div id="start" class="seite aktiv">
 
-    <section class="start">
+        <div
+            class="dropzone"
+            id="dropzone"
+        >
 
-        <div class="inhalt">
-
-            <div class="auszeichnung">
-                Nachhilfe für die 1.–4. Klasse
+            <div class="icon">
+                🎬
             </div>
-
-            <h1>
-                Gemeinsam<br>
-                besser lernen.
-            </h1>
-
-            <p>
-                Freundliche und verständliche Nachhilfe
-                für Grundschulkinder – mit Geduld,
-                Spaß und ohne unnötigen Druck.
-            </p>
-
-            <button
-                class="senden"
-                onclick="seiteZeigen('termin')"
-                style="padding:15px 25px;"
-            >
-                Termin anfragen
-            </button>
-
-        </div>
-
-        <div class="preis">
-
-            <div class="symbol">🎓</div>
-
-            <h2>Einzelunterricht</h2>
-
-            <div class="preis-zahl">
-                20 €
-            </div>
-
-            <p>für 90 Minuten</p>
-
-        </div>
-
-    </section>
-
-</div>
-
-
-<div id="angebot" class="seite">
-
-    <section class="bildschirm">
-
-        <h2 class="titel">
-            Meine Angebote
-        </h2>
-
-        <div class="karten">
-
-            <div class="karte">
-
-                <div class="symbol">📚</div>
-
-                <h3>Einzelunterricht</h3>
-
-                <p>
-                    Persönliche Nachhilfe für ein Kind.
-                    Gemeinsam lernen, üben und Fragen klären.
-                </p>
-
-                <div class="preis-klein">
-                    20 € · 90 Minuten
-                </div>
-
-            </div>
-
-
-            <div class="karte">
-
-                <div class="symbol">👥</div>
-
-                <h3>Gruppenunterricht</h3>
-
-                <p>
-                    Lernen in einer kleinen Gruppe mit
-                    bis zu 5 Kindern.
-                </p>
-
-                <div class="preis-klein">
-                    15 € pro Kind · 90 Minuten
-                </div>
-
-            </div>
-
-
-            <div class="karte">
-
-                <div class="symbol">🧮</div>
-
-                <h3>Prüfungsvorbereitung</h3>
-
-                <p>
-                    Gemeinsam den Stoff wiederholen,
-                    schwierige Themen erklären und
-                    gezielt für eine Arbeit üben.
-                </p>
-
-                <div class="preis-klein">
-                    20 € · 90 Minuten
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-</div>
-
-
-<div id="ueber" class="seite">
-
-    <section class="bildschirm">
-
-        <h2 class="titel">
-            Über mich
-        </h2>
-
-        <div class="ueber">
-
-            <h2>👋 Hallo!</h2>
-
-            <br>
-
-            <p>
-                Ich bin Schüler der 7. Klasse und möchte
-                Kindern aus der 1.–4. Klasse beim Lernen helfen.
-            </p>
-
-            <br>
-
-            <p>
-                Mir ist wichtig, dass Kinder Fragen stellen
-                können und den Lernstoff wirklich verstehen.
-            </p>
-
-            <br>
-
-            <p>
-                Ich biete Einzelunterricht, Gruppenunterricht
-                und gezielte Prüfungsvorbereitung an.
-            </p>
-
-        </div>
-
-    </section>
-
-</div>
-
-
-<div id="termin" class="seite">
-
-    <section class="bildschirm">
-
-        <div class="formular">
 
             <h2>
-                📅 Termin anfragen
+                Video auswählen
             </h2>
 
-            <p class="beschreibung">
-                Wähle ein Angebot aus und erstelle deine Anfrage.
+            <p>
+
+                Klicke hier oder ziehe
+                eine Videodatei hier hinein
+
             </p>
 
-            <form id="nachhilfeFormular">
-
-                <label for="angebotAuswahl">
-                    Gewünschtes Angebot
-                </label>
-
-                <select id="angebotAuswahl" required>
-
-                    <option value="">
-                        Bitte auswählen
-                    </option>
-
-                    <option value="Einzelunterricht – 20 € / 90 Minuten">
-                        Einzelunterricht – 20 € / 90 Minuten
-                    </option>
-
-                    <option value="Gruppenunterricht – 15 € pro Kind / 90 Minuten">
-                        Gruppenunterricht – 15 € pro Kind / 90 Minuten
-                    </option>
-
-                    <option value="Prüfungsvorbereitung – 20 € / 90 Minuten">
-                        Prüfungsvorbereitung – 20 € / 90 Minuten
-                    </option>
-
-                </select>
-
-
-                <input
-                    id="name"
-                    type="text"
-                    placeholder="Name des Kindes"
-                    required
-                >
-
-
-                <select id="klasse" required>
-
-                    <option value="">
-                        Klasse auswählen
-                    </option>
-
-                    <option>1. Klasse</option>
-                    <option>2. Klasse</option>
-                    <option>3. Klasse</option>
-                    <option>4. Klasse</option>
-
-                </select>
-
-
-                <select id="fach" required>
-
-                    <option value="">
-                        Fach auswählen
-                    </option>
-
-                    <option>Mathematik</option>
-                    <option>Deutsch</option>
-                    <option>Hausaufgaben / Lernhilfe</option>
-
-                </select>
-
-
-                <input
-                    id="zeit"
-                    type="text"
-                    placeholder="Wunschzeit"
-                    required
-                >
-
-
-                <textarea
-                    id="nachricht"
-                    placeholder="Weitere Nachricht"
-                ></textarea>
-
-
-                <button
-                    class="senden"
-                    type="submit"
-                >
-                    Anfrage erstellen und kopieren
-                </button>
-
-            </form>
-
-
-            <div id="meldung"></div>
-
-
-            <div class="email-box">
-
-                <p>
-                    Anfrage bitte per E-Mail senden an:
-                </p>
-
-                <div class="email-adresse">
-                    r.schmid.8321@gmail.com
-                </div>
-
-            </div>
+            <input
+                type="file"
+                id="fileInput"
+                accept="video/*"
+            >
 
         </div>
 
-    </section>
+
+        <div
+            class="fileInfo"
+            id="fileInfo"
+        >
+
+            <div
+                class="fileName"
+                id="fileName"
+            ></div>
+
+            <div
+                class="fileSize"
+                id="fileSize"
+            ></div>
+
+        </div>
+
+
+        <button
+            id="convertButton"
+            disabled
+        >
+
+            🎵 In MP3 konvertieren
+
+        </button>
+
+
+        <div
+            class="status"
+            id="status"
+        ></div>
+
+
+    </div>
+
+
+    <div class="footer">
+
+        Video → Audio → MP3
+
+    </div>
 
 </div>
-
-</main>
-
-
-<footer>
-    © 2026 LernStart · Nachhilfe 1.–4. Klasse
-</footer>
 
 
 <script>
 
-function seiteZeigen(name, knopf){
+const dropzone =
+    document.getElementById(
+        "dropzone"
+    );
 
-    document.querySelectorAll(".seite").forEach(function(seite){
-        seite.classList.remove("aktiv");
-    });
+const fileInput =
+    document.getElementById(
+        "fileInput"
+    );
 
-    document.getElementById(name).classList.add("aktiv");
+const fileInfo =
+    document.getElementById(
+        "fileInfo"
+    );
 
-    document.querySelectorAll("nav button").forEach(function(button){
-        button.classList.remove("aktiv");
-    });
+const fileName =
+    document.getElementById(
+        "fileName"
+    );
 
-    if(knopf){
-        knopf.classList.add("aktiv");
+const fileSize =
+    document.getElementById(
+        "fileSize"
+    );
+
+const convertButton =
+    document.getElementById(
+        "convertButton"
+    );
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+let selectedFile = null;
+
+
+// Datei auswählen
+
+dropzone.addEventListener(
+    "click",
+    () => {
+
+        fileInput.click();
+
     }
+);
 
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
+
+fileInput.addEventListener(
+    "change",
+    () => {
+
+        if (
+            fileInput.files.length
+        ) {
+
+            selectFile(
+                fileInput.files[0]
+            );
+
+        }
+
+    }
+);
+
+
+// Drag & Drop
+
+dropzone.addEventListener(
+    "dragover",
+    event => {
+
+        event.preventDefault();
+
+        dropzone.classList.add(
+            "drag"
+        );
+
+    }
+);
+
+
+dropzone.addEventListener(
+    "dragleave",
+    () => {
+
+        dropzone.classList.remove(
+            "drag"
+        );
+
+    }
+);
+
+
+dropzone.addEventListener(
+    "drop",
+    event => {
+
+        event.preventDefault();
+
+        dropzone.classList.remove(
+            "drag"
+        );
+
+        const file =
+            event.dataTransfer.files[0];
+
+        if (file) {
+
+            selectFile(file);
+
+        }
+
+    }
+);
+
+
+// Datei setzen
+
+function selectFile(file) {
+
+    selectedFile = file;
+
+    fileName.textContent =
+        "📁 " + file.name;
+
+    fileSize.textContent =
+        formatSize(file.size);
+
+    fileInfo.style.display =
+        "block";
+
+    convertButton.disabled =
+        false;
+
+    status.className =
+        "status";
+
+    status.innerHTML =
+        "";
+
 }
 
 
-document
-.getElementById("nachhilfeFormular")
-.addEventListener("submit",async function(event){
+// Größe
 
-    event.preventDefault();
+function formatSize(bytes) {
 
-    const angebot =
-        document.getElementById("angebotAuswahl").value;
-
-    const name =
-        document.getElementById("name").value;
-
-    const klasse =
-        document.getElementById("klasse").value;
-
-    const fach =
-        document.getElementById("fach").value;
-
-    const zeit =
-        document.getElementById("zeit").value;
-
-    const nachricht =
-        document.getElementById("nachricht").value;
-
-
-    const text =
-`Neue Nachhilfe-Anfrage
-
-Gewünschtes Angebot:
-${angebot}
-
-Name des Kindes:
-${name}
-
-Klasse:
-${klasse}
-
-Fach:
-${fach}
-
-Wunschzeit:
-${zeit}
-
-Nachricht:
-${nachricht || "Keine weitere Nachricht."}`;
-
-
-    try{
-
-        await navigator.clipboard.writeText(text);
-
-        document.getElementById("meldung").textContent =
-            "✅ Die komplette Anfrage wurde kopiert! Öffne jetzt deine E-Mail-App und sende sie an r.schmid.8321@gmail.com.";
-
-    }catch(error){
-
-        document.getElementById("meldung").textContent =
-            "Die Anfrage konnte nicht automatisch kopiert werden. Bitte markiere den Text in der Anfrage und kopiere ihn.";
-
+    if (
+        bytes < 1024
+    ) {
+        return bytes + " Bytes";
     }
 
-});
+    if (
+        bytes < 1024 * 1024
+    ) {
+        return (
+            bytes / 1024
+        ).toFixed(1)
+        + " KB";
+    }
+
+    return (
+        bytes /
+        (1024 * 1024)
+    ).toFixed(1)
+    + " MB";
+
+}
+
+
+// Konvertierung
+
+convertButton.addEventListener(
+    "click",
+    async () => {
+
+        if (
+            !selectedFile
+        ) {
+            return;
+        }
+
+
+        convertButton.disabled =
+            true;
+
+
+        status.className =
+            "status loading";
+
+
+        status.innerHTML =
+            '<span class="spinner"></span>' +
+            "Video wird hochgeladen und konvertiert...";
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "video",
+            selectedFile
+        );
+
+
+        try {
+
+
+            const response =
+                await fetch(
+                    "/convert",
+                    {
+                        method:
+                            "POST",
+
+                        body:
+                            formData
+                    }
+                );
+
+
+            if (
+                !response.ok
+            ) {
+
+                let message =
+                    "Konvertierung fehlgeschlagen.";
+
+                try {
+
+                    const data =
+                        await response.json();
+
+                    if (
+                        data.error
+                    ) {
+                        message =
+                            data.error;
+                    }
+
+                } catch (error) {}
+
+                throw new Error(
+                    message
+                );
+
+            }
+
+
+            const blob =
+                await response.blob();
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const a =
+                document.createElement(
+                    "a"
+                );
+
+
+            const originalName =
+                selectedFile.name.replace(
+                    /\.[^/.]+$/,
+                    ""
+                );
+
+
+            a.href =
+                url;
+
+
+            a.download =
+                originalName +
+                ".mp3";
+
+
+            document.body.appendChild(
+                a
+            );
+
+
+            a.click();
+
+
+            a.remove();
+
+
+            URL.revokeObjectURL(
+                url
+            );
+
+
+            status.className =
+                "status success";
+
+
+            status.innerHTML =
+                "✅ Fertig! Die MP3-Datei wurde heruntergeladen.";
+
+
+        } catch (error) {
+
+
+            console.error(
+                error
+            );
+
+
+            status.className =
+                "status error";
+
+
+            status.innerHTML =
+                "❌ " +
+                error.message;
+
+
+        } finally {
+
+
+            convertButton.disabled =
+                false;
+
+
+        }
+
+    }
+);
 
 </script>
 
