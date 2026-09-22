@@ -1,838 +1,308 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>Video zu MP3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZIP → EXE</title>
 
 <style>
+*{box-sizing:border-box}
 
-* {
-    box-sizing: border-box;
+body{
+margin:0;
+min-height:100vh;
+background:#080b12;
+color:white;
+font-family:Arial,sans-serif;
+display:flex;
+align-items:center;
+justify-content:center
 }
 
-body {
-
-    margin: 0;
-
-    min-height: 100vh;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #303078,
-            #15152d 45%,
-            #080810
-        );
-
-    color: white;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
+.box{
+width:min(700px,92%);
+background:#111722;
+border:1px solid #293244;
+border-radius:20px;
+padding:30px;
+box-shadow:0 20px 60px #0008
 }
 
-.app {
+h1{margin-top:0}
 
-    width: min(
-        700px,
-        94vw
-    );
-
-    padding: 25px;
-
+.sub{
+color:#9ca8bc;
+margin-bottom:25px
 }
 
-h1 {
-
-    text-align: center;
-
-    font-size: 42px;
-
-    margin-bottom: 8px;
-
+.drop{
+border:2px dashed #53627c;
+border-radius:16px;
+padding:45px 20px;
+text-align:center;
+cursor:pointer
 }
 
-.subtitle {
-
-    text-align: center;
-
-    color: #b5b5d0;
-
-    margin-bottom: 30px;
-
+.drop:hover{
+background:#ffffff08;
+border-color:#728cff
 }
 
-.card {
+input{display:none}
 
-    background:
-        rgba(
-            25,
-            25,
-            45,
-            .9
-        );
-
-    border:
-
-        1px solid
-        rgba(
-            255,
-            255,
-            255,
-            .1
-        );
-
-    border-radius: 25px;
-
-    padding: 25px;
-
-    box-shadow:
-
-        0 25px 80px
-        rgba(
-            0,
-            0,
-            0,
-            .5
-        );
-
+button{
+width:100%;
+margin-top:20px;
+padding:15px;
+border:0;
+border-radius:12px;
+background:#586cff;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer
 }
 
-.dropzone {
-
-    min-height: 270px;
-
-    border:
-
-        3px dashed
-        #7777ff;
-
-    border-radius: 20px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    align-items: center;
-
-    cursor: pointer;
-
-    transition: .2s;
-
-    padding: 20px;
-
+button:disabled{
+opacity:.45;
+cursor:not-allowed
 }
 
-.dropzone:hover {
-
-    border-color: #b0b0ff;
-
-    background:
-        rgba(
-            100,
-            100,
-            255,
-            .08
-        );
-
+.status{
+margin-top:20px;
+padding:15px;
+border-radius:12px;
+background:#090d15;
+white-space:pre-wrap;
+word-break:break-word
 }
 
-.dropzone.drag {
-
-    border-color: white;
-
-    background:
-        rgba(
-            120,
-            100,
-            255,
-            .2
-        );
-
+.download{
+display:block;
+margin-top:15px;
+padding:14px;
+border-radius:12px;
+background:#1c9b62;
+color:white;
+text-decoration:none;
+text-align:center;
+font-weight:bold
 }
 
-.icon {
-
-    font-size: 70px;
-
-}
-
-.dropzone h2 {
-
-    text-align: center;
-
-}
-
-.dropzone p {
-
-    color: #aaaac5;
-
-    text-align: center;
-
-}
-
-input {
-
-    display: none;
-
-}
-
-.fileInfo {
-
-    display: none;
-
-    margin-top: 20px;
-
-    padding: 18px;
-
-    border-radius: 15px;
-
-    background:
-        rgba(
-            0,
-            0,
-            0,
-            .3
-        );
-
-}
-
-.fileName {
-
-    font-weight: bold;
-
-    word-break: break-word;
-
-}
-
-.fileSize {
-
-    color: #aaaac5;
-
-    margin-top: 8px;
-
-}
-
-button {
-
-    width: 100%;
-
-    margin-top: 20px;
-
-    padding: 18px;
-
-    border: none;
-
-    border-radius: 15px;
-
-    font-size: 18px;
-
-    font-weight: bold;
-
-    cursor: pointer;
-
-    color: white;
-
-    background:
-
-        linear-gradient(
-            90deg,
-            #635bff,
-            #a35bff
-        );
-
-    transition: .2s;
-
-}
-
-button:hover {
-
-    transform:
-        translateY(-2px);
-
-    filter:
-        brightness(1.15);
-
-}
-
-button:disabled {
-
-    opacity: .5;
-
-    cursor: not-allowed;
-
-    transform: none;
-
-}
-
-.status {
-
-    display: none;
-
-    margin-top: 20px;
-
-    padding: 15px;
-
-    text-align: center;
-
-    border-radius: 12px;
-
-}
-
-.status.loading {
-
-    display: block;
-
-    background:
-        rgba(
-            100,
-            100,
-            255,
-            .15
-        );
-
-}
-
-.status.error {
-
-    display: block;
-
-    background:
-        rgba(
-            255,
-            60,
-            60,
-            .2
-        );
-
-}
-
-.status.success {
-
-    display: block;
-
-    background:
-        rgba(
-            50,
-            255,
-            130,
-            .15
-        );
-
-}
-
-.spinner {
-
-    display: inline-block;
-
-    width: 18px;
-
-    height: 18px;
-
-    border:
-
-        3px solid
-        rgba(
-            255,
-            255,
-            255,
-            .3
-        );
-
-    border-top-color: white;
-
-    border-radius: 50%;
-
-    animation:
-        spin .8s linear infinite;
-
-    vertical-align: middle;
-
-    margin-right: 8px;
-
-}
-
-@keyframes spin {
-
-    to {
-
-        transform:
-            rotate(360deg);
-
-    }
-
-}
-
-.footer {
-
-    text-align: center;
-
-    color: #777790;
-
-    margin-top: 20px;
-
-    font-size: 13px;
-
-}
-
+.good{color:#62e6a0}
+.bad{color:#ff7373}
 </style>
-
 </head>
-
 
 <body>
 
-<div class="app">
+<div class="box">
 
-    <h1>
-        🎵 Video zu MP3
-    </h1>
+<h1>ZIP → EXE</h1>
 
-    <div class="subtitle">
+<div class="sub">
+Web-Projekt sicher als Windows-EXE verpacken
+</div>
 
-        Lade ein Video hoch und
-        konvertiere die Audiospur
-        in eine MP3-Datei.
+<div class="drop" id="drop">
 
-    </div>
+📦<br><br>
 
+ZIP-Datei auswählen
 
-    <div class="card">
+<br>
 
+<small>
+HTML / CSS / JavaScript / Bilder
+</small>
 
-        <div
-            class="dropzone"
-            id="dropzone"
-        >
-
-            <div class="icon">
-                🎬
-            </div>
-
-            <h2>
-                Video auswählen
-            </h2>
-
-            <p>
-
-                Klicke hier oder ziehe
-                eine Videodatei hier hinein
-
-            </p>
-
-            <input
-                type="file"
-                id="fileInput"
-                accept="video/*"
-            >
-
-        </div>
-
-
-        <div
-            class="fileInfo"
-            id="fileInfo"
-        >
-
-            <div
-                class="fileName"
-                id="fileName"
-            ></div>
-
-            <div
-                class="fileSize"
-                id="fileSize"
-            ></div>
-
-        </div>
-
-
-        <button
-            id="convertButton"
-            disabled
-        >
-
-            🎵 In MP3 konvertieren
-
-        </button>
-
-
-        <div
-            class="status"
-            id="status"
-        ></div>
-
-
-    </div>
-
-
-    <div class="footer">
-
-        Video → Audio → MP3
-
-    </div>
+<input
+id="file"
+type="file"
+accept=".zip,application/zip"
+>
 
 </div>
 
+<button id="build" disabled>
+EXE erstellen
+</button>
+
+<div class="status" id="status">
+Noch keine ZIP ausgewählt.
+</div>
+
+</div>
 
 <script>
 
-const dropzone =
-    document.getElementById(
-        "dropzone"
-    );
-
 const fileInput =
-    document.getElementById(
-        "fileInput"
-    );
+document.getElementById("file");
 
-const fileInfo =
-    document.getElementById(
-        "fileInfo"
-    );
+const drop =
+document.getElementById("drop");
 
-const fileName =
-    document.getElementById(
-        "fileName"
-    );
-
-const fileSize =
-    document.getElementById(
-        "fileSize"
-    );
-
-const convertButton =
-    document.getElementById(
-        "convertButton"
-    );
+const build =
+document.getElementById("build");
 
 const status =
-    document.getElementById(
-        "status"
-    );
+document.getElementById("status");
 
+let selectedFile=null;
 
-let selectedFile = null;
+drop.onclick=()=>{
+fileInput.click();
+};
 
+fileInput.onchange=()=>{
+if(fileInput.files.length){
+selectFile(fileInput.files[0]);
+}
+};
 
-// Datei auswählen
+drop.ondragover=e=>{
+e.preventDefault();
+drop.style.borderColor="#728cff";
+};
 
-dropzone.addEventListener(
-    "click",
-    () => {
+drop.ondragleave=()=>{
+drop.style.borderColor="";
+};
 
-        fileInput.click();
+drop.ondrop=e=>{
 
-    }
+e.preventDefault();
+
+drop.style.borderColor="";
+
+if(e.dataTransfer.files.length){
+selectFile(e.dataTransfer.files[0]);
+}
+
+};
+
+function selectFile(file){
+
+selectedFile=file;
+
+if(!file.name.toLowerCase().endsWith(".zip")){
+
+status.innerHTML=
+'<span class="bad">✕</span> Nur ZIP-Dateien sind erlaubt.';
+
+build.disabled=true;
+
+return;
+}
+
+status.textContent=
+"ZIP ausgewählt:\n"+
+file.name+
+"\n\nGröße: "+
+(file.size/1024/1024).toFixed(2)+
+" MB";
+
+build.disabled=false;
+}
+
+build.onclick=async()=>{
+
+if(!selectedFile)return;
+
+build.disabled=true;
+
+status.textContent=
+"ZIP wird hochgeladen und geprüft...\n\n"+
+"Bitte warten.";
+
+try{
+
+const form=new FormData();
+
+form.append(
+"zip",
+selectedFile
 );
 
-
-fileInput.addEventListener(
-    "change",
-    () => {
-
-        if (
-            fileInput.files.length
-        ) {
-
-            selectFile(
-                fileInput.files[0]
-            );
-
-        }
-
-    }
+const response=await fetch(
+"/api/build",
+{
+method:"POST",
+body:form
+}
 );
 
+/*
+WICHTIG:
+Nicht blind response.json() verwenden.
+Wir lesen zuerst den Text.
+*/
 
-// Drag & Drop
+const text=await response.text();
 
-dropzone.addEventListener(
-    "dragover",
-    event => {
+let data;
 
-        event.preventDefault();
+try{
 
-        dropzone.classList.add(
-            "drag"
-        );
+data=JSON.parse(text);
 
-    }
+}catch{
+
+throw new Error(
+"Der Server hat keine gültige JSON-Antwort gesendet.\n\n"+
+"HTTP-Status: "+
+response.status+
+"\n\n"+
+(text
+? text.substring(0,1000)
+: "Leere Antwort vom Server.")
 );
-
-
-dropzone.addEventListener(
-    "dragleave",
-    () => {
-
-        dropzone.classList.remove(
-            "drag"
-        );
-
-    }
-);
-
-
-dropzone.addEventListener(
-    "drop",
-    event => {
-
-        event.preventDefault();
-
-        dropzone.classList.remove(
-            "drag"
-        );
-
-        const file =
-            event.dataTransfer.files[0];
-
-        if (file) {
-
-            selectFile(file);
-
-        }
-
-    }
-);
-
-
-// Datei setzen
-
-function selectFile(file) {
-
-    selectedFile = file;
-
-    fileName.textContent =
-        "📁 " + file.name;
-
-    fileSize.textContent =
-        formatSize(file.size);
-
-    fileInfo.style.display =
-        "block";
-
-    convertButton.disabled =
-        false;
-
-    status.className =
-        "status";
-
-    status.innerHTML =
-        "";
 
 }
 
+if(!response.ok){
 
-// Größe
-
-function formatSize(bytes) {
-
-    if (
-        bytes < 1024
-    ) {
-        return bytes + " Bytes";
-    }
-
-    if (
-        bytes < 1024 * 1024
-    ) {
-        return (
-            bytes / 1024
-        ).toFixed(1)
-        + " KB";
-    }
-
-    return (
-        bytes /
-        (1024 * 1024)
-    ).toFixed(1)
-    + " MB";
+throw new Error(
+data.error ||
+"Serverfehler HTTP "+
+response.status
+);
 
 }
 
+status.innerHTML=
+'<span class="good">✓ Fertig</span>'+
+'\n\n'+
+(data.message || "EXE erstellt.")+
+'<a class="download" href="'+
+data.download+
+'">EXE herunterladen</a>';
 
-// Konvertierung
+}catch(error){
 
-convertButton.addEventListener(
-    "click",
-    async () => {
+status.innerHTML=
+'<span class="bad">✕ Fehler</span>'+
+'\n\n'+
+escapeHtml(error.message);
 
-        if (
-            !selectedFile
-        ) {
-            return;
-        }
+}finally{
 
+build.disabled=false;
 
-        convertButton.disabled =
-            true;
+}
 
+};
 
-        status.className =
-            "status loading";
+function escapeHtml(text){
 
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 
-        status.innerHTML =
-            '<span class="spinner"></span>' +
-            "Video wird hochgeladen und konvertiert...";
-
-
-        const formData =
-            new FormData();
-
-
-        formData.append(
-            "video",
-            selectedFile
-        );
-
-
-        try {
-
-
-            const response =
-                await fetch(
-                    "/convert",
-                    {
-                        method:
-                            "POST",
-
-                        body:
-                            formData
-                    }
-                );
-
-
-            if (
-                !response.ok
-            ) {
-
-                let message =
-                    "Konvertierung fehlgeschlagen.";
-
-                try {
-
-                    const data =
-                        await response.json();
-
-                    if (
-                        data.error
-                    ) {
-                        message =
-                            data.error;
-                    }
-
-                } catch (error) {}
-
-                throw new Error(
-                    message
-                );
-
-            }
-
-
-            const blob =
-                await response.blob();
-
-
-            const url =
-                URL.createObjectURL(
-                    blob
-                );
-
-
-            const a =
-                document.createElement(
-                    "a"
-                );
-
-
-            const originalName =
-                selectedFile.name.replace(
-                    /\.[^/.]+$/,
-                    ""
-                );
-
-
-            a.href =
-                url;
-
-
-            a.download =
-                originalName +
-                ".mp3";
-
-
-            document.body.appendChild(
-                a
-            );
-
-
-            a.click();
-
-
-            a.remove();
-
-
-            URL.revokeObjectURL(
-                url
-            );
-
-
-            status.className =
-                "status success";
-
-
-            status.innerHTML =
-                "✅ Fertig! Die MP3-Datei wurde heruntergeladen.";
-
-
-        } catch (error) {
-
-
-            console.error(
-                error
-            );
-
-
-            status.className =
-                "status error";
-
-
-            status.innerHTML =
-                "❌ " +
-                error.message;
-
-
-        } finally {
-
-
-            convertButton.disabled =
-                false;
-
-
-        }
-
-    }
-);
+}
 
 </script>
 
