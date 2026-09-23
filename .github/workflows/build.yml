@@ -24,7 +24,7 @@ jobs:
       - name: Node.js installieren
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Electron-Projekt erstellen
         shell: pwsh
@@ -46,7 +46,8 @@ jobs:
 
           try {
             $uri = [System.Uri]$targetUrl
-          } catch {
+          }
+          catch {
             throw "Ungültige Website-URL."
           }
 
@@ -60,6 +61,8 @@ jobs:
 
           Copy-Item "1.ico" "build/1.ico" -Force
 
+          $safeJsonName = $safeName.Replace('\','\\').Replace('"','\"')
+
           $package = @"
           {
             "name": "website-wrapper",
@@ -72,14 +75,12 @@ jobs:
               "start": "electron .",
               "dist": "electron-builder --win msi"
             },
-            "dependencies": {
-              "electron": "38.2.0"
-            },
             "devDependencies": {
+              "electron": "38.2.0",
               "electron-builder": "26.0.12"
             },
             "build": {
-              "productName": "$($safeName.Replace('"',''))",
+              "productName": "$safeJsonName",
               "appId": "com.websitewrapper.app",
               "directories": {
                 "output": "dist"
@@ -103,12 +104,17 @@ jobs:
           }
           "@
 
-          Set-Content -Path "build/package.json" -Value $package -Encoding UTF8
+          Set-Content `
+            -Path "build/package.json" `
+            -Value $package `
+            -Encoding UTF8
+
+          $safeUrl = $targetUrl.Replace('\','\\').Replace('"','\"')
 
           $main = @"
           const { app, BrowserWindow, session } = require("electron");
 
-          const TARGET_URL = "$($targetUrl.Replace('\','\\').Replace('"','\"'))";
+          const TARGET_URL = "$safeUrl";
 
           function createWindow() {
             const win = new BrowserWindow({
@@ -119,6 +125,7 @@ jobs:
               backgroundColor: "#000000",
               autoHideMenuBar: true,
               icon: __dirname + "/1.ico",
+
               webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
@@ -130,7 +137,10 @@ jobs:
             win.loadURL(TARGET_URL);
 
             win.webContents.setWindowOpenHandler(({ url }) => {
-              if (url.startsWith("https://") || url.startsWith("http://")) {
+              if (
+                url.startsWith("https://") ||
+                url.startsWith("http://")
+              ) {
                 win.loadURL(url);
               }
 
@@ -162,7 +172,10 @@ jobs:
           });
           "@
 
-          Set-Content -Path "build/main.js" -Value $main -Encoding UTF8
+          Set-Content `
+            -Path "build/main.js" `
+            -Value $main `
+            -Encoding UTF8
 
       - name: Abhängigkeiten installieren
         working-directory: build
