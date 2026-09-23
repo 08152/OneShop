@@ -21,10 +21,20 @@ jobs:
       - name: Repository laden
         uses: actions/checkout@v4
 
-      - name: Node.js installieren
+      - name: Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+
+      - name: Icon prüfen
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "1.ico")) {
+            throw "FEHLER: 1.ico wurde nicht im Repository gefunden."
+          }
+
+          Write-Host "1.ico gefunden."
 
       - name: Electron-Projekt erstellen
         shell: pwsh
@@ -48,20 +58,21 @@ jobs:
             $uri = [System.Uri]$targetUrl
           }
           catch {
-            throw "Ungültige Website-URL."
+            throw "Ungültige URL."
           }
 
           if ($uri.Scheme -ne "https" -and $uri.Scheme -ne "http") {
-            throw "Nur http:// und https:// URLs sind erlaubt."
+            throw "Nur HTTP und HTTPS sind erlaubt."
           }
 
-          if (-not (Test-Path "1.ico")) {
-            throw "1.ico wurde im Repository nicht gefunden."
+          if ($uri.UserInfo) {
+            throw "URLs mit Benutzername oder Passwort sind nicht erlaubt."
           }
 
           Copy-Item "1.ico" "build/1.ico" -Force
 
-          $safeJsonName = $safeName.Replace('\','\\').Replace('"','\"')
+          $jsonName = $safeName.Replace('\','\\').Replace('"','\"')
+          $jsonUrl = $targetUrl.Replace('\','\\').Replace('"','\"')
 
           $package = @"
           {
@@ -69,8 +80,8 @@ jobs:
             "version": "1.0.0",
             "description": "Website application",
             "author": "08152",
-            "main": "main.js",
             "private": true,
+            "main": "main.js",
             "scripts": {
               "start": "electron .",
               "dist": "electron-builder --win msi"
@@ -80,7 +91,7 @@ jobs:
               "electron-builder": "26.0.12"
             },
             "build": {
-              "productName": "$safeJsonName",
+              "productName": "$jsonName",
               "appId": "com.websitewrapper.app",
               "directories": {
                 "output": "dist"
@@ -109,12 +120,14 @@ jobs:
             -Value $package `
             -Encoding UTF8
 
-          $safeUrl = $targetUrl.Replace('\','\\').Replace('"','\"')
-
           $main = @"
-          const { app, BrowserWindow, session } = require("electron");
+          const {
+            app,
+            BrowserWindow,
+            session
+          } = require("electron");
 
-          const TARGET_URL = "$safeUrl";
+          const TARGET_URL = "$jsonUrl";
 
           function createWindow() {
             const win = new BrowserWindow({
@@ -144,7 +157,9 @@ jobs:
                 win.loadURL(url);
               }
 
-              return { action: "deny" };
+              return {
+                action: "deny"
+              };
             });
           }
 
@@ -159,7 +174,9 @@ jobs:
             createWindow();
 
             app.on("activate", () => {
-              if (BrowserWindow.getAllWindows().length === 0) {
+              if (
+                BrowserWindow.getAllWindows().length === 0
+              ) {
                 createWindow();
               }
             });
@@ -177,13 +194,77 @@ jobs:
             -Value $main `
             -Encoding UTF8
 
-      - name: Abhängigkeiten installieren
+      - name: Electron herunterladen und installieren
         working-directory: build
-        run: npm install
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $maxAttempts = 5
+
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+
+            Write-Host ""
+            Write-Host "========================================="
+            Write-Host "Installationsversuch $attempt von $maxAttempts"
+            Write-Host "========================================="
+            Write-Host ""
+
+            Remove-Item `
+              -Recurse `
+              -Force `
+              node_modules `
+              -ErrorAction SilentlyContinue
+
+            Remove-Item `
+              -Force `
+              package-lock.json `
+              -ErrorAction SilentlyContinue
+
+            npm cache verify
+
+            npm install --no-audit --no-fund
+
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host ""
+              Write-Host "Installation erfolgreich."
+              exit 0
+            }
+
+            if ($attempt -lt $maxAttempts) {
+              Write-Host ""
+              Write-Host "Installation fehlgeschlagen."
+              Write-Host "Warte 15 Sekunden und versuche es erneut..."
+              Start-Sleep -Seconds 15
+            }
+          }
+
+          throw "Electron konnte nach $maxAttempts Versuchen nicht installiert werden."
 
       - name: MSI erstellen
         working-directory: build
-        run: npm run dist
+        shell: pwsh
+        run: |
+          npm run dist
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "MSI-Build fehlgeschlagen."
+          }
+
+      - name: MSI prüfen
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem "build/dist/*.msi" -ErrorAction SilentlyContinue
+
+          if ($files.Count -eq 0) {
+            throw "Keine MSI-Datei gefunden."
+          }
+
+          foreach ($file in $files) {
+            Write-Host "MSI gefunden:"
+            Write-Host $file.FullName
+            Write-Host "Größe: $($file.Length) Bytes"
+          }
 
       - name: MSI hochladen
         uses: actions/upload-artifact@v4
