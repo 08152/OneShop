@@ -1,0 +1,212 @@
+name: Build MSI
+
+on:
+  workflow_dispatch:
+    inputs:
+      app_name:
+        description: "App Name"
+        required: true
+        default: "Meine Website"
+
+      website_url:
+        description: "Website URL"
+        required: true
+        default: "https://example.com"
+
+jobs:
+
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Create Electron project
+        shell: pwsh
+        env:
+          APP_NAME: ${{ inputs.app_name }}
+          WEBSITE_URL: ${{ inputs.website_url }}
+        run: |
+
+          $safeName =
+            $env:APP_NAME -replace '[^a-zA-Z0-9 ._-]', ''
+
+          $safeName =
+            $safeName.Trim()
+
+          if ([string]::IsNullOrWhiteSpace($safeName)) {
+            $safeName = "Meine Website"
+          }
+
+          try {
+            $u = [System.Uri]$env:WEBSITE_URL
+          }
+          catch {
+            throw "Ungültige URL"
+          }
+
+          if (
+            $u.Scheme -ne "https" -and
+            $u.Scheme -ne "http"
+          ) {
+            throw "Nur HTTP/HTTPS erlaubt"
+          }
+
+          if (
+            $u.UserInfo -ne ""
+          ) {
+            throw "URLs mit Benutzername/Passwort sind nicht erlaubt"
+          }
+
+          New-Item -ItemType Directory -Force -Path build | Out-Null
+
+          $main = @"
+          const { app, BrowserWindow, session } = require("electron");
+
+          const TARGET_URL = '$($env:WEBSITE_URL.Replace("'", "\'"))';
+
+          function createWindow() {
+
+            const win = new BrowserWindow({
+              width: 1280,
+              height: 800,
+              minWidth: 800,
+              minHeight: 500,
+              autoHideMenuBar: true,
+
+              webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true,
+                webSecurity: true
+              }
+            });
+
+            win.webContents.on(
+              "will-navigate",
+              (event, navigationUrl) => {
+
+                try {
+
+                  const u = new URL(navigationUrl);
+
+                  if (
+                    u.protocol !== "http:" &&
+                    u.protocol !== "https:"
+                  ) {
+                    event.preventDefault();
+                  }
+
+                } catch {
+                  event.preventDefault();
+                }
+
+              }
+            );
+
+            win.webContents.session
+              .setPermissionRequestHandler(
+                (webContents, permission, callback) => {
+                  callback(false);
+                }
+              );
+
+            win.loadURL(TARGET_URL);
+          }
+
+          app.whenReady().then(() => {
+
+            session.defaultSession
+              .setPermissionRequestHandler(
+                (webContents, permission, callback) => {
+                  callback(false);
+                }
+              );
+
+            createWindow();
+
+          });
+
+          app.on("window-all-closed", () => {
+            if (process.platform !== "darwin") {
+              app.quit();
+            }
+          });
+          "@
+
+          Set-Content `
+            -Path build/main.js `
+            -Value $main `
+            -Encoding UTF8
+
+          $package = @{
+            name = (
+              $safeName.ToLower() `
+              -replace '[^a-z0-9-]', '-'
+            )
+            version = "1.0.0"
+            private = $true
+            main = "main.js"
+
+            scripts = @{
+              dist = "electron-builder --win msi"
+            }
+
+            devDependencies = @{
+              electron = "38.2.0"
+              "electron-builder" = "26.0.12"
+            }
+
+            build = @{
+              productName = $safeName
+
+              appId =
+                "com.websitewrapper.app"
+
+              directories = @{
+                output = "dist"
+              }
+
+              files = @(
+                "main.js"
+              )
+
+              win = @{
+                target = @(
+                  @{
+                    target = "msi"
+                    arch = @("x64")
+                  }
+                )
+              }
+            }
+          }
+
+          $package |
+            ConvertTo-Json -Depth 10 |
+            Set-Content `
+              -Path build/package.json `
+              -Encoding UTF8
+
+      - name: Install dependencies
+        working-directory: build
+        run: npm install
+
+      - name: Build MSI
+        working-directory: build
+        run: npm run dist
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: MSI
+          path: build/dist/*.msi
+          if-no-files-found: error
