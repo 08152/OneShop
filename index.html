@@ -3,307 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ZIP → EXE</title>
-
+<title>Website → MSI</title>
 <style>
 *{box-sizing:border-box}
-
 body{
-margin:0;
-min-height:100vh;
-background:#080b12;
-color:white;
-font-family:Arial,sans-serif;
-display:flex;
-align-items:center;
-justify-content:center
+  margin:0;
+  min-height:100vh;
+  background:#080808;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center
 }
-
-.box{
-width:min(700px,92%);
-background:#111722;
-border:1px solid #293244;
-border-radius:20px;
-padding:30px;
-box-shadow:0 20px 60px #0008
+.card{
+  width:min(650px,94vw);
+  background:#111;
+  border:1px solid #292929;
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 20px 70px #000
 }
-
-h1{margin-top:0}
-
-.sub{
-color:#9ca8bc;
-margin-bottom:25px
+h1{margin:0 0 8px}
+p{color:#999}
+input,button{
+  width:100%;
+  height:52px;
+  margin-top:14px;
+  border-radius:12px;
+  border:1px solid #333;
+  font-size:16px
 }
-
-.drop{
-border:2px dashed #53627c;
-border-radius:16px;
-padding:45px 20px;
-text-align:center;
-cursor:pointer
+input{
+  background:#080808;
+  color:white;
+  padding:0 15px
 }
-
-.drop:hover{
-background:#ffffff08;
-border-color:#728cff
-}
-
-input{display:none}
-
 button{
-width:100%;
-margin-top:20px;
-padding:15px;
-border:0;
-border-radius:12px;
-background:#586cff;
-color:white;
-font-size:16px;
-font-weight:bold;
-cursor:pointer
+  background:white;
+  color:#000;
+  font-weight:bold;
+  cursor:pointer
 }
-
 button:disabled{
-opacity:.45;
-cursor:not-allowed
+  opacity:.4;
+  cursor:not-allowed
 }
-
-.status{
-margin-top:20px;
-padding:15px;
-border-radius:12px;
-background:#090d15;
-white-space:pre-wrap;
-word-break:break-word
+#status{
+  margin-top:18px;
+  padding:15px;
+  border-radius:12px;
+  background:#080808;
+  color:#aaa;
+  white-space:pre-wrap
 }
-
-.download{
-display:block;
-margin-top:15px;
-padding:14px;
-border-radius:12px;
-background:#1c9b62;
-color:white;
-text-decoration:none;
-text-align:center;
-font-weight:bold
-}
-
-.good{color:#62e6a0}
-.bad{color:#ff7373}
+.ok{color:#6cff9b}
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="card">
+  <h1>Website → MSI</h1>
+  <p>
+    Erstelle eine Windows-App, die beim Start deine Website lädt.
+    Änderungen auf der Website werden automatisch übernommen.
+  </p>
 
-<h1>ZIP → EXE</h1>
+  <input
+    id="name"
+    maxlength="50"
+    placeholder="App-Name"
+    value="Meine Website"
+  >
 
-<div class="sub">
-Web-Projekt sicher als Windows-EXE verpacken
-</div>
+  <input
+    id="url"
+    type="url"
+    placeholder="https://example.com"
+  >
 
-<div class="drop" id="drop">
+  <button id="build">
+    MSI erstellen
+  </button>
 
-📦<br><br>
-
-ZIP-Datei auswählen
-
-<br>
-
-<small>
-HTML / CSS / JavaScript / Bilder
-</small>
-
-<input
-id="file"
-type="file"
-accept=".zip,application/zip"
->
-
-</div>
-
-<button id="build" disabled>
-EXE erstellen
-</button>
-
-<div class="status" id="status">
-Noch keine ZIP ausgewählt.
-</div>
-
+  <div id="status">
+    Noch keine Website angegeben.
+  </div>
 </div>
 
 <script>
+const nameInput=document.getElementById("name");
+const urlInput=document.getElementById("url");
+const build=document.getElementById("build");
+const status=document.getElementById("status");
 
-const fileInput =
-document.getElementById("file");
+function validUrl(value){
+  try{
+    const u=new URL(value);
 
-const drop =
-document.getElementById("drop");
-
-const build =
-document.getElementById("build");
-
-const status =
-document.getElementById("status");
-
-let selectedFile=null;
-
-drop.onclick=()=>{
-fileInput.click();
-};
-
-fileInput.onchange=()=>{
-if(fileInput.files.length){
-selectFile(fileInput.files[0]);
-}
-};
-
-drop.ondragover=e=>{
-e.preventDefault();
-drop.style.borderColor="#728cff";
-};
-
-drop.ondragleave=()=>{
-drop.style.borderColor="";
-};
-
-drop.ondrop=e=>{
-
-e.preventDefault();
-
-drop.style.borderColor="";
-
-if(e.dataTransfer.files.length){
-selectFile(e.dataTransfer.files[0]);
-}
-
-};
-
-function selectFile(file){
-
-selectedFile=file;
-
-if(!file.name.toLowerCase().endsWith(".zip")){
-
-status.innerHTML=
-'<span class="bad">✕</span> Nur ZIP-Dateien sind erlaubt.';
-
-build.disabled=true;
-
-return;
-}
-
-status.textContent=
-"ZIP ausgewählt:\n"+
-file.name+
-"\n\nGröße: "+
-(file.size/1024/1024).toFixed(2)+
-" MB";
-
-build.disabled=false;
+    return u.protocol==="https:" || u.protocol==="http:";
+  }catch{
+    return false;
+  }
 }
 
 build.onclick=async()=>{
 
-if(!selectedFile)return;
+  const name=nameInput.value.trim();
+  const url=urlInput.value.trim();
 
-build.disabled=true;
+  if(!name){
+    status.textContent="❌ Bitte einen App-Namen eingeben.";
+    return;
+  }
 
-status.textContent=
-"ZIP wird hochgeladen und geprüft...\n\n"+
-"Bitte warten.";
+  if(!validUrl(url)){
+    status.textContent="❌ Bitte eine gültige http:// oder https:// URL eingeben.";
+    return;
+  }
 
-try{
+  build.disabled=true;
 
-const form=new FormData();
+  status.textContent=
+    "Build wird vorbereitet...\n"+
+    "URL wird geprüft...";
 
-form.append(
-"zip",
-selectedFile
-);
+  try{
 
-const response=await fetch(
-"/api/build",
-{
-method:"POST",
-body:form
-}
-);
+    const response=await fetch("/api/create",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        name,
+        url
+      })
+    });
 
-/*
-WICHTIG:
-Nicht blind response.json() verwenden.
-Wir lesen zuerst den Text.
-*/
+    const data=await response.json();
 
-const text=await response.text();
+    if(!response.ok){
+      throw new Error(data.error||"Fehler");
+    }
 
-let data;
+    status.innerHTML=
+      '<span class="ok">✓ Projekt erstellt.</span>\n\n'+
+      'Der Windows-MSI-Build läuft jetzt über GitHub Actions.\n'+
+      'Öffne dein GitHub-Repository und gehe zu:\n'+
+      'Actions → Build MSI.\n\n'+
+      'Die fertige MSI liegt danach unter den Workflow-Artefakten.';
 
-try{
+  }catch(error){
 
-data=JSON.parse(text);
+    status.textContent=
+      "❌ "+error.message;
 
-}catch{
+  }
 
-throw new Error(
-"Der Server hat keine gültige JSON-Antwort gesendet.\n\n"+
-"HTTP-Status: "+
-response.status+
-"\n\n"+
-(text
-? text.substring(0,1000)
-: "Leere Antwort vom Server.")
-);
-
-}
-
-if(!response.ok){
-
-throw new Error(
-data.error ||
-"Serverfehler HTTP "+
-response.status
-);
-
-}
-
-status.innerHTML=
-'<span class="good">✓ Fertig</span>'+
-'\n\n'+
-(data.message || "EXE erstellt.")+
-'<a class="download" href="'+
-data.download+
-'">EXE herunterladen</a>';
-
-}catch(error){
-
-status.innerHTML=
-'<span class="bad">✕ Fehler</span>'+
-'\n\n'+
-escapeHtml(error.message);
-
-}finally{
-
-build.disabled=false;
-
-}
-
+  build.disabled=false;
 };
-
-function escapeHtml(text){
-
-return String(text)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
-}
-
 </script>
 
 </body>
