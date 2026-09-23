@@ -14,74 +14,111 @@ on:
         default: "https://example.com"
 
 jobs:
-
   build:
-
     runs-on: windows-latest
 
     steps:
-
-      - name: Checkout
+      - name: Repository laden
         uses: actions/checkout@v4
 
-      - name: Node.js
+      - name: Node.js installieren
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Create Electron project
+      - name: Electron-Projekt erstellen
         shell: pwsh
         env:
           APP_NAME: ${{ inputs.app_name }}
           WEBSITE_URL: ${{ inputs.website_url }}
         run: |
+          $ErrorActionPreference = "Stop"
 
-          $safeName =
-            $env:APP_NAME -replace '[^a-zA-Z0-9 ._-]', ''
+          New-Item -ItemType Directory -Force -Path build | Out-Null
 
-          $safeName =
-            $safeName.Trim()
+          $safeName = $env:APP_NAME.Trim()
 
           if ([string]::IsNullOrWhiteSpace($safeName)) {
             $safeName = "Meine Website"
           }
 
+          $targetUrl = $env:WEBSITE_URL.Trim()
+
           try {
-            $u = [System.Uri]$env:WEBSITE_URL
-          }
-          catch {
-            throw "Ungültige URL"
-          }
-
-          if (
-            $u.Scheme -ne "https" -and
-            $u.Scheme -ne "http"
-          ) {
-            throw "Nur HTTP/HTTPS erlaubt"
+            $uri = [System.Uri]$targetUrl
+          } catch {
+            throw "Ungültige Website-URL."
           }
 
-          if (
-            $u.UserInfo -ne ""
-          ) {
-            throw "URLs mit Benutzername/Passwort sind nicht erlaubt"
+          if ($uri.Scheme -ne "https" -and $uri.Scheme -ne "http") {
+            throw "Nur http:// und https:// URLs sind erlaubt."
           }
 
-          New-Item -ItemType Directory -Force -Path build | Out-Null
+          if (-not (Test-Path "1.ico")) {
+            throw "1.ico wurde im Repository nicht gefunden."
+          }
+
+          Copy-Item "1.ico" "build/1.ico" -Force
+
+          $package = @"
+          {
+            "name": "website-wrapper",
+            "version": "1.0.0",
+            "description": "Website application",
+            "author": "08152",
+            "main": "main.js",
+            "private": true,
+            "scripts": {
+              "start": "electron .",
+              "dist": "electron-builder --win msi"
+            },
+            "dependencies": {
+              "electron": "38.2.0"
+            },
+            "devDependencies": {
+              "electron-builder": "26.0.12"
+            },
+            "build": {
+              "productName": "$($safeName.Replace('"',''))",
+              "appId": "com.websitewrapper.app",
+              "directories": {
+                "output": "dist"
+              },
+              "files": [
+                "main.js",
+                "1.ico"
+              ],
+              "win": {
+                "icon": "1.ico",
+                "target": [
+                  {
+                    "target": "msi",
+                    "arch": [
+                      "x64"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+          "@
+
+          Set-Content -Path "build/package.json" -Value $package -Encoding UTF8
 
           $main = @"
           const { app, BrowserWindow, session } = require("electron");
 
-          const TARGET_URL = '$($env:WEBSITE_URL.Replace("'", "\'"))';
+          const TARGET_URL = "$($targetUrl.Replace('\','\\').Replace('"','\"'))";
 
           function createWindow() {
-
             const win = new BrowserWindow({
               width: 1280,
               height: 800,
               minWidth: 800,
-              minHeight: 500,
+              minHeight: 600,
+              backgroundColor: "#000000",
               autoHideMenuBar: true,
-
+              icon: __dirname + "/1.ico",
               webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
@@ -90,49 +127,32 @@ jobs:
               }
             });
 
-            win.webContents.on(
-              "will-navigate",
-              (event, navigationUrl) => {
-
-                try {
-
-                  const u = new URL(navigationUrl);
-
-                  if (
-                    u.protocol !== "http:" &&
-                    u.protocol !== "https:"
-                  ) {
-                    event.preventDefault();
-                  }
-
-                } catch {
-                  event.preventDefault();
-                }
-
-              }
-            );
-
-            win.webContents.session
-              .setPermissionRequestHandler(
-                (webContents, permission, callback) => {
-                  callback(false);
-                }
-              );
-
             win.loadURL(TARGET_URL);
+
+            win.webContents.setWindowOpenHandler(({ url }) => {
+              if (url.startsWith("https://") || url.startsWith("http://")) {
+                win.loadURL(url);
+              }
+
+              return { action: "deny" };
+            });
           }
 
           app.whenReady().then(() => {
 
-            session.defaultSession
-              .setPermissionRequestHandler(
-                (webContents, permission, callback) => {
-                  callback(false);
-                }
-              );
+            session.defaultSession.setPermissionRequestHandler(
+              (webContents, permission, callback) => {
+                callback(false);
+              }
+            );
 
             createWindow();
 
+            app.on("activate", () => {
+              if (BrowserWindow.getAllWindows().length === 0) {
+                createWindow();
+              }
+            });
           });
 
           app.on("window-all-closed", () => {
@@ -142,69 +162,17 @@ jobs:
           });
           "@
 
-          Set-Content `
-            -Path build/main.js `
-            -Value $main `
-            -Encoding UTF8
+          Set-Content -Path "build/main.js" -Value $main -Encoding UTF8
 
-          $package = @{
-            name = (
-              $safeName.ToLower() `
-              -replace '[^a-z0-9-]', '-'
-            )
-            version = "1.0.0"
-            private = $true
-            main = "main.js"
-
-            scripts = @{
-              dist = "electron-builder --win msi"
-            }
-
-            devDependencies = @{
-              electron = "38.2.0"
-              "electron-builder" = "26.0.12"
-            }
-
-            build = @{
-              productName = $safeName
-
-              appId =
-                "com.websitewrapper.app"
-
-              directories = @{
-                output = "dist"
-              }
-
-              files = @(
-                "main.js"
-              )
-
-              win = @{
-                target = @(
-                  @{
-                    target = "msi"
-                    arch = @("x64")
-                  }
-                )
-              }
-            }
-          }
-
-          $package |
-            ConvertTo-Json -Depth 10 |
-            Set-Content `
-              -Path build/package.json `
-              -Encoding UTF8
-
-      - name: Install dependencies
+      - name: Abhängigkeiten installieren
         working-directory: build
         run: npm install
 
-      - name: Build MSI
+      - name: MSI erstellen
         working-directory: build
         run: npm run dist
 
-      - name: Upload MSI
+      - name: MSI hochladen
         uses: actions/upload-artifact@v4
         with:
           name: MSI
