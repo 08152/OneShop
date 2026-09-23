@@ -1,1116 +1,475 @@
-"use strict";
-
 const express = require("express");
 const multer = require("multer");
 const AdmZip = require("adm-zip");
 const fs = require("fs");
+const fsp = require("fs/promises");
 const path = require("path");
-const os = require("os");
 const crypto = require("crypto");
-const { execFile } = require("child_process");
+const { spawn } = require("child_process");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-/*
-  Upload-Limit:
-  ZIP: maximal 100 MB
-*/
+const ROOT = path.join(__dirname, "work");
+const UPLOADS = path.join(ROOT, "uploads");
+const BUILDS = path.join(ROOT, "builds");
+
+const MAX_ZIP = 25 * 1024 * 1024;
+const MAX_UNPACKED = 100 * 1024 * 1024;
+const MAX_FILES = 500;
+
+const ALLOWED = new Set([
+  ".html", ".htm", ".css", ".js", ".mjs", ".json",
+  ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg",
+  ".ico", ".txt", ".woff", ".woff2", ".ttf", ".otf",
+  ".mp3", ".wav", ".ogg", ".mp4", ".webm"
+]);
+
+const FORBIDDEN = new Set([
+  ".exe", ".msi", ".com", ".scr", ".bat", ".cmd",
+  ".ps1", ".psm1", ".vbs", ".vbe", ".jscript",
+  ".jar", ".dll", ".so", ".dylib", ".sh", ".bash",
+  ".zsh", ".bin"
+]);
+
+for (const dir of [UPLOADS, BUILDS]) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+app.use(express.static(path.join(__dirname, "public")));
+
 const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-        fileSize: 100 * 1024 * 1024
+  dest: UPLOADS,
+  limits: {
+    fileSize: MAX_ZIP,
+    files: 1
+  },
+  fileFilter(req, file, cb) {
+    if (path.extname(file.originalname).toLowerCase() !== ".zip") {
+      return cb(new Error("Nur ZIP-Dateien sind erlaubt."));
     }
+    cb(null, true);
+  }
 });
 
-app.use(express.static(__dirname));
-
-/*
-  Erlaubte Web-Dateien
-*/
-const allowedExtensions = new Set([
-    ".html",
-    ".htm",
-    ".css",
-    ".js",
-    ".mjs",
-    ".json",
-
-    ".png",
-    ".jpg",
-    ".jpeg",
-    ".gif",
-    ".webp",
-    ".svg",
-    ".ico",
-
-    ".woff",
-    ".woff2",
-    ".ttf",
-    ".otf",
-
-    ".mp3",
-    ".wav",
-    ".ogg",
-
-    ".mp4",
-    ".webm"
-]);
-
-/*
-  Ausführbare Dateien blockieren
-*/
-const blockedExtensions = new Set([
-    ".exe",
-    ".dll",
-    ".bat",
-    ".cmd",
-    ".com",
-    ".scr",
-    ".msi",
-
-    ".ps1",
-    ".vbs",
-    ".vbe",
-    ".jscript",
-    ".jse",
-    ".wsf",
-    ".wsh",
-
-    ".jar",
-    ".apk",
-
-    ".sh",
-    ".bash",
-
-    ".so",
-    ".dylib",
-    ".sys",
-    ".ocx"
-]);
-
-/*
-  Generierte Dateien
-*/
-const generatedFiles = new Map();
-
-/*
-  JSON-Antwort immer korrekt senden
-*/
-function sendJSON(res, status, data) {
-
-    if (res.headersSent) {
-        return;
-    }
-
-    res.status(status);
-
-    res.setHeader(
-        "Content-Type",
-        "application/json; charset=utf-8"
-    );
-
-    res.end(
-        JSON.stringify(data)
-    );
+function safeName(name) {
+  return String(name || "")
+    .trim()
+    .replace(/[^a-zA-Z0-9 _.-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 50) || "Meine-App";
 }
 
-/*
-  7-Zip finden
-*/
-function find7z() {
+function dangerousPath(name) {
+  if (!name || name.length > 240) return true;
+  if (name.includes("\0")) return true;
+  if (name.startsWith("/") || name.startsWith("\\")) return true;
 
-    const possible = [
-        process.env.SEVEN_ZIP_PATH,
+  const normalized = name.replace(/\\/g, "/");
+  const parts = normalized.split("/");
 
-        "/usr/bin/7z",
-        "/usr/local/bin/7z",
-        "/bin/7z",
+  if (parts.includes("..")) return true;
 
-        "/usr/bin/7zz",
-        "/usr/local/bin/7zz",
-        "/bin/7zz"
-    ].filter(Boolean);
+  const ext = path.extname(normalized).toLowerCase();
 
-    for (const file of possible) {
+  if (FORBIDDEN.has(ext)) return true;
 
-        try {
-
-            if (fs.existsSync(file)) {
-                return file;
-            }
-
-        } catch {}
+  if (parts.some(p => p.startsWith("."))) {
+    if (![".", ".."].includes(parts[parts.length - 1])) {
+      return true;
     }
+  }
 
-    return null;
+  return false;
 }
 
-/*
-  7-Zip-SFX-Modul finden
-*/
-function findSFX() {
+function sha256(file) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash("sha256");
+    const stream = fs.createReadStream(file);
 
-    const possible = [
-
-        process.env.SFX_PATH,
-
-        "/usr/lib/p7zip/7zS.sfx",
-        "/usr/lib/7zip/7zS.sfx",
-
-        "/opt/7zip/7zS.sfx",
-
-        "/usr/local/lib/p7zip/7zS.sfx",
-
-        path.join(__dirname, "7zS.sfx")
-
-    ].filter(Boolean);
-
-    for (const file of possible) {
-
-        try {
-
-            if (fs.existsSync(file)) {
-                return file;
-            }
-
-        } catch {}
-    }
-
-    return null;
+    stream.on("data", d => hash.update(d));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(hash.digest("hex")));
+  });
 }
 
-/*
-  ZIP überprüfen
-*/
-function validateZip(zip) {
+async function validateAndExtract(zipFile, destination) {
+  const zip = new AdmZip(zipFile);
+  const entries = zip.getEntries();
 
-    const entries = zip.getEntries();
+  if (!entries.length) {
+    throw new Error("Die ZIP-Datei ist leer.");
+  }
 
-    if (!entries.length) {
+  if (entries.length > MAX_FILES) {
+    throw new Error(`Zu viele Dateien. Maximum: ${MAX_FILES}.`);
+  }
 
-        throw new Error(
-            "Die ZIP-Datei ist leer."
-        );
+  let total = 0;
+  let htmlFound = false;
+
+  for (const entry of entries) {
+    const name = entry.entryName;
+
+    if (dangerousPath(name)) {
+      throw new Error(`Unsicherer ZIP-Pfad erkannt: ${name}`);
     }
 
-    /*
-      Maximal 1000 Dateien
-    */
-    if (entries.length > 1000) {
+    if (entry.isDirectory) continue;
 
-        throw new Error(
-            "Die ZIP-Datei enthält mehr als 1000 Dateien."
-        );
+    const ext = path.extname(name).toLowerCase();
+
+    if (!ALLOWED.has(ext)) {
+      throw new Error(`Nicht erlaubter Dateityp: ${name}`);
     }
 
-    /*
-      Maximal 250 MB entpackt
-    */
-    const MAX_TOTAL_SIZE =
-        250 * 1024 * 1024;
+    const size = Number(entry.header.size || 0);
 
-    let totalSize = 0;
-    let htmlFile = null;
+    total += size;
 
-    for (const entry of entries) {
-
-        const rawName =
-            entry.entryName || "";
-
-        const normalized =
-            rawName
-                .replace(/\\/g, "/")
-                .replace(/^\/+/g, "");
-
-        /*
-          Path Traversal verhindern
-        */
-        if (
-            normalized.startsWith("../") ||
-            normalized.includes("/../") ||
-            normalized === ".." ||
-            path.posix.isAbsolute(normalized)
-        ) {
-
-            throw new Error(
-                "Unsicherer Dateipfad in der ZIP: " +
-                rawName
-            );
-        }
-
-        if (entry.isDirectory) {
-            continue;
-        }
-
-        const ext =
-            path.posix
-                .extname(normalized)
-                .toLowerCase();
-
-        /*
-          Ausführbare Dateien ablehnen
-        */
-        if (blockedExtensions.has(ext)) {
-
-            throw new Error(
-                "Nicht erlaubte ausführbare Datei gefunden: " +
-                rawName
-            );
-        }
-
-        /*
-          Nur Web-Dateien erlauben
-        */
-        if (!allowedExtensions.has(ext)) {
-
-            throw new Error(
-                "Nicht unterstützte Datei gefunden: " +
-                rawName
-            );
-        }
-
-        const size =
-            Number(entry.header.size || 0);
-
-        totalSize += size;
-
-        if (totalSize > MAX_TOTAL_SIZE) {
-
-            throw new Error(
-                "Der entpackte Inhalt darf maximal 250 MB groß sein."
-            );
-        }
-
-        /*
-          Startseite bestimmen
-        */
-        if (
-            normalized.toLowerCase() ===
-            "index.html"
-        ) {
-
-            htmlFile = normalized;
-
-        } else if (
-            !htmlFile &&
-            (
-                ext === ".html" ||
-                ext === ".htm"
-            )
-        ) {
-
-            htmlFile = normalized;
-        }
+    if (total > MAX_UNPACKED) {
+      throw new Error("Die entpackte ZIP wäre zu groß.");
     }
 
-    if (!htmlFile) {
+    if (ext === ".html" || ext === ".htm") {
+      htmlFound = true;
+    }
+  }
 
-        throw new Error(
-            "Keine HTML-Datei gefunden. " +
-            "Die ZIP muss mindestens eine HTML-Datei enthalten."
-        );
+  if (!htmlFound) {
+    throw new Error("Die ZIP muss mindestens eine HTML-Datei enthalten.");
+  }
+
+  await fsp.mkdir(destination, { recursive: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory) continue;
+
+    const target = path.resolve(destination, entry.entryName);
+    const root = path.resolve(destination);
+
+    if (!target.startsWith(root + path.sep)) {
+      throw new Error("Unsicherer Zielpfad erkannt.");
     }
 
-    return {
-        entries,
-        htmlFile,
-        totalSize
-    };
+    await fsp.mkdir(path.dirname(target), { recursive: true });
+
+    const data = entry.getData();
+
+    if (data.length > MAX_UNPACKED) {
+      throw new Error("Einzelne Datei ist zu groß.");
+    }
+
+    await fsp.writeFile(target, data);
+  }
+
+  return {
+    files: entries.filter(e => !e.isDirectory).length,
+    unpackedBytes: total
+  };
 }
 
-/*
-  ZIP entpacken
-*/
-function extractZip(zip, folder) {
+function createElectronFiles(appDir, appName) {
+  const electronMain = `
+const { app, BrowserWindow, session } = require("electron");
+const path = require("path");
 
-    const entries = zip.getEntries();
+app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
 
-    const root =
-        path.resolve(folder);
-
-    for (const entry of entries) {
-
-        if (entry.isDirectory) {
-            continue;
-        }
-
-        const relative =
-            entry.entryName
-                .replace(/\\/g, "/")
-                .replace(/^\/+/g, "");
-
-        const destination =
-            path.resolve(
-                folder,
-                relative
-            );
-
-        /*
-          Zusätzlicher Sicherheitscheck
-        */
-        if (
-            destination !== root &&
-            !destination.startsWith(
-                root + path.sep
-            )
-        ) {
-
-            throw new Error(
-                "Unsicherer Dateipfad."
-            );
-        }
-
-        fs.mkdirSync(
-            path.dirname(destination),
-            {
-                recursive: true
-            }
-        );
-
-        const data =
-            entry.getData();
-
-        fs.writeFileSync(
-            destination,
-            data
-        );
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    minWidth: 800,
+    minHeight: 600,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true
     }
+  });
+
+  win.webContents.session.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      callback(false);
+    }
+  );
+
+  win.loadFile(path.join(__dirname, "app", "index.html"));
 }
 
-/*
-  7-Zip-Archiv erstellen
-*/
-function createArchive(
-    sevenZip,
-    folder,
-    archive
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            execFile(
-                sevenZip,
-
-                [
-                    "a",
-                    "-t7z",
-                    "-mx=5",
-                    archive,
-                    "."
-                ],
-
-                {
-                    cwd: folder,
-
-                    timeout:
-                        180000,
-
-                    maxBuffer:
-                        10 * 1024 * 1024
-                },
-
-                (
-                    error,
-                    stdout,
-                    stderr
-                ) => {
-
-                    if (error) {
-
-                        reject(
-                            new Error(
-                                "7-Zip konnte das Archiv nicht erstellen.\n" +
-                                (
-                                    stderr ||
-                                    error.message
-                                )
-                            )
-                        );
-
-                        return;
-                    }
-
-                    resolve();
-                }
-            );
-        }
-    );
-}
-
-/*
-  SFX-EXE erstellen
-*/
-function createExe(
-    sfx,
-    archive,
-    config,
-    output
-) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            try {
-
-                const sfxData =
-                    fs.readFileSync(sfx);
-
-                const configData =
-                    Buffer.from(
-                        config,
-                        "utf8"
-                    );
-
-                const archiveData =
-                    fs.readFileSync(archive);
-
-                const outputData =
-                    Buffer.concat([
-                        sfxData,
-                        configData,
-                        archiveData
-                    ]);
-
-                fs.writeFileSync(
-                    output,
-                    outputData
-                );
-
-                resolve();
-
-            } catch (error) {
-
-                reject(error);
-            }
-        }
-    );
-}
-
-/*
-  ZIP → EXE
-*/
-app.post(
-    "/api/build",
-
-    upload.single("zip"),
-
-    async (req, res) => {
-
-        let workDir = null;
-
-        try {
-
-            /*
-              Prüfen, ob Datei vorhanden
-            */
-            if (!req.file) {
-
-                return sendJSON(
-                    res,
-                    400,
-                    {
-                        ok: false,
-                        error:
-                            "Keine ZIP-Datei hochgeladen."
-                    }
-                );
-            }
-
-            console.log(
-                "ZIP erhalten:",
-                req.file.originalname,
-                req.file.size,
-                "Bytes"
-            );
-
-            /*
-              ZIP öffnen
-            */
-            let zip;
-
-            try {
-
-                zip =
-                    new AdmZip(
-                        req.file.buffer
-                    );
-
-            } catch (error) {
-
-                return sendJSON(
-                    res,
-                    400,
-                    {
-                        ok: false,
-                        error:
-                            "Die ZIP-Datei konnte nicht gelesen werden."
-                    }
-                );
-            }
-
-            /*
-              ZIP überprüfen
-            */
-            const info =
-                validateZip(zip);
-
-            console.log(
-                "ZIP geprüft:",
-                info.entries.length,
-                "Dateien"
-            );
-
-            console.log(
-                "HTML:",
-                info.htmlFile
-            );
-
-            console.log(
-                "Entpackte Größe:",
-                info.totalSize,
-                "Bytes"
-            );
-
-            /*
-              7-Zip suchen
-            */
-            const sevenZip =
-                find7z();
-
-            if (!sevenZip) {
-
-                return sendJSON(
-                    res,
-                    500,
-                    {
-                        ok: false,
-                        error:
-                            "7-Zip wurde auf dem Render-Server nicht gefunden."
-                    }
-                );
-            }
-
-            /*
-              SFX suchen
-            */
-            const sfx =
-                findSFX();
-
-            if (!sfx) {
-
-                return sendJSON(
-                    res,
-                    500,
-                    {
-                        ok: false,
-                        error:
-                            "Das 7-Zip-SFX-Modul 7zS.sfx wurde nicht gefunden."
-                    }
-                );
-            }
-
-            console.log(
-                "7-Zip:",
-                sevenZip
-            );
-
-            console.log(
-                "SFX:",
-                sfx
-            );
-
-            /*
-              Zufällige ID
-            */
-            const id =
-                crypto
-                    .randomBytes(16)
-                    .toString("hex");
-
-            /*
-              Temporärer Arbeitsordner
-            */
-            workDir =
-                path.join(
-                    os.tmpdir(),
-                    "zip-exe-" + id
-                );
-
-            fs.mkdirSync(
-                workDir,
-                {
-                    recursive: true
-                }
-            );
-
-            const filesDir =
-                path.join(
-                    workDir,
-                    "files"
-                );
-
-            fs.mkdirSync(
-                filesDir,
-                {
-                    recursive: true
-                }
-            );
-
-            /*
-              ZIP entpacken
-            */
-            console.log(
-                "Entpacke ZIP..."
-            );
-
-            extractZip(
-                zip,
-                filesDir
-            );
-
-            /*
-              7z-Datei erstellen
-            */
-            const archive =
-                path.join(
-                    workDir,
-                    "app.7z"
-                );
-
-            console.log(
-                "Erstelle 7z-Archiv..."
-            );
-
-            await createArchive(
-                sevenZip,
-                filesDir,
-                archive
-            );
-
-            /*
-              Prüfen
-            */
-            if (
-                !fs.existsSync(archive)
-            ) {
-
-                throw new Error(
-                    "Das 7z-Archiv wurde nicht erstellt."
-                );
-            }
-
-            /*
-              HTML-Dateiname säubern
-            */
-            const startPage =
-                info.htmlFile
-                    .replace(/\\/g, "/")
-                    .replace(/"/g, "");
-
-            /*
-              SFX-Konfiguration
-              
-              Die HTML-Datei wird nach
-              %TEMP% entpackt und geöffnet.
-            */
-            const config =
-`;!@Install@!UTF-8!
-Title="Web HTML App"
-RunProgram="cmd.exe /c start "" "%TEMP%\\\\WebApp_${id}\\\\${startPage}""
-GUIMode="2"
-;!@InstallEnd@!`;
-
-            /*
-              EXE
-            */
-            const output =
-                path.join(
-                    workDir,
-                    "WebApp.exe"
-                );
-
-            console.log(
-                "Erstelle EXE..."
-            );
-
-            await createExe(
-                sfx,
-                archive,
-                config,
-                output
-            );
-
-            /*
-              Prüfen
-            */
-            if (
-                !fs.existsSync(output)
-            ) {
-
-                throw new Error(
-                    "Die EXE wurde nicht erzeugt."
-                );
-            }
-
-            const stat =
-                fs.statSync(output);
-
-            if (
-                stat.size <= 0
-            ) {
-
-                throw new Error(
-                    "Die erzeugte EXE ist leer."
-                );
-            }
-
-            /*
-              Download-ID
-            */
-            const downloadId =
-                crypto
-                    .randomBytes(24)
-                    .toString("hex");
-
-            generatedFiles.set(
-                downloadId,
-                {
-                    path: output,
-                    dir: workDir,
-                    created: Date.now()
-                }
-            );
-
-            console.log(
-                "EXE erfolgreich erstellt:",
-                stat.size,
-                "Bytes"
-            );
-
-            /*
-              WICHTIG:
-              Immer JSON zurückgeben
-            */
-            return sendJSON(
-                res,
-                200,
-                {
-                    ok: true,
-                    message:
-                        "EXE erfolgreich erstellt.",
-                    filename:
-                        "WebApp.exe",
-                    size:
-                        stat.size,
-                    download:
-                        "/api/download/" +
-                        downloadId
-                }
-            );
-
-        } catch (error) {
-
-            console.error(
-                "BUILD ERROR:",
-                error
-            );
-
-            /*
-              Arbeitsordner löschen
-            */
-            if (workDir) {
-
-                try {
-
-                    fs.rmSync(
-                        workDir,
-                        {
-                            recursive: true,
-                            force: true
-                        }
-                    );
-
-                } catch (cleanupError) {
-
-                    console.error(
-                        "Cleanup error:",
-                        cleanupError
-                    );
-                }
-            }
-
-            /*
-              Niemals leere Antwort
-            */
-            return sendJSON(
-                res,
-                500,
-                {
-                    ok: false,
-                    error:
-                        error.message ||
-                        "Unbekannter Serverfehler."
-                }
-            );
-        }
+app.whenReady().then(() => {
+  session.defaultSession.setPermissionRequestHandler(
+    (webContents, permission, callback) => {
+      callback(false);
     }
-);
+  );
 
-/*
-  EXE herunterladen
-*/
-app.get(
-    "/api/download/:id",
-    (req, res) => {
+  createWindow();
 
-        const item =
-            generatedFiles.get(
-                req.params.id
-            );
-
-        if (!item) {
-
-            return res
-                .status(404)
-                .send(
-                    "Datei nicht gefunden oder bereits gelöscht."
-                );
-        }
-
-        if (
-            !fs.existsSync(item.path)
-        ) {
-
-            generatedFiles.delete(
-                req.params.id
-            );
-
-            return res
-                .status(404)
-                .send(
-                    "EXE-Datei nicht gefunden."
-                );
-        }
-
-        res.download(
-            item.path,
-            "WebApp.exe",
-            (error) => {
-
-                if (error) {
-
-                    console.error(
-                        "Download error:",
-                        error
-                    );
-
-                    return;
-                }
-
-                /*
-                  Nach Download löschen
-                */
-                setTimeout(
-                    () => {
-
-                        try {
-
-                            fs.rmSync(
-                                item.dir,
-                                {
-                                    recursive: true,
-                                    force: true
-                                }
-                            );
-
-                        } catch (error) {
-
-                            console.error(
-                                "Delete error:",
-                                error
-                            );
-                        }
-
-                        generatedFiles.delete(
-                            req.params.id
-                        );
-
-                    },
-                    1000
-                );
-            }
-        );
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
     }
-);
+  });
+});
 
-/*
-  Multer-Fehler
-*/
-app.use(
-    (error, req, res, next) => {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
+});
+`;
 
-        console.error(
-            "UPLOAD ERROR:",
-            error
-        );
-
-        if (
-            error instanceof
-            multer.MulterError
-        ) {
-
-            let message =
-                error.message;
-
-            if (
-                error.code ===
-                "LIMIT_FILE_SIZE"
-            ) {
-
-                message =
-                    "Die ZIP-Datei ist zu groß. " +
-                    "Maximal 100 MB sind erlaubt.";
-            }
-
-            return sendJSON(
-                res,
-                400,
-                {
-                    ok: false,
-                    error:
-                        "Upload-Fehler: " +
-                        message
-                }
-            );
-        }
-
-        return sendJSON(
-            res,
-            500,
-            {
-                ok: false,
-                error:
-                    error.message ||
-                    "Serverfehler."
-            }
-        );
-    }
-);
-
-/*
-  API 404
-*/
-app.use(
-    (req, res) => {
-
-        if (
-            req.path.startsWith("/api/")
-        ) {
-
-            return sendJSON(
-                res,
-                404,
-                {
-                    ok: false,
-                    error:
-                        "API-Endpunkt nicht gefunden."
-                }
-            );
-        }
-
-        res
-            .status(404)
-            .send(
-                "Nicht gefunden."
-            );
-    }
-);
-
-/*
-  Alte Dateien automatisch löschen
-*/
-setInterval(
-    () => {
-
-        const now =
-            Date.now();
-
-        for (
-            const [
-                id,
-                item
-            ] of generatedFiles
-        ) {
-
-            /*
-              Nach 30 Minuten löschen
-            */
-            if (
-                now - item.created >
-                30 * 60 * 1000
-            ) {
-
-                try {
-
-                    fs.rmSync(
-                        item.dir,
-                        {
-                            recursive: true,
-                            force: true
-                        }
-                    );
-
-                } catch (error) {
-
-                    console.error(
-                        "Cleanup error:",
-                        error
-                    );
-                }
-
-                generatedFiles.delete(
-                    id
-                );
-            }
-        }
-
+  const packageJson = {
+    name: appName.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+    version: "1.0.0",
+    description: appName,
+    main: "main.js",
+    private: true,
+    scripts: {
+      dist: "electron-builder --win msi"
     },
-    5 * 60 * 1000
-);
-
-/*
-  Server starten
-*/
-app.listen(
-    PORT,
-    "0.0.0.0",
-    () => {
-
-        console.log(
-            "================================"
-        );
-
-        console.log(
-            "ZIP → EXE Server gestartet"
-        );
-
-        console.log(
-            "Port:",
-            PORT
-        );
-
-        console.log(
-            "ZIP-Limit: 100 MB"
-        );
-
-        console.log(
-            "Entpackt-Limit: 250 MB"
-        );
-
-        console.log(
-            "================================"
-        );
+    devDependencies: {
+      electron: "38.2.0",
+      "electron-builder": "26.0.12"
+    },
+    build: {
+      appId: `com.safehtml.${crypto.randomBytes(6).toString("hex")}`,
+      productName: appName,
+      directories: {
+        output: "dist"
+      },
+      files: [
+        "main.js",
+        "app/**/*"
+      ],
+      win: {
+        target: [
+          {
+            target: "msi",
+            arch: ["x64"]
+          }
+        ]
+      },
+      nsis: {
+        oneClick: false
+      }
     }
-);
+  };
+
+  fs.writeFileSync(
+    path.join(appDir, "main.js"),
+    electronMain
+  );
+
+  fs.writeFileSync(
+    path.join(appDir, "package.json"),
+    JSON.stringify(packageJson, null, 2)
+  );
+}
+
+function run(command, args, cwd) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      shell: false,
+      env: {
+        ...process.env,
+        npm_config_audit: "false",
+        npm_config_fund: "false"
+      }
+    });
+
+    let output = "";
+
+    child.stdout.on("data", d => {
+      output += d.toString();
+    });
+
+    child.stderr.on("data", d => {
+      output += d.toString();
+    });
+
+    child.on("error", reject);
+
+    child.on("close", code => {
+      if (code === 0) resolve(output);
+      else reject(new Error(output.slice(-6000)));
+    });
+  });
+}
+
+app.post("/api/build", upload.single("zip"), async (req, res) => {
+  let jobDir = null;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: "Keine ZIP-Datei hochgeladen."
+      });
+    }
+
+    const appName = safeName(req.body.name);
+
+    const id = crypto.randomBytes(12).toString("hex");
+
+    jobDir = path.join(BUILDS, id);
+
+    const appDir = path.join(jobDir, "app");
+
+    await fsp.mkdir(appDir, { recursive: true });
+
+    const hash = await sha256(req.file.path);
+
+    const result = await validateAndExtract(
+      req.file.path,
+      appDir
+    );
+
+    const htmlFiles = [];
+
+    async function findHtml(dir) {
+      const items = await fsp.readdir(dir, {
+        withFileTypes: true
+      });
+
+      for (const item of items) {
+        const full = path.join(dir, item.name);
+
+        if (item.isDirectory()) {
+          await findHtml(full);
+        } else if (
+          [".html", ".htm"].includes(
+            path.extname(item.name).toLowerCase()
+          )
+        ) {
+          htmlFiles.push(full);
+        }
+      }
+    }
+
+    await findHtml(appDir);
+
+    if (!htmlFiles.length) {
+      throw new Error("Keine HTML-Datei gefunden.");
+    }
+
+    const rootIndex = path.join(appDir, "index.html");
+
+    if (!fs.existsSync(rootIndex)) {
+      await fsp.copyFile(
+        htmlFiles[0],
+        rootIndex
+      );
+    }
+
+    createElectronFiles(jobDir, appName);
+
+    await fsp.writeFile(
+      path.join(jobDir, "security-report.json"),
+      JSON.stringify({
+        sha256: hash,
+        zipSize: req.file.size,
+        unpackedBytes: result.unpackedBytes,
+        files: result.files,
+        checks: {
+          pathTraversal: "passed",
+          forbiddenExtensions: "passed",
+          maxFiles: "passed",
+          maxUnpackedSize: "passed",
+          nodeIntegration: "disabled",
+          contextIsolation: "enabled",
+          sandbox: "enabled",
+          permissions: "denied"
+        }
+      }, null, 2)
+    );
+
+    /*
+      WICHTIG:
+      Dieser Server ist für Render vorbereitet.
+      Ein MSI-Build funktioniert nur auf einem Windows-
+      Build-Runner. Auf Linux/Render wird hier bewusst
+      NICHT versucht, beliebige Windows-Programme
+      auszuführen.
+    */
+
+    if (process.platform !== "win32") {
+      return res.status(501).json({
+        error:
+          "Der sichere ZIP-Check war erfolgreich, aber Render läuft nicht auf Windows. " +
+          "Für die MSI-Erstellung muss der Build über einen Windows-Runner, z.B. GitHub Actions, laufen.",
+        security: {
+          sha256: hash,
+          files: result.files,
+          unpackedBytes: result.unpackedBytes
+        }
+      });
+    }
+
+    await run("npm", ["install", "--ignore-scripts"], jobDir);
+
+    await run("npx", ["electron-builder", "--win", "msi"], jobDir);
+
+    const dist = path.join(jobDir, "dist");
+
+    const files = await fsp.readdir(dist);
+
+    const msi = files.find(
+      f => f.toLowerCase().endsWith(".msi")
+    );
+
+    if (!msi) {
+      throw new Error("Keine MSI erzeugt.");
+    }
+
+    const finalFile = path.join(dist, msi);
+
+    res.download(finalFile, `${appName}.msi`, async () => {
+      await fsp.rm(jobDir, {
+        recursive: true,
+        force: true
+      });
+
+      await fsp.rm(req.file.path, {
+        force: true
+      });
+    });
+
+  } catch (err) {
+    if (jobDir) {
+      await fsp.rm(jobDir, {
+        recursive: true,
+        force: true
+      }).catch(() => {});
+    }
+
+    if (req.file?.path) {
+      await fsp.rm(req.file.path, {
+        force: true
+      }).catch(() => {});
+    }
+
+    res.status(400).json({
+      error: err.message || "Build fehlgeschlagen."
+    });
+  }
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    platform: process.platform,
+    msiBuild:
+      process.platform === "win32"
+        ? "available"
+        : "requires Windows runner"
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server läuft auf Port ${PORT}`);
+});
